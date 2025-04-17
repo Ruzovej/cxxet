@@ -19,8 +19,12 @@ function some_function() {
 
 function setup_file() {
     user_log "configuring and building with preset '%s' ...\n" "${RSM_PRESET}"
-    cmake -S . -B "build/${RSM_PRESET}" --preset "${RSM_PRESET}" -DRSM_BUILD_TESTS=ON
-    cmake --build "build/${RSM_PRESET}" -j "$(nproc)" --target rsm_dummy_app
+    ./compile.bash \
+        -DRSM_BUILD_TESTS=ON \
+        --preset "${RSM_PRESET}" \
+        --target rsm_dummy_app \
+        --target rsm_infra_sanitizer_check \
+        --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? It displays the output of it in console ...
     user_log 'done ...\n'
     export RSM_TESTS_BINARY="bin/${RSM_PRESET}/rsm_dummy_app"
 }

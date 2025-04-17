@@ -4,6 +4,8 @@
 
 #include "rsm.hpp"
 
+namespace {
+
 class Noisy {
   const int ii;
 
@@ -17,6 +19,8 @@ public:
     std::cout << "~Noisy() with ii = " << ii << "\n";
   }
 };
+
+} // namespace
 
 int main(int, char const **) {
   rsm::init_thread(15);
