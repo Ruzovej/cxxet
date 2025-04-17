@@ -56,7 +56,7 @@ function(add_sanitizer target sanitizer)
         ${target}
             PUBLIC
             -fsanitize=${sanitizer}
-            -fsanitize-recover=all
+            -fno-sanitize-recover=all
             -fno-omit-frame-pointer
             -fPIE
             -pie
@@ -65,7 +65,7 @@ function(add_sanitizer target sanitizer)
         ${target}
             PUBLIC
             -fsanitize=${sanitizer}
-            -fsanitize-recover=all
+            -fno-sanitize-recover=all
             -fno-omit-frame-pointer
             -fPIE
             -pie

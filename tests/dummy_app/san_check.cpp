@@ -1,19 +1,22 @@
 #include <climits>
+#include <cstdlib>
 
 #include <new>
+#include <string_view>
 #include <thread>
 
 namespace {
 
 void trigger_tsan() {
   int i{0};
-  std::thread{[&i]() { ++i; }}.join();
+  std::thread th{[&i]() { ++i; }};
   ++i;
+  th.join();
 }
 
 void trigger_ubsan() {
-  int i{INT_MAX};
-  ++i;
+  int i{-1};
+  i <<= 1;
 }
 
 void trigger_asan() {
@@ -22,14 +25,30 @@ void trigger_asan() {
   b[index] = 1;
 }
 
-void trigger_lsan() { [[maybe_unused]] auto *p{new int[10]}; }
+void trigger_lsan() {
+  [[maybe_unused]] auto *volatile p{new int{}};
+  [[maybe_unused]] auto *volatile up{std::make_unique<int>().release()};
+}
 
 } // namespace
 
-int main(int, char **) {
-  trigger_tsan();
-  trigger_ubsan();
-  trigger_asan();
-  trigger_lsan();
+int main(int argc, char **argv) {
+  if (argc != 2) {
+    return EXIT_FAILURE;
+  }
+
+  const std::string_view arg{argv[1]};
+  if (arg == "tsan") {
+    trigger_tsan();
+  } else if (arg == "ubsan") {
+    trigger_ubsan();
+  } else if (arg == "asan") {
+    trigger_asan();
+  } else if (arg == "lsan") {
+    trigger_lsan();
+  } else {
+    return EXIT_FAILURE;
+  }
+
   return 0;
 }

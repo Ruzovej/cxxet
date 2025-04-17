@@ -26,7 +26,7 @@ function setup_file() {
         --target rsm_infra_sanitizer_check \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? It displays the output of it in console ...
     user_log 'done ...\n'
-    export RSM_TESTS_BINARY="bin/${RSM_PRESET}/rsm_dummy_app"
+    export RSM_BIN_DIR="bin/${RSM_PRESET}"
 }
 
 function setup() {
@@ -39,6 +39,32 @@ function teardown() {
 
 function teardown_file() {
     :
+}
+
+@test "sanitizers work as expected" {
+    local san_check="${RSM_BIN_DIR}/rsm_infra_sanitizer_check"
+    if [[ "${RSM_PRESET}" =~ asan* ]]; then
+        run "${san_check}" asan
+        assert_failure
+        assert_output --partial "runtime error: index 2 out of bounds for type 'int [2]'"
+
+        run "${san_check}" lsan
+        assert_failure
+        assert_output --partial "==ERROR: LeakSanitizer: detected memory leaks"
+        assert_output --partial "SUMMARY: AddressSanitizer: 8 byte(s) leaked in 2 allocation(s)."
+    elif [[ "${RSM_PRESET}" =~ tsan* ]]; then
+        run "${san_check}" tsan
+        assert_failure
+        assert_output --partial 'WARNING: ThreadSanitizer: data race'
+        assert_output --partial 'ThreadSanitizer: reported 1 warnings'
+    else
+        skip "sanitizers are not enabled"
+    fi
+
+    # enabled in both cases:
+    run "${san_check}" ubsan
+    assert_failure
+    assert_output --partial 'runtime error: left shift of negative value -1'
 }
 
 @test "first" {
