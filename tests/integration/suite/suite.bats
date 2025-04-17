@@ -58,7 +58,23 @@ function teardown_file() {
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
         assert_output --partial 'ThreadSanitizer: reported 1 warnings'
     else
-        skip "sanitizers are not enabled"
+        run "${san_check}" tsan
+        assert_success
+        assert_output ''
+
+        run "${san_check}" ubsan
+        assert_success
+        assert_output ''
+        
+        run "${san_check}" asan
+        assert_success
+        assert_output ''
+        
+        run "${san_check}" lsan
+        assert_success
+        assert_output ''
+        
+        return 0
     fi
 
     # enabled in both cases:
