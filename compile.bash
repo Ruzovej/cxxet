@@ -2,6 +2,10 @@
 
 set -e
 
+targets=()
+force_compile_commands_symlink='true'
+defines=()
+
 while (( $# > 0 )); do
     case "$1" in
         --preset)
@@ -9,8 +13,16 @@ while (( $# > 0 )); do
             shift 2
             ;;
         --target)
-            target="$2"
+            targets+=("$1" "$2")
             shift 2
+            ;;
+        -D*)
+            defines+=("$1")
+            shift 1
+            ;;
+        --polite-ln-compile_commands)
+            force_compile_commands_symlink='false'
+            shift 1
             ;;
         *)
             printf 'Unknown option: %s\n' "$1"
@@ -26,15 +38,19 @@ num_jobs="$(nproc)"
     cmake \
         -S . \
         -B "build/${rsm_preset}" \
+        "${defines[@]}" \
         --graphviz="graphviz/${rsm_preset}" \
         --preset "${rsm_preset}"
-    ln \
-        --symbolic \
-        --force \
-        "build/${rsm_preset}/compile_commands.json" \
-        compile_commands.json
+    [[ "${force_compile_commands_symlink}" == 'false' \
+        && -f compile_commands.json ]] \
+        || \
+        ln \
+            --symbolic \
+            --force \
+            "build/${rsm_preset}/compile_commands.json" \
+            compile_commands.json
     cmake \
         --build "build/${rsm_preset}" \
         -j "${num_jobs}" \
-        --target "${target:-all}"
+        "${targets[@]}"
 )
