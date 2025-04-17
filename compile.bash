@@ -2,14 +2,15 @@
 
 set -e
 
+rsm_preset=tsan
 targets=()
-force_compile_commands_symlink='true'
 defines=()
+force_compile_commands_symlink='true'
 
 while (( $# > 0 )); do
     case "$1" in
         --preset)
-            rsm_preset_arg="$2"
+            rsm_preset="$2"
             shift 2
             ;;
         --target)
@@ -31,7 +32,6 @@ while (( $# > 0 )); do
     esac
 done
 
-rsm_preset="${rsm_preset_arg:-tsan}"
 num_jobs="$(nproc)"
 (
     set -x
@@ -41,14 +41,16 @@ num_jobs="$(nproc)"
         "${defines[@]}" \
         --graphviz="graphviz/${rsm_preset}" \
         --preset "${rsm_preset}"
+
     [[ "${force_compile_commands_symlink}" == 'false' \
         && -f compile_commands.json ]] \
-        || \
+    || \
         ln \
             --symbolic \
             --force \
             "build/${rsm_preset}/compile_commands.json" \
             compile_commands.json
+
     cmake \
         --build "build/${rsm_preset}" \
         -j "${num_jobs}" \

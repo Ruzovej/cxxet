@@ -4,6 +4,7 @@ set -e
 
 case "$1" in
     -b|--bats)
+        shift
         source tests/integration/bats_runner.bash
         bats_runner
         ;;
@@ -12,3 +13,8 @@ case "$1" in
         exit 1
         ;;
 esac
+
+if [[ "$#" -gt 0 ]]; then
+    printf 'Ignoring further command line args (%s)\n' "$*"
+    exit 1
+fi
