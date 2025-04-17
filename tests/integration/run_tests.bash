@@ -10,4 +10,15 @@ args=(
     #--tap
 )
 
-"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/suite.bats
+test_presets=(
+    tsan
+    tsan_d
+    asan
+    asan_d
+    release
+)
+
+for preset in "${test_presets[@]}"; do
+    RSM_PRESET="${preset}" \
+    "${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/suite.bats
+done
