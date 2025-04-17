@@ -15,12 +15,33 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# TODO refactor:
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin" CACHE PATH "Folder with compilation results" FORCE)
-# + add various suffixes based upon build type ...
+# options:
+set(RSM_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
+set(RSM_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
+set(RSM_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
+set(RSM_WITH_TSAN "OFF" CACHE BOOL "Build with thread and undefined sanitizers")
 
-set(RSM_BUILD_TESTS "ON" CACHE BOOL "Build unit tests")
+# implied by options:
+set(RSM_LIB_KIND "STATIC")
+if (RSM_BUILD_SHARED)
+    set(RSM_LIB_KIND "SHARED") # TODO fix this
+endif()
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${RSM_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${RSM_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${RSM_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
+
+if (RSM_WITH_ASAN AND RSM_WITH_TSAN)
+    message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
+endif()
+
+if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
+    set(RSM_BUILD_TESTS "ON")
+else()
+    set(RSM_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
+endif()
+
+# source files:
 # https://cmake.org/cmake/help/latest/command/file.html#filesystem
 file(
     GLOB_RECURSE
@@ -50,13 +71,11 @@ function(add_sanitizer target sanitizer)
             -pie
     )
 endfunction()
-function(add_tsan target)
-    add_sanitizer(${target} thread)
-endfunction()
 
+# core library:
 add_library(
     rsm
-        STATIC
+        ${RSM_LIB_KIND}
         ${rsm_sources}
 )
 target_include_directories(
@@ -64,7 +83,15 @@ target_include_directories(
         PUBLIC
         "include"
 )
-add_sanitizer(rsm thread) # thread address undefined leak
+if (RSM_WITH_ASAN)
+    add_sanitizer(rsm address)
+    add_sanitizer(rsm leak)
+    add_sanitizer(rsm undefined)
+endif()
+if (RSM_WITH_TSAN)
+    add_sanitizer(rsm thread)
+    add_sanitizer(rsm undefined)
+endif()
 # TODO refactor:
 set(RSM_UNIX_COMPILER_FLAGS
     -Wall
@@ -105,6 +132,7 @@ target_compile_options(
         ${RSM_COMPILER_FLAGS}
 )
 
+# tests, etc.:
 if (RSM_BUILD_TESTS)
     add_subdirectory(tests/dummy_app)
     add_subdirectory(tests/unit)
