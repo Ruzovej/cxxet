@@ -1,0 +1,9 @@
+add_executable(
+    rsm_dummy_app
+        "main.cpp"
+)
+target_link_libraries(
+    rsm_dummy_app
+        PRIVATE
+        rsm
+)
