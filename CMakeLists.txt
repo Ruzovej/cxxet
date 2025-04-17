@@ -6,7 +6,7 @@ project(
     LANGUAGES CXX # TODO later maybe even `C`?!
 )
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
 
 #set(CMAKE_C_STANDARD 99)
 #set(CMAKE_C_STANDARD_REQUIRED ON)
