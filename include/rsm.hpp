@@ -45,7 +45,7 @@ struct records {
   records(
       unsigned const
           block_size); // TODO optimize this ... don't allocate `first` on heap,
-                       // maybe allicate this whole structure via `malloc` with
+                       // maybe allocate this whole structure via `malloc` with
                        // extra space for the data & set the pointers to it?
   ~records() noexcept;
 
