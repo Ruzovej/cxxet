@@ -4,12 +4,12 @@ function bats_runner() {
     source tests/integration/init/initialize_bats.bash
     initialize_bats
 
-    args=(
+    local args=(
         --timing
         #--tap
     )
 
-    test_presets=(
+    local test_presets=(
         tsan
         tsan_d
         asan
@@ -17,6 +17,7 @@ function bats_runner() {
         release
     )
 
+    local preset
     for preset in "${test_presets[@]}"; do
         RSM_PRESET="${preset}" \
         "${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/suite.bats

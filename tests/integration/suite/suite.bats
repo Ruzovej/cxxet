@@ -24,7 +24,7 @@ function setup_file() {
         --preset "${RSM_PRESET}" \
         --target rsm_dummy_app \
         --target rsm_infra_sanitizer_check \
-        --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? It displays the output of it in console ...
+        --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done ...\n'
     export RSM_BIN_DIR="bin/${RSM_PRESET}"
 }
@@ -52,11 +52,19 @@ function teardown_file() {
         assert_failure
         assert_output --partial "==ERROR: LeakSanitizer: detected memory leaks"
         assert_output --partial "SUMMARY: AddressSanitizer: 8 byte(s) leaked in 2 allocation(s)."
+
+        run "${san_check}" ubsan
+        assert_failure
+        assert_output --partial 'runtime error: left shift of negative value -1'
     elif [[ "${RSM_PRESET}" =~ tsan* ]]; then
         run "${san_check}" tsan
         assert_failure
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
         assert_output --partial 'ThreadSanitizer: reported 1 warnings'
+
+        run "${san_check}" ubsan
+        assert_failure
+        assert_output --partial 'runtime error: left shift of negative value -1'
     else
         run "${san_check}" tsan
         assert_success
@@ -65,22 +73,15 @@ function teardown_file() {
         run "${san_check}" ubsan
         assert_success
         assert_output ''
-        
+
         run "${san_check}" asan
         assert_success
         assert_output ''
-        
+
         run "${san_check}" lsan
         assert_success
         assert_output ''
-        
-        return 0
     fi
-
-    # enabled in both cases:
-    run "${san_check}" ubsan
-    assert_failure
-    assert_output --partial 'runtime error: left shift of negative value -1'
 }
 
 @test "first" {

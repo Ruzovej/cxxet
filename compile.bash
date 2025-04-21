@@ -39,8 +39,8 @@ num_jobs="$(nproc)"
         -S . \
         -B "build/${rsm_preset}" \
         "${defines[@]}" \
-        --graphviz="graphviz/${rsm_preset}" \
-        --preset "${rsm_preset}"
+        --preset "${rsm_preset}" #\
+        # --graphviz="graphviz/${rsm_preset}"
 
     [[ "${force_compile_commands_symlink}" == 'false' \
         && -f compile_commands.json ]] \
