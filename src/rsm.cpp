@@ -26,16 +26,13 @@ void records::print_records() const {
   }
 }
 
-namespace {
-std::mutex global_access_mutex{};
-}
-
 [[nodiscard]] global *global::instance() noexcept {
   static global g;
   return &g;
 }
 
 void global::append(records *recs) noexcept {
+  static std::mutex global_access_mutex{};
   std::lock_guard lck{global_access_mutex};
   if (!first) {
     first = recs;
@@ -63,6 +60,9 @@ global::~global() noexcept {
 }
 
 void thread::init(unsigned const block_size) {
+  [[maybe_unused]] auto const global_inst{
+      global::instance()}; // ensure global is initialized before (and hence
+                           // destroyed after) any thread_local instance
   auto const inst{instance()};
   assert(!inst->active &&
          "calling thread::init more than once in the current thread!");
