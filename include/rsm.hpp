@@ -13,25 +13,37 @@ namespace rsm {
 
 namespace impl {
 
-[[nodiscard]] inline long long now_ns() {
+[[nodiscard]] inline struct timespec now() noexcept {
+  // https://stackoverflow.com/a/42658433
+  // https://www.man7.org/linux/man-pages/man3/clock_gettime.3.html
+  constexpr int clock_type{
+      // choose exactly one of:
+      // CLOCK_MONOTONIC // sometimes higher latency
+      // CLOCK_MONOTONIC_COARSE // dosn't work (on my primary PC)
+      // CLOCK_BOOTTIME // "equivalent" to `CLOCK_MONOTONIC`
+      // CLOCK_THREAD_CPUTIME_ID // very low resolution, seems unusable
+      CLOCK_MONOTONIC_RAW // seems best
+  };
   struct timespec t;
-  clock_gettime(CLOCK_MONOTONIC, &t);
-  static_assert(sizeof(long long) < sizeof(struct timespec),
-                "conversion to `long long` doesn't make sense");
+  clock_gettime(clock_type, &t);
+  return t;
+}
+
+[[nodiscard]] inline long long as_int_ns(struct timespec const t) noexcept {
   return static_cast<long long>(t.tv_sec * 1'000'000'000 + t.tv_nsec);
 }
 
 }; // namespace impl
 
 struct marker {
-  inline marker(char const *aDesc) : desc{aDesc}, start_ns{impl::now_ns()} {}
+  inline marker(char const *aDesc) : desc{aDesc}, start{impl::now()} {}
   inline ~marker() noexcept { submit(); }
 
   [[maybe_unused]] inline long long submit() noexcept;
 
 private:
   char const *desc;
-  long long const start_ns;
+  struct timespec const start;
 };
 
 namespace impl {
@@ -73,6 +85,11 @@ private:
   global() = default;
   ~global() noexcept;
 
+  global(global const &) = delete;
+  global &operator=(global const &) = delete;
+  global(global &&) = delete;
+  global &operator=(global &&) = delete;
+
   records *first{nullptr}, *last{nullptr};
 };
 
@@ -100,6 +117,11 @@ private:
   thread() = default;
   ~thread() noexcept;
 
+  thread(thread const &) = delete;
+  thread &operator=(thread const &) = delete;
+  thread(thread &&) = delete;
+  thread &operator=(thread &&) = delete;
+
   void allocate_next_records();
 
   records *first{nullptr}, *last{nullptr};
@@ -113,10 +135,12 @@ private:
 [[maybe_unused]] inline long long marker::submit() noexcept {
   if (desc) // [[likely]] // TODO
   {
-    auto const now{impl::now_ns()};
-    impl::thread::instance()->append_record(impl::record{desc, start_ns, now});
+    auto const now_ns{impl::as_int_ns(impl::now())};
+    auto const start_ns{impl::as_int_ns(start)};
+    impl::thread::instance()->append_record(
+        impl::record{desc, start_ns, now_ns});
     desc = nullptr;
-    return now - start_ns;
+    return now_ns - start_ns;
   }
   return -1;
 }
