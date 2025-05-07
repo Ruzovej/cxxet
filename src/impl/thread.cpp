@@ -6,7 +6,7 @@
 
 namespace rsm::impl {
 
-void thread::init(unsigned const block_size) {
+void thread::init() {
   [[maybe_unused]] auto const global_inst{
       global::instance()}; // ensure global is initialized before (and hence
                            // destroyed after) any thread_local instance
@@ -14,7 +14,7 @@ void thread::init(unsigned const block_size) {
   assert(!inst->active &&
          "calling thread::init more than once in the current thread!");
   if (!inst->active) {
-    inst->block_size = block_size;
+    inst->block_size = global::instance()->get_block_size();
     inst->active = true;
     inst->allocate_next_records();
   }

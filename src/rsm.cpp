@@ -6,7 +6,7 @@
 
 namespace rsm {
 
-void init_thread(unsigned const block_size) { impl::thread::init(block_size); }
+void init_thread() { impl::thread::init(); }
 
 void flush_thread() noexcept { impl::thread::instance()->flush_to_global(); }
 

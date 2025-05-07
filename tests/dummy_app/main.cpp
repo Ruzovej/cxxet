@@ -5,7 +5,7 @@
 #include "rsm.hpp"
 
 int main(int, char const **) {
-  rsm::init_thread(15);
+  rsm::init_thread();
 
   std::vector<int> v(1'000'000, 0);
   rsm::marker m1{"loop"};
@@ -27,7 +27,7 @@ int main(int, char const **) {
   m3.submit();
 
   std::thread{[]() {
-    rsm::init_thread(1);
+    rsm::init_thread();
     {
       rsm::marker m{"scoped 1"};
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -35,7 +35,7 @@ int main(int, char const **) {
     rsm::flush_thread();
   }}.join();
   std::thread{[]() {
-    rsm::init_thread(1);
+    rsm::init_thread();
     {
       rsm::marker m{"scoped 2"};
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -43,14 +43,14 @@ int main(int, char const **) {
     // `rsm::flush_thread();` can be omitted
   }}.join();
   std::thread{[]() {
-    rsm::init_thread(1);
+    rsm::init_thread();
 
     rsm::marker m{"scoped 3"};
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     // no extra scope needed in this case
   }}.join();
   std::thread{[]() {
-    rsm::init_thread(1);
+    rsm::init_thread();
 
     rsm::marker m{"scoped 4"};
     std::this_thread::sleep_for(std::chrono::milliseconds(1));

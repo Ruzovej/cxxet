@@ -11,8 +11,10 @@ struct global {
 
   void print_records() const;
 
+  [[nodiscard]] unsigned get_block_size() const noexcept { return block_size; }
+
 private:
-  global() = default;
+  global();
   ~global() noexcept;
 
   global(global const &) = delete;
@@ -21,6 +23,7 @@ private:
   global &operator=(global &&) = delete;
 
   records *first{nullptr}, *last{nullptr};
+  unsigned block_size{64}; // Default block size
 };
 
 } // namespace rsm::impl

@@ -6,7 +6,7 @@
 namespace rsm::impl {
 
 struct thread {
-  static void init(unsigned const block_size);
+  static void init();
 
   [[nodiscard]] static inline thread *instance() noexcept {
     thread_local thread t;

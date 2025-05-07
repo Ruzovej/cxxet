@@ -4,7 +4,7 @@
 
 namespace rsm {
 
-void init_thread(unsigned const block_size);
+void init_thread();
 
 void flush_thread() noexcept;
 
