@@ -38,8 +38,6 @@ private:
   void allocate_next_records();
 
   records *first{nullptr}, *last{nullptr};
-
-  unsigned block_size{};
   bool active{false};
 };
 

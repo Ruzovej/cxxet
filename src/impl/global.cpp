@@ -5,16 +5,20 @@
 
 namespace rsm::impl {
 
-global::global() {
-    // Get block_size from environment variable if available, otherwise use default value of 64
-    const char* env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
-    if (env_block_size && *env_block_size != '\0') {
-        try {
-            block_size = static_cast<unsigned>(std::stoul(env_block_size));
-        } catch (...) {
-            // In case of invalid conversion, keep the default value
+global::global() 
+    : block_size([]{
+        // Get block_size from environment variable if available, otherwise use default value of 64
+        const char* env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
+        if (env_block_size && *env_block_size != '\0') {
+            try {
+                return static_cast<unsigned>(std::stoul(env_block_size));
+            } catch (...) {
+                // In case of invalid conversion, keep the default value
+            }
         }
-    }
+        return 64u;
+    }())
+{
 }
 
 [[nodiscard]] global *global::instance() noexcept {

@@ -14,7 +14,6 @@ void thread::init() {
   assert(!inst->active &&
          "calling thread::init more than once in the current thread!");
   if (!inst->active) {
-    inst->block_size = global::instance()->get_block_size();
     inst->active = true;
     inst->allocate_next_records();
   }
@@ -32,7 +31,7 @@ thread::~thread() noexcept { flush_to_global(); }
 
 void thread::allocate_next_records() {
   auto target{last ? &last->next : &last};
-  *target = new records(block_size);
+  *target = new records(global::instance()->get_block_size());
   if (!first) {
     first = *target;
   }
