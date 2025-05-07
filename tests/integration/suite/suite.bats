@@ -121,17 +121,17 @@ function teardown_file() {
 }
 
 # TODO later remove those ...
-
-@test "first" {
-    user_log 'doing %s stuff ...\n' '1st'
-    run some_function 'doing 1st stuff ...'
-    assert_success
-    assert_output --partial '1st'
-}
-
-@test "second" {
-    user_log 'doing 2nd stuff ...\n'
-    run some_function '2nd' 13
-    assert_failure 13
-    assert_output '2nd'
-}
+#
+#@test "first" {
+#    user_log 'doing %s stuff ...\n' '1st'
+#    run some_function 'doing 1st stuff ...'
+#    assert_success
+#    assert_output --partial '1st'
+#}
+#
+#@test "second" {
+#    user_log 'doing 2nd stuff ...\n'
+#    run some_function '2nd' 13
+#    assert_failure 13
+#    assert_output '2nd'
+#}
