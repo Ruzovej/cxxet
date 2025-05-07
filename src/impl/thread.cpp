@@ -30,10 +30,13 @@ void thread::flush_to_global() noexcept {
 thread::~thread() noexcept { flush_to_global(); }
 
 void thread::allocate_next_records() {
-  auto target{last ? &last->next : &last};
+  // [[assume((first == nullptr) == (last == nullptr))]];
+  auto target{first ? &last->next : &last};
   *target = new records(global::instance()->get_block_size());
   if (!first) {
     first = *target;
+  } else {
+    last = *target;
   }
 }
 

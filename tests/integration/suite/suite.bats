@@ -27,6 +27,7 @@ function setup_file() {
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
     export RSM_BIN_DIR="bin/${RSM_PRESET}"
+    export RSM_DEFAULT_BLOCK_SIZE=2
 }
 
 function setup() {
@@ -97,6 +98,7 @@ function teardown_file() {
     refute_output --partial "WARNING:"
 
     # Verify that all markers are reported in the output
+    assert_output --partial "deduced RSM_DEFAULT_BLOCK_SIZE: 2"
     assert_output --partial ": 'loop', color -1, tag -1: "
     assert_output --partial ": 'int store', color -1, tag -1: "
     assert_output --partial ": 'int load', color -1, tag -1: "

@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 
+#include <iostream>
 #include <mutex>
 
 namespace rsm::impl {
@@ -19,7 +20,9 @@ global::global()
           }
         }
         return 64u;
-      }()) {}
+      }()) {
+  std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
+}
 
 [[nodiscard]] global *global::instance() noexcept {
   static global g;

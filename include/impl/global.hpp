@@ -23,7 +23,7 @@ private:
   global &operator=(global &&) = delete;
 
   records *first{nullptr}, *last{nullptr};
-  unsigned const block_size{64};
+  unsigned const block_size;
 };
 
 } // namespace rsm::impl

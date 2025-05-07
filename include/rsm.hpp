@@ -21,7 +21,17 @@ struct marker {
       : desc{aDesc}, color{aColor}, tag{aTag}, start{impl::now()} {}
   inline ~marker() noexcept { submit(); }
 
-  [[maybe_unused]] inline long long submit() noexcept;
+  [[maybe_unused]] inline long long submit() noexcept {
+    if (desc) // [[likely]] // TODO
+    {
+      auto const now_ns{impl::as_int_ns(impl::now())};
+      auto const start_ns{impl::as_int_ns(start)};
+      append_record(start_ns, now_ns);
+      desc = nullptr;
+      return now_ns - start_ns;
+    }
+    return -1;
+  }
 
 private:
   char const *desc;
@@ -36,17 +46,5 @@ private:
   marker(marker &&) = delete;
   marker &operator=(marker &&) = delete;
 };
-
-[[maybe_unused]] inline long long marker::submit() noexcept {
-  if (desc) // [[likely]] // TODO
-  {
-    auto const now_ns{impl::as_int_ns(impl::now())};
-    auto const start_ns{impl::as_int_ns(start)};
-    append_record(start_ns, now_ns);
-    desc = nullptr;
-    return now_ns - start_ns;
-  }
-  return -1;
-}
 
 } // namespace rsm
