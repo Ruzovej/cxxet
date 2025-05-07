@@ -12,11 +12,9 @@ void flush_thread() noexcept { impl::thread::instance()->flush_to_global(); }
 
 void print_flushed_records() { rsm::impl::global::instance()->print_records(); }
 
-void marker::append_record(char const *desc, int const color, int const tag,
-                           long long const start_ns,
+void marker::append_record(long long const start_ns,
                            long long const end_ns) noexcept {
-  impl::thread::instance()->append_record(
-      impl::record{desc, color, tag, start_ns, end_ns});
+  impl::thread::instance()->append_record({desc, color, tag, start_ns, end_ns});
 }
 
 } // namespace rsm
