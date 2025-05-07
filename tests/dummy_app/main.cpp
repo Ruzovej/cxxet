@@ -56,6 +56,32 @@ int main(int, char const **) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     m.submit(); // explicit marker submit
   }}.join();
+  std::thread{[]() {
+    rsm::init_thread();
+
+    RSM_MARKER("scoped 5 (macro with both default color and tag)");
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }}.join();
+  std::thread{[]() {
+    rsm::init_thread();
+
+    RSM_MARKER("scoped 6 (macro with explicit color and default tag)", 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }}.join();
+  std::thread{[]() {
+    rsm::init_thread();
+
+    RSM_MARKER("scoped 7 (macro with both explicit color and tag)", 1, 2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }}.join();
+
+  {
+    RSM_MARKER("first local macro marker");
+    {
+      RSM_MARKER("second local macro marker testing no shadowing occurs");
+      RSM_MARKER("third local macro marker testing no shadowing occurs");
+    }
+  }
 
   rsm::flush_thread(); // this must be done in the main thread, otherwise
   // "local" submitted markers won't be flushed

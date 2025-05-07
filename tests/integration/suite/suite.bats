@@ -96,7 +96,7 @@ function teardown_file() {
     refute_output --partial "ERROR:"
     refute_output --partial "WARNING:"
 
-    # Verify that all 7 markers are reported in the output
+    # Verify that all markers are reported in the output
     assert_output --partial ": 'loop' "
     assert_output --partial ": 'int store' "
     assert_output --partial ": 'int load' "
@@ -104,8 +104,15 @@ function teardown_file() {
     assert_output --partial ": 'scoped 2' "
     assert_output --partial ": 'scoped 3' "
     assert_output --partial ": 'scoped 4' "
+    assert_output --partial ": 'scoped 5 (macro with both default color and tag)' "
+    assert_output --partial ": 'scoped 6 (macro with explicit color and default tag)' "
+    assert_output --partial ": 'scoped 7 (macro with both explicit color and tag)' "
+    assert_output --partial ": 'first local macro marker' "
+    assert_output --partial ": 'second local macro marker testing no shadowing occurs' "
+    assert_output --partial ": 'third local macro marker testing no shadowing occurs' "
+    #assert_output --partial ": '' "
 
-    # TODO how to check that output consists of exactly 7 lines?!
+    # TODO how to check that output consists of exactly above mentioned `N` lines?!
 
     assert_success
 }
