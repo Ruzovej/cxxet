@@ -11,6 +11,6 @@ struct record {
 
 static_assert(
     64 % sizeof(record) == 0,
-    "record size must be a multiple of 64 [byte] (cache line alignment?!)");
+    "`record` size must be a multiple of 64 [byte] (cache line size?!)");
 
 } // namespace rsm::impl
