@@ -15,9 +15,10 @@ records::~records() noexcept { delete[] first; }
 
 void records::print_records() const {
   for (auto iter{first}; iter < last; ++iter) {
-    std::cout << thread_id << ": '" << iter->desc << "' " << iter->start_ns
-              << " -> " << iter->end_ns << " ~ "
-              << (iter->end_ns - iter->start_ns) << " [ns]\n";
+    std::cout << thread_id << ": '" << iter->desc << "', color " << iter->color
+              << ", tag " << iter->tag << ": " << iter->start_ns << " -> "
+              << iter->end_ns << " ~ " << (iter->end_ns - iter->start_ns)
+              << " [ns]\n";
   }
 }
 

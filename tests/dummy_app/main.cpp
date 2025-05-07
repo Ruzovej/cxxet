@@ -14,16 +14,16 @@ int main(int, char const **) {
   }
   m1.submit();
 
-  [[maybe_unused]] int volatile i;
+  [[maybe_unused]] int volatile x;
   std::this_thread::yield();
   rsm::marker m2{"int store"};
-  i = 42;
+  x = 42;
   m2.submit();
 
-  [[maybe_unused]] int j;
+  [[maybe_unused]] int y;
   std::this_thread::yield();
   rsm::marker m3{"int load"};
-  j = i;
+  y = x;
   m3.submit();
 
   std::thread{[]() {
@@ -85,6 +85,27 @@ int main(int, char const **) {
 
   rsm::flush_thread(); // this must be done in the main thread, otherwise
   // "local" submitted markers won't be flushed
+
+  { // even after flushing "main" (or the "last" one - dumping collected
+    // statistics - to be precise) thread, other threads may still safely
+    // contribute:
+    constexpr int num_ths{3};
+    std::vector<std::thread> ths;
+    ths.reserve(num_ths);
+
+    for (int i{0}; i < num_ths; ++i) {
+      ths.emplace_back([i]() {
+        rsm::init_thread();
+
+        RSM_MARKER("scoped 8 (in 3 various parallel threads)", -1, i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(num_ths - i));
+      });
+    }
+
+    for (auto &th : ths) {
+      th.join();
+    }
+  }
 
   rsm::print_flushed_records();
 
