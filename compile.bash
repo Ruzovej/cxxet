@@ -41,16 +41,20 @@ num_jobs="$(nproc)"
         "${defines[@]}" \
         --preset "${rsm_preset}" #\
         # --graphviz="graphviz/${rsm_preset}"
+)
 
-    [[ "${force_compile_commands_symlink}" == 'false' \
-        && -f compile_commands.json ]] \
-    || \
-        ln \
-            --symbolic \
-            --force \
-            "build/${rsm_preset}/compile_commands.json" \
-            compile_commands.json
+[[ "${force_compile_commands_symlink}" == 'false' && -f compile_commands.json ]] \
+|| (
+    set -x
+    ln \
+        --symbolic \
+        --force \
+        "build/${rsm_preset}/compile_commands.json" \
+        compile_commands.json
+)
 
+(
+    set -x
     cmake \
         --build "build/${rsm_preset}" \
         -j "${num_jobs}" \
