@@ -1,33 +1,36 @@
 #include "impl/global.hpp"
 
 #include <cstdlib>
+
 #include <mutex>
 
 namespace rsm::impl {
 
-global::global() 
-    : block_size([]{
-        // Get block_size from environment variable if available, otherwise use default value of 64
-        const char* env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
+global::global()
+    : block_size([] {
+        // Get block_size from environment variable if available, otherwise use
+        // default value of 64
+        const char *env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
         if (env_block_size && *env_block_size != '\0') {
-            try {
-                return static_cast<unsigned>(std::stoul(env_block_size));
-            } catch (...) {
-                // In case of invalid conversion, keep the default value
-            }
+          try {
+            return static_cast<unsigned>(std::stoul(env_block_size));
+          } catch (...) {
+            // In case of invalid conversion, keep the default value
+          }
         }
         return 64u;
-    }())
-{
-}
+      }()) {}
 
 [[nodiscard]] global *global::instance() noexcept {
   static global g;
   return &g;
 }
 
+namespace {
+std::mutex global_access_mutex{};
+}
+
 void global::append(records *recs) noexcept {
-  static std::mutex global_access_mutex{};
   std::lock_guard lck{global_access_mutex};
   if (!first) {
     first = recs;
