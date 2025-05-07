@@ -11,7 +11,7 @@ void flush_thread() noexcept;
 void print_flushed_records();
 
 struct marker {
-  inline marker(char const *aDesc, int const aColor = -1, int const aTag = -1)
+  inline marker(char const *aDesc, int const aColor = -1, int const aTag = -1) noexcept
       : desc{aDesc}, color{aColor}, tag{aTag}, start{impl::now()} {}
   inline ~marker() noexcept { submit(); }
 
@@ -26,6 +26,11 @@ private:
   static void append_record(char const *desc, int const color, int const tag,
                             long long const start_ns,
                             long long const end_ns) noexcept;
+
+  marker(marker const &) = delete;
+  marker &operator=(marker const &) = delete;
+  marker(marker &&) = delete;
+  marker &operator=(marker &&) = delete;
 };
 
 [[maybe_unused]] inline long long marker::submit() noexcept {
