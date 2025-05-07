@@ -51,8 +51,9 @@ int main(int, char const **) {
   m2.submit();
 
   rsm::flush_thread(); // this must be done in the main thread, otherwise
-                       // "local" submitted markers won't be flushed
-  rsm::impl::global::instance()->print_records();
+  // "local" submitted markers won't be flushed
+
+  rsm::print_flushed_records();
 
   return 0;
 }
