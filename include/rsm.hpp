@@ -1,11 +1,13 @@
 #pragma once
 
-#include "impl/thread.hpp"
 #include "impl/utils.hpp"
 
 namespace rsm {
 
 void init_thread(unsigned const block_size);
+
+void append_record(char const *desc, long long const start_ns,
+                   long long const end_ns) noexcept;
 
 void flush_thread() noexcept;
 
@@ -27,8 +29,7 @@ private:
   {
     auto const now_ns{impl::as_int_ns(impl::now())};
     auto const start_ns{impl::as_int_ns(start)};
-    impl::thread::instance()->append_record(
-        impl::record{desc, start_ns, now_ns});
+    append_record(desc, start_ns, now_ns);
     desc = nullptr;
     return now_ns - start_ns;
   }

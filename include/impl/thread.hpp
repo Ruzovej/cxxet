@@ -1,5 +1,6 @@
 #pragma once
 
+#include "impl/record.hpp"
 #include "impl/records.hpp"
 
 namespace rsm::impl {
@@ -11,7 +12,7 @@ struct thread {
     thread_local thread t;
     return &t;
   }
-  
+
   inline void append_record(record const m) {
     if (active) // [[likely]] // TODO ...
     {

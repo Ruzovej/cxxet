@@ -7,6 +7,25 @@
 int main(int, char const **) {
   rsm::init_thread(15);
 
+  std::vector<int> v(1'000'000, 0);
+  rsm::marker m1{"loop"};
+  for (int &x : v) {
+    x += 1;
+  }
+  m1.submit();
+
+  [[maybe_unused]] int volatile i;
+  std::this_thread::yield();
+  rsm::marker m2{"int store"};
+  i = 42;
+  m2.submit();
+
+  [[maybe_unused]] int j;
+  std::this_thread::yield();
+  rsm::marker m3{"int load"};
+  j = i;
+  m3.submit();
+
   std::thread{[]() {
     rsm::init_thread(1);
     {
@@ -37,18 +56,6 @@ int main(int, char const **) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     m.submit(); // explicit marker submit
   }}.join();
-
-  std::vector<int> v(1'000'000);
-  rsm::marker m{"loop"};
-  for (int &x : v) {
-    x += 1;
-  }
-  m.submit();
-
-  [[maybe_unused]] int volatile i;
-  rsm::marker m2{"int assignment"};
-  i = 42;
-  m2.submit();
 
   rsm::flush_thread(); // this must be done in the main thread, otherwise
   // "local" submitted markers won't be flushed
