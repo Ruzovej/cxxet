@@ -10,10 +10,10 @@ function bats_runner() {
     )
 
     local test_presets=(
-        tsan
-        tsan_d
         asan
         asan_d
+        tsan
+        tsan_d
         release
     )
 

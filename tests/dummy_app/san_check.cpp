@@ -8,9 +8,15 @@
 namespace {
 
 void trigger_tsan() {
-  int i{0};
-  std::thread th{[&i]() { ++i; }};
-  ++i;
+  volatile int i{0};
+  std::thread th{[&i]() {
+    for (int j{0}; j < 1'000'000; ++j) {
+      ++i;
+    }
+  }};
+  for (int j{0}; j < 1'000'000; ++j) {
+    ++i;
+  }
   th.join();
 }
 
@@ -50,5 +56,5 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }

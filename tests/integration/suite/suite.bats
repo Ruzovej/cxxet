@@ -84,6 +84,34 @@ function teardown_file() {
     fi
 }
 
+@test "dummy app reports all markers with no sanitizer issues" {
+    run "${RSM_BIN_DIR}/rsm_dummy_app"
+
+    # Verify that no sanitizer errors are reported
+    refute_output --partial "Sanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "runtime error"
+    refute_output --partial "ERROR:"
+    refute_output --partial "WARNING:"
+
+    # Verify that all 7 markers are reported in the output
+    assert_output --partial ": 'loop' "
+    assert_output --partial ": 'int store' "
+    assert_output --partial ": 'int load' "
+    assert_output --partial ": 'scoped 1' "
+    assert_output --partial ": 'scoped 2' "
+    assert_output --partial ": 'scoped 3' "
+    assert_output --partial ": 'scoped 4' "
+
+    # TODO how to check that output consists of exactly 7 lines?!
+
+    assert_success
+}
+
+# TODO later remove those ...
+
 @test "first" {
     user_log 'doing %s stuff ...\n' '1st'
     run some_function 'doing 1st stuff ...'
