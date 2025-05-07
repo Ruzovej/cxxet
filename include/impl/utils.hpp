@@ -9,6 +9,10 @@
 #error "Unsupported platform"
 #endif
 
+#define RSM_IMPL_IMPLICIT_MARKER_NAME_JOIN(name, line) name##line
+#define RSM_IMPL_IMPLICIT_MARKER_NAME(name, line)                              \
+  RSM_IMPL_IMPLICIT_MARKER_NAME_JOIN(name, line)
+
 namespace rsm::impl {
 
 [[nodiscard]] inline struct timespec now() noexcept {

@@ -2,10 +2,11 @@
 
 #include "impl/utils.hpp"
 
-#define RSM_MARKER_NAME_JOIN(name, line) name##line
-#define RSM_MARKER_NAME(name, line) RSM_MARKER_NAME_JOIN(name, line)
 #define RSM_MARKER(...)                                                        \
-  ::rsm::marker RSM_MARKER_NAME(RSM_EXPLICIT_MARKER_, __LINE__) { __VA_ARGS__ }
+  ::rsm::marker RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,            \
+                                              __LINE__) {                      \
+    __VA_ARGS__                                                                \
+  }
 
 namespace rsm {
 
