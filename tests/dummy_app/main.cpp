@@ -96,9 +96,11 @@ int main(int, char const **) {
     for (int i{0}; i < num_ths; ++i) {
       ths.emplace_back([i]() {
         rsm::init_thread();
-
-        RSM_MARKER("scoped 8 (in 3 various parallel threads)", -1, i);
-        std::this_thread::sleep_for(std::chrono::milliseconds(num_ths - i));
+        {
+          RSM_MARKER("scoped 8 (in 3 various parallel threads)", -1, i);
+          std::this_thread::sleep_for(std::chrono::milliseconds(num_ths - i));
+        }
+        rsm::flush_thread();
       });
     }
 
