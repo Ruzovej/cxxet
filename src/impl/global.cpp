@@ -3,9 +3,32 @@
 #include <cstdlib>
 
 #include <iostream>
-#include <mutex>
 
 namespace rsm::impl {
+
+[[nodiscard]] global *global::instance() noexcept {
+  static global g;
+  return &g;
+}
+
+void global::append(records *recs) noexcept {
+  std::lock_guard lck{mtx};
+  if (!first) {
+    first = recs;
+  } else {
+    last->next = recs;
+  }
+  while (recs->next) {
+    recs = recs->next;
+  }
+  last = recs;
+}
+
+void global::print_records() const {
+  for (auto iter{first}; iter != nullptr; iter = iter->next) {
+    iter->print_records();
+  }
+}
 
 global::global()
     : block_size([] {
@@ -22,34 +45,6 @@ global::global()
         return 64u;
       }()) {
   std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
-}
-
-[[nodiscard]] global *global::instance() noexcept {
-  static global g;
-  return &g;
-}
-
-namespace {
-std::mutex global_access_mutex{};
-}
-
-void global::append(records *recs) noexcept {
-  std::lock_guard lck{global_access_mutex};
-  if (!first) {
-    first = recs;
-  } else {
-    last->next = recs;
-  }
-  while (recs->next) {
-    recs = recs->next;
-  }
-  last = recs;
-}
-
-void global::print_records() const {
-  for (auto iter{first}; iter != nullptr; iter = iter->next) {
-    iter->print_records();
-  }
 }
 
 global::~global() noexcept {

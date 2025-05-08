@@ -27,7 +27,7 @@ struct thread {
   void flush_to_global() noexcept;
 
 private:
-  thread() = default;
+  thread() noexcept = default;
   ~thread() noexcept;
 
   thread(thread const &) = delete;

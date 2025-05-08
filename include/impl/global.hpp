@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include "impl/records.hpp"
 
 namespace rsm::impl {
@@ -22,6 +24,7 @@ private:
   global(global &&) = delete;
   global &operator=(global &&) = delete;
 
+  std::mutex mtx;
   records *first{nullptr}, *last{nullptr};
   unsigned const block_size;
 };
