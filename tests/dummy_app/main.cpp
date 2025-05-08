@@ -89,7 +89,8 @@ int main(int, char const **) {
   { // even after flushing "main" (or the "last" one - dumping collected
     // statistics - to be precise) thread, other threads may still safely
     // contribute:
-    constexpr int num_ths{3};
+    constexpr int num_ths{30}; // TODO either reduce this to former `3` or add
+                               // assertions to corresponding `bats` test
     std::vector<std::thread> ths;
     ths.reserve(num_ths);
 
