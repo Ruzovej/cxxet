@@ -147,3 +147,78 @@ suite.bats
 
 2 tests, 1 failure in 1 seconds
 ```
+
+### on commit `6baca2b20a59ef02636d452619c8b58d7fb7ffc2`
+
+```bash
+$ time ./tests.bash --bats --rounds 2000
+...
+Executing bats tests round no. 124/2000:
+...
+suite.bats
+   configuring and building with preset 'tsan_d' ... done
+ ✓ sanitizers work as expected [157]
+ ✗ dummy app reports all markers with no sanitizer issues [238]
+   (from function `refute_output' in file tests/integration/external/bats-helper/bats-assert/src/refute_output.bash, line 189,
+    in test file tests/integration/suite/suite.bats, line 92)
+     `refute_output --partial "Sanitizer"' failed
+
+   -- output should not contain substring --
+   substring (1 lines):
+     Sanitizer
+   output (50 lines):
+     ==================
+     WARNING: ThreadSanitizer: data race (pid=220221)
+       Write of size 8 at 0x7b0400000070 by thread T8:
+         #0 pipe ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1726 (libtsan.so.0+0x3ea28)
+         #1 __sanitizer::IsAccessibleMemoryRange(unsigned long, unsigned long) ../../../../src/libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp:276 (libubsan.so.1+0x20102)
+         #2 ~_State_impl /usr/include/c++/11/bits/std_thread.h:201 (rsm_dummy_app+0x156a1)
+         #3 <null> <null> (libstdc++.so.6+0xdc25b)
+
+       Previous write of size 8 at 0x7b0400000070 by thread T10:
+         #0 pipe ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1726 (libtsan.so.0+0x3ea28)
+         #1 __sanitizer::IsAccessibleMemoryRange(unsigned long, unsigned long) ../../../../src/libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp:276 (libubsan.so.1+0x20102)
+         #2 ~_State_impl /usr/include/c++/11/bits/std_thread.h:201 (rsm_dummy_app+0x156a1)
+         #3 <null> <null> (libstdc++.so.6+0xdc25b)
+
+       Thread T8 (tid=220230, running) created by main thread at:
+         #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:969 (libtsan.so.0+0x605b8)
+         #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xdc328)
+         #2 construct<std::thread, main(int, char const**)::<lambda()> > /usr/include/c++/11/ext/new_allocator.h:162 (rsm_dummy_app+0x143a1)
+         #3 construct<std::thread, main(int, char const**)::<lambda()> > /usr/include/c++/11/bits/alloc_traits.h:516 (rsm_dummy_app+0x13610)
+         #4 emplace_back<main(int, char const**)::<lambda()> > /usr/include/c++/11/bits/vector.tcc:115 (rsm_dummy_app+0x11af7)
+         #5 main /home/lukas/tmp/rsm/tests/dummy_app/main.cpp:97 (rsm_dummy_app+0x10a0a)
+
+       Thread T10 (tid=220232, finished) created by main thread at:
+         #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:969 (libtsan.so.0+0x605b8)
+         #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xdc328)
+         #2 construct<std::thread, main(int, char const**)::<lambda()> > /usr/include/c++/11/ext/new_allocator.h:162 (rsm_dummy_app+0x143a1)
+         #3 construct<std::thread, main(int, char const**)::<lambda()> > /usr/include/c++/11/bits/alloc_traits.h:516 (rsm_dummy_app+0x13610)
+         #4 emplace_back<main(int, char const**)::<lambda()> > /usr/include/c++/11/bits/vector.tcc:115 (rsm_dummy_app+0x11af7)
+         #5 main /home/lukas/tmp/rsm/tests/dummy_app/main.cpp:97 (rsm_dummy_app+0x10a0a)
+
+     SUMMARY: ThreadSanitizer: data race ../../../../src/libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp:276 in __sanitizer::IsAccessibleMemoryRange(unsigned long, unsigned long)
+     ==================
+     deduced RSM_DEFAULT_BLOCK_SIZE: 2
+     220223: 'scoped 1', color -1, tag -1: 8699125396194 -> 8699126491092 ~ 1094898 [ns]
+     220224: 'scoped 2', color -1, tag -1: 8699126961274 -> 8699128052686 ~ 1091412 [ns]
+     220225: 'scoped 3', color -1, tag -1: 8699128716666 -> 8699129824729 ~ 1108063 [ns]
+     220226: 'scoped 4', color -1, tag -1: 8699130124318 -> 8699131224165 ~ 1099847 [ns]
+     220227: 'scoped 5 (macro with both default color and tag)', color -1, tag -1: 8699131513955 -> 8699132594576 ~ 1080621 [ns]
+     220228: 'scoped 6 (macro with explicit color and default tag)', color 1, tag -1: 8699133766421 -> 8699134891696 ~ 1125275 [ns]
+     220229: 'scoped 7 (macro with both explicit color and tag)', color 1, tag 2: 8699135199420 -> 8699136293637 ~ 1094217 [ns]
+     220221: 'loop', color -1, tag -1: 8699084788139 -> 8699124044699 ~ 39256560 [ns]
+     220221: 'int store', color -1, tag -1: 8699124060599 -> 8699124060749 ~ 150 [ns]
+     220221: 'int load', color -1, tag -1: 8699124061340 -> 8699124061400 ~ 60 [ns]
+     220221: 'third local macro marker testing no shadowing occurs', color -1, tag -1: 8699136367307 -> 8699136367487 ~ 180 [ns]
+     220221: 'second local macro marker testing no shadowing occurs', color -1, tag -1: 8699136367107 -> 8699136369010 ~ 1903 [ns]
+     220221: 'first local macro marker', color -1, tag -1: 8699136366576 -> 8699136381113 ~ 14537 [ns]
+     220232: 'scoped 8 (in 3 various parallel threads)', color -1, tag 2: 8699138564878 -> 8699139716594 ~ 1151716 [ns]
+     220230: 'scoped 8 (in 3 various parallel threads)', color -1, tag 0: 8699136614106 -> 8699139736512 ~ 3122406 [ns]
+     220231: 'scoped 8 (in 3 various parallel threads)', color -1, tag 1: 8699138310115 -> 8699216880212 ~ 78570097 [ns]
+     ThreadSanitizer: reported 1 warnings
+   --
+
+
+2 tests, 1 failure in 1 seconds
+```
