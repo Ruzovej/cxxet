@@ -222,3 +222,108 @@ suite.bats
 
 2 tests, 1 failure in 1 seconds
 ```
+
+### on commit `ff45f1d1f69fea0bd0d26b5a78c72f13ae8450ac`
+
+```bash
+$ time ./tests.bash --bats --rounds 2000
+...
+Executing bats tests round no. 46/2000:
+...
+suite.bats
+   configuring and building with preset 'tsan' ... done
+ ✓ sanitizers work as expected [147]
+ ✗ dummy app reports all markers with no sanitizer issues [238]
+   (from function `refute_output' in file tests/integration/external/bats-helper/bats-assert/src/refute_output.bash, line 189,
+    in test file tests/integration/suite/suite.bats, line 92)
+     `refute_output --partial "Sanitizer"' failed
+
+   -- output should not contain substring --
+   substring (1 lines):
+     Sanitizer
+   output (80 lines):
+     ==================
+     WARNING: ThreadSanitizer: data race (pid=266469)
+       Write of size 8 at 0x7b0400000070 by thread T36:
+         #0 pipe ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1726 (libtsan.so.0+0x3ea28)
+         #1 __sanitizer::IsAccessibleMemoryRange(unsigned long, unsigned long) ../../../../src/libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp:276 (libubsan.so.1+0x20102)
+         #2 <null> <null> (libstdc++.so.6+0xdc25b)
+
+       Previous write of size 8 at 0x7b0400000070 by thread T37:
+         #0 pipe ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1726 (libtsan.so.0+0x3ea28)
+         #1 __sanitizer::IsAccessibleMemoryRange(unsigned long, unsigned long) ../../../../src/libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp:276 (libubsan.so.1+0x20102)
+         #2 <null> <null> (libstdc++.so.6+0xdc25b)
+
+       As if synchronized via sleep:
+         #0 nanosleep ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:366 (libtsan.so.0+0x6696c)
+         #1 void std::this_thread::sleep_for<long, std::ratio<1l, 1000l> >(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /usr/include/c++/11/bits/this_thread_sleep.h:82 (rsm_dummy_app+0xab2a)
+         #2 operator() /home/lukas/tmp/rsm/tests/dummy_app/main.cpp:101 (rsm_dummy_app+0xab2a)
+         #3 __invoke_impl<void, main(int, char const**)::<lambda()> > /usr/include/c++/11/bits/invoke.h:61 (rsm_dummy_app+0xab2a)
+         #4 __invoke<main(int, char const**)::<lambda()> > /usr/include/c++/11/bits/invoke.h:96 (rsm_dummy_app+0xab2a)
+         #5 _M_invoke<0> /usr/include/c++/11/bits/std_thread.h:259 (rsm_dummy_app+0xab2a)
+         #6 operator() /usr/include/c++/11/bits/std_thread.h:266 (rsm_dummy_app+0xab2a)
+         #7 _M_run /usr/include/c++/11/bits/std_thread.h:211 (rsm_dummy_app+0xab2a)
+         #8 <null> <null> (libstdc++.so.6+0xdc252)
+
+       Thread T36 (tid=266506, running) created by main thread at:
+         #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:969 (libtsan.so.0+0x605b8)
+         #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xdc328)
+         #2 __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58 (libc.so.6+0x29d8f)
+
+       Thread T37 (tid=266507, finished) created by main thread at:
+         #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:969 (libtsan.so.0+0x605b8)
+         #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xdc328)
+         #2 __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58 (libc.so.6+0x29d8f)
+
+     SUMMARY: ThreadSanitizer: data race ../../../../src/libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp:276 in __sanitizer::IsAccessibleMemoryRange(unsigned long, unsigned long)
+     ==================
+     deduced RSM_DEFAULT_BLOCK_SIZE: 2
+     266471: 'scoped 1', color -1, tag -1: 9020917937323 -> 9020919035798 ~ 1098475 [ns]
+     266472: 'scoped 2', color -1, tag -1: 9020919432701 -> 9020920516418 ~ 1083717 [ns]
+     266473: 'scoped 3', color -1, tag -1: 9020920825775 -> 9020922023980 ~ 1198205 [ns]
+     266474: 'scoped 4', color -1, tag -1: 9020922458024 -> 9020923742768 ~ 1284744 [ns]
+     266475: 'scoped 5 (macro with both default color and tag)', color -1, tag -1: 9020924509658 -> 9020925594416 ~ 1084758 [ns]
+     266476: 'scoped 6 (macro with explicit color and default tag)', color 1, tag -1: 9020925893725 -> 9020926975989 ~ 1082264 [ns]
+     266477: 'scoped 7 (macro with both explicit color and tag)', color 1, tag 2: 9020927268794 -> 9020928388830 ~ 1120036 [ns]
+     266469: 'loop', color -1, tag -1: 9020912411295 -> 9020916937546 ~ 4526251 [ns]
+     266469: 'int store', color -1, tag -1: 9020916952354 -> 9020916952664 ~ 310 [ns]
+     266469: 'int load', color -1, tag -1: 9020916953255 -> 9020916953336 ~ 81 [ns]
+     266469: 'third local macro marker testing no shadowing occurs', color -1, tag -1: 9020928559965 -> 9020928560566 ~ 601 [ns]
+     266469: 'second local macro marker testing no shadowing occurs', color -1, tag -1: 9020928559434 -> 9020928563111 ~ 3677 [ns]
+     266469: 'first local macro marker', color -1, tag -1: 9020928558202 -> 9020928592757 ~ 34555 [ns]
+     266507: 'scoped 8 (in 3 various parallel threads)', color -1, tag 29: 9020939971755 -> 9020941069038 ~ 1097283 [ns]
+     266506: 'scoped 8 (in 3 various parallel threads)', color -1, tag 28: 9020939060896 -> 9020941148759 ~ 2087863 [ns]
+     266505: 'scoped 8 (in 3 various parallel threads)', color -1, tag 27: 9020938789611 -> 9021022719231 ~ 83929620 [ns]
+     266504: 'scoped 8 (in 3 various parallel threads)', color -1, tag 26: 9020938518517 -> 9021022835562 ~ 84317045 [ns]
+     266503: 'scoped 8 (in 3 various parallel threads)', color -1, tag 25: 9020938294511 -> 9021022865378 ~ 84570867 [ns]
+     266502: 'scoped 8 (in 3 various parallel threads)', color -1, tag 24: 9020937612948 -> 9021022987911 ~ 85374963 [ns]
+     266501: 'scoped 8 (in 3 various parallel threads)', color -1, tag 23: 9020937343997 -> 9021023017477 ~ 85673480 [ns]
+     266500: 'scoped 8 (in 3 various parallel threads)', color -1, tag 22: 9020937037205 -> 9021023133187 ~ 86095982 [ns]
+     266499: 'scoped 8 (in 3 various parallel threads)', color -1, tag 21: 9020936740632 -> 9021023229199 ~ 86488567 [ns]
+     266498: 'scoped 8 (in 3 various parallel threads)', color -1, tag 20: 9020936453938 -> 9021023318318 ~ 86864380 [ns]
+     266497: 'scoped 8 (in 3 various parallel threads)', color -1, tag 19: 9020936170440 -> 9021023342614 ~ 87172174 [ns]
+     266496: 'scoped 8 (in 3 various parallel threads)', color -1, tag 18: 9020935887840 -> 9021023461380 ~ 87573540 [ns]
+     266495: 'scoped 8 (in 3 various parallel threads)', color -1, tag 17: 9020935618703 -> 9021023485315 ~ 87866612 [ns]
+     266494: 'scoped 8 (in 3 various parallel threads)', color -1, tag 16: 9020935274239 -> 9021023671328 ~ 88397089 [ns]
+     266493: 'scoped 8 (in 3 various parallel threads)', color -1, tag 15: 9020934991773 -> 9021023688531 ~ 88696758 [ns]
+     266490: 'scoped 8 (in 3 various parallel threads)', color -1, tag 12: 9020933322705 -> 9021023918157 ~ 90595452 [ns]
+     266489: 'scoped 8 (in 3 various parallel threads)', color -1, tag 11: 9020932964755 -> 9021023956860 ~ 90992105 [ns]
+     266488: 'scoped 8 (in 3 various parallel threads)', color -1, tag 10: 9020932683401 -> 9021023987989 ~ 91304588 [ns]
+     266486: 'scoped 8 (in 3 various parallel threads)', color -1, tag 8: 9020932100235 -> 9021024157741 ~ 92057506 [ns]
+     266487: 'scoped 8 (in 3 various parallel threads)', color -1, tag 9: 9020932406105 -> 9021024145279 ~ 91739174 [ns]
+     266485: 'scoped 8 (in 3 various parallel threads)', color -1, tag 7: 9020931860500 -> 9021024188910 ~ 92328410 [ns]
+     266484: 'scoped 8 (in 3 various parallel threads)', color -1, tag 6: 9020931445372 -> 9021024325451 ~ 92880079 [ns]
+     266483: 'scoped 8 (in 3 various parallel threads)', color -1, tag 5: 9020931147326 -> 9021024438791 ~ 93291465 [ns]
+     266481: 'scoped 8 (in 3 various parallel threads)', color -1, tag 3: 9020930596460 -> 9021024529136 ~ 93932676 [ns]
+     266480: 'scoped 8 (in 3 various parallel threads)', color -1, tag 2: 9020930314716 -> 9021024562590 ~ 94247874 [ns]
+     266479: 'scoped 8 (in 3 various parallel threads)', color -1, tag 1: 9020929741979 -> 9021024680464 ~ 94938485 [ns]
+     266478: 'scoped 8 (in 3 various parallel threads)', color -1, tag 0: 9020929189720 -> 9021024703758 ~ 95514038 [ns]
+     266491: 'scoped 8 (in 3 various parallel threads)', color -1, tag 13: 9020934013432 -> 9021024935938 ~ 90922506 [ns]
+     266482: 'scoped 8 (in 3 various parallel threads)', color -1, tag 4: 9020930874789 -> 9021024971456 ~ 94096667 [ns]
+     266492: 'scoped 8 (in 3 various parallel threads)', color -1, tag 14: 9020934708315 -> 9021024981355 ~ 90273040 [ns]
+     ThreadSanitizer: reported 1 warnings
+   --
+
+
+2 tests, 1 failure in 1 seconds
+```
