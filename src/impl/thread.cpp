@@ -22,9 +22,9 @@ void thread::init() {
 void thread::flush_to_global() noexcept {
   if (active) {
     global::instance()->append(first);
+    first = last = nullptr;
+    active = false;
   }
-  first = last = nullptr;
-  active = false;
 }
 
 thread::~thread() noexcept { flush_to_global(); }
