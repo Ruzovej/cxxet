@@ -8,5 +8,9 @@ time ./tests.bash --bats
 printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nCompiling in "release" mode "rsm_dummy_app":\n\n'
 time ./compile.bash --preset release -DRSM_BUILD_TESTS=ON
 printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nExecuting compiled "rsm_dummy_app":\n\n'
+
+set -x
+
 export RSM_DEFAULT_BLOCK_SIZE=4 # torture it with some non-default value & force it to allocate more during the run
 time bin/release/rsm_dummy_app
+time bin/release/rsm_dummy_app 0 /tmp/easy_trace.json

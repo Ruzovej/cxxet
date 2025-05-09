@@ -109,9 +109,11 @@ int main(int argc, char const **argv) {
     }
   }
 
-  rsm::dump_collected_records(
+  rsm::output::format const fmt{
       argc > 1 ? static_cast<rsm::output::format>(std::stoi(argv[1]))
-               : rsm::output::format::raw_naive_v0);
+               : rsm::output::format::raw_naive_v0};
+  char const *const filename{argc > 2 ? argv[2] : nullptr};
+  rsm::dump_collected_records(fmt, filename);
 
   return 0;
 }

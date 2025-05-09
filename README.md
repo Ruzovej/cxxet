@@ -2,6 +2,8 @@
 
 TODO ...
 
+* [using `Tracy` profiler to display saved traces](doc/UsingTracyProfiler.md)
+
 ## TODO
 
 * this file - description, usage, etc.
@@ -24,7 +26,7 @@ TODO ...
 * fix `shared` version of library
 * `windows` support
 * CI/CD ...?
-* [TODO.md](TODO.md)
+* [TODO.md](doc/TODO.md)
 * get inspired by [`Tracy`'s features](https://github.com/wolfpld/tracy/releases/latest/download/tracy.pdf), e.g.:
   * 3.15 `Automated data collection`
     * .3 `Context switches`

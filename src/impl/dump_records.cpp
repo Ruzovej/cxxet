@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -72,7 +73,8 @@ void write_chrome_trace(std::ostream &out, records const *first,
       }
 
       // [ms]:
-      const auto start{static_cast<double>(r->start_ns - time_point_zero) / 1000.0};
+      const auto start{static_cast<double>(r->start_ns - time_point_zero) /
+                       1000.0};
       const auto duration{static_cast<double>(r->end_ns - r->start_ns) /
                           1000.0};
 
@@ -93,8 +95,12 @@ void write_chrome_trace(std::ostream &out, records const *first,
     }
   }
 
-  out << "\n  ],\n";
-  //out << "  \"displayTimeUnit\": \"ns\"\n";
+  if constexpr (true) {
+    out << "\n  ]\n";
+  } else { // TODO remove or not?
+    out << "\n  ],\n";
+    out << "  \"displayTimeUnit\": \"ns\"\n";
+  }
   out << "}\n";
 }
 
@@ -180,11 +186,13 @@ void dump_records(records const *first, long long const time_point_zero,
   if (filename) {
     file.open(filename, std::ios::out);
   } else {
+    std::cout.flush();
     file.open("/dev/stdout", std::ios::app);
   }
   if (!file.is_open()) {
-    throw std::runtime_error("Failed to open file for writing: " +
-                             std::string(filename));
+    throw std::runtime_error("Failed to open file '" +
+                             std::string(filename ? filename : "/dev/stdout") +
+                             "'!");
   }
 
   switch (fmt) {
