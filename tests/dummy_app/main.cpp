@@ -107,7 +107,7 @@ int main(int, char const **) {
     }
   }
 
-  rsm::print_flushed_records();
+  rsm::dump_collected_records();
 
   return 0;
 }

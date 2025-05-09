@@ -10,7 +10,7 @@ void init_thread() { impl::thread::init(); }
 
 void flush_thread() noexcept { impl::thread::instance()->flush_to_global(); }
 
-void print_flushed_records() { rsm::impl::global::instance()->print_records(); }
+void dump_collected_records() { rsm::impl::global::instance()->print_records(); }
 
 void marker::append_record(long long const start_ns,
                            long long const end_ns) noexcept {

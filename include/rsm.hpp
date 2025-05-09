@@ -14,7 +14,7 @@ void init_thread();
 
 void flush_thread() noexcept;
 
-void print_flushed_records();
+void dump_collected_records();
 
 struct marker {
   inline marker(char const *aDesc, int const aColor = -1,
