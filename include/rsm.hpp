@@ -1,6 +1,7 @@
 #pragma once
 
 #include "impl/utils.hpp"
+#include "rsm_output_format.hpp"
 
 #define RSM_MARKER(...)                                                        \
   ::rsm::marker RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,            \
@@ -14,7 +15,9 @@ void init_thread();
 
 void flush_thread() noexcept;
 
-void dump_collected_records();
+void dump_collected_records(
+    output::format const fmt = output::format::chrome_trace,
+    char const *const filename = nullptr); // `filename == nullptr` means stdout
 
 struct marker {
   inline marker(char const *aDesc, int const aColor = -1,

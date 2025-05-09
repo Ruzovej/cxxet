@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include "impl/records.hpp"
+#include "rsm_output_format.hpp"
 
 namespace rsm::impl {
 
@@ -11,13 +12,15 @@ struct global {
 
   void append(records *recs) noexcept;
 
-  void print_records() const;
+  void dump_and_deallocate_collected_records(output::format const fmt, char const *const filename);
 
   [[nodiscard]] unsigned get_block_size() const noexcept { return block_size; }
 
 private:
   global();
   ~global() noexcept;
+
+  void deallocate_current() noexcept;
 
   global(global const &) = delete;
   global &operator=(global const &) = delete;
@@ -26,6 +29,7 @@ private:
 
   std::mutex mtx;
   records *first{nullptr}, *last{nullptr};
+  long long const time_point;
   unsigned const block_size;
 };
 

@@ -14,7 +14,7 @@ struct records {
 
   inline void append_record(record const r) noexcept { *(last++) = r; }
 
-  void print_records() const;
+  [[deprecated]] void print_records() const;
 
   unsigned long long const thread_id;
   records *next{nullptr};

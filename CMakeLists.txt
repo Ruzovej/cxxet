@@ -109,6 +109,7 @@ set(RSM_UNIX_COMPILER_FLAGS
     -Wformat=2
     -Wnull-dereference
     -Wimplicit-fallthrough
+    -Wno-error=deprecated-declarations # TODO remove this or not?!
 )
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(

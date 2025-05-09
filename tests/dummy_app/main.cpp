@@ -1,10 +1,12 @@
+#include <cstdlib>
+
 #include <iostream>
 #include <thread>
 #include <vector>
 
 #include "rsm.hpp"
 
-int main(int, char const **) {
+int main(int argc, char const **argv) {
   rsm::init_thread();
 
   std::vector<int> v(1'000'000, 0);
@@ -107,7 +109,9 @@ int main(int, char const **) {
     }
   }
 
-  rsm::dump_collected_records();
+  rsm::dump_collected_records(
+      argc > 1 ? static_cast<rsm::output::format>(std::stoi(argv[1]))
+               : rsm::output::format::raw_naive_v0);
 
   return 0;
 }
