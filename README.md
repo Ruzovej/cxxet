@@ -20,7 +20,7 @@ TODO ...
 * benchmarking
   * try reimplementing the `rsm::marker` to don't hold all the data, but "save" them immediately and update end time on `submit`/d-ror (by holding only pointer to this particular record)
 * add more output formats (e.g. implied by this conversation: <https://chatgpt.com/share/681b2833-c728-8003-9e28-a4e1c1c35196>)
-  * read e.g. <https://www.chromium.org/developers/how-tos/trace-event-profiling-tool/> and fix how it's saved -> e.g. "stacked" markers are properly displayed
+  * read e.g. <https://www.chromium.org/developers/how-tos/trace-event-profiling-tool/> and fix how it's saved -> e.g. ~~"stacked" markers are properly displayed~~
 * consider simplifying the `thread` & `global` initialization?
 * consider removing `impl::thread::active` & initialize it automatically?
 * compare "Meyers singleton" vs. "global, file scope singletons"? Both `static` and `thread_local` ...
