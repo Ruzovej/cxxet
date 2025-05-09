@@ -2,12 +2,15 @@
 
 #include <cstring>
 
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace rsm::impl {
 
@@ -60,42 +63,62 @@ std::string escape_json_string(const char *str) {
 
 void write_chrome_trace(std::ostream &out, records const *first,
                         long long const time_point_zero) {
+  using pid_and_record = std::pair<long long, record const *>;
+  std::vector<pid_and_record> sorted_records;
+
+  for (records const *block{first}; block != nullptr; block = block->next) {
+    for (record const *r{block->first}; r < block->last; ++r) {
+      sorted_records.emplace_back(block->thread_id, r);
+    }
+  }
+  std::sort(sorted_records.begin(), sorted_records.end(),
+            [](const pid_and_record &a, const pid_and_record &b) {
+              auto const trans = [](pid_and_record const &r) {
+                return std::tuple(
+                    r.first,            // `tid` ascending
+                    r.second->start_ns, // `start` ascending
+                    -r.second->end_ns   // `end` with minus => descending
+                );
+              };
+              return trans(a) < trans(b);
+            });
+
   out << "{\n";
   out << "  \"traceEvents\": [\n";
 
   bool first_record{true};
-  for (records const *block{first}; block != nullptr; block = block->next) {
-    for (record const *r{block->first}; r < block->last; ++r) {
-      if (!first_record) {
-        out << ",\n";
-      } else {
-        first_record = false;
-      }
-
-      // [ms]:
-      const auto start{static_cast<double>(r->start_ns - time_point_zero) /
-                       1000.0};
-      const auto duration{static_cast<double>(r->end_ns - r->start_ns) /
-                          1000.0};
-
-      // Chrome trace format:
-      // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
-      out << "    {\n";
-      out << "      \"name\": " << escape_json_string(r->desc) << ",\n";
-      out << "      \"cat\": \"rsm," << r->tag << "\",\n";
-      out << "      \"ph\": \"X\",\n"; // Complete event (with duration)
-      out << "      \"ts\": " << start << ",\n";
-      out << "      \"dur\": " << duration << ",\n";
-      out << "      \"pid\": 1,\n"; // TODO write correct PID later ...
-      out << "      \"tid\": " << block->thread_id << ",\n";
-      out << "      \"args\": {\n";
-      out << "        \"color\": " << r->color << "\n";
-      out << "      }\n";
-      out << "    }";
+  for (auto const &[thread_id, r] : sorted_records) {
+    if (!first_record) {
+      out << ",\n";
+    } else {
+      first_record = false;
     }
+
+    // [us]:
+    const auto start{static_cast<double>(r->start_ns - time_point_zero) /
+                     1'000.0};
+    const auto duration{static_cast<double>(r->end_ns - r->start_ns) / 1'000.0};
+    //// [ns]:
+    // const auto start{static_cast<double>(r->start_ns - time_point_zero)};
+    // const auto duration{static_cast<double>(r->end_ns - r->start_ns)};
+
+    // Chrome trace format:
+    // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
+    out << "    {\n";
+    out << "      \"name\": " << escape_json_string(r->desc) << ",\n";
+    out << "      \"cat\": \"rsm," << r->tag << "\",\n";
+    out << "      \"ph\": \"X\",\n"; // Complete event (with duration)
+    out << "      \"ts\": " << start << ",\n";
+    out << "      \"dur\": " << duration << ",\n";
+    out << "      \"pid\": 1,\n"; // TODO write correct PID later ...
+    out << "      \"tid\": " << thread_id << ",\n";
+    out << "      \"args\": {\n";
+    out << "        \"color\": " << r->color << "\n";
+    out << "      }\n";
+    out << "    }";
   }
 
-  if constexpr (true) {
+  if constexpr (false) {
     out << "\n  ]\n";
   } else { // TODO remove or not?
     out << "\n  ],\n";

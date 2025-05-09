@@ -115,6 +115,9 @@ function teardown_file() {
     assert_output --partial ": 'scoped 8 (in 3 various parallel threads)', color -1, tag 0: "
     assert_output --partial ": 'scoped 8 (in 3 various parallel threads)', color -1, tag 1: "
     assert_output --partial ": 'scoped 8 (in 3 various parallel threads)', color -1, tag 2: "
+    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 0: "
+    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 1: "
+    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 2: "
     #assert_output --partial ": '', color -1, tag -1: "
 
     # TODO how to check that output consists of exactly above mentioned `N` lines?!
