@@ -8,7 +8,7 @@ printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nExecuting compiled "rsm_dummy_app":\n\n'
 
 export RSM_DEFAULT_BLOCK_SIZE=4 # torture it with some non-default value & force it to allocate more during the run
 time {
-    for i in {1..10}; do
-        bin/release/rsm_dummy_app 0 "/tmp/easy_trace_${i}.json" --no-threads
+    for ((i=1; i<=${1:-10}; i++)); do
+        bin/release/rsm_dummy_app 0 "/tmp/easy_trace_${i}.json" --single-extra-thread
     done
 }

@@ -20,7 +20,17 @@ int main(int argc, char const **argv) {
     return true;
   }()};
 
-  if (test_threads) {
+  bool const test_many_threads{test_threads && [&]() {
+    if (argc > 3) {
+      auto const arg{std::string_view{argv[3]}};
+      if (arg == "--single-extra-thread" || arg == "-set") {
+        return false;
+      }
+    }
+    return true;
+  }()};
+
+  if (test_many_threads) {
     std::vector<int> v(1'000'000, 0);
     rsm::marker m1{"loop"};
     for (int &x : v) {
@@ -90,26 +100,43 @@ int main(int argc, char const **argv) {
     }}.join();
   }
 
-  {
-    RSM_MARKER("first local macro marker");
+  auto const simple_marker_cascade = [](int const tid) {
+    RSM_MARKER("first local macro marker", -1, tid);
     {
-      RSM_MARKER("second local macro marker testing no shadowing occurs");
-      RSM_MARKER("third local macro marker testing no shadowing occurs");
+      RSM_MARKER("second local macro marker testing no shadowing occurs", -1,
+                 tid);
+      RSM_MARKER("third local macro marker testing no shadowing occurs", -1,
+                 tid);
       {
         for (int i{0}; i < 3; ++i) {
           RSM_MARKER("fourth local macro marker testing no shadowing occurs",
-                     -1, i);
+                     -1, i + 3 * tid);
         }
       }
     }
+  };
+
+  std::thread tsmc;
+  if (test_threads) {
+    tsmc = std::thread{[&simple_marker_cascade]() {
+      rsm::init_thread();
+      simple_marker_cascade(1);
+      rsm::flush_thread();
+    }};
   }
+  simple_marker_cascade(0);
 
   rsm::flush_thread(); // this must be done in the main thread, otherwise
   // "local" submitted markers won't be flushed
 
-  if (test_threads) { // even after flushing "main" (or the "last" one - dumping
-                      // collected statistics - to be precise) thread, other
-                      // threads may still safely contribute:
+  if (test_threads) {
+    tsmc.join();
+  }
+
+  if (test_many_threads) { // even after flushing "main" (or the "last" one -
+                           // dumping
+    // collected statistics - to be precise) thread, other
+    // threads may still safely contribute:
     constexpr int num_ths{3};
     std::vector<std::thread> ths;
     ths.reserve(num_ths);
