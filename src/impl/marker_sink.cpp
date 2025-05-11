@@ -27,10 +27,9 @@ void marker_sink::init_thread() {
       global_instance()}; // ensure global is initialized before (and hence
                           // destroyed after) any thread_local instance
   auto const inst{thread_instance()};
-  assert(!inst->active &&
-         "calling marker_sink::init_thread more than once in the current thread!");
-  if (!inst->active) {
-    inst->active = true;
+  
+  // Just allocate the first records block if needed
+  if (!inst->first) {
     inst->allocate_next_records();
   }
 }
@@ -99,16 +98,15 @@ void marker_sink::append(records* recs) noexcept {
 
 // Flush records to parent sink
 void marker_sink::flush_to_parent() noexcept {
-  if (active && parent_sink) {
+  if (parent_sink && first) {
     parent_sink->append(first);
     first = last = nullptr;
-    active = false;
   }
 }
 
 // Dump records and clean up
 void marker_sink::dump_and_deallocate_collected_records(output::format const fmt,
-                                                     char const* const filename) {
+                                                      char const* const filename) {
   // This should only be called on the global instance
   assert(!parent_sink && "dump_and_deallocate_collected_records should only be called on the global instance");
   std::lock_guard lck{mtx};

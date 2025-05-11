@@ -33,12 +33,10 @@ public:
   
   // Append a single record to this sink
   inline void append_record(record const m) {
-    if (active) {
-      if (!last || !last->free_capacity()) {
-        allocate_next_records();
-      }
-      last->append_record(m);
+    if (!last || !last->free_capacity()) {
+      allocate_next_records();
     }
+    last->append_record(m);
   }
   
   // Append a chain of records to this sink (used when another sink flushes to this one)
@@ -74,9 +72,6 @@ private:
   // Linked list of record blocks
   records* first{nullptr};
   records* last{nullptr};
-  
-  // Whether this sink is actively collecting records
-  bool active{false};
   
   // For the global instance
   std::mutex mtx;
