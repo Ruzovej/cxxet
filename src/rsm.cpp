@@ -1,22 +1,24 @@
 #include "rsm.hpp"
 
-#include "impl/marker_sink.hpp"
+#include "impl/global.hpp"
 #include "impl/record.hpp"
+#include "impl/thread.hpp"
 
 namespace rsm {
 
-void init_thread() { impl::marker_sink::init_thread(); }
+void init_thread() { impl::thread::init(); }
 
-void flush_thread() noexcept { impl::marker_sink::thread_instance()->flush_to_parent(); }
+void flush_thread() noexcept { impl::thread::instance()->flush_to_global(); }
 
 void dump_collected_records(output::format const fmt,
                             char const *const filename) {
-  impl::marker_sink::global_instance()->dump_and_deallocate_collected_records(fmt, filename);
+  impl::global::instance()->dump_and_deallocate_collected_records(fmt,
+                                                                  filename);
 }
 
 void marker::append_record(long long const start_ns,
                            long long const end_ns) noexcept {
-  impl::marker_sink::thread_instance()->append_record({desc, color, tag, start_ns, end_ns});
+  impl::thread::instance()->append_record({desc, color, tag, start_ns, end_ns});
 }
 
 } // namespace rsm
