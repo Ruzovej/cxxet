@@ -5,11 +5,11 @@
 
 namespace rsm::impl {
 
-struct thread {
+struct thread_local_sink {
   static void init();
 
-  [[nodiscard]] static inline thread *instance() noexcept {
-    thread_local thread t;
+  [[nodiscard]] static inline thread_local_sink *instance() noexcept {
+    thread_local thread_local_sink t;
     return &t;
   }
 
@@ -27,13 +27,13 @@ struct thread {
   void flush_to_global() noexcept;
 
 private:
-  thread() noexcept = default;
-  ~thread() noexcept;
+  thread_local_sink() noexcept = default;
+  ~thread_local_sink() noexcept;
 
-  thread(thread const &) = delete;
-  thread &operator=(thread const &) = delete;
-  thread(thread &&) = delete;
-  thread &operator=(thread &&) = delete;
+  thread_local_sink(thread_local_sink const &) = delete;
+  thread_local_sink &operator=(thread_local_sink const &) = delete;
+  thread_local_sink(thread_local_sink &&) = delete;
+  thread_local_sink &operator=(thread_local_sink &&) = delete;
 
   void allocate_next_records();
 

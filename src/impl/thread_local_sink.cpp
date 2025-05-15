@@ -1,4 +1,4 @@
-#include "impl/thread.hpp"
+#include "impl/thread_local_sink.hpp"
 
 #include <cassert>
 
@@ -6,7 +6,7 @@
 
 namespace rsm::impl {
 
-void thread::init() {
+void thread_local_sink::init() {
   [[maybe_unused]] auto const global_inst{
       global::instance()}; // ensure global is initialized before (and hence
                            // destroyed after) any thread_local instance
@@ -19,7 +19,7 @@ void thread::init() {
   }
 }
 
-void thread::flush_to_global() noexcept {
+void thread_local_sink::flush_to_global() noexcept {
   if (active) {
     global::instance()->append(first);
     first = last = nullptr;
@@ -27,9 +27,9 @@ void thread::flush_to_global() noexcept {
   }
 }
 
-thread::~thread() noexcept { flush_to_global(); }
+thread_local_sink::~thread_local_sink() noexcept { flush_to_global(); }
 
-void thread::allocate_next_records() {
+void thread_local_sink::allocate_next_records() {
   // [[assume((first == nullptr) == (last == nullptr))]];
   auto target{first ? &last->next : &last};
   *target = new records(global::instance()->get_block_size());
