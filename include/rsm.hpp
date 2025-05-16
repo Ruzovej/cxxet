@@ -1,5 +1,6 @@
 #pragma once
 
+#include "impl/central_sink.hpp"
 #include "impl/utils.hpp"
 #include "rsm_output_format.hpp"
 
@@ -11,7 +12,7 @@
 
 namespace rsm {
 
-void init_local_sink();
+void init_local_sink(impl::central_sink *parent_sink = nullptr);
 
 void flush_thread() noexcept;
 

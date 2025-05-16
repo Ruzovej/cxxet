@@ -1,5 +1,6 @@
 #include "impl/central_sink.hpp"
 
+#include <cassert>
 #include <cstdlib>
 
 #include <iostream>
@@ -9,12 +10,27 @@
 
 namespace rsm::impl {
 
-[[nodiscard]] central_sink *central_sink::instance() noexcept {
-  static central_sink g;
-  return &g;
+central_sink::central_sink()
+    : time_point{as_int_ns(now())}, block_size([] {
+        // Get block_size from environment variable if available, otherwise use
+        // default value of 64
+        const char *env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
+        if (env_block_size && *env_block_size != '\0') {
+          try {
+            return static_cast<unsigned>(std::stoul(env_block_size));
+          } catch (...) {
+            // In case of invalid conversion, keep the default value
+          }
+        }
+        return 64u;
+      }()) {
+  std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
 }
 
+central_sink::~central_sink() noexcept { deallocate_current(); }
+
 void central_sink::append(records *recs) noexcept {
+  assert(recs && "attempting to append a null records instance");
   std::lock_guard lck{mtx};
   if (!first) {
     first = recs;
@@ -39,25 +55,6 @@ void central_sink::dump_and_deallocate_collected_records(
   }
   deallocate_current();
 }
-
-central_sink::central_sink()
-    : time_point{as_int_ns(now())}, block_size([] {
-        // Get block_size from environment variable if available, otherwise use
-        // default value of 64
-        const char *env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
-        if (env_block_size && *env_block_size != '\0') {
-          try {
-            return static_cast<unsigned>(std::stoul(env_block_size));
-          } catch (...) {
-            // In case of invalid conversion, keep the default value
-          }
-        }
-        return 64u;
-      }()) {
-  std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
-}
-
-central_sink::~central_sink() noexcept { deallocate_current(); }
 
 void central_sink::deallocate_current() noexcept {
   while (first) {

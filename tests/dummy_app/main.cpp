@@ -67,7 +67,8 @@ int main(int argc, char const **argv) {
       // `rsm::flush_thread();` can be omitted
     }}.join();
     std::thread{[]() {
-      rsm::init_local_sink();
+      // `rsm::init_local_sink();` can be omitted (but at the cost of allocating
+      // the internal buffers on first submit of any marker ... => skewed time)
 
       rsm::marker m{"scoped 3"};
       std::this_thread::sleep_for(std::chrono::milliseconds(1));

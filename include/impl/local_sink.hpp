@@ -7,27 +7,22 @@
 namespace rsm::impl {
 
 struct local_sink {
-  static void init();
-
-  [[nodiscard]] static local_sink *instance() noexcept;
-
-  inline void append_record(record const m) {
-    if (active) // [[likely]] // TODO ...
-    {
-      if (!last || !last->free_capacity()) // [[unlikely]] // TODO ...
-      {
-        allocate_next_records();
-      }
-      last->append_record(m);
-    }
-  }
-
-  void flush_to_central_sink(central_sink *) noexcept;
-
-private:
-  local_sink() noexcept = default;
+  explicit local_sink(central_sink *aParent);
   ~local_sink() noexcept;
 
+  inline void append_record(record const m) {
+    if (!last || !last->free_capacity()) // [[unlikely]] // TODO ...
+    {
+      allocate_next_records();
+    }
+    last->append_record(m);
+  }
+
+  void flush_to_parent_sink() noexcept;
+
+  void set_parent_sink(central_sink *aParent) noexcept;
+
+private:
   local_sink(local_sink const &) = delete;
   local_sink &operator=(local_sink const &) = delete;
   local_sink(local_sink &&) = delete;
@@ -35,8 +30,8 @@ private:
 
   void allocate_next_records();
 
+  central_sink *parent{nullptr};
   records *first{nullptr}, *last{nullptr};
-  bool active{false};
 };
 
 } // namespace rsm::impl

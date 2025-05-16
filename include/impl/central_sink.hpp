@@ -8,7 +8,8 @@
 namespace rsm::impl {
 
 struct central_sink {
-  [[nodiscard]] static central_sink *instance() noexcept;
+  central_sink();
+  ~central_sink() noexcept;
 
   void append(records *recs) noexcept;
 
@@ -18,9 +19,6 @@ struct central_sink {
   [[nodiscard]] unsigned get_block_size() const noexcept { return block_size; }
 
 private:
-  central_sink();
-  ~central_sink() noexcept;
-
   void deallocate_current() noexcept;
 
   central_sink(central_sink const &) = delete;

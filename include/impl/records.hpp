@@ -12,6 +12,8 @@ struct records {
     return last < capacity;
   }
 
+  [[nodiscard]] inline bool empty() const noexcept { return last == first; }
+
   inline void append_record(record const r) noexcept { *(last++) = r; }
 
   [[deprecated]] void print_records() const;
