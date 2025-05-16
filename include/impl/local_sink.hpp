@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "impl/central_sink.hpp"
 #include "impl/record.hpp"
 #include "impl/records.hpp"
@@ -31,7 +33,8 @@ private:
   void allocate_next_records();
 
   central_sink *parent{nullptr};
-  records *first{nullptr}, *last{nullptr};
+  std::unique_ptr<records> first{nullptr};
+  records *last{nullptr};
 };
 
 } // namespace rsm::impl

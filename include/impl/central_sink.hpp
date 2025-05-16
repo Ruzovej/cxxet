@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <mutex>
 
 #include "impl/records.hpp"
@@ -9,9 +10,9 @@ namespace rsm::impl {
 
 struct central_sink {
   central_sink();
-  ~central_sink() noexcept;
+  ~central_sink() noexcept = default;
 
-  void append(records *recs) noexcept;
+  void append(std::unique_ptr<records> &&recs) noexcept;
 
   void dump_and_deallocate_collected_records(output::format const fmt,
                                              char const *const filename);
@@ -19,15 +20,14 @@ struct central_sink {
   [[nodiscard]] unsigned get_block_size() const noexcept { return block_size; }
 
 private:
-  void deallocate_current() noexcept;
-
   central_sink(central_sink const &) = delete;
   central_sink &operator=(central_sink const &) = delete;
   central_sink(central_sink &&) = delete;
   central_sink &operator=(central_sink &&) = delete;
 
   std::mutex mtx;
-  records *first{nullptr}, *last{nullptr};
+  std::unique_ptr<records> first{nullptr};
+  records *last{nullptr};
   long long const time_point;
   unsigned const block_size;
 };

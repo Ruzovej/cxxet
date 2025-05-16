@@ -15,8 +15,8 @@ local_sink::~local_sink() noexcept { flush_to_parent_sink(); }
 
 void local_sink::flush_to_parent_sink() noexcept {
   if (first) {
-    parent->append(first);
-    first = last = nullptr;
+    parent->append(std::move(first));
+    last = nullptr;
   }
 }
 
@@ -28,12 +28,12 @@ void local_sink::set_parent_sink(central_sink *aParent) noexcept {
 
 void local_sink::allocate_next_records() {
   // [[assume((first == nullptr) == (last == nullptr))]];
-  auto target{first ? &last->next : &last};
-  *target = new records(parent->get_block_size());
-  if (!first) {
-    first = *target;
+  auto target{first ? &last->next : &first};
+  *target = std::make_unique<records>(parent->get_block_size());
+  if (!last) {
+    last = first.get();
   } else {
-    last = *target;
+    last = last->next.get();
   }
 }
 

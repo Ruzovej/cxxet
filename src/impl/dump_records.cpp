@@ -66,8 +66,9 @@ void write_chrome_trace(std::ostream &out, records const *first,
   using pid_and_record = std::pair<long long, record const *>;
   std::vector<pid_and_record> sorted_records;
 
-  for (records const *block{first}; block != nullptr; block = block->next) {
-    for (record const *r{block->first}; r < block->last; ++r) {
+  for (records const *block{first}; block != nullptr;
+       block = block->next.get()) {
+    for (record const *r{block->first.get()}; r < block->last; ++r) {
       sorted_records.emplace_back(block->thread_id, r);
     }
   }
@@ -135,8 +136,9 @@ void write_raw_json(std::ostream &out, records const *first,
   out << "  \"records\": [\n";
 
   bool first_record{true};
-  for (records const *block{first}; block != nullptr; block = block->next) {
-    for (record const *r{block->first}; r < block->last; ++r) {
+  for (records const *block{first}; block != nullptr;
+       block = block->next.get()) {
+    for (record const *r{block->first.get()}; r < block->last; ++r) {
       if (!first_record) {
         out << ",\n";
       } else {
@@ -166,17 +168,18 @@ void write_raw_binary(std::ostream &out, records const *first,
   out.write(reinterpret_cast<const char *>(&version), sizeof(version));
 
   // For each record block
-  for (records const *block = first; block != nullptr; block = block->next) {
+  for (records const *block = first; block != nullptr;
+       block = block->next.get()) {
     // Write thread ID
     out.write(reinterpret_cast<const char *>(&block->thread_id),
               sizeof(block->thread_id));
 
     // Write number of records in this block
-    uint32_t count = static_cast<uint32_t>(block->last - block->first);
+    uint32_t count = static_cast<uint32_t>(block->last - block->first.get());
     out.write(reinterpret_cast<const char *>(&count), sizeof(count));
 
     // Write each record
-    for (record const *r = block->first; r < block->last; ++r) {
+    for (record const *r = block->first.get(); r < block->last; ++r) {
       // For strings, write length followed by chars
       if (r->desc) {
         size_t len = strlen(r->desc);

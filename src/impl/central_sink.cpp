@@ -27,41 +27,31 @@ central_sink::central_sink()
   std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
 }
 
-central_sink::~central_sink() noexcept { deallocate_current(); }
-
-void central_sink::append(records *recs) noexcept {
+void central_sink::append(std::unique_ptr<records> &&recs) noexcept {
   assert(recs && "attempting to append a null records instance");
   std::lock_guard lck{mtx};
   if (!first) {
-    first = recs;
+    first = std::move(recs);
+    last = first.get();
   } else {
-    last->next = recs;
+    last->next = std::move(recs);
   }
-  while (recs->next) {
-    recs = recs->next;
+  while (last->next) {
+    last = last->next.get();
   }
-  last = recs;
 }
 
 void central_sink::dump_and_deallocate_collected_records(
     output::format const fmt, char const *const filename) {
   std::lock_guard lck{mtx};
   if (fmt == output::format::raw_naive_v0) {
-    for (auto iter{first}; iter != nullptr; iter = iter->next) {
+    for (auto iter{first.get()}; iter != nullptr; iter = iter->next.get()) {
       iter->print_records();
     }
   } else {
-    dump_records(first, time_point, fmt, filename);
+    dump_records(first.get(), time_point, fmt, filename);
   }
-  deallocate_current();
-}
-
-void central_sink::deallocate_current() noexcept {
-  while (first) {
-    auto const next{first->next};
-    delete first;
-    first = next;
-  }
+  first.reset(nullptr);
 }
 
 } // namespace rsm::impl
