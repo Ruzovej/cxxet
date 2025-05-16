@@ -1,4 +1,4 @@
-#include "impl/thread_local_sink.hpp"
+#include "impl/local_sink.hpp"
 
 #include <cassert>
 
@@ -6,7 +6,7 @@
 
 namespace rsm::impl {
 
-void thread_local_sink::init() {
+void local_sink::init() {
   [[maybe_unused]] auto const global_inst{
       central_sink::instance()}; // ensure global is initialized before (and
                                  // hence destroyed after) any thread_local
@@ -20,12 +20,12 @@ void thread_local_sink::init() {
   }
 }
 
-[[nodiscard]] thread_local_sink *thread_local_sink::instance() noexcept {
-  thread_local thread_local_sink t;
+[[nodiscard]] local_sink *local_sink::instance() noexcept {
+  thread_local local_sink t;
   return &t;
 }
 
-void thread_local_sink::flush_to_central_sink(central_sink *sink) noexcept {
+void local_sink::flush_to_central_sink(central_sink *sink) noexcept {
   if (active) {
     sink->append(first);
     first = last = nullptr;
@@ -33,11 +33,11 @@ void thread_local_sink::flush_to_central_sink(central_sink *sink) noexcept {
   }
 }
 
-thread_local_sink::~thread_local_sink() noexcept {
+local_sink::~local_sink() noexcept {
   flush_to_central_sink(central_sink::instance());
 }
 
-void thread_local_sink::allocate_next_records() {
+void local_sink::allocate_next_records() {
   // [[assume((first == nullptr) == (last == nullptr))]];
   auto target{first ? &last->next : &last};
   *target = new records(central_sink::instance()->get_block_size());

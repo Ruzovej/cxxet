@@ -6,10 +6,10 @@
 
 namespace rsm::impl {
 
-struct thread_local_sink {
+struct local_sink {
   static void init();
 
-  [[nodiscard]] static thread_local_sink *instance() noexcept;
+  [[nodiscard]] static local_sink *instance() noexcept;
 
   inline void append_record(record const m) {
     if (active) // [[likely]] // TODO ...
@@ -25,13 +25,13 @@ struct thread_local_sink {
   void flush_to_central_sink(central_sink *) noexcept;
 
 private:
-  thread_local_sink() noexcept = default;
-  ~thread_local_sink() noexcept;
+  local_sink() noexcept = default;
+  ~local_sink() noexcept;
 
-  thread_local_sink(thread_local_sink const &) = delete;
-  thread_local_sink &operator=(thread_local_sink const &) = delete;
-  thread_local_sink(thread_local_sink &&) = delete;
-  thread_local_sink &operator=(thread_local_sink &&) = delete;
+  local_sink(local_sink const &) = delete;
+  local_sink &operator=(local_sink const &) = delete;
+  local_sink(local_sink &&) = delete;
+  local_sink &operator=(local_sink &&) = delete;
 
   void allocate_next_records();
 

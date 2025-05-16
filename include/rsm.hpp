@@ -11,7 +11,7 @@
 
 namespace rsm {
 
-void init_thread_local_sink();
+void init_local_sink();
 
 void flush_thread() noexcept;
 
