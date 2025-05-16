@@ -1,4 +1,4 @@
-#include "impl/global.hpp"
+#include "impl/central_sink.hpp"
 
 #include <cstdlib>
 
@@ -9,12 +9,12 @@
 
 namespace rsm::impl {
 
-[[nodiscard]] global *global::instance() noexcept {
-  static global g;
+[[nodiscard]] central_sink *central_sink::instance() noexcept {
+  static central_sink g;
   return &g;
 }
 
-void global::append(records *recs) noexcept {
+void central_sink::append(records *recs) noexcept {
   std::lock_guard lck{mtx};
   if (!first) {
     first = recs;
@@ -27,8 +27,8 @@ void global::append(records *recs) noexcept {
   last = recs;
 }
 
-void global::dump_and_deallocate_collected_records(output::format const fmt,
-                                                   char const *const filename) {
+void central_sink::dump_and_deallocate_collected_records(
+    output::format const fmt, char const *const filename) {
   std::lock_guard lck{mtx};
   if (fmt == output::format::raw_naive_v0) {
     for (auto iter{first}; iter != nullptr; iter = iter->next) {
@@ -40,7 +40,7 @@ void global::dump_and_deallocate_collected_records(output::format const fmt,
   deallocate_current();
 }
 
-global::global()
+central_sink::central_sink()
     : time_point{as_int_ns(now())}, block_size([] {
         // Get block_size from environment variable if available, otherwise use
         // default value of 64
@@ -57,9 +57,9 @@ global::global()
   std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
 }
 
-global::~global() noexcept { deallocate_current(); }
+central_sink::~central_sink() noexcept { deallocate_current(); }
 
-void global::deallocate_current() noexcept {
+void central_sink::deallocate_current() noexcept {
   while (first) {
     auto const next{first->next};
     delete first;

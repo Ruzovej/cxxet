@@ -1,5 +1,6 @@
 #pragma once
 
+#include "impl/central_sink.hpp"
 #include "impl/record.hpp"
 #include "impl/records.hpp"
 
@@ -8,10 +9,7 @@ namespace rsm::impl {
 struct thread_local_sink {
   static void init();
 
-  [[nodiscard]] static inline thread_local_sink *instance() noexcept {
-    thread_local thread_local_sink t;
-    return &t;
-  }
+  [[nodiscard]] static thread_local_sink *instance() noexcept;
 
   inline void append_record(record const m) {
     if (active) // [[likely]] // TODO ...
@@ -24,7 +22,7 @@ struct thread_local_sink {
     }
   }
 
-  void flush_to_global() noexcept;
+  void flush_to_central_sink(central_sink *) noexcept;
 
 private:
   thread_local_sink() noexcept = default;

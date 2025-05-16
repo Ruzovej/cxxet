@@ -16,7 +16,7 @@ struct records {
 
   [[deprecated]] void print_records() const;
 
-  unsigned long long const thread_id;
+  long long const thread_id;
   records *next{nullptr};
   record *const first, *last, *const capacity;
 };

@@ -7,7 +7,7 @@
 namespace rsm::impl {
 
 records::records(unsigned const block_size)
-    : thread_id{static_cast<unsigned long long>(gettid())},
+    : thread_id{static_cast<long long>(gettid())},
       first{new record[block_size]}, last{first}, capacity{first + block_size} {
 }
 
