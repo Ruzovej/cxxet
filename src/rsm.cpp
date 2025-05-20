@@ -6,11 +6,8 @@
 
 namespace rsm {
 
-namespace {
 static impl::central_sink global_sink{};
-thread_local impl::local_sink thread_sink{
-    &global_sink}; // by default, flush all to `global_sink`
-} // namespace
+static thread_local impl::local_sink thread_sink{&global_sink};
 
 void init_local_sink(impl::central_sink *parent_sink) {
   // if not already initialized, preallocates memory & resets parent
