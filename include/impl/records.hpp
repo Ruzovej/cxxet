@@ -24,7 +24,9 @@ struct records {
 
   long long const thread_id;
   std::unique_ptr<records> next{nullptr};
-  std::unique_ptr<record[]> first;
+  std::unique_ptr<record[]>
+      first; // TODO optimize this (via non-std extension?!) so this array is
+             // part of this structure ...
   record *last, *const capacity;
 };
 
