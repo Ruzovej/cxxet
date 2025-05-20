@@ -12,8 +12,7 @@ struct central_sink {
   central_sink();
   ~central_sink() noexcept = default;
 
-  void append(std::unique_ptr<records, typename records::RecordsDeleter>
-                  &&recs) noexcept;
+  void append(std::unique_ptr<records> &&recs) noexcept;
 
   void dump_and_deallocate_collected_records(output::format const fmt,
                                              char const *const filename);
@@ -27,7 +26,7 @@ private:
   central_sink &operator=(central_sink &&) = delete;
 
   std::mutex mtx;
-  std::unique_ptr<records, typename records::RecordsDeleter> first{nullptr};
+  std::unique_ptr<records> first{nullptr};
   records *last{nullptr};
   long long const time_point;
   unsigned const block_size;

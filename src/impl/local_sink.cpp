@@ -29,8 +29,7 @@ void local_sink::set_parent_sink(central_sink *aParent) noexcept {
 void local_sink::allocate_next_records() {
   // [[assume((first == nullptr) == (last == nullptr))]];
   auto target{first ? &last->next : &first};
-  *target = std::unique_ptr<records, typename records::RecordsDeleter>(
-      records::create(parent->get_block_size()));
+  *target = records::create(parent->get_block_size());
 
   if (!last) {
     last = first.get();
