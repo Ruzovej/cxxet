@@ -33,7 +33,7 @@ private:
   void allocate_next_records();
 
   central_sink *parent{nullptr};
-  std::unique_ptr<records> first{nullptr};
+  std::unique_ptr<records, typename records::RecordsDeleter> first{nullptr};
   records *last{nullptr};
 };
 

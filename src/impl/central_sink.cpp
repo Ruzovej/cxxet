@@ -27,7 +27,9 @@ central_sink::central_sink()
   std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
 }
 
-void central_sink::append(std::unique_ptr<records> &&recs) noexcept {
+void central_sink::append(
+    std::unique_ptr<records, typename records::RecordsDeleter>
+        &&recs) noexcept {
   assert(recs && "attempting to append a null records instance");
   std::lock_guard lck{mtx};
   if (!first) {
