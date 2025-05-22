@@ -35,13 +35,9 @@ struct marker {
     {
       auto const now_ns{impl::as_int_ns(impl::now())};
       auto const start_ns{impl::as_int_ns(start)};
-      impl::event::any evt;
-      evt.evt.cmp = impl::event::complete{
-          impl::event::common{impl::event::type::complete,
-                              static_cast<char>(color), static_cast<short>(tag),
-                              0, desc},
-          start_ns, now_ns - start_ns};
-      append_event(evt);
+      append_event(impl::event::complete{static_cast<char>(color),
+                                         static_cast<short>(tag), 0, desc,
+                                         start_ns, now_ns - start_ns});
       desc = nullptr;
       return now_ns - start_ns;
     }

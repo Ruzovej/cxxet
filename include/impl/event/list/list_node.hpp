@@ -20,6 +20,8 @@ struct meta_info {
 union raw_element {
   meta_info meta;
   any evt;
+
+  raw_element() noexcept : meta{} {}
 };
 
 struct handler {
