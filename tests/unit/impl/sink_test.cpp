@@ -23,19 +23,20 @@ TEST_CASE("sink cascade") {
   event::any a[size];
 
   new (&a[0].evt.begin) event::duration_begin{
-      event::common{event::type::duration_begin, {}, "test begin"}, 0};
+      event::common{event::type::duration_begin, 1, 2, 3, "test begin"}, 0};
 
   new (&a[1].evt.end) event::duration_end{
-      event::common{event::type::duration_end, {}, "test end"}, 5};
+      event::common{event::type::duration_end, 4, 5, 6, "test end"}, 5};
 
   new (&a[2].evt.cmp) event::complete{
-      event::common{event::type::complete, {}, "test complete"}, 10, 15};
+      event::common{event::type::complete, 7, 8, 9, "test complete"}, 10, 15};
 
   new (&a[3].evt.cnt) event::counter{
-      event::common{event::type::counter, {}, "test counter"}, 20, 42.666};
+      event::common{event::type::counter, 16, 17, 18, "test counter"}, 20,
+      42.666};
 
   new (&a[4].evt.inst) event::instant{
-      event::common{event::type::instant, {}, "test instant"}, 25};
+      event::common{event::type::instant, 19, 20, 21, "test instant"}, 25};
 
   SUBCASE("tree") {
     test_sink<central_sink> root{};

@@ -20,9 +20,9 @@ void flush_thread_local_sink() noexcept;
 
 void flush_all_collected_events(
     output::format const fmt = output::format::chrome_trace,
-    char const *const filename = nullptr, // `== nullptr` => no-op; to be more precise: discard everything
-    bool const defer_flush = false
-);
+    char const *const filename = nullptr, // `== nullptr` => no-op; to be more
+                                          // precise: discard everything
+    bool const defer_flush = false);
 
 struct marker {
   inline marker(char const *aDesc, int const aColor = -1,
@@ -36,12 +36,11 @@ struct marker {
       auto const now_ns{impl::as_int_ns(impl::now())};
       auto const start_ns{impl::as_int_ns(start)};
       impl::event::any evt;
-      evt.evt.cmp =
-          impl::event::complete{impl::event::common{impl::event::type::complete,
-                                                    {static_cast<char>(color),
-                                                     static_cast<char>(tag)},
-                                                    desc},
-                                start_ns, now_ns - start_ns};
+      evt.evt.cmp = impl::event::complete{
+          impl::event::common{impl::event::type::complete,
+                              static_cast<char>(color), static_cast<short>(tag),
+                              0, desc},
+          start_ns, now_ns - start_ns};
       append_event(evt);
       desc = nullptr;
       return now_ns - start_ns;

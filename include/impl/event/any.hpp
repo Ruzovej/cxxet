@@ -17,8 +17,8 @@ struct any {
   } evt;
 
   [[nodiscard]] type get_type() const noexcept {
-    return evt.begin.evt.t; // valid because of shared initial type sequence (or
-                            // how is it called)
+    // valid because of `common initial sequence of members`:
+    return evt.begin.evt.t;
   }
 
   // ugh ... TODO refactor:

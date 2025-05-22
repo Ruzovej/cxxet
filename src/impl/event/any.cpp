@@ -4,6 +4,15 @@
 
 namespace rsm::impl::event {
 
+namespace {
+struct common_without_explicit_padding {
+  type t;
+  char const *const desc;
+};
+} // namespace
+
+static_assert(sizeof(common) <= sizeof(common_without_explicit_padding)); // is this meaningful test?!
+
 // how to automatically keep this list up to date?! Or maybe put it to separate
 // & corresponding files?
 static_assert(std::is_trivially_destructible_v<duration_begin>);

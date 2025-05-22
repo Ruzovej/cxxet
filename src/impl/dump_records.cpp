@@ -140,8 +140,8 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
     case event::type::complete: {
       auto const evt_complete = evt.evt.cmp;
       out << thread_id << ": '" << evt_complete.evt.desc << "', color "
-          << static_cast<int>(evt_complete.evt.explicit_padding[0]) << ", tag "
-          << static_cast<int>(evt_complete.evt.explicit_padding[1]) << ": "
+          << static_cast<int>(evt_complete.evt.flag_1) << ", tag "
+          << static_cast<int>(evt_complete.evt.flag_2) << ": "
           << evt_complete.start_ns << " -> "
           << (evt_complete.start_ns + evt_complete.duration_ns) << " ~ "
           << evt_complete.duration_ns << " [ns]\n";
