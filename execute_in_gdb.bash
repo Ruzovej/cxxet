@@ -13,5 +13,5 @@ printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nExecuting compiled "rsm_dummy_app" within gdb
 
 set -x
 
-export RSM_DEFAULT_BLOCK_SIZE=4 # torture it with some non-default value & force it to allocate more during the run
+export RSM_DEFAULT_BLOCK_SIZE="${2:-4}" # torture it with some non-default value & force it to allocate more during the run
 gdb --args "bin/${preset}/rsm_dummy_app"
