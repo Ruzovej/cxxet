@@ -46,7 +46,7 @@ struct handler {
     new (&last[1 + last[0].meta.size++].evt) any{event};
   }
 
-  void drain_and_prepend_other(handler &other) noexcept;
+  void drain_other(handler &other) noexcept;
 
   template <typename callable_t> long long apply(callable_t &&callable) const {
     long long cnt{0};

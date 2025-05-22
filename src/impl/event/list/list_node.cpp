@@ -22,12 +22,19 @@ handler::~handler() noexcept {
   }
 }
 
-void handler::drain_and_prepend_other(handler &other) noexcept {
-  assert(this != &other && "attempting to drain and prepend self");
-  if (other.first) {
-    other.last[0].meta.next = first;
-    first = std::exchange(other.first, nullptr);
+void handler::drain_other(handler &other) noexcept {
+  assert(this != &other && "attempting to drain and append to self!");
+  assert((first == nullptr) == (last == nullptr));
+  assert((other.first == nullptr) == (other.last == nullptr));
+  if (last) {
+    last[0].meta.next = std::exchange(other.first, nullptr);
+    while (last[0].meta.next) {
+      last = last[0].meta.next;
+    }
     other.last = nullptr;
+  } else {
+    std::swap(first, other.first);
+    std::swap(last, other.last);
   }
 }
 

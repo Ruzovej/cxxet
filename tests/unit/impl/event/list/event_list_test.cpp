@@ -33,7 +33,7 @@ TEST_CASE("event::list") {
 
     SUBCASE("prepend") {
       event::list l2;
-      l.drain_and_prepend_other(l2);
+      l.drain_other(l2);
 
       n = l.apply([](long long const, long long const, event::any const &) {
         REQUIRE(false);
@@ -113,7 +113,7 @@ TEST_CASE("event::list") {
       other.append(a[0]);
       other.append(a[1]);
 
-      l.drain_and_prepend_other(other);
+      l.drain_other(other);
       n = l.apply([&counter, &a](long long const, long long const,
                                  event::any const &evt) {
         REQUIRE_EQ(evt, a[counter++]);
@@ -128,7 +128,7 @@ TEST_CASE("event::list") {
       l.append(a[0]);
       l.append(a[1]);
 
-      l.drain_and_prepend_other(other);
+      l.drain_other(other);
       n = l.apply([&counter, &a](long long const, long long const,
                                  event::any const &evt) {
         REQUIRE_EQ(evt, a[counter++]);
@@ -139,18 +139,18 @@ TEST_CASE("event::list") {
     }
 
     SUBCASE("prepend") {
+      l.set_default_node_capacity(2);
+      l.reserve();
+      l.append(a[0]);
+      l.append(a[1]);
       event::list other;
       other.set_default_node_capacity(2);
       other.reserve();
-      other.append(a[0]);
-      other.append(a[1]);
-      l.set_default_node_capacity(2);
-      l.reserve();
-      l.append(a[2]);
-      l.append(a[3]);
-      l.append(a[4]);
+      other.append(a[2]);
+      other.append(a[3]);
+      other.append(a[4]);
 
-      l.drain_and_prepend_other(other);
+      l.drain_other(other);
       n = l.apply([&counter, &a](long long const, long long const,
                                  event::any const &evt) {
         REQUIRE_EQ(evt, a[counter++]);

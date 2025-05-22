@@ -47,22 +47,22 @@ TEST_CASE("sink cascade") {
 
     REQUIRE_EQ(n, 0);
 
-    leaf2.flush();
+    leaf1.flush();
 
     n = root.apply([&a](long long const, long long const,
-                        event::any const &evt) { REQUIRE_EQ(evt, a[1]); });
+                        event::any const &evt) { REQUIRE_EQ(evt, a[0]); });
 
-    REQUIRE(leaf2.empty());
+    REQUIRE(leaf1.empty());
     REQUIRE_EQ(n, 1);
 
-    leaf1.flush();
+    leaf2.flush();
 
     n = root.apply([&counter, &a](long long const, long long const,
                                   event::any const &evt) {
       REQUIRE_EQ(evt, a[counter++]);
     });
 
-    REQUIRE(leaf1.empty());
+    REQUIRE(leaf2.empty());
     REQUIRE_EQ(n, counter);
     REQUIRE_EQ(counter, 2);
   }
@@ -71,8 +71,8 @@ TEST_CASE("sink cascade") {
     test_sink root{nullptr};
     test_sink leaf1{&root}, leaf2{&leaf1};
 
-    leaf2.append_event(a[0]);
-    leaf1.append_event(a[1]);
+    leaf1.append_event(a[0]);
+    leaf2.append_event(a[1]);
 
     n = root.apply([](long long const, long long const, event::any const &) {
       REQUIRE(false);

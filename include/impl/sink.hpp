@@ -25,9 +25,7 @@ struct sink {
   [[nodiscard]] bool empty() const noexcept { return events.empty(); }
 
 protected:
-  virtual void drain(sink &other) {
-    events.drain_and_prepend_other(other.events);
-  }
+  virtual void drain(sink &other) { events.drain_other(other.events); }
 
   sink(sink const &) = delete;
   sink &operator=(sink const &) = delete;
