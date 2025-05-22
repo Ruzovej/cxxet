@@ -36,10 +36,7 @@ void handler::drain_other(handler &other) noexcept {
   assert((other.first == nullptr) == (other.last == nullptr));
   if (last) {
     last[0].meta.next = std::exchange(other.first, nullptr);
-    while (last[0].meta.next) {
-      last = last[0].meta.next;
-    }
-    other.last = nullptr;
+    last = std::exchange(other.last, nullptr);
   } else {
     std::swap(first, other.first);
     std::swap(last, other.last);
