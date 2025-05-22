@@ -39,7 +39,8 @@ function unit_runner() {
                     --target rsm_unit_tests \
                     --polite-ln-compile_commands
             fi
-            "bin/${preset}/rsm_unit_tests"
+            "bin/${preset}/rsm_unit_tests" \
+                --no-intro
             printf '\n'
         done
 
