@@ -20,8 +20,8 @@ void flush_thread_local_sink() noexcept;
 
 void flush_all_collected_events(
     output::format const fmt = output::format::chrome_trace,
-    char const *const filename = nullptr,
-    bool const defer_flush = false // `filename == nullptr` means `/dev/null`
+    char const *const filename = nullptr, // `== nullptr` => no-op; to be more precise: discard everything
+    bool const defer_flush = false
 );
 
 struct marker {
