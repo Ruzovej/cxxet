@@ -8,7 +8,7 @@
 #include "rsm.hpp"
 
 int main(int argc, char const **argv) {
-  rsm::init_local_sink();
+  rsm::init_thread_local_sink();
 
   bool const test_threads{[&]() {
     if (argc > 3) {
@@ -51,15 +51,15 @@ int main(int argc, char const **argv) {
     m3.submit();
 
     std::thread{[]() {
-      rsm::init_local_sink();
+      rsm::init_thread_local_sink();
       {
         rsm::marker m{"scoped 1"};
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
-      rsm::flush_thread();
+      rsm::flush_thread_local_sink();
     }}.join();
     std::thread{[]() {
-      rsm::init_local_sink();
+      rsm::init_thread_local_sink();
       {
         rsm::marker m{"scoped 2"};
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -75,26 +75,26 @@ int main(int argc, char const **argv) {
       // no extra scope needed in this case
     }}.join();
     std::thread{[]() {
-      rsm::init_local_sink();
+      rsm::init_thread_local_sink();
 
       rsm::marker m{"scoped 4"};
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       m.submit(); // explicit marker submit
     }}.join();
     std::thread{[]() {
-      rsm::init_local_sink();
+      rsm::init_thread_local_sink();
 
       RSM_MARKER("scoped 5 (macro with both default color and tag)");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }}.join();
     std::thread{[]() {
-      rsm::init_local_sink();
+      rsm::init_thread_local_sink();
 
       RSM_MARKER("scoped 6 (macro with explicit color and default tag)", 1);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }}.join();
     std::thread{[]() {
-      rsm::init_local_sink();
+      rsm::init_thread_local_sink();
 
       RSM_MARKER("scoped 7 (macro with both explicit color and tag)", 1, 2);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -120,15 +120,17 @@ int main(int argc, char const **argv) {
   std::thread tsmc;
   if (test_threads) {
     tsmc = std::thread{[&simple_marker_cascade]() {
-      rsm::init_local_sink();
+      rsm::init_thread_local_sink();
       simple_marker_cascade(1);
-      rsm::flush_thread();
+      rsm::flush_thread_local_sink();
     }};
   }
   simple_marker_cascade(0);
 
-  rsm::flush_thread(); // this must be done in the main thread, otherwise
-  // "local" submitted markers won't be flushed
+  rsm::flush_thread_local_sink(); // in the main thread, if flushing all
+                                  // immediately, this must be done in advance &
+                                  // manually, otherwise "local" submitted
+                                  // markers won't be flushed
 
   if (test_threads) {
     tsmc.join();
@@ -144,7 +146,7 @@ int main(int argc, char const **argv) {
 
     for (int i{0}; i < num_ths; ++i) {
       ths.emplace_back([i]() {
-        rsm::init_local_sink();
+        rsm::init_thread_local_sink();
 
         RSM_MARKER("scoped 8 (in 3 various parallel threads)", -1, i);
         std::this_thread::sleep_for(std::chrono::milliseconds(num_ths - i));
@@ -160,7 +162,7 @@ int main(int argc, char const **argv) {
       argc > 1 ? static_cast<rsm::output::format>(std::stoi(argv[1]))
                : rsm::output::format::raw_naive_v0};
   char const *const filename{argc > 2 ? argv[2] : "/dev/stdout"};
-  rsm::dump_collected_records(fmt, filename);
+  rsm::flush_all_collected_events(fmt, filename);
 
   return 0;
 }

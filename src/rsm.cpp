@@ -10,7 +10,8 @@ namespace rsm {
 static impl::central_sink global_sink{false};
 static thread_local impl::local_sink thread_sink{&global_sink};
 
-void init_local_sink(impl::sink *parent_sink, int const default_node_capacity) {
+void init_thread_local_sink(impl::sink *parent_sink,
+                            int const default_node_capacity) {
   assert(default_node_capacity >= 0 &&
          "default_node_capacity must be non-negative");
   // if not already initialized, preallocates memory & resets parent
@@ -23,11 +24,15 @@ void init_local_sink(impl::sink *parent_sink, int const default_node_capacity) {
       .reserve();
 }
 
-void flush_thread() noexcept { thread_sink.flush_to_parent(); }
+void flush_thread_local_sink() noexcept { thread_sink.flush_to_parent(); }
 
-void dump_collected_records(output::format const fmt,
-                            char const *const filename) {
-  global_sink.set_target_format(fmt).set_target_filename(filename).flush();
+void flush_all_collected_events(output::format const fmt,
+                                char const *const filename,
+                                bool const defer_flush) {
+  global_sink.set_target_format(fmt).set_target_filename(filename);
+  if (!defer_flush) {
+    global_sink.flush();
+  }
 }
 
 void marker::append_event(impl::event::any const &evt) noexcept {

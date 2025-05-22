@@ -13,14 +13,16 @@
 
 namespace rsm {
 
-void init_local_sink(impl::sink *parent_sink = nullptr,
-                     int const default_node_capacity = 0);
+void init_thread_local_sink(impl::sink *parent_sink = nullptr,
+                            int const default_node_capacity = 0);
 
-void flush_thread() noexcept;
+void flush_thread_local_sink() noexcept;
 
-void dump_collected_records(
+void flush_all_collected_events(
     output::format const fmt = output::format::chrome_trace,
-    char const *const filename = nullptr); // `filename == nullptr` means stdout
+    char const *const filename = nullptr,
+    bool const defer_flush = false // `filename == nullptr` means `/dev/null`
+);
 
 struct marker {
   inline marker(char const *aDesc, int const aColor = -1,
