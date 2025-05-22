@@ -30,6 +30,14 @@ struct list {
 
   void reserve(bool const force = false) noexcept { handler.reserve(force); }
 
+  void drain_and_prepend_other(list &other) noexcept {
+    handler.drain_and_prepend_other(other.handler);
+  }
+
+  [[nodiscard]] bool empty() const noexcept { return handler.empty(); }
+
+  [[nodiscard]] long long size() const noexcept { return handler.size(); }
+
 private:
   list_node::handler handler; // TODO this "intermediate step" isn't needed,
                               // merge `list_node::handler` and `list` ...

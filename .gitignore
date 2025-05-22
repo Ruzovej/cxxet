@@ -1,5 +1,5 @@
 /.cache
 /bin
-/build*
+/build
 /compile_commands.json
 /graphviz
