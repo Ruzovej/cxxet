@@ -64,27 +64,6 @@ std::string escape_json_string(const char *str) {
 
 void write_chrome_trace(std::ostream &out, impl::event::list const &list,
                         long long const time_point_zero) {
-  // using pid_and_record = std::pair<long long, record const *>;
-  // std::vector<pid_and_record> sorted_records;
-  //
-  // for (records const *block{first}; block != nullptr;
-  //     block = block->next.get()) {
-  //  for (record const *r{block->data}; r < block->last; ++r) {
-  //    sorted_records.emplace_back(block->thread_id, r);
-  //  }
-  //}
-  // std::sort(sorted_records.begin(), sorted_records.end(),
-  //          [](const pid_and_record &a, const pid_and_record &b) {
-  //            auto const trans = [](pid_and_record const &r) {
-  //              return std::tuple(
-  //                  r.first,            // `tid` ascending
-  //                  r.second->start_ns, // `start` ascending
-  //                  -r.second->end_ns   // `end` with minus => descending
-  //              );
-  //            };
-  //            return trans(a) < trans(b);
-  //          });
-
   out << "{\n";
   out << "  \"traceEvents\": [\n";
 
@@ -110,9 +89,9 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
     case event::type::complete: {
       auto const e = evt.evt.cmp;
       // [us]:
-      const auto start{static_cast<double>(e.start_ns - time_point_zero) /
+      auto const start{static_cast<double>(e.start_ns - time_point_zero) /
                        1'000.0};
-      const auto duration{static_cast<double>(e.duration_ns) / 1'000.0};
+      auto const duration{static_cast<double>(e.duration_ns) / 1'000.0};
 
       // Chrome trace format:
       // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
@@ -121,8 +100,8 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       out << "      \"ph\": \"X\",\n";
       out << "      \"ts\": " << start << ",\n";
       out << "      \"dur\": " << duration << ",\n";
-      out << "      \"pid\": " << pid << " ,\n";
-      out << "      \"tid\": " << thread_id << ",\n";
+      out << "      \"pid\": " << pid << ",\n";
+      out << "      \"tid\": " << thread_id << "\n";
       out << "    }";
       break;
     }
@@ -140,12 +119,8 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
     }
   });
 
-  if constexpr (false) {
-    out << "\n  ]\n";
-  } else { // TODO remove or not?
-    out << "\n  ],\n";
-    out << "  \"displayTimeUnit\": \"ns\"\n";
-  }
+  out << "\n  ],\n";
+  out << "  \"displayTimeUnit\": \"ns\"\n";
   out << "}\n";
 }
 
@@ -221,6 +196,7 @@ void dump_records(impl::event::list const &list,
   }
   }
 
+  file.flush();
   file.close();
 }
 
