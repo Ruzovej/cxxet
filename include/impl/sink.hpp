@@ -17,7 +17,7 @@ struct sink {
     events.set_default_node_capacity(capacity);
   }
   [[nodiscard]] int get_default_capacity() const noexcept {
-    return events.get_default_capacity();
+    return events.get_default_node_capacity();
   }
 
 protected:

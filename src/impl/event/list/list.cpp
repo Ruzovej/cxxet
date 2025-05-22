@@ -1,4 +1,4 @@
-#include "impl/event/list/list_node.hpp"
+#include "impl/event/list/list.hpp"
 
 #include <unistd.h>
 
@@ -7,16 +7,17 @@
 #include <type_traits>
 #include <utility>
 
-namespace rsm::impl::event::list_node {
+namespace rsm::impl::event {
 
-static_assert(std::is_trivially_destructible_v<meta_info>);
-static_assert(std::is_trivially_destructible_v<raw_element>);
+list::list() noexcept = default;
 
-handler::handler() noexcept = default;
+list::~list() noexcept {
+  static_assert(std::is_trivially_destructible_v<list::meta_info>);
+  static_assert(std::is_trivially_destructible_v<list::raw_element>);
+  destroy();
+}
 
-handler::~handler() noexcept { destroy(); }
-
-void handler::destroy() noexcept {
+void list::destroy() noexcept {
   while (first) {
     auto *next{first->meta.next};
     delete[] first;
@@ -24,13 +25,12 @@ void handler::destroy() noexcept {
   }
 }
 
-handler &handler::set_default_capacity(int const capacity) noexcept {
+void list::set_default_node_capacity(int const capacity) noexcept {
   assert(capacity > 0);
   default_capacity = capacity;
-  return *this;
 }
 
-void handler::drain_other(handler &other) noexcept {
+void list::drain_other(list &other) noexcept {
   assert(this != &other && "attempting to drain and append to self!");
   assert((first == nullptr) == (last == nullptr));
   assert((other.first == nullptr) == (other.last == nullptr));
@@ -43,7 +43,7 @@ void handler::drain_other(handler &other) noexcept {
   }
 }
 
-[[nodiscard]] bool handler::empty() const noexcept {
+[[nodiscard]] bool list::empty() const noexcept {
   if (first != nullptr) {
     for (auto it{first}; it != nullptr; it = it[0].meta.next) {
       if (it[0].meta.size > 0) {
@@ -51,21 +51,28 @@ void handler::drain_other(handler &other) noexcept {
       }
     }
   }
-
   return true;
 }
 
-[[nodiscard]] long long handler::size() const noexcept {
+[[nodiscard]] long long list::size() const noexcept {
   long long sz{0};
-
   for (auto it{first}; it != nullptr; it = it[0].meta.next) {
     sz += it[0].meta.size;
   }
-
   return sz;
 }
 
-static raw_element *allocate_raw_node_elems(int const capacity) noexcept {
+void list::do_reserve(bool const force) noexcept {
+  if (force || (get_current_free_capacity() < default_capacity)) {
+    auto target{first ? &last[0].meta.next : &first};
+    *target = allocate_raw_node_elems(default_capacity);
+    last = *target;
+  }
+}
+
+long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
+
+list::raw_element *list::allocate_raw_node_elems(int const capacity) noexcept {
   // this can throw ... but if it does, it means allocation failed -> how to
   // handle it? Let's just crash ...
   auto *data{new raw_element[static_cast<unsigned>(capacity) + 1]};
@@ -76,16 +83,4 @@ static raw_element *allocate_raw_node_elems(int const capacity) noexcept {
   return data;
 }
 
-long long handler::get_pid() const noexcept {
-  return static_cast<long long>(getpid());
-}
-
-void handler::do_reserve(bool const force) noexcept {
-  if (force || (get_current_free_capacity() < default_capacity)) {
-    auto target{first ? &last->meta.next : &first};
-    *target = allocate_raw_node_elems(default_capacity);
-    last = *target;
-  }
-}
-
-} // namespace rsm::impl::event::list_node
+} // namespace rsm::impl::event
