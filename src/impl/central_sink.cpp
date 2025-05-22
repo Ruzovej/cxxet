@@ -10,48 +10,42 @@
 
 namespace rsm::impl {
 
-central_sink::central_sink()
-    : time_point{as_int_ns(now())}, block_size([] {
-        // Get block_size from environment variable if available, otherwise use
-        // default value of 64
-        const char *env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
-        if (env_block_size && *env_block_size != '\0') {
-          try {
-            return static_cast<unsigned>(std::stoul(env_block_size));
-          } catch (...) {
-            // In case of invalid conversion, keep the default value
-          }
-        }
-        return 64u;
-      }()) {
-  std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << block_size << '\n';
-}
-
-void central_sink::append(std::unique_ptr<records> &&recs) noexcept {
-  assert(recs && "attempting to append a null records instance");
-  std::lock_guard lck{mtx};
-  if (!first) {
-    first = std::move(recs);
-    last = first.get();
-  } else {
-    last->next = std::move(recs);
-  }
-  while (last->next) {
-    last = last->next.get();
-  }
-}
-
-void central_sink::dump_and_deallocate_collected_records(
-    output::format const fmt, char const *const filename) {
-  std::lock_guard lck{mtx};
-  if (fmt == output::format::raw_naive_v0) {
-    for (auto iter{first.get()}; iter != nullptr; iter = iter->next.get()) {
-      iter->print_records();
+central_sink::central_sink(bool const silent)
+    : sink{}, time_point{as_int_ns(now())} {
+  set_default_list_node_capacity([] {
+    // Get block_size from environment variable if available, otherwise use
+    // default value of 64
+    const char *env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
+    if (env_block_size && *env_block_size != '\0') {
+      try {
+        return static_cast<int>(std::stoul(env_block_size));
+      } catch (...) {
+        // In case of invalid conversion, keep the default value
+      }
     }
-  } else {
-    dump_records(first.get(), time_point, fmt, filename);
+    return 64;
+  }());
+  if (!silent) {
+    std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << get_default_capacity()
+              << '\n';
   }
-  first.reset(nullptr);
+}
+
+central_sink::~central_sink() noexcept { flush(); }
+
+void central_sink::flush() {
+  std::lock_guard lck{mtx};
+  if (!events.empty()) {
+    if (target_filename) {
+      dump_records(events, time_point, target_format, target_filename);
+    }
+    events.destroy();
+  }
+}
+
+void central_sink::drain(sink &other) {
+  std::lock_guard lck{mtx};
+  sink::drain(other);
 }
 
 } // namespace rsm::impl

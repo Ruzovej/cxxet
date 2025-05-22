@@ -12,6 +12,8 @@ struct list {
   list() = default;
   ~list() noexcept = default;
 
+  void destroy() noexcept { handler.destroy(); }
+
   void append(any const &event) noexcept { handler.append(event); }
 
   template <typename callable_t> long long apply(callable_t &&callable) const {
@@ -26,6 +28,10 @@ struct list {
 
   void set_default_node_capacity(int const capacity) noexcept {
     handler.set_default_capacity(capacity);
+  }
+
+  [[nodiscard]] int get_default_capacity() const noexcept {
+    return handler.get_default_capacity();
   }
 
   void reserve(bool const force = false) noexcept { handler.reserve(force); }

@@ -6,36 +6,32 @@
 
 namespace rsm::impl {
 
-local_sink::local_sink(central_sink *aParent) : parent{aParent} {
-  assert(parent && "attempting to create a local sink without a parent");
-  allocate_next_records();
-}
+local_sink::local_sink(sink *aParent) : sink{}, parent{aParent} {}
 
-local_sink::~local_sink() noexcept { flush_to_parent_sink(); }
+local_sink::~local_sink() noexcept { flush_to_parent(); }
 
-void local_sink::flush_to_parent_sink() noexcept {
-  if (first) {
-    parent->append(std::move(first));
-    last = nullptr;
+void local_sink::flush_to_parent() {
+  if (parent && !events.empty()) {
+    parent->drain(*this);
   }
 }
 
-void local_sink::set_parent_sink(central_sink *aParent) noexcept {
-  assert((!first || first->empty()) &&
+local_sink &local_sink::set_parent_sink(sink *aParent) noexcept {
+  assert((parent && events.empty()) &&
          "attempting to set a parent sink with unflushed records");
   parent = aParent;
+  return *this;
 }
 
-void local_sink::allocate_next_records() {
-  // [[assume((first == nullptr) == (last == nullptr))]];
-  auto target{first ? &last->next : &first};
-  *target = records::create(parent->get_block_size());
+local_sink &local_sink::set_default_list_node_capacity(
+    int const default_list_node_capacity) noexcept {
+  events.set_default_node_capacity(default_list_node_capacity);
+  return *this;
+}
 
-  if (!last) {
-    last = first.get();
-  } else {
-    last = last->next.get();
-  }
+local_sink &local_sink::reserve() {
+  events.reserve();
+  return *this;
 }
 
 } // namespace rsm::impl

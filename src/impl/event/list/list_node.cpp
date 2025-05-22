@@ -14,12 +14,20 @@ static_assert(std::is_trivially_destructible_v<raw_element>);
 
 handler::handler() noexcept = default;
 
-handler::~handler() noexcept {
+handler::~handler() noexcept { destroy(); }
+
+void handler::destroy() noexcept {
   while (first) {
     auto *next{first->meta.next};
     delete[] first;
     first = next;
   }
+}
+
+handler &handler::set_default_capacity(int const capacity) noexcept {
+  assert(capacity > 0);
+  default_capacity = capacity;
+  return *this;
 }
 
 void handler::drain_other(handler &other) noexcept {
@@ -61,8 +69,6 @@ void handler::drain_other(handler &other) noexcept {
 }
 
 static raw_element *allocate_raw_node_elems(int const capacity) noexcept {
-  assert(capacity >= 1);
-
   // this can throw ... but if it does, it means allocation failed -> how to
   // handle it? Let's just crash ...
   auto *data{new raw_element[static_cast<unsigned>(capacity) + 1]};

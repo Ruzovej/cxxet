@@ -1,40 +1,28 @@
 #pragma once
 
-#include <memory>
-
-#include "impl/central_sink.hpp"
-#include "impl/record.hpp"
-#include "impl/records.hpp"
+#include "impl/sink.hpp"
 
 namespace rsm::impl {
 
-struct local_sink {
-  explicit local_sink(central_sink *aParent);
-  ~local_sink() noexcept;
+struct local_sink : sink {
+  explicit local_sink(sink *aParent);
+  ~local_sink() noexcept override;
 
-  inline void append_record(record const m) {
-    if (!last || !last->free_capacity()) // [[unlikely]] // TODO ...
-    {
-      allocate_next_records();
-    }
-    last->append_record(m);
+  inline void append_event(event::any const &evt) noexcept {
+    events.append(evt);
   }
 
-  void flush_to_parent_sink() noexcept;
+  void flush_to_parent();
 
-  void set_parent_sink(central_sink *aParent) noexcept;
+  local_sink &set_parent_sink(sink *aParent) noexcept;
+
+  local_sink &set_default_list_node_capacity(
+      int const default_list_node_capacity = 64) noexcept;
+
+  local_sink &reserve();
 
 private:
-  local_sink(local_sink const &) = delete;
-  local_sink &operator=(local_sink const &) = delete;
-  local_sink(local_sink &&) = delete;
-  local_sink &operator=(local_sink &&) = delete;
-
-  void allocate_next_records();
-
-  central_sink *parent{nullptr};
-  std::unique_ptr<records> first{nullptr};
-  records *last{nullptr};
+  sink *parent{nullptr};
 };
 
 } // namespace rsm::impl

@@ -26,10 +26,9 @@ struct handler {
   handler() noexcept;
   ~handler() noexcept;
 
-  handler &set_default_capacity(int const capacity) noexcept {
-    default_capacity = capacity;
-    return *this;
-  }
+  void destroy() noexcept;
+
+  handler &set_default_capacity(int const capacity) noexcept;
   [[nodiscard]] int get_default_capacity() const noexcept {
     return default_capacity;
   }

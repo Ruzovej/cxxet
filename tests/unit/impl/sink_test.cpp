@@ -1,14 +1,17 @@
-#include "impl/sink.hpp"
+#include "impl/central_sink.hpp"
+#include "impl/local_sink.hpp"
 
 #include <doctest/doctest.h>
 
 namespace rsm::impl {
 
-struct test_sink : sink {
-  using sink::sink;
+template <typename base_sink> struct test_sink : base_sink {
+  using base_sink::base_sink;
 
-  template <typename callable_t> long long apply(callable_t &&callable) const {
-    return events.apply(std::forward<callable_t>(callable));
+  template <typename callable_t> long long apply(callable_t &&callable) {
+    const auto n{base_sink::events.apply(std::forward<callable_t>(callable))};
+    // base_sink::events.destroy();
+    return n;
   }
 };
 
@@ -35,8 +38,9 @@ TEST_CASE("sink cascade") {
       event::common{event::type::instant, {}, "test instant"}, 25};
 
   SUBCASE("tree") {
-    test_sink root{nullptr};
-    test_sink leaf1{&root}, leaf2{&root};
+    test_sink<central_sink> root{};
+    root.set_target_filename("/dev/null");
+    test_sink<local_sink> leaf1{&root}, leaf2{&root};
 
     leaf1.append_event(a[0]);
     leaf2.append_event(a[1]);
@@ -47,7 +51,7 @@ TEST_CASE("sink cascade") {
 
     REQUIRE_EQ(n, 0);
 
-    leaf1.flush();
+    leaf1.flush_to_parent();
 
     n = root.apply([&a](long long const, long long const,
                         event::any const &evt) { REQUIRE_EQ(evt, a[0]); });
@@ -55,7 +59,7 @@ TEST_CASE("sink cascade") {
     REQUIRE(leaf1.empty());
     REQUIRE_EQ(n, 1);
 
-    leaf2.flush();
+    leaf2.flush_to_parent();
 
     n = root.apply([&counter, &a](long long const, long long const,
                                   event::any const &evt) {
@@ -68,8 +72,9 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("linear") {
-    test_sink root{nullptr};
-    test_sink leaf1{&root}, leaf2{&leaf1};
+    test_sink<central_sink> root{};
+    root.set_target_filename("/dev/null");
+    test_sink<local_sink> leaf1{&root}, leaf2{&leaf1};
 
     leaf1.append_event(a[0]);
     leaf2.append_event(a[1]);
@@ -81,7 +86,7 @@ TEST_CASE("sink cascade") {
     REQUIRE(root.empty());
     REQUIRE_EQ(n, 0);
 
-    leaf2.flush();
+    leaf2.flush_to_parent();
 
     n = leaf1.apply([&counter, &a](long long const, long long const,
                                    event::any const &evt) {
@@ -93,7 +98,7 @@ TEST_CASE("sink cascade") {
     REQUIRE_EQ(n, counter);
     REQUIRE_EQ(n, 2);
 
-    leaf1.flush();
+    leaf1.flush_to_parent();
     counter = 0;
 
     n = root.apply([&counter, &a](long long const, long long const,
@@ -107,10 +112,11 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("flush upon destruction") {
-    test_sink root{nullptr};
+    test_sink<central_sink> root{};
+    root.set_target_filename("/dev/null");
 
     {
-      test_sink leaf{&root};
+      test_sink<local_sink> leaf{&root};
       leaf.append_event(a[0]);
     }
     n = root.apply([&counter, &a](long long const, long long const,

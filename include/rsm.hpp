@@ -1,6 +1,7 @@
 #pragma once
 
-#include "impl/central_sink.hpp"
+#include "impl/event/any.hpp"
+#include "impl/sink.hpp"
 #include "impl/utils.hpp"
 #include "rsm_output_format.hpp"
 
@@ -12,7 +13,8 @@
 
 namespace rsm {
 
-void init_local_sink(impl::central_sink *parent_sink = nullptr);
+void init_local_sink(impl::sink *parent_sink = nullptr,
+                     int const default_node_capacity = 0);
 
 void flush_thread() noexcept;
 
@@ -31,7 +33,14 @@ struct marker {
     {
       auto const now_ns{impl::as_int_ns(impl::now())};
       auto const start_ns{impl::as_int_ns(start)};
-      append_record(start_ns, now_ns);
+      impl::event::any evt;
+      evt.evt.cmp =
+          impl::event::complete{impl::event::common{impl::event::type::complete,
+                                                    {static_cast<char>(color),
+                                                     static_cast<char>(tag)},
+                                                    desc},
+                                start_ns, now_ns - start_ns};
+      append_event(evt);
       desc = nullptr;
       return now_ns - start_ns;
     }
@@ -40,11 +49,11 @@ struct marker {
 
 private:
   char const *desc;
-  int const color;
-  int const tag;
+  int const color; // TODO discard those members and ignore them ...
+  int const tag;   // TODO discard those members and ignore them ...
   struct timespec const start;
 
-  void append_record(long long const start_ns, long long const end_ns) noexcept;
+  void append_event(impl::event::any const &evt) noexcept;
 
   marker(marker const &) = delete;
   marker &operator=(marker const &) = delete;
