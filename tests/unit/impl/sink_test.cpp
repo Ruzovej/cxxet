@@ -37,8 +37,9 @@ TEST_CASE("sink cascade") {
   new (&a[4].evt.inst) event::instant{19, 20, 21, "test instant", 25};
 
   SUBCASE("one 'leaf'") {
-    test_sink<central_sink> root{};
-    root.set_target_filename("/dev/null");
+    sink_traits traits{};
+    traits.set_target_filename("/dev/null");
+    test_sink<central_sink> root{traits};
     test_sink<local_sink> leaf{root};
 
     leaf.append_event(a[0]);
@@ -64,8 +65,9 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("two 'leafs'") {
-    test_sink<central_sink> root{};
-    root.set_target_filename("/dev/null");
+    sink_traits traits{};
+    traits.set_target_filename("/dev/null");
+    test_sink<central_sink> root{traits};
     test_sink<local_sink> leaf1{root}, leaf2{root};
 
     leaf1.append_event(a[0]);
@@ -98,13 +100,21 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("flush upon destruction") {
-    test_sink<central_sink> root{};
-    root.set_target_filename("/dev/null");
+    sink_traits traits{};
+    traits.set_target_filename("/dev/null");
+    test_sink<central_sink> root{traits};
 
-    {
+    SUBCASE("without reserve") {
       test_sink<local_sink> leaf{root};
       leaf.append_event(a[0]);
     }
+
+    SUBCASE("with reserve") {
+      test_sink<local_sink> leaf{root};
+      leaf.reserve();
+      leaf.append_event(a[0]);
+    }
+
     n = root.apply([&counter, &a](long long const, long long const,
                                   event::any const &evt) {
       REQUIRE_EQ(evt, a[counter++]);

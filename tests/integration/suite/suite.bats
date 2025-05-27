@@ -28,6 +28,7 @@ function setup_file() {
     user_log 'done\n'
     export RSM_BIN_DIR="bin/${RSM_PRESET}"
     export RSM_DEFAULT_BLOCK_SIZE=2
+    export RSM_VERBOSE=1
 }
 
 function setup() {
@@ -98,7 +99,9 @@ function teardown_file() {
     refute_output --partial "WARNING:"
 
     # Verify that all markers are reported in the output
-    assert_output --partial "deduced RSM_DEFAULT_BLOCK_SIZE: 2"
+    assert_output --partial "Deduced RSM_DEFAULT_BLOCK_SIZE: 2"
+    assert_output --partial "Deduced RSM_OUTPUT_FORMAT: 0"
+    assert_output --partial "Deduced RSM_TARGET_FILENAME: "
     assert_output --partial ": 'loop', color -1, tag -1: "
     assert_output --partial ": 'int store', color -1, tag -1: "
     assert_output --partial ": 'int load', color -1, tag -1: "

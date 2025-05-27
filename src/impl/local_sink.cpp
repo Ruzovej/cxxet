@@ -1,9 +1,5 @@
 #include "impl/local_sink.hpp"
 
-#include <cassert>
-
-#include "impl/central_sink.hpp"
-
 namespace rsm::impl {
 
 local_sink::local_sink(central_sink &aParent) : parent{aParent} {}

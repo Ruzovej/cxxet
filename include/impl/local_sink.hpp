@@ -1,10 +1,9 @@
 #pragma once
 
+#include "impl/central_sink.hpp"
 #include "impl/event/list/list.hpp"
 
 namespace rsm::impl {
-
-struct central_sink;
 
 struct local_sink {
   explicit local_sink(central_sink &aParent);
