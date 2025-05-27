@@ -62,7 +62,7 @@ int parse_int(char const *const str_value) {
   return static_cast<int>(std::stoul(str_value));
 }
 
-char const *parse_string(char const *str_value) { return str_value; }
+char const *parse_string(char const *const str_value) { return str_value; }
 
 } // namespace
 
