@@ -2,7 +2,10 @@
 
 namespace rsm::impl {
 
-local_sink::local_sink(central_sink &aParent) noexcept : parent{aParent} {}
+local_sink::local_sink(central_sink &aParent) noexcept : parent{aParent} {
+  events.set_default_node_capacity(
+      parent.get_traits().default_list_node_capacity);
+}
 
 local_sink::~local_sink() noexcept { flush(); }
 

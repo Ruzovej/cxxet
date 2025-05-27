@@ -9,6 +9,21 @@
 
 namespace rsm::impl::event {
 
+namespace {
+
+list::raw_element *allocate_raw_node_elems(int const capacity) noexcept {
+  // this can throw ... but if it does, it means allocation failed -> how to
+  // handle it? Let's just crash ...
+  auto *data{new list::raw_element[static_cast<unsigned>(capacity) + 1]};
+
+  new (&data[0].meta)
+      list::meta_info{static_cast<long long>(gettid()), nullptr, 0, capacity};
+
+  return data;
+}
+
+} // namespace
+
 list::list() noexcept = default;
 
 list::~list() noexcept {
@@ -28,6 +43,14 @@ void list::destroy() noexcept {
 void list::set_default_node_capacity(int const capacity) noexcept {
   assert(capacity > 0);
   default_capacity = capacity;
+}
+
+void list::reserve(bool const force) noexcept {
+  if (force || (get_current_free_capacity() < default_capacity)) {
+    auto target{first ? &last[0].meta.next : &first};
+    *target = allocate_raw_node_elems(default_capacity);
+    last = *target;
+  }
 }
 
 void list::drain_other(list &other) noexcept {
@@ -62,25 +85,6 @@ void list::drain_other(list &other) noexcept {
   return sz;
 }
 
-void list::do_reserve(bool const force) noexcept {
-  if (force || (get_current_free_capacity() < default_capacity)) {
-    auto target{first ? &last[0].meta.next : &first};
-    *target = allocate_raw_node_elems(default_capacity);
-    last = *target;
-  }
-}
-
 long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
-
-list::raw_element *list::allocate_raw_node_elems(int const capacity) noexcept {
-  // this can throw ... but if it does, it means allocation failed -> how to
-  // handle it? Let's just crash ...
-  auto *data{new raw_element[static_cast<unsigned>(capacity) + 1]};
-
-  new (&data[0].meta)
-      meta_info{static_cast<long long>(gettid()), nullptr, 0, capacity};
-
-  return data;
-}
 
 } // namespace rsm::impl::event

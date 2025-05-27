@@ -10,7 +10,6 @@ template <typename base_sink> struct test_sink : base_sink {
 
   template <typename callable_t> long long apply(callable_t &&callable) {
     const auto n{base_sink::events.apply(std::forward<callable_t>(callable))};
-    // base_sink::events.destroy();
     return n;
   }
 

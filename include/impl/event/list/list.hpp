@@ -8,7 +8,7 @@
 
 namespace rsm::impl::event {
 
-class list {
+struct list {
   union raw_element;
 
   struct meta_info {
@@ -27,7 +27,6 @@ class list {
     constexpr raw_element() noexcept : meta{} {}
   };
 
-public:
   list() noexcept;
   ~list() noexcept;
 
@@ -35,7 +34,7 @@ public:
 
   void append(any const &event) noexcept {
     if (get_current_free_capacity() < 1) {
-      do_reserve(true);
+      reserve(true);
     }
     new (&last[1 + last[0].meta.size++].evt) any{event};
   }
@@ -60,11 +59,7 @@ public:
 
   void set_default_node_capacity(int const capacity) noexcept;
 
-  [[nodiscard]] int get_default_node_capacity() const noexcept {
-    return default_capacity;
-  }
-
-  void reserve(bool const force = false) noexcept { do_reserve(force); }
+  void reserve(bool const force = false) noexcept;
 
   void drain_other(list &other) noexcept;
 
@@ -82,11 +77,7 @@ private:
     return last ? (last[0].meta.get_free_capacity()) : 0;
   }
 
-  void do_reserve(bool const force) noexcept;
-
   static long long get_pid() noexcept;
-
-  static raw_element *allocate_raw_node_elems(int capacity) noexcept;
 
   raw_element *first{nullptr}, *last{nullptr};
   int default_capacity{64};
