@@ -35,7 +35,7 @@ function bats_runner() {
     local round=1
     while (( round <= num_rounds )); do
         [[ "${num_rounds}" -eq 1 ]] \
-            || printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\nExecuting bats tests round no. %s/%s:\n\n' "${round}" "${num_rounds}"
+            || printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Executing bats tests round no. %s/%s:\n\n' "${round}" "${num_rounds}"
         (( round++ ))
         local preset
         for preset in "${test_presets[@]}"; do

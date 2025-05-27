@@ -1,5 +1,6 @@
 #pragma once
 
+#include "impl/event/any.hpp"
 #include "impl/utils.hpp"
 #include "rsm_output_format.hpp"
 
@@ -9,15 +10,17 @@
     __VA_ARGS__                                                                \
   }
 
+void RSM_init_thread_local_sink() noexcept;
+
+void RSM_flush_thread_local_sink() noexcept;
+
+void RSM_flush_all_collected_events(
+    rsm::output::format const fmt = rsm::output::format::chrome_trace,
+    char const *const filename = nullptr, // `== nullptr` => no-op; to be more
+                                          // precise: discard everything
+    bool const defer_flush = false) noexcept;
+
 namespace rsm {
-
-void init_thread();
-
-void flush_thread() noexcept;
-
-void dump_collected_records(
-    output::format const fmt = output::format::chrome_trace,
-    char const *const filename = nullptr); // `filename == nullptr` means stdout
 
 struct marker {
   inline marker(char const *aDesc, int const aColor = -1,
@@ -30,7 +33,9 @@ struct marker {
     {
       auto const now_ns{impl::as_int_ns(impl::now())};
       auto const start_ns{impl::as_int_ns(start)};
-      append_record(start_ns, now_ns);
+      append_event(impl::event::complete{static_cast<char>(color),
+                                         static_cast<short>(tag), 0, desc,
+                                         start_ns, now_ns - start_ns});
       desc = nullptr;
       return now_ns - start_ns;
     }
@@ -39,11 +44,11 @@ struct marker {
 
 private:
   char const *desc;
-  int const color;
-  int const tag;
+  int const color; // TODO discard those members and ignore them ...
+  int const tag;   // TODO discard those members and ignore them ...
   struct timespec const start;
 
-  void append_record(long long const start_ns, long long const end_ns) noexcept;
+  void append_event(impl::event::any const &evt) noexcept;
 
   marker(marker const &) = delete;
   marker &operator=(marker const &) = delete;

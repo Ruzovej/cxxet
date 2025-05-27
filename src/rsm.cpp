@@ -1,23 +1,33 @@
 #include "rsm.hpp"
 
-#include "impl/global.hpp"
-#include "impl/record.hpp"
-#include "impl/thread.hpp"
+#include "impl/central_sink.hpp"
+#include "impl/local_sink.hpp"
+#include "impl/sink_properties.hpp"
+
+static rsm::impl::sink_properties sink_props{};
+static rsm::impl::central_sink global_sink{sink_props};
+static thread_local rsm::impl::local_sink thread_sink{global_sink};
+
+void RSM_init_thread_local_sink() noexcept {
+  // if not already initialized, preallocates memory
+  thread_sink.reserve();
+}
+
+void RSM_flush_thread_local_sink() noexcept { thread_sink.flush(); }
+
+void RSM_flush_all_collected_events(rsm::output::format const fmt,
+                                    char const *const filename,
+                                    bool const defer_flush) noexcept {
+  sink_props.set_target_format(fmt).set_target_filename(filename);
+  if (!defer_flush) {
+    global_sink.flush();
+  }
+}
 
 namespace rsm {
 
-void init_thread() { impl::thread::init(); }
-
-void flush_thread() noexcept { impl::thread::instance()->flush_to_global(); }
-
-void dump_collected_records(output::format const fmt,
-                            char const *const filename) {
-  rsm::impl::global::instance()->dump_and_deallocate_collected_records(fmt, filename);
-}
-
-void marker::append_record(long long const start_ns,
-                           long long const end_ns) noexcept {
-  impl::thread::instance()->append_record({desc, color, tag, start_ns, end_ns});
+void marker::append_event(impl::event::any const &evt) noexcept {
+  thread_sink.append_event(evt);
 }
 
 } // namespace rsm
