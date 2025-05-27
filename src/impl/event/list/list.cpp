@@ -40,6 +40,13 @@ void list::destroy() noexcept {
   }
 }
 
+void list::append(any const &event) noexcept {
+  if (get_current_free_capacity() < 1) {
+    reserve(true);
+  }
+  new (&last[1 + last[0].meta.size++].evt) any{event};
+}
+
 void list::set_default_node_capacity(int const capacity) noexcept {
   assert(capacity > 0);
   default_capacity = capacity;
@@ -83,6 +90,10 @@ void list::drain_other(list &other) noexcept {
     sz += it[0].meta.size;
   }
   return sz;
+}
+
+int list::get_current_free_capacity() const noexcept {
+  return last ? (last[0].meta.get_free_capacity()) : 0;
 }
 
 long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }

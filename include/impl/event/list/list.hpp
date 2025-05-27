@@ -32,12 +32,7 @@ struct list {
 
   void destroy() noexcept;
 
-  void append(any const &event) noexcept {
-    if (get_current_free_capacity() < 1) {
-      reserve(true);
-    }
-    new (&last[1 + last[0].meta.size++].evt) any{event};
-  }
+  void append(any const &event) noexcept;
 
   template <typename callable_t> long long apply(callable_t &&callable) const {
     static_assert(std::is_invocable_r_v<void, // return type
@@ -73,9 +68,7 @@ private:
   list(list &&) = delete;
   list &operator=(list &&) = delete;
 
-  int get_current_free_capacity() const noexcept {
-    return last ? (last[0].meta.get_free_capacity()) : 0;
-  }
+  int get_current_free_capacity() const noexcept;
 
   static long long get_pid() noexcept;
 
