@@ -122,7 +122,9 @@ if (RSM_WITH_TSAN)
     add_sanitizer(rsm thread)
     add_sanitizer(rsm undefined)
 endif()
-# TODO refactor:
+# TODO
+# * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
+# * refactor:
 set(RSM_UNIX_COMPILER_FLAGS
     -Wall
     -Wextra

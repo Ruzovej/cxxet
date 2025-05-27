@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef __PIC__
-#define RSM_API __attribute__((visibility("default")))
+#define RSM_IMPL_API __attribute__((visibility("default")))
 #else
-#define RSM_API
+#define RSM_IMPL_API
 #endif

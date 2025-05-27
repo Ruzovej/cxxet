@@ -11,11 +11,11 @@
     __VA_ARGS__                                                                \
   }
 
-RSM_API void RSM_init_thread_local_sink() noexcept;
+RSM_IMPL_API void RSM_init_thread_local_sink() noexcept;
 
-RSM_API void RSM_flush_thread_local_sink() noexcept;
+RSM_IMPL_API void RSM_flush_thread_local_sink() noexcept;
 
-RSM_API void RSM_flush_all_collected_events(
+RSM_IMPL_API void RSM_flush_all_collected_events(
     rsm::output::format const fmt = rsm::output::format::chrome_trace,
     char const *const filename = nullptr, // `== nullptr` => no-op; to be more
                                           // precise: discard everything
@@ -23,7 +23,7 @@ RSM_API void RSM_flush_all_collected_events(
 
 namespace rsm {
 
-struct RSM_API marker {
+struct RSM_IMPL_API marker {
   inline marker(char const *aDesc, int const aColor = -1,
                 int const aTag = -1) noexcept
       : desc{aDesc}, color{aColor}, tag{aTag}, start{impl::now()} {}
