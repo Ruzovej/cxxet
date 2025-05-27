@@ -13,11 +13,11 @@ namespace {
 
 template <typename parse_fn_t, typename default_value_t,
           typename value_t = std::invoke_result_t<parse_fn_t, char const *>>
-value_t parse_env_variable(char const *env_var_name, const parse_fn_t &parse_fn,
+value_t parse_env_variable(char const *env_var_name, parse_fn_t const &parse_fn,
                            default_value_t const default_value,
                            bool const verbose) {
   auto const value{std::invoke([&]() -> value_t {
-    auto env_var_val{std::getenv(env_var_name)};
+    auto const env_var_val{std::getenv(env_var_name)};
     if (env_var_val && *env_var_val != '\0') {
       try {
         return parse_fn(env_var_val);
@@ -58,7 +58,7 @@ output::format parse_output_format(std::string_view const str) {
   }
 }
 
-int parse_int(char const *str_value) {
+int parse_int(char const *const str_value) {
   return static_cast<int>(std::stoul(str_value));
 }
 
