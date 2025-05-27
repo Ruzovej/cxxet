@@ -13,6 +13,10 @@ template <typename base_sink> struct test_sink : base_sink {
     // base_sink::events.destroy();
     return n;
   }
+
+  [[nodiscard]] bool empty() const noexcept {
+    return base_sink::events.empty();
+  }
 };
 
 TEST_CASE("sink cascade") {
@@ -32,10 +36,37 @@ TEST_CASE("sink cascade") {
 
   new (&a[4].evt.inst) event::instant{19, 20, 21, "test instant", 25};
 
-  SUBCASE("tree") {
+  SUBCASE("one 'leaf'") {
     test_sink<central_sink> root{};
     root.set_target_filename("/dev/null");
-    test_sink<local_sink> leaf1{&root}, leaf2{&root};
+    test_sink<local_sink> leaf{root};
+
+    leaf.append_event(a[0]);
+    leaf.append_event(a[1]);
+
+    n = root.apply([](long long const, long long const, event::any const &) {
+      REQUIRE(false);
+    });
+
+    REQUIRE(root.empty());
+    REQUIRE_EQ(n, 0);
+
+    leaf.flush();
+
+    n = root.apply([&counter, &a](long long const, long long const,
+                                  event::any const &evt) {
+      REQUIRE_EQ(evt, a[counter++]);
+    });
+
+    REQUIRE(leaf.empty());
+    REQUIRE_EQ(n, counter);
+    REQUIRE_EQ(counter, 2);
+  }
+
+  SUBCASE("two 'leafs'") {
+    test_sink<central_sink> root{};
+    root.set_target_filename("/dev/null");
+    test_sink<local_sink> leaf1{root}, leaf2{root};
 
     leaf1.append_event(a[0]);
     leaf2.append_event(a[1]);
@@ -46,7 +77,7 @@ TEST_CASE("sink cascade") {
 
     REQUIRE_EQ(n, 0);
 
-    leaf1.flush_to_parent();
+    leaf1.flush();
 
     n = root.apply([&a](long long const, long long const,
                         event::any const &evt) { REQUIRE_EQ(evt, a[0]); });
@@ -54,7 +85,7 @@ TEST_CASE("sink cascade") {
     REQUIRE(leaf1.empty());
     REQUIRE_EQ(n, 1);
 
-    leaf2.flush_to_parent();
+    leaf2.flush();
 
     n = root.apply([&counter, &a](long long const, long long const,
                                   event::any const &evt) {
@@ -62,46 +93,6 @@ TEST_CASE("sink cascade") {
     });
 
     REQUIRE(leaf2.empty());
-    REQUIRE_EQ(n, counter);
-    REQUIRE_EQ(counter, 2);
-  }
-
-  SUBCASE("linear") {
-    test_sink<central_sink> root{};
-    root.set_target_filename("/dev/null");
-    test_sink<local_sink> leaf1{&root}, leaf2{&leaf1};
-
-    leaf1.append_event(a[0]);
-    leaf2.append_event(a[1]);
-
-    n = root.apply([](long long const, long long const, event::any const &) {
-      REQUIRE(false);
-    });
-
-    REQUIRE(root.empty());
-    REQUIRE_EQ(n, 0);
-
-    leaf2.flush_to_parent();
-
-    n = leaf1.apply([&counter, &a](long long const, long long const,
-                                   event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
-    REQUIRE(leaf2.empty());
-    REQUIRE(root.empty());
-    REQUIRE_EQ(n, counter);
-    REQUIRE_EQ(n, 2);
-
-    leaf1.flush_to_parent();
-    counter = 0;
-
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
-    REQUIRE(leaf1.empty());
     REQUIRE_EQ(n, counter);
     REQUIRE_EQ(counter, 2);
   }
@@ -111,7 +102,7 @@ TEST_CASE("sink cascade") {
     root.set_target_filename("/dev/null");
 
     {
-      test_sink<local_sink> leaf{&root};
+      test_sink<local_sink> leaf{root};
       leaf.append_event(a[0]);
     }
     n = root.apply([&counter, &a](long long const, long long const,

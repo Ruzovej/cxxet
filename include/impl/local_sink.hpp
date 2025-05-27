@@ -1,28 +1,33 @@
 #pragma once
 
-#include "impl/sink.hpp"
+#include "impl/event/list/list.hpp"
 
 namespace rsm::impl {
 
-struct local_sink : sink {
-  explicit local_sink(sink *aParent);
-  ~local_sink() noexcept override;
+struct central_sink;
+
+struct local_sink {
+  explicit local_sink(central_sink &aParent);
+  ~local_sink() noexcept;
 
   inline void append_event(event::any const &evt) noexcept {
     events.append(evt);
   }
 
-  void flush_to_parent();
+  void flush();
 
-  local_sink &set_parent_sink(sink *aParent) noexcept;
-
-  local_sink &set_default_list_node_capacity(
-      int const default_list_node_capacity = 64) noexcept;
-
-  local_sink &reserve();
+  void reserve();
 
 private:
-  sink *parent{nullptr};
+  local_sink(local_sink const &) = delete;
+  local_sink &operator=(local_sink const &) = delete;
+  local_sink(local_sink &&) = delete;
+  local_sink &operator=(local_sink &&) = delete;
+
+  central_sink &parent;
+
+protected: // because of testing ...
+  event::list events;
 };
 
 } // namespace rsm::impl

@@ -10,9 +10,8 @@
 
 namespace rsm::impl {
 
-central_sink::central_sink(bool const silent)
-    : sink{}, time_point{as_int_ns(now())} {
-  set_default_list_node_capacity([] {
+central_sink::central_sink(bool const silent) : time_point{as_int_ns(now())} {
+  events.set_default_node_capacity([] {
     // Get block_size from environment variable if available, otherwise use
     // default value
     const char *env_block_size = std::getenv("RSM_DEFAULT_BLOCK_SIZE");
@@ -26,8 +25,8 @@ central_sink::central_sink(bool const silent)
     return 64;
   }());
   if (!silent) {
-    std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: " << get_default_capacity()
-              << '\n';
+    std::cout << "deduced RSM_DEFAULT_BLOCK_SIZE: "
+              << events.get_default_node_capacity() << '\n';
   }
 }
 
@@ -47,9 +46,9 @@ void central_sink::flush() {
   }
 }
 
-void central_sink::drain(sink &other) {
+void central_sink::drain(event::list &aEvents) {
   std::lock_guard lck{mtx};
-  sink::drain(other);
+  events.drain_other(aEvents);
 }
 
 } // namespace rsm::impl

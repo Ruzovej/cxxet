@@ -31,9 +31,9 @@ TEST_CASE("event::list") {
       });
     }
 
-    SUBCASE("prepend") {
-      event::list l2;
-      l.drain_other(l2);
+    SUBCASE("drain other empty") {
+      event::list other;
+      l.drain_other(other);
 
       n = l.apply([](long long const, long long const, event::any const &) {
         REQUIRE(false);
@@ -102,7 +102,7 @@ TEST_CASE("event::list") {
       REQUIRE_EQ(counter, size);
     }
 
-    SUBCASE("prepend to empty") {
+    SUBCASE("drain other") {
       event::list other;
       other.set_default_node_capacity(2);
       other.reserve();
@@ -119,7 +119,7 @@ TEST_CASE("event::list") {
       REQUIRE_EQ(counter, 2);
     }
 
-    SUBCASE("prepend from empty") {
+    SUBCASE("drain other empty") {
       event::list other;
       l.append(a[0]);
       l.append(a[1]);
@@ -134,13 +134,13 @@ TEST_CASE("event::list") {
       REQUIRE_EQ(counter, 2);
     }
 
-    SUBCASE("prepend") {
-      l.set_default_node_capacity(2);
+    SUBCASE("drain") {
+      l.set_default_node_capacity(3); // will have one space left
       l.reserve();
       l.append(a[0]);
       l.append(a[1]);
       event::list other;
-      other.set_default_node_capacity(2);
+      other.set_default_node_capacity(2); // will have to allocate twice
       other.reserve();
       other.append(a[2]);
       other.append(a[3]);
