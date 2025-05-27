@@ -1,4 +1,4 @@
-#include "impl/sink_traits.hpp"
+#include "impl/sink_properties.hpp"
 
 #include <cstdlib>
 
@@ -66,7 +66,7 @@ char const *parse_string(char const *str_value) { return str_value; }
 
 } // namespace
 
-sink_traits::sink_traits() noexcept
+sink_properties::sink_properties() noexcept
     : verbose{parse_env_variable("RSM_VERBOSE", parse_bool, false, false)},
       target_format{parse_env_variable("RSM_OUTPUT_FORMAT", parse_output_format,
                                        output::format::chrome_trace, verbose)},

@@ -37,7 +37,7 @@ TEST_CASE("sink cascade") {
   new (&a[4].evt.inst) event::instant{19, 20, 21, "test instant", 25};
 
   SUBCASE("one 'leaf'") {
-    sink_traits traits{};
+    sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<central_sink> root{traits};
     test_sink<local_sink> leaf{root};
@@ -65,7 +65,7 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("two 'leafs'") {
-    sink_traits traits{};
+    sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<central_sink> root{traits};
     test_sink<local_sink> leaf1{root}, leaf2{root};
@@ -100,7 +100,7 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("flush upon destruction") {
-    sink_traits traits{};
+    sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<central_sink> root{traits};
 

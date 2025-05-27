@@ -3,19 +3,19 @@
 #include <mutex>
 
 #include "impl/event/list/list.hpp"
-#include "impl/sink_traits.hpp"
+#include "impl/sink_properties.hpp"
 
 namespace rsm::impl {
 
 struct central_sink {
-  explicit central_sink(sink_traits const &aTraits);
+  explicit central_sink(sink_properties const &aTraits);
   ~central_sink() noexcept;
 
   void flush();
 
   void drain(event::list &aEvents);
 
-  [[nodiscard]] sink_traits const &get_traits() const noexcept {
+  [[nodiscard]] sink_properties const &get_traits() const noexcept {
     return traits;
   }
 
@@ -27,7 +27,7 @@ private:
 
   std::mutex mtx;
   long long const time_point;
-  sink_traits const &traits;
+  sink_properties const &traits;
 
 protected: // because of testing ...
   event::list events;

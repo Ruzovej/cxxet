@@ -7,7 +7,7 @@
 
 namespace rsm::impl {
 
-central_sink::central_sink(sink_traits const &aTraits)
+central_sink::central_sink(sink_properties const &aTraits)
     : time_point{as_int_ns(now())}, traits{aTraits} {}
 
 central_sink::~central_sink() noexcept { flush(); }
