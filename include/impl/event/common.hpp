@@ -14,8 +14,8 @@ enum class type : char {
   instant = 'i',
   counter = 'C',
   // TODO implement or at least consider:
-  // async: b nestable begin, n nestable instant, e nestable end
-  // flow: s start, t step, f end
+  // async: 'b' nestable begin, 'n' nestable instant, 'e' nestable end
+  // flow: 's' start, 't' step, 'f' end
   unknown = '\0',
 };
 

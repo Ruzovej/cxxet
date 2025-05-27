@@ -13,7 +13,9 @@ struct local_sink {
 
   void flush() noexcept;
 
-  void reserve() noexcept;
+  void reserve() noexcept; // TODO rework this ... perform it in ctor with
+                           // "default" value; change this one to accept
+                           // non-default value, etc. or remove it completely
 
 private:
   local_sink(local_sink const &) = delete;
