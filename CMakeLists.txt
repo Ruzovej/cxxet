@@ -58,8 +58,6 @@ function(add_sanitizer target sanitizer)
             -fsanitize=${sanitizer}
             -fno-sanitize-recover=all
             -fno-omit-frame-pointer
-            -fPIE
-            -pie
     )
     target_link_options(
         ${target}
@@ -67,8 +65,6 @@ function(add_sanitizer target sanitizer)
             -fsanitize=${sanitizer}
             -fno-sanitize-recover=all
             -fno-omit-frame-pointer
-            -fPIE
-            -pie
     )
 endfunction()
 
@@ -78,6 +74,40 @@ add_library(
         ${RSM_LIB_KIND}
         ${rsm_sources}
 )
+if (RSM_BUILD_SHARED)
+    set_target_properties( # TODO review this, is it needed/useful?
+        rsm
+            PROPERTIES
+            VERSION 0.1.0
+            SOVERSION 0
+    )
+    # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
+    target_compile_options(
+        rsm
+            PRIVATE
+            -fvisibility=hidden
+            -fPIC
+    )
+    target_link_options(
+        rsm
+            PRIVATE
+            -fvisibility=hidden
+            -fPIC
+    )
+else()
+    target_compile_options(
+        rsm
+            PRIVATE
+            -fPIE
+            -pie
+    )
+    target_link_options(
+        rsm
+            PRIVATE
+            -fPIE
+            -pie
+    )
+endif()
 target_include_directories(
     rsm
         PUBLIC

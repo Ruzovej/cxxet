@@ -1,6 +1,7 @@
 #pragma once
 
 #include "impl/event/any.hpp"
+#include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 #include "rsm_output_format.hpp"
 
@@ -10,11 +11,11 @@
     __VA_ARGS__                                                                \
   }
 
-void RSM_init_thread_local_sink() noexcept;
+RSM_API void RSM_init_thread_local_sink() noexcept;
 
-void RSM_flush_thread_local_sink() noexcept;
+RSM_API void RSM_flush_thread_local_sink() noexcept;
 
-void RSM_flush_all_collected_events(
+RSM_API void RSM_flush_all_collected_events(
     rsm::output::format const fmt = rsm::output::format::chrome_trace,
     char const *const filename = nullptr, // `== nullptr` => no-op; to be more
                                           // precise: discard everything
@@ -22,7 +23,7 @@ void RSM_flush_all_collected_events(
 
 namespace rsm {
 
-struct marker {
+struct RSM_API marker {
   inline marker(char const *aDesc, int const aColor = -1,
                 int const aTag = -1) noexcept
       : desc{aDesc}, color{aColor}, tag{aTag}, start{impl::now()} {}

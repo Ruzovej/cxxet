@@ -11,7 +11,7 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "RSM_BUILD_SHARED": "OFF"
+                "RSM_BUILD_SHARED": "ON"
             }
         },
         {
