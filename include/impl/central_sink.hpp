@@ -11,9 +11,9 @@ struct central_sink {
   explicit central_sink(sink_properties const &aTraits);
   ~central_sink() noexcept;
 
-  void flush();
+  void flush() noexcept;
 
-  void drain(event::list &aEvents);
+  void drain(event::list &aEvents) noexcept;
 
   [[nodiscard]] sink_properties const &get_traits() const noexcept {
     return traits;

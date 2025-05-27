@@ -10,17 +10,17 @@
     __VA_ARGS__                                                                \
   }
 
-namespace rsm {
+void RSM_init_thread_local_sink() noexcept;
 
-void init_thread_local_sink();
+void RSM_flush_thread_local_sink() noexcept;
 
-void flush_thread_local_sink() noexcept;
-
-void flush_all_collected_events(
-    output::format const fmt = output::format::chrome_trace,
+void RSM_flush_all_collected_events(
+    rsm::output::format const fmt = rsm::output::format::chrome_trace,
     char const *const filename = nullptr, // `== nullptr` => no-op; to be more
                                           // precise: discard everything
-    bool const defer_flush = false);
+    bool const defer_flush = false) noexcept;
+
+namespace rsm {
 
 struct marker {
   inline marker(char const *aDesc, int const aColor = -1,

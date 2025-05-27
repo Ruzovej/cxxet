@@ -12,7 +12,7 @@ central_sink::central_sink(sink_properties const &aTraits)
 
 central_sink::~central_sink() noexcept { flush(); }
 
-void central_sink::flush() {
+void central_sink::flush() noexcept {
   std::lock_guard lck{mtx};
   if (!events.empty()) {
     try {
@@ -27,7 +27,7 @@ void central_sink::flush() {
   }
 }
 
-void central_sink::drain(event::list &aEvents) {
+void central_sink::drain(event::list &aEvents) noexcept {
   std::lock_guard lck{mtx};
   events.drain_other(aEvents);
 }

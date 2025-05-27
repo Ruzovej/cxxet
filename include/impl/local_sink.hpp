@@ -6,16 +6,14 @@
 namespace rsm::impl {
 
 struct local_sink {
-  explicit local_sink(central_sink &aParent);
+  explicit local_sink(central_sink &aParent) noexcept;
   ~local_sink() noexcept;
 
-  inline void append_event(event::any const &evt) noexcept {
-    events.append(evt);
-  }
+  void append_event(event::any const &evt) noexcept;
 
-  void flush();
+  void flush() noexcept;
 
-  void reserve();
+  void reserve() noexcept;
 
 private:
   local_sink(local_sink const &) = delete;
