@@ -78,8 +78,8 @@ if (RSM_BUILD_SHARED)
     set_target_properties( # TODO review this, is it needed/useful?
         rsm
             PROPERTIES
-            VERSION 0.1.0
-            SOVERSION 0
+            VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
+            SOVERSION 0 # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
     )
     # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
     target_compile_options(
@@ -88,25 +88,19 @@ if (RSM_BUILD_SHARED)
             -fvisibility=hidden
             -fPIC
     )
-    target_link_options(
-        rsm
-            PRIVATE
-            -fvisibility=hidden
-            -fPIC
-    )
 else()
-    target_compile_options(
-        rsm
-            PRIVATE
-            -fPIE
-            -pie
-    )
-    target_link_options(
-        rsm
-            PRIVATE
-            -fPIE
-            -pie
-    )
+    if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
+        target_compile_options(
+            rsm
+                PRIVATE
+                -fPIE
+        )
+        target_link_options(
+            rsm
+                PRIVATE
+                -pie
+        )
+    endif()
 endif()
 target_include_directories(
     rsm
