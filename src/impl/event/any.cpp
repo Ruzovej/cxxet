@@ -1,5 +1,8 @@
 #include "impl/event/any.hpp"
 
+#include <cstddef>
+
+#include <algorithm>
 #include <type_traits>
 #include <variant>
 
@@ -36,5 +39,19 @@ static_assert(std::is_trivially_destructible_v<instant>);
 static_assert(std::is_trivially_destructible_v<counter>);
 
 static_assert(std::is_trivially_destructible_v<any>);
+
+static constexpr std::size_t max_size{
+    std::max({sizeof(duration_begin), sizeof(duration_end), sizeof(complete),
+              sizeof(instant), sizeof(counter)})};
+
+static constexpr std::size_t min_size{
+    std::min({sizeof(duration_begin), sizeof(duration_end), sizeof(complete),
+              sizeof(instant), sizeof(counter)})};
+
+static_assert(min_size < max_size); // TODO add explicit padding to every event
+// and change this to equality
+
+static_assert(sizeof(any) == max_size,
+              "`any` should have same size as the internal union it wraps!");
 
 } // namespace rsm::impl::event
