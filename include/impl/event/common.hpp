@@ -23,9 +23,9 @@ enum class type_t : char {
 template <type_t bound_type = type_t::unknown> struct common {
   //                        // related to field:
   type_t const type{bound_type}; // "ph"
-  char flag_1;                   // unspecified meaning
-  short flag_2;                  // unspecified meaning
-  int flag_4;                    // unspecified meaning
+  char flag_1;                   // explicit padding - unspecified meaning
+  short flag_2;                  // explicit padding - unspecified meaning
+  int flag_4;                    // explicit padding - unspecified meaning
   const char *desc;              // "name"
   // optional (or not?!) fields:
   // * "cat" -> TODO have it here or not?!

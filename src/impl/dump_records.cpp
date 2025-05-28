@@ -72,6 +72,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
                         long long const time_point_zero) {
   out << "{\n";
   out << "  \"displayTimeUnit\": \"ns\",\n";
+  // TODO put into some "comment" value of `time_point_zero`
   out << "  \"traceEvents\": [\n";
 
   bool first_record{true};
@@ -115,7 +116,8 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
     case event::type_t::instant: {
       auto const &e{evt.evt.inst};
 
-      auto const timestamp{longlong_ns_to_double_us(e.timestamp_ns)};
+      auto const timestamp{
+          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero)};
       out << "      \"ts\": " << timestamp << ",\n";
 
       auto const scope{
