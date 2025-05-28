@@ -24,9 +24,9 @@ struct any {
 
   any() noexcept : evt{} {}
 
-  [[nodiscard]] constexpr type get_type() const noexcept {
+  [[nodiscard]] constexpr type_t get_type() const noexcept {
     // valid because of `common initial sequence of members`:
-    return evt.common_base.c.t;
+    return evt.common_base.c.type;
   }
 
   // ugh ... TODO refactor those below - they wouldn't scale well & basically
@@ -52,14 +52,14 @@ struct any {
   }
 
   [[nodiscard]] constexpr bool operator==(any const &other) const noexcept {
-    return get_type() == other.get_type() && get_type() != type::unknown &&
-           ((get_type() == type::duration_begin &&
+    return get_type() == other.get_type() && get_type() != type_t::unknown &&
+           ((get_type() == type_t::duration_begin &&
              evt.dur_begin == other.evt.dur_begin) ||
-            (get_type() == type::duration_end &&
+            (get_type() == type_t::duration_end &&
              evt.dur_end == other.evt.dur_end) ||
-            (get_type() == type::complete && evt.cmpl == other.evt.cmpl) ||
-            (get_type() == type::counter && evt.cntr == other.evt.cntr) ||
-            (get_type() == type::instant && evt.inst == other.evt.inst));
+            (get_type() == type_t::complete && evt.cmpl == other.evt.cmpl) ||
+            (get_type() == type_t::counter && evt.cntr == other.evt.cntr) ||
+            (get_type() == type_t::instant && evt.inst == other.evt.inst));
   }
 };
 

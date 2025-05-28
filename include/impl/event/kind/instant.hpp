@@ -7,7 +7,7 @@ namespace rsm::impl::event {
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.lenwiilchoxp
 
 struct instant {
-  static constexpr type t{type::instant};
+  static constexpr type_t t{type_t::instant};
 
   enum class scope_t : char {
     global = 'g',

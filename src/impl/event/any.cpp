@@ -10,7 +10,7 @@ namespace {
 // Are those meaningful tests?!
 
 struct common_without_explicit_padding {
-  type const t;
+  type_t const t;
   char const *const desc;
 };
 
