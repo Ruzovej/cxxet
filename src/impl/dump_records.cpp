@@ -103,7 +103,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       break;
     }
     case event::type_t::complete: {
-      auto const e{evt.evt.cmpl};
+      auto const &e{evt.evt.cmpl};
 
       auto const start{longlong_ns_to_double_us(e.start_ns - time_point_zero)};
       out << "      \"ts\": " << start << ",\n";
@@ -113,7 +113,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       break;
     }
     case event::type_t::instant: {
-      auto const e{evt.evt.inst};
+      auto const &e{evt.evt.inst};
 
       auto const timestamp{longlong_ns_to_double_us(e.timestamp_ns)};
       out << "      \"ts\": " << timestamp << ",\n";
@@ -156,7 +156,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       break;
     }
     case event::type_t::complete: {
-      auto const evt_complete{evt.evt.cmpl};
+      auto const &evt_complete{evt.evt.cmpl};
       out << thread_id << ": '" << evt_complete.evt.desc << "', color "
           << static_cast<int>(evt_complete.evt.flag_1) << ", tag "
           << static_cast<int>(evt_complete.evt.flag_2) << ": "
