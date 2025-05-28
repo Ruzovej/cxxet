@@ -1,5 +1,6 @@
 #include "impl/dump_records.hpp"
 
+#include <cassert>
 #include <cstring>
 
 #include <algorithm>
@@ -9,6 +10,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include "rsm_output_format.hpp"
@@ -62,6 +64,10 @@ std::string escape_json_string(const char *str) {
   return result.str();
 }
 
+double longlong_ns_to_double_us(long long const ns) noexcept {
+  return static_cast<double>(ns) / 1'000.0;
+}
+
 void write_chrome_trace(std::ostream &out, impl::event::list const &list,
                         long long const time_point_zero) {
   out << "{\n";
@@ -89,9 +95,8 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
     case event::type::complete: {
       auto const e{evt.evt.cmpl};
       // [us]:
-      auto const start{static_cast<double>(e.start_ns - time_point_zero) /
-                       1'000.0};
-      auto const duration{static_cast<double>(e.duration_ns) / 1'000.0};
+      auto const start{longlong_ns_to_double_us(e.start_ns - time_point_zero)};
+      auto const duration{longlong_ns_to_double_us(e.duration_ns)};
 
       // Chrome trace format:
       // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
@@ -106,7 +111,23 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       break;
     }
     case event::type::instant: {
-      // TODO handle this
+      auto const e{evt.evt.inst};
+      // [us]:
+      auto const timestamp{longlong_ns_to_double_us(e.timestamp_ns)};
+      auto const scope{
+          static_cast<std::underlying_type_t<event::instant::scope_t>>(
+              e.scope)};
+
+      // Chrome trace format:
+      // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
+      out << "    {\n";
+      out << "      \"name\": " << escape_json_string(e.evt.desc) << ",\n";
+      out << "      \"ph\": \"i\",\n";
+      out << "      \"ts\": " << timestamp << ",\n";
+      out << "      \"s\": \"" << scope << "\",\n";
+      out << "      \"pid\": " << pid << ",\n";
+      out << "      \"tid\": " << thread_id << "\n";
+      out << "    }";
       break;
     }
     case event::type::counter: {

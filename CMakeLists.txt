@@ -75,7 +75,7 @@ add_library(
         ${rsm_sources}
 )
 if (RSM_BUILD_SHARED)
-    set_target_properties( # TODO review this, is it needed/useful?
+    set_target_properties( # seems useful -> TODO polish it later
         rsm
             PROPERTIES
             VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html

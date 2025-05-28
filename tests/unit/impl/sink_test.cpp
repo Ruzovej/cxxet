@@ -33,7 +33,8 @@ TEST_CASE("sink cascade") {
 
   new (&a[3].evt.cntr) event::counter{16, 17, 18, "test counter", 20, 42.666};
 
-  new (&a[4].evt.inst) event::instant{19, 20, 21, "test instant", 25};
+  new (&a[4].evt.inst) event::instant{
+      19, 20, 21, "test instant", 25, event::instant::scope_t::global};
 
   SUBCASE("one 'leaf'") {
     sink_properties traits{};

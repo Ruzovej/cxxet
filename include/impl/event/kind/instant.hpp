@@ -9,21 +9,29 @@ namespace rsm::impl::event {
 struct instant {
   static constexpr type t{type::instant};
 
+  enum class scope_t : char {
+    global = 'g',
+    process = 'p',
+    thread = 't',
+  };
+
   common<t> evt;
   long long timestamp_ns;
+  scope_t scope{scope_t::process};
 
   instant() = default;
-  constexpr instant(char const *const aDesc,
-                    long long const aTimestamp_ns) noexcept
-      : evt{aDesc}, timestamp_ns{aTimestamp_ns} {}
+  constexpr instant(char const *const aDesc, long long const aTimestamp_ns,
+                    scope_t const aScope) noexcept
+      : evt{aDesc}, timestamp_ns{aTimestamp_ns}, scope{aScope} {}
   constexpr instant(char const aFlag1, short const aFlag2, int const aFlag4,
-                    char const *const aDesc,
-                    long long const aTimestamp_ns) noexcept
-      : evt{aFlag1, aFlag2, aFlag4, aDesc}, timestamp_ns{aTimestamp_ns} {}
+                    char const *const aDesc, long long const aTimestamp_ns,
+                    scope_t const aScope) noexcept
+      : evt{aFlag1, aFlag2, aFlag4, aDesc},
+        timestamp_ns{aTimestamp_ns}, scope{aScope} {}
 
   [[nodiscard]] constexpr bool operator==(instant const &other) const noexcept {
     auto const tie = [](instant const &i) {
-      return std::tie(i.evt, i.timestamp_ns);
+      return std::tie(i.evt, i.timestamp_ns, i.scope);
     };
     return tie(*this) == tie(other);
   }
