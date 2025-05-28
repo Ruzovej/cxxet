@@ -37,7 +37,7 @@ struct any {
                                     std::is_same_v<EventType, complete> ||
                                     std::is_same_v<EventType, counter> ||
                                     std::is_same_v<EventType, instant>>>
-  any(EventType const &e) noexcept : any{} {
+  any(EventType const &e) noexcept : evt{} {
     if constexpr (std::is_same_v<EventType, duration_begin>) {
       new (&evt.dur_begin) duration_begin{e};
     } else if constexpr (std::is_same_v<EventType, duration_end>) {
