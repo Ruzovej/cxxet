@@ -8,11 +8,11 @@
 
 namespace rsm {
 
-inline void mark_instant(char const *aDesc,
+inline void mark_instant(char const *desc,
                          impl::event::instant::scope_t const scope =
                              impl::event::instant::scope_t::thread) noexcept {
   RSM_IMPL_append_event(
-      impl::event::instant{aDesc, scope, impl::as_int_ns(impl::now())});
+      impl::event::instant{desc, scope, impl::as_int_ns(impl::now())});
 }
 
 } // namespace rsm

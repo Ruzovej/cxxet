@@ -88,8 +88,13 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
     // Chrome trace format:
     // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
     out << "    {\n";
-    out << "      \"name\": " << escape_json_string(evt.evt.common_base.c.desc)
-        << ",\n";
+    out << "      \"name\": ";
+    if (evt.get_type() == event::type_t::counter) {
+      out << "\"Counter\"";
+    } else {
+      out << escape_json_string(evt.evt.common_base.c.desc);
+    }
+    out << ",\n";
     out << "      \"ph\": \""
         << static_cast<std::underlying_type_t<event::type_t>>(evt.get_type())
         << "\",\n";
@@ -127,7 +132,14 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       break;
     }
     case event::type_t::counter: {
-      // TODO handle this
+      auto const &e{evt.evt.cntr};
+
+      auto const timestamp{
+          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero)};
+      out << "      \"ts\": " << timestamp << ",\n";
+
+      out << "      \"args\": {" << escape_json_string(e.evt.desc) << ": "
+          << e.value << "},\n";
       break;
     }
     default: {
