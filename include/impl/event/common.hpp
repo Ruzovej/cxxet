@@ -7,7 +7,7 @@ namespace rsm::impl::event {
 // inspired by
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
 
-enum class type : char {
+enum class type_t : char {
   duration_begin = 'B',
   duration_end = 'E',
   complete = 'X',
@@ -20,13 +20,13 @@ enum class type : char {
 };
 
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.uxpopqvbjezh
-template <type bound_type = type::unknown> struct common {
+template <type_t bound_type = type_t::unknown> struct common {
   //                        // related to field:
-  type const t{bound_type}; // "ph"
-  char flag_1;              // unspecified meaning
-  short flag_2;             // unspecified meaning
-  int flag_4;               // unspecified meaning
-  const char *desc;         // "name"
+  type_t const type{bound_type}; // "ph"
+  char flag_1;                   // explicit padding - unspecified meaning
+  short flag_2;                  // explicit padding - unspecified meaning
+  int flag_4;                    // explicit padding - unspecified meaning
+  const char *desc;              // "name"
   // optional (or not?!) fields:
   // * "cat" -> TODO have it here or not?!
   // other mandatory fields:
@@ -42,7 +42,7 @@ template <type bound_type = type::unknown> struct common {
 
   [[nodiscard]] constexpr bool operator==(common const &other) const noexcept {
     auto const tie = [](common const &c) {
-      return std::tie(c.t, c.flag_1, c.flag_2, c.flag_4, c.desc);
+      return std::tie(c.type, c.flag_1, c.flag_2, c.flag_4, c.desc);
     };
     return tie(*this) == tie(other);
   }

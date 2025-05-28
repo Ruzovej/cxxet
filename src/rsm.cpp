@@ -24,10 +24,6 @@ void RSM_flush_all_collected_events(rsm::output::format const fmt,
   }
 }
 
-namespace rsm {
-
-void marker::append_event(impl::event::any const &evt) noexcept {
+void RSM_IMPL_append_event(rsm::impl::event::any const &evt) noexcept {
   thread_sink.append_event(evt);
 }
-
-} // namespace rsm

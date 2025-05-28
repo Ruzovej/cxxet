@@ -16,6 +16,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # options:
+set(RSM_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
 set(RSM_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
 set(RSM_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
 set(RSM_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
@@ -75,7 +76,7 @@ add_library(
         ${rsm_sources}
 )
 if (RSM_BUILD_SHARED)
-    set_target_properties( # TODO review this, is it needed/useful?
+    set_target_properties( # seems useful -> TODO polish it later
         rsm
             PROPERTIES
             VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
@@ -163,4 +164,8 @@ target_compile_options(
 if (RSM_BUILD_TESTS)
     add_subdirectory(tests/dummy_app)
     add_subdirectory(tests/unit)
+endif()
+
+if (RSM_BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()
