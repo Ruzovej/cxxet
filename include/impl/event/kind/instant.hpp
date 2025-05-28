@@ -17,7 +17,7 @@ struct instant {
 
   common<t> evt;
   long long timestamp_ns;
-  scope_t scope{scope_t::process};
+  scope_t scope;
 
   instant() = default;
   constexpr instant(char const *const aDesc, long long const aTimestamp_ns,
