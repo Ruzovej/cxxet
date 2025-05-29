@@ -34,3 +34,8 @@ add_example(
     rsm_example_counter_1
         "counter/1.cpp"
 )
+
+add_example(
+    rsm_example_counter_2
+        "counter/2.cpp"
+)
