@@ -5,6 +5,7 @@
 
 namespace {
 
+// https://en.wikipedia.org/wiki/Euler_method#First-order_process
 template <typename fn_t>
 double euler_method(fn_t &&fn, double x, double y, double const h,
                     int const num_steps) {
