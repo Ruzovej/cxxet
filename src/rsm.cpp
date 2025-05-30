@@ -1,5 +1,7 @@
 #include "rsm.hpp"
 
+#include <cassert>
+
 #include "impl/central_sink.hpp"
 #include "impl/local_sink.hpp"
 #include "impl/sink_properties.hpp"
@@ -7,16 +9,25 @@
 static rsm::impl::sink_properties sink_props{};
 static rsm::impl::central_sink global_sink{sink_props};
 static thread_local rsm::impl::local_sink thread_sink{global_sink};
+#ifndef NDEBUG
+static thread_local bool was_initialized{false};
+#endif
 
 void RSM_init_thread_local_sink() noexcept {
-  // if not already initialized, preallocates memory
-  (void)thread_sink;
+#ifndef NDEBUG
+  assert(!was_initialized &&
+         "RSM_init_thread_local_sink() called multiple times");
+  was_initialized = true;
+#endif
+
+  thread_sink.reserve();
 }
 
 void RSM_thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
-  if (minimum_free_capacity > 0) {
-    thread_sink.reserve(minimum_free_capacity);
-  }
+#ifndef NDEBUG
+  was_initialized = true;
+#endif
+  thread_sink.reserve(minimum_free_capacity);
 }
 
 void RSM_flush_thread_local_sink() noexcept { thread_sink.flush(); }
