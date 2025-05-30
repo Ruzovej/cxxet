@@ -13,6 +13,9 @@
 
 RSM_IMPL_API void RSM_init_thread_local_sink() noexcept;
 
+RSM_IMPL_API void
+RSM_thread_local_sink_reserve(int const minimum_free_capacity) noexcept;
+
 RSM_IMPL_API void RSM_flush_thread_local_sink() noexcept;
 
 RSM_IMPL_API void RSM_flush_all_collected_events(

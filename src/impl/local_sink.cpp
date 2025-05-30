@@ -3,8 +3,7 @@
 namespace rsm::impl {
 
 local_sink::local_sink(central_sink &aParent) noexcept : parent{aParent} {
-  events.set_default_node_capacity(
-      parent.get_traits().default_list_node_capacity);
+  reserve(parent.get_traits().default_list_node_capacity);
 }
 
 local_sink::~local_sink() noexcept { flush(); }
@@ -19,6 +18,9 @@ void local_sink::flush() noexcept {
   }
 }
 
-void local_sink::reserve() noexcept { events.reserve(); }
+void local_sink::reserve(int const minimum_free_capacity) noexcept {
+  events.set_default_node_capacity(minimum_free_capacity);
+  events.reserve();
+}
 
 } // namespace rsm::impl

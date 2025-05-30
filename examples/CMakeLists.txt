@@ -29,3 +29,13 @@ add_example(
     rsm_example_instant_2
         "instant/2.cpp"
 )
+
+add_example(
+    rsm_example_counter_1
+        "counter/1.cpp"
+)
+
+add_example(
+    rsm_example_counter_2
+        "counter/2.cpp"
+)

@@ -118,7 +118,7 @@ TEST_CASE("sink cascade") {
 
     SUBCASE("with reserve") {
       test_sink<local_sink> leaf{root};
-      leaf.reserve();
+      leaf.reserve(traits.default_list_node_capacity);
       leaf.append_event(a[0]);
     }
 
