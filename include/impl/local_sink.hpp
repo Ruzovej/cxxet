@@ -13,7 +13,8 @@ struct local_sink {
 
   void flush() noexcept;
 
-  void reserve(int const minimum_free_capacity) noexcept;
+  // `minimum_free_capacity <= 0` => use setting from parent
+  void reserve(int const minimum_free_capacity = 0) noexcept;
 
 private:
   local_sink(local_sink const &) = delete;

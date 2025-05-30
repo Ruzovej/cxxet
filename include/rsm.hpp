@@ -11,6 +11,7 @@
     __VA_ARGS__                                                                \
   }
 
+// call at most once per thread, and not after `RSM_thread_local_sink_reserve`:
 RSM_IMPL_API void RSM_init_thread_local_sink() noexcept;
 
 RSM_IMPL_API void

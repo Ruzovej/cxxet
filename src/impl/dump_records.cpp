@@ -70,28 +70,27 @@ double longlong_ns_to_double_us(long long const ns) noexcept {
 
 void write_chrome_trace(std::ostream &out, impl::event::list const &list,
                         long long const time_point_zero) {
-  out << "{\n";
-  out << "  \"displayTimeUnit\": \"ns\",\n";
+  out << "{\"displayTimeUnit\":\"ns\",";
   // TODO put into some "comment" value of `time_point_zero`
-  out << "  \"traceEvents\": [\n";
+  out << "\"traceEvents\":[";
 
   bool first_record{true};
   list.apply([time_point_zero, &first_record, &out](long long const pid,
                                                     long long const thread_id,
                                                     event::any const &evt) {
     if (!first_record) {
-      out << ",\n";
+      out << ',';
     } else {
       first_record = false;
     }
 
     // Chrome trace format:
     // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
-    out << "    {\n";
-    out << "      \"name\": " << escape_json_string(evt.get_name()) << ",\n";
-    out << "      \"ph\": \"" << evt.get_ph() << "\",\n";
+    out << '{';
+    out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
+    out << "\"ph\":\"" << evt.get_ph() << "\",";
     // TODO - start using this:
-    // out << "      \"cat\": " << escape_json_string(???) << ",\n";
+    // out << "\"cat\":" << escape_json_string(???) << ",";
 
     switch (evt.get_type()) {
     case event::type_t::duration_begin: {
@@ -106,10 +105,10 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       auto const &e{evt.evt.cmpl};
 
       auto const start{longlong_ns_to_double_us(e.start_ns - time_point_zero)};
-      out << "      \"ts\": " << start << ",\n";
+      out << "\"ts\":" << start << ',';
 
       auto const duration{longlong_ns_to_double_us(e.duration_ns)};
-      out << "      \"dur\": " << duration << ",\n";
+      out << "\"dur\":" << duration << ',';
       break;
     }
     case event::type_t::instant: {
@@ -117,12 +116,12 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
 
       auto const timestamp{
           longlong_ns_to_double_us(e.timestamp_ns - time_point_zero)};
-      out << "      \"ts\": " << timestamp << ",\n";
+      out << "\"ts\":" << timestamp << ',';
 
       auto const scope{
           static_cast<std::underlying_type_t<event::instant::scope_t>>(
               e.scope)};
-      out << "      \"s\": \"" << scope << "\",\n";
+      out << "\"s\":\"" << scope << "\",";
       break;
     }
     case event::type_t::counter: {
@@ -130,10 +129,10 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
 
       auto const timestamp{
           longlong_ns_to_double_us(e.timestamp_ns - time_point_zero)};
-      out << "      \"ts\": " << timestamp << ",\n";
+      out << "\"ts\":" << timestamp << ',';
 
-      out << "      \"args\": {" << escape_json_string(e.get_quantity_name())
-          << ": " << e.value << "},\n";
+      out << "\"args\":{" << escape_json_string(e.get_quantity_name()) << ":"
+          << e.value << "},";
       break;
     }
     default: {
@@ -141,13 +140,13 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
     }
     }
 
-    out << "      \"pid\": " << pid << ",\n";
-    out << "      \"tid\": " << thread_id << "\n";
-    out << "    }";
+    out << "\"pid\":" << pid << ',';
+    out << "\"tid\":" << thread_id;
+    out << '}';
   });
 
-  out << "\n  ]\n";
-  out << "}\n";
+  out << ']'; // traceEvents
+  out << '}';
 }
 
 [[deprecated]] void write_naive_v0(std::ostream &out,

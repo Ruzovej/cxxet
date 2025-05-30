@@ -20,8 +20,6 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 } // namespace
 
 int main(int argc, char const **argv) {
-  RSM_init_thread_local_sink();
-
   {
     RSM_MARKER("Counter example 2");
 
