@@ -23,6 +23,10 @@ struct counter {
       : evt{aFlag1, aFlag2, aFlag4, name},
         timestamp_ns{aTimestamp_ns}, value{aValue} {}
 
+  [[nodiscard]] constexpr char const *get_quantity_name() const noexcept {
+    return evt.desc;
+  }
+
   [[nodiscard]] constexpr bool operator==(counter const &other) const noexcept {
     auto const tie = [](counter const &c) {
       return std::tie(c.evt, c.timestamp_ns, c.value);

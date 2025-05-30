@@ -3,6 +3,7 @@
 #include <new>
 #include <utility>
 
+#include "impl/event/common.hpp"
 #include "impl/event/kind/complete.hpp"
 #include "impl/event/kind/counter.hpp"
 #include "impl/event/kind/duration.hpp"
@@ -24,9 +25,18 @@ struct any {
 
   any() noexcept : evt{} {}
 
+  // valid because of `common initial sequence of members`:
   [[nodiscard]] constexpr type_t get_type() const noexcept {
-    // valid because of `common initial sequence of members`:
     return evt.common_base.c.type;
+  }
+
+  [[nodiscard]] constexpr char const *get_name() const noexcept {
+    return get_type() == event::type_t::counter ? "Counter"
+                                                : evt.common_base.c.desc;
+  }
+
+  [[nodiscard]] constexpr auto get_ph() const noexcept {
+    return static_cast<std::underlying_type_t<event::type_t>>(get_type());
   }
 
   // ugh ... TODO refactor those below - they wouldn't scale well & basically
@@ -51,6 +61,7 @@ struct any {
     }
   }
 
+  // used only for testing - maybe hide it otherwise (via #if-def, etc.)?
   [[nodiscard]] constexpr bool operator==(any const &other) const noexcept {
     return get_type() == other.get_type() && get_type() != type_t::unknown &&
            ((get_type() == type_t::duration_begin &&
