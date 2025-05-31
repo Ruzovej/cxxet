@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "rsm.hpp"
+#include "rsm/mark_complete.hpp"
 #include "rsm/mark_counter.hpp"
 
 namespace {
@@ -21,7 +22,7 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 
 int main(int argc, char const **argv) {
   {
-    RSM_MARKER("Counter example 2");
+    RSM_MARK_COMPLETE("Counter example 2");
 
     int const num_points{10'000};
     // step traits:
@@ -37,14 +38,14 @@ int main(int argc, char const **argv) {
     }};
 
     {
-      RSM_MARKER("RSM_thread_local_sink_reserve");
+      RSM_MARK_COMPLETE("RSM_thread_local_sink_reserve");
       RSM_thread_local_sink_reserve(
           num_points * 2 // ...
-          + 2            // those 2 extra `RSM_MARKER`s above and below ...
+          + 3 // those 3 extra `RSM_MARK_COMPLETE`s above and below ...
       );
     }
 
-    RSM_MARKER("Euler method iterations");
+    RSM_MARK_COMPLETE("Euler method iterations");
     for (int i{0}; i < num_points; ++i) {
       RSM_MARK_COUNTERS("y", y, "x", x);
       y = euler_method(fn, x, y, h, steps_for_point);

@@ -1,14 +1,15 @@
-#include <iostream>
+#include <chrono>
 #include <thread>
 
 #include "rsm.hpp"
+#include "rsm/mark_complete.hpp"
 #include "rsm/mark_instant.hpp"
 
 int main(int argc, char const **argv) {
   RSM_init_thread_local_sink();
 
   {
-    RSM_MARKER("macro: old marker, main thread");
+    RSM_MARK_COMPLETE("macro: old marker, main thread");
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
@@ -18,17 +19,17 @@ int main(int argc, char const **argv) {
     RSM_MARK_INSTANT("macro: main thread started");
 
     std::thread{[]() {
-      RSM_MARKER("macro: old marker, thread 1");
+      RSM_MARK_COMPLETE("macro: old marker, thread 1");
       RSM_MARK_INSTANT("macro: thread 1 started");
     }}.join();
 
     std::thread{[]() {
-      RSM_MARKER("macro: old marker, thread 2");
+      RSM_MARK_COMPLETE("macro: old marker, thread 2");
       RSM_MARK_INSTANT("macro: thread 2 started");
     }}.join();
 
     std::thread{[]() {
-      RSM_MARKER("macro: old marker, thread 3");
+      RSM_MARK_COMPLETE("macro: old marker, thread 3");
       RSM_MARK_INSTANT("macro: thread 3 started");
     }}.join();
 
