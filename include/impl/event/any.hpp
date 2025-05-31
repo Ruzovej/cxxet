@@ -32,7 +32,11 @@ struct any {
 
   [[nodiscard]] constexpr char const *get_name() const noexcept {
     return get_type() == event::type_t::counter ? "Counter"
-                                                : evt.common_base.c.desc;
+           : get_type() == event::type_t::duration_end
+               // TODO maybe don't return empty string, and rather skip writing
+               // out `"name":"",` completely (in `dump_records`)...:
+               ? (evt.common_base.c.desc ? evt.common_base.c.desc : "")
+               : evt.common_base.c.desc;
   }
 
   [[nodiscard]] constexpr auto get_ph() const noexcept {
