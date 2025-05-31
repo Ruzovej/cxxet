@@ -4,11 +4,11 @@
 #include "rsm.hpp"
 #include "rsm/mark_complete.hpp"
 
-static void pyramid(int const i) {
+static void pyramid(int const level) {
   RSM_MARK_COMPLETE("pyramid");
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  if (i > 0) {
-    pyramid(i - 1);
+  if (level > 0) {
+    pyramid(level - 1);
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 }
