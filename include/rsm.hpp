@@ -51,7 +51,7 @@ private:
   char const *desc;
   int const color; // TODO discard those members and ignore them ...
   int const tag;   // TODO discard those members and ignore them ...
-  struct timespec const start;
+  impl::timepoint_t const start;
 
   marker(marker const &) = delete;
   marker &operator=(marker const &) = delete;

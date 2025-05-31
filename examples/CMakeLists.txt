@@ -44,3 +44,8 @@ add_example(
     rsm_example_duration_1
         "duration/1.cpp"
 )
+
+add_example(
+    rsm_example_complete_1
+        "complete/1.cpp"
+)
