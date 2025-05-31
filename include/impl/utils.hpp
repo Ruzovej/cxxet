@@ -21,7 +21,9 @@ RSM_IMPL_append_event(rsm::impl::event::any const &evt) noexcept;
 
 namespace rsm::impl {
 
-[[nodiscard]] inline struct timespec now() noexcept {
+using timepoint_t = struct timespec;
+
+[[nodiscard]] inline timepoint_t now() noexcept {
   // https://stackoverflow.com/a/42658433
   // https://www.man7.org/linux/man-pages/man3/clock_gettime.3.html
   constexpr int clock_type{
@@ -32,12 +34,12 @@ namespace rsm::impl {
       // CLOCK_THREAD_CPUTIME_ID // very low resolution, seems unusable
       CLOCK_MONOTONIC_RAW // seems best
   };
-  struct timespec t;
+  timepoint_t t;
   clock_gettime(clock_type, &t);
   return t;
 }
 
-[[nodiscard]] inline long long as_int_ns(struct timespec const t) noexcept {
+[[nodiscard]] inline long long as_int_ns(timepoint_t const t) noexcept {
   return static_cast<long long>(t.tv_sec * 1'000'000'000 + t.tv_nsec);
 }
 
