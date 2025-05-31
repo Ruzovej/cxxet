@@ -94,11 +94,19 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
 
     switch (evt.get_type()) {
     case event::type_t::duration_begin: {
-      // TODO handle this
+      auto const &e{evt.evt.dur_begin};
+
+      auto const timestamp{
+          longlong_ns_to_double_us(e.start_ns - time_point_zero)};
+      out << "\"ts\":" << timestamp << ',';
       break;
     }
     case event::type_t::duration_end: {
-      // TODO handle this
+      auto const &e{evt.evt.dur_end};
+
+      auto const timestamp{
+          longlong_ns_to_double_us(e.end_ns - time_point_zero)};
+      out << "\"ts\":" << timestamp << ',';
       break;
     }
     case event::type_t::complete: {

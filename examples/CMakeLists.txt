@@ -39,3 +39,8 @@ add_example(
     rsm_example_counter_2
         "counter/2.cpp"
 )
+
+add_example(
+    rsm_example_duration_1
+        "duration/1.cpp"
+)
