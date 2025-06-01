@@ -14,3 +14,8 @@ It's lightweight library that generates `chrome trace` format output, which can 
   * Markers for measuring time spans, with begin and end marked separately.
 * **[complete/](complete/)**
   * Marker for measuring time spans, with begin and end merged into single event.
+
+## Performance Tips
+
+* Use `RSM_thread_local_sink_reserve(capacity)` when you know how many events you'll generate.
+* Markers have (low?) overhead that can accumulate within high-frequency usage.

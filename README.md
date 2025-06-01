@@ -4,8 +4,6 @@ TODO ...
 
 Examples are [here](examples/README.md).
 
-
-
 ## Explorations
 
 ### Various formats - are they feasible, widely used, etc.?
