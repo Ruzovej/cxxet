@@ -6,42 +6,46 @@
 #include "rsm/mark_instant.hpp"
 
 int main(int argc, char const **argv) {
+  char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
+  RSM_flush_all_collected_events(rsm::output::format::chrome_trace, filename,
+                                 true);
+
   RSM_init_thread_local_sink();
 
-  {
-    RSM_MARK_COMPLETE("macro: old marker, main thread");
+  RSM_MARK_INSTANT("main thread beginning");
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  {
+    RSM_MARK_COMPLETE("main thread, local scope");
 
     // Unfortunately, using non-default scope (== `...::thread`), makes `chrome`
     // & ui.perfetto.dev display it somehow unusably ...
 
-    RSM_MARK_INSTANT("macro: main thread started");
+    std::thread t1{[]() {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      RSM_MARK_COMPLETE("thread 1");
+      RSM_MARK_INSTANT("thread 1 started");
+    }};
 
-    std::thread{[]() {
-      RSM_MARK_COMPLETE("macro: old marker, thread 1");
-      RSM_MARK_INSTANT("macro: thread 1 started");
-    }}.join();
+    std::thread t2{[]() {
+      RSM_MARK_COMPLETE("thread 2");
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      RSM_MARK_INSTANT("thread 2 started");
+    }};
 
-    std::thread{[]() {
-      RSM_MARK_COMPLETE("macro: old marker, thread 2");
-      RSM_MARK_INSTANT("macro: thread 2 started");
-    }}.join();
+    std::thread t3{[]() {
+      RSM_MARK_COMPLETE("thread 3");
+      RSM_MARK_INSTANT("thread 3 started");
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }};
 
-    std::thread{[]() {
-      RSM_MARK_COMPLETE("macro: old marker, thread 3");
-      RSM_MARK_INSTANT("macro: thread 3 started");
-    }}.join();
-
-    RSM_MARK_INSTANT("macro: main thread flushing all markers");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    t1.join();
+    t2.join();
+    t3.join();
   }
 
-  RSM_flush_thread_local_sink();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-  char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
-  RSM_flush_all_collected_events(rsm::output::format::chrome_trace, filename);
+  RSM_MARK_INSTANT("main terminating");
 
   return 0;
 }
