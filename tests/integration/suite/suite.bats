@@ -188,8 +188,24 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
 
     assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 13
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["X"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["main","pyramid","scope 1.1","scope 2.1","scope 2.2"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "pyramid")] | length' "${result}")" 9
+
+    assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("dur") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
 @test "Instant markers example 1" {
