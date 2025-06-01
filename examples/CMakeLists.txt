@@ -16,7 +16,6 @@ function(add_example target_name source_file)
     endif()
     if (RSM_WITH_TSAN)
         add_sanitizer(${target_name} thread)
-        #add_sanitizer(${target_name} undefined)
     endif()
 endfunction()
 
