@@ -4,4 +4,4 @@ Instant markers are used to mark specific points in time during program executio
 
 ## Notes
 
-- The default scope is thread-local (process/global scope may have display issues in some viewers)
+- The default scope is thread-local (process/global scope may have display issues in some viewers).
