@@ -35,6 +35,7 @@ function teardown() {
 
 function teardown_file() {
     rm -rf "${TMP_RESULT_DIR}"
+    #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
 }
 
 # TODO later remove those ...
@@ -320,4 +321,20 @@ Deduced RSM_TARGET_FILENAME: "
     refute_output --partial "AddressSanitizer"
 
     assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 20003
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["C","X"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result}")" 20000
+    
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 3
+
+    assert_equal "$(jq -e -c '[.traceEvents[] | select(.ph == "C")] | map(.args | keys[]) | unique | sort' "${result}")" '["x","y"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["Counter","Counter example 2","Euler method iterations","RSM_thread_local_sink_reserve"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
