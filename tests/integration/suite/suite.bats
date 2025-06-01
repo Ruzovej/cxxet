@@ -17,8 +17,7 @@ function setup_file() {
     ./compile.bash \
         -DRSM_BUILD_TESTS=ON \
         --preset "${RSM_PRESET}" \
-        --target rsm_dummy_app \
-        --target rsm_infra_sanitizer_check \
+        --target infra_sanitizer_check \
         --target rsm_examples \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
@@ -67,7 +66,7 @@ function teardown_file() {
 #}
 
 @test "sanitizers work as expected" {
-    local san_check="${BIN_DIR}/rsm_infra_sanitizer_check"
+    local san_check="${BIN_DIR}/infra_sanitizer_check"
     if [[ "${RSM_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
@@ -104,55 +103,6 @@ function teardown_file() {
         assert_success
         assert_output ''
     fi
-}
-
-# TODO delete later:
-@test "dummy app reports all markers with no sanitizer issues" {
-    run "${BIN_DIR}/rsm_dummy_app"
-
-    # Verify that no sanitizer errors are reported
-    refute_output --partial "Sanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "runtime error"
-    refute_output --partial "ERROR:"
-    refute_output --partial "WARNING:"
-
-    # Verify that all markers are reported in the output
-    assert_output --partial "Deduced RSM_DEFAULT_BLOCK_SIZE: 2"
-    assert_output --partial "Deduced RSM_OUTPUT_FORMAT: 0"
-    assert_output --partial "Deduced RSM_TARGET_FILENAME: "
-    assert_output --partial ": 'loop', color -1, tag -1: "
-    assert_output --partial ": 'int store', color -1, tag -1: "
-    assert_output --partial ": 'int load', color -1, tag -1: "
-    assert_output --partial ": 'scoped 1', color -1, tag -1: "
-    assert_output --partial ": 'scoped 2', color -1, tag -1: "
-    assert_output --partial ": 'scoped 3', color -1, tag -1: "
-    assert_output --partial ": 'scoped 4', color -1, tag -1: "
-    assert_output --partial ": 'scoped 5 (macro with both default color and tag)', color -1, tag -1: "
-    assert_output --partial ": 'scoped 6 (macro with explicit color and default tag)', color 1, tag -1: "
-    assert_output --partial ": 'scoped 7 (macro with both explicit color and tag)', color 1, tag 2: "
-    assert_output --partial ": 'first local macro marker', color -1, tag 0: "
-    assert_output --partial ": 'second local macro marker testing no shadowing occurs', color -1, tag 0: "
-    assert_output --partial ": 'third local macro marker testing no shadowing occurs', color -1, tag 0: "
-    assert_output --partial ": 'first local macro marker', color -1, tag 1: "
-    assert_output --partial ": 'second local macro marker testing no shadowing occurs', color -1, tag 1: "
-    assert_output --partial ": 'third local macro marker testing no shadowing occurs', color -1, tag 1: "
-    assert_output --partial ": 'scoped 8 (in 3 various parallel threads)', color -1, tag 0: "
-    assert_output --partial ": 'scoped 8 (in 3 various parallel threads)', color -1, tag 1: "
-    assert_output --partial ": 'scoped 8 (in 3 various parallel threads)', color -1, tag 2: "
-    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 0: "
-    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 1: "
-    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 2: "
-    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 3: "
-    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 4: "
-    assert_output --partial ": 'fourth local macro marker testing no shadowing occurs', color -1, tag 5: "
-    #assert_output --partial ": '', color -1, tag -1: "
-
-    # TODO how to check that output consists of exactly above mentioned `N` lines?!
-
-    assert_success
 }
 
 @test "Duration markers example" {
