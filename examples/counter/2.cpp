@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "rsm.hpp"
+#include "rsm/mark_complete.hpp"
 #include "rsm/mark_counter.hpp"
 
 namespace {
@@ -20,42 +21,39 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 } // namespace
 
 int main(int argc, char const **argv) {
+  char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
+  RSM_flush_all_collected_events(rsm::output::format::chrome_trace, filename,
+                                 true);
+
+  RSM_MARK_COMPLETE("Counter example 2");
+
+  int const num_points{10'000};
+  // step traits:
+  int const steps_for_point{4};
+  double const h{1e-2 / steps_for_point};
+  // initial conditions:
+  double x{0.0};
+  double y{0.0};
+  // differential equation "y' = 1 + 16 * cos(x)"
+  // (trivial: solution "y = x + 16 * sin(x)"):
+  auto const fn{[](double const xx, double const yy [[maybe_unused]]) {
+    return 1.0 + 16.0 * std::cos(xx);
+  }};
+
   {
-    RSM_MARKER("Counter example 2");
-
-    int const num_points{10'000};
-    // step traits:
-    int const steps_for_point{4};
-    double const h{1e-2 / steps_for_point};
-    // initial conditions:
-    double x{0.0};
-    double y{0.0};
-    // differential equation "y' = 1 + 16 * cos(x)"
-    // (trivial: solution "y = x + 16 * sin(x)"):
-    auto const fn{[](double const xx, double const yy [[maybe_unused]]) {
-      return 1.0 + 16.0 * std::cos(xx);
-    }};
-
-    {
-      RSM_MARKER("RSM_thread_local_sink_reserve");
-      RSM_thread_local_sink_reserve(
-          num_points * 2 // ...
-          + 2            // those 2 extra `RSM_MARKER`s above and below ...
-      );
-    }
-
-    RSM_MARKER("Euler method iterations");
-    for (int i{0}; i < num_points; ++i) {
-      RSM_MARK_COUNTERS("y", y, "x", x);
-      y = euler_method(fn, x, y, h, steps_for_point);
-      x += h * steps_for_point;
-    }
+    RSM_MARK_COMPLETE("RSM_thread_local_sink_reserve");
+    RSM_thread_local_sink_reserve(
+        num_points * 2 // ...
+        + 3            // those 3 extra `RSM_MARK_COMPLETE`s above and below ...
+    );
   }
 
-  RSM_flush_thread_local_sink();
-
-  char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
-  RSM_flush_all_collected_events(rsm::output::format::chrome_trace, filename);
+  RSM_MARK_COMPLETE("Euler method iterations");
+  for (int i{0}; i < num_points; ++i) {
+    RSM_MARK_COUNTERS("y", y, "x", x);
+    y = euler_method(fn, x, y, h, steps_for_point);
+    x += h * steps_for_point;
+  }
 
   return 0;
 }

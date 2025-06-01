@@ -20,7 +20,7 @@ set(RSM_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
 set(RSM_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
 set(RSM_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
 set(RSM_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
-set(RSM_WITH_TSAN "OFF" CACHE BOOL "Build with thread and undefined sanitizers")
+set(RSM_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
 # implied by options:
 set(RSM_LIB_KIND "STATIC")
@@ -115,7 +115,6 @@ if (RSM_WITH_ASAN)
 endif()
 if (RSM_WITH_TSAN)
     add_sanitizer(rsm thread)
-    add_sanitizer(rsm undefined)
 endif()
 # TODO
 # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>

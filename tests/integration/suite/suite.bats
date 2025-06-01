@@ -9,26 +9,24 @@ function user_log() {
     printf "${fmt_string}" "$@" >&3
 }
 
-function some_function() {
-    local msg="${1:-default message}"
-    local ret_code="${2:-0}"
-
-    printf '%s\n' "${msg}"
-    return "${ret_code}"
-}
-
 function setup_file() {
+    run which jq
+    assert_success
+
     user_log "# configuring and building with preset '%s' ... " "${RSM_PRESET}"
     ./compile.bash \
         -DRSM_BUILD_TESTS=ON \
         --preset "${RSM_PRESET}" \
         --target rsm_dummy_app \
         --target rsm_infra_sanitizer_check \
+        --target rsm_examples \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
-    export RSM_BIN_DIR="bin/${RSM_PRESET}"
+
+    export BIN_DIR="bin/${RSM_PRESET}"
     export RSM_DEFAULT_BLOCK_SIZE=2
     export RSM_VERBOSE=1
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rsm.suite.bats.${RSM_PRESET}.XXXXXX")"
 }
 
 function setup() {
@@ -40,11 +38,36 @@ function teardown() {
 }
 
 function teardown_file() {
-    :
+    rm -rf "${TMP_RESULT_DIR}"
+    #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
 }
 
+# TODO later remove those ...
+#
+#function some_function() {
+#    local msg="${1:-default message}"
+#    local ret_code="${2:-0}"
+#
+#    printf '%s\n' "${msg}"
+#    return "${ret_code}"
+#}
+#
+#@test "first" {
+#    user_log '# doing %s stuff ...\n' '1st'
+#    run some_function 'doing 1st stuff ...'
+#    assert_success
+#    assert_output --partial '1st'
+#}
+#
+#@test "second" {
+#    user_log '# doing 2nd stuff ...\n'
+#    run some_function '2nd' 13
+#    assert_failure 13
+#    assert_output '2nd'
+#}
+
 @test "sanitizers work as expected" {
-    local san_check="${RSM_BIN_DIR}/rsm_infra_sanitizer_check"
+    local san_check="${BIN_DIR}/rsm_infra_sanitizer_check"
     if [[ "${RSM_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
@@ -63,11 +86,8 @@ function teardown_file() {
         assert_failure
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
         assert_output --partial 'ThreadSanitizer: reported 1 warnings'
-
-        run "${san_check}" ubsan
-        assert_failure
-        assert_output --partial 'runtime error: left shift of negative value -1'
     else
+        # well, to be precise, each consists of "undefined behavior" so it's just a lucky coincidence that it succeeds:
         run "${san_check}" tsan
         assert_success
         assert_output ''
@@ -86,8 +106,9 @@ function teardown_file() {
     fi
 }
 
+# TODO delete later:
 @test "dummy app reports all markers with no sanitizer issues" {
-    run "${RSM_BIN_DIR}/rsm_dummy_app"
+    run "${BIN_DIR}/rsm_dummy_app"
 
     # Verify that no sanitizer errors are reported
     refute_output --partial "Sanitizer"
@@ -134,18 +155,197 @@ function teardown_file() {
     assert_success
 }
 
-# TODO later remove those ...
-#
-#@test "first" {
-#    user_log '# doing %s stuff ...\n' '1st'
-#    run some_function 'doing 1st stuff ...'
-#    assert_success
-#    assert_output --partial '1st'
-#}
-#
-#@test "second" {
-#    user_log '# doing 2nd stuff ...\n'
-#    run some_function '2nd' 13
-#    assert_failure 13
-#    assert_output '2nd'
-#}
+@test "Duration markers example" {
+    local executable="${BIN_DIR}/rsm_example_duration_1"
+    local result="${TMP_RESULT_DIR}/example_duration.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 32
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["B","E"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["","Pyramid level","RAII duration test","RAII inner duration","RAII outer duration","RAII thread duration test","main - joining threads","main - spawning threads","manual duration test","manual inner duration","manual outer duration","manual thread duration test"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "Pyramid level")] | length' "${result}")" 6
+
+    assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("pid") and has("tid"))' "${result}")" 'true'
+}
+
+@test "Complete markers example" {
+    local executable="${BIN_DIR}/rsm_example_complete_1"
+    local result="${TMP_RESULT_DIR}/example_complete.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 13
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["X"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["main","pyramid","scope 1.1","scope 2.1","scope 2.2"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "pyramid")] | length' "${result}")" 9
+
+    assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("dur") and has("pid") and has("tid"))' "${result}")" 'true'
+}
+
+@test "Instant markers example 1" {
+    local executable="${BIN_DIR}/rsm_example_instant_1"
+    local result="${TMP_RESULT_DIR}/example_instant_1.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 5
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["i"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.s) | unique | sort' "${result}")" '["t"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["main thread flushing all markers","main thread started","thread 1 started","thread 2 started","thread 3 started"]'
+
+    assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("s") and has("pid") and has("tid"))' "${result}")" 'true'
+}
+
+@test "Instant markers example 2" {
+    local executable="${BIN_DIR}/rsm_example_instant_2"
+    local result="${TMP_RESULT_DIR}/example_instant_2.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 9
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result}")" 5
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 4
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["main terminating","main thread beginning","main thread, local scope","thread 1","thread 1 started","thread 2","thread 2 started","thread 3","thread 3 started"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | all(has("name") and has("ph") and has("ts") and has("s") and has("pid") and has("tid"))' "${result}")" 'true'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph != "i")] | all(has("name") and has("ph") and has("ts") and has("dur") and has("pid") and has("tid") and (has("s") | not))' "${result}")" 'true'
+}
+
+@test "Counter markers example 1" {
+    local executable="${BIN_DIR}/rsm_example_counter_1"
+    local result="${TMP_RESULT_DIR}/example_counter_1.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 12
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["C"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["Counter"]'
+
+    assert_equal "$(jq -e '.traceEvents | all(has("args"))' "${result}")" 'true'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.args | keys[]) | unique | sort' "${result}")" '["RAM [MB]","cpu utilization","thread 1 operations","thread 2 operations"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.args."RAM [MB]")] | length' "${result}")" 5
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.args."cpu utilization")] | length' "${result}")" 5
+
+    assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
+}
+
+@test "Counter markers example 2" {
+    local executable="${BIN_DIR}/rsm_example_counter_2"
+    local result="${TMP_RESULT_DIR}/example_counter_2.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 20003
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["C","X"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result}")" 20000
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 3
+
+    assert_equal "$(jq -e -c '[.traceEvents[] | select(.ph == "C")] | map(.args | keys[]) | unique | sort' "${result}")" '["x","y"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["Counter","Counter example 2","Euler method iterations","RSM_thread_local_sink_reserve"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
+}
+
+# TODO:
+# * empty file (because of no trace events in the source code, not taking the branch where they are, forgetting to manually flush it, ...)
+# * no file at all - not specifying it in the source code, or overwriting it there (when taken from env. variable)
+# * test that all related env. variables are correctly obtained & printed out
+# * manual dumping (without `defer = true`) into multiple files from single process
+# * all event kinds in one file

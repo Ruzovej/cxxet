@@ -50,55 +50,63 @@ int main(int argc, char const **argv) {
     y = x;
     m3.submit();
 
-    std::thread{[]() {
+    std::thread t1{[]() {
       RSM_init_thread_local_sink();
       {
         rsm::marker m{"scoped 1"};
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
       RSM_flush_thread_local_sink();
-    }}.join();
-    std::thread{[]() {
+    }};
+    std::thread t2{[]() {
       RSM_init_thread_local_sink();
       {
         rsm::marker m{"scoped 2"};
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
       // `RSM_flush_thread();` can be omitted
-    }}.join();
-    std::thread{[]() {
+    }};
+    std::thread t3{[]() {
       // `RSM_init_local_sink();` can be omitted (but at the cost of allocating
       // the internal buffers on first submit of any marker ... => skewed time)
 
       rsm::marker m{"scoped 3"};
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       // no extra scope needed in this case
-    }}.join();
-    std::thread{[]() {
+    }};
+    std::thread t4{[]() {
       RSM_init_thread_local_sink();
 
       rsm::marker m{"scoped 4"};
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       m.submit(); // explicit marker submit
-    }}.join();
-    std::thread{[]() {
+    }};
+    std::thread t5{[]() {
       RSM_init_thread_local_sink();
 
       RSM_MARKER("scoped 5 (macro with both default color and tag)");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }}.join();
-    std::thread{[]() {
+    }};
+    std::thread t6{[]() {
       RSM_init_thread_local_sink();
 
       RSM_MARKER("scoped 6 (macro with explicit color and default tag)", 1);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }}.join();
-    std::thread{[]() {
+    }};
+    std::thread t7{[]() {
       RSM_init_thread_local_sink();
 
       RSM_MARKER("scoped 7 (macro with both explicit color and tag)", 1, 2);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }}.join();
+    }};
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    t5.join();
+    t6.join();
+    t7.join();
   }
 
   auto const simple_marker_cascade = [](int const tid) {

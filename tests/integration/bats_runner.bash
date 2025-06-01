@@ -25,10 +25,10 @@ function bats_runner() {
     )
 
     local test_presets=(
-        asan
         asan_d
-        tsan
+        asan
         tsan_d
+        tsan
         release
     )
 
@@ -40,7 +40,7 @@ function bats_runner() {
         local preset
         for preset in "${test_presets[@]}"; do
             RSM_PRESET="${preset}" \
-            "${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/suite.bats
+            "${BATS_EXECUTABLE}" "${args[@]}" --recursive tests/integration/suite
         done
     done
 }
