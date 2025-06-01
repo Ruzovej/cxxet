@@ -49,3 +49,14 @@ add_example(
     rsm_example_complete_1
         "complete/1.cpp"
 )
+
+add_custom_target(
+    rsm_examples
+        DEPENDS
+            rsm_example_instant_1
+            rsm_example_instant_2
+            rsm_example_counter_1
+            rsm_example_counter_2
+            rsm_example_duration_1
+            rsm_example_complete_1
+)

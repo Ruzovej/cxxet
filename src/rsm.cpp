@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <iostream> // must be there, even if unused ... so `std::cout`, etc. gets initialized before it's potentially used in `sink_properties` ctor
+
 #include "impl/central_sink.hpp"
 #include "impl/local_sink.hpp"
 #include "impl/sink_properties.hpp"

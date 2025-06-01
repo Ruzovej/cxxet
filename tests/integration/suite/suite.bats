@@ -9,14 +9,6 @@ function user_log() {
     printf "${fmt_string}" "$@" >&3
 }
 
-function some_function() {
-    local msg="${1:-default message}"
-    local ret_code="${2:-0}"
-
-    printf '%s\n' "${msg}"
-    return "${ret_code}"
-}
-
 function setup_file() {
     user_log "# configuring and building with preset '%s' ... " "${RSM_PRESET}"
     ./compile.bash \
@@ -24,11 +16,13 @@ function setup_file() {
         --preset "${RSM_PRESET}" \
         --target rsm_dummy_app \
         --target rsm_infra_sanitizer_check \
+        --target rsm_examples \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
-    export RSM_BIN_DIR="bin/${RSM_PRESET}"
+    export BIN_DIR="bin/${RSM_PRESET}"
     export RSM_DEFAULT_BLOCK_SIZE=2
     export RSM_VERBOSE=1
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/suite.bats.${RSM_PRESET}.XXX")"
 }
 
 function setup() {
@@ -40,11 +34,35 @@ function teardown() {
 }
 
 function teardown_file() {
-    :
+    rm -rf "${TMP_RESULT_DIR}"
 }
 
+# TODO later remove those ...
+#
+#function some_function() {
+#    local msg="${1:-default message}"
+#    local ret_code="${2:-0}"
+#
+#    printf '%s\n' "${msg}"
+#    return "${ret_code}"
+#}
+#
+#@test "first" {
+#    user_log '# doing %s stuff ...\n' '1st'
+#    run some_function 'doing 1st stuff ...'
+#    assert_success
+#    assert_output --partial '1st'
+#}
+#
+#@test "second" {
+#    user_log '# doing 2nd stuff ...\n'
+#    run some_function '2nd' 13
+#    assert_failure 13
+#    assert_output '2nd'
+#}
+
 @test "sanitizers work as expected" {
-    local san_check="${RSM_BIN_DIR}/rsm_infra_sanitizer_check"
+    local san_check="${BIN_DIR}/rsm_infra_sanitizer_check"
     if [[ "${RSM_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
@@ -86,8 +104,9 @@ function teardown_file() {
     fi
 }
 
+# TODO delete later:
 @test "dummy app reports all markers with no sanitizer issues" {
-    run "${RSM_BIN_DIR}/rsm_dummy_app"
+    run "${BIN_DIR}/rsm_dummy_app"
 
     # Verify that no sanitizer errors are reported
     refute_output --partial "Sanitizer"
@@ -134,18 +153,74 @@ function teardown_file() {
     assert_success
 }
 
-# TODO later remove those ...
-#
-#@test "first" {
-#    user_log '# doing %s stuff ...\n' '1st'
-#    run some_function 'doing 1st stuff ...'
-#    assert_success
-#    assert_output --partial '1st'
-#}
-#
-#@test "second" {
-#    user_log '# doing 2nd stuff ...\n'
-#    run some_function '2nd' 13
-#    assert_failure 13
-#    assert_output '2nd'
-#}
+@test "Duration markers example" {
+    local executable="${BIN_DIR}/rsm_example_duration_1"
+    local result="${TMP_RESULT_DIR}/example_duration.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    assert [ -f "${result}" ]
+}
+
+@test "Complete markers example" {
+    local executable="${BIN_DIR}/rsm_example_complete_1"
+    local result="${TMP_RESULT_DIR}/example_complete.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    assert [ -f "${result}" ]
+}
+
+@test "Instant markers example 1" {
+    local executable="${BIN_DIR}/rsm_example_instant_1"
+    local result="${TMP_RESULT_DIR}/example_instant_1.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    assert [ -f "${result}" ]
+}
+
+@test "Instant markers example 2" {
+    local executable="${BIN_DIR}/rsm_example_instant_2"
+    local result="${TMP_RESULT_DIR}/example_instant_2.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    assert [ -f "${result}" ]
+}
+
+@test "Counter markers example 1" {
+    local executable="${BIN_DIR}/rsm_example_counter_1"
+    local result="${TMP_RESULT_DIR}/example_counter_1.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    assert [ -f "${result}" ]
+}
+
+@test "Counter markers example 2" {
+    local executable="${BIN_DIR}/rsm_example_counter_2"
+    local result="${TMP_RESULT_DIR}/example_counter_2.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
+Deduced RSM_DEFAULT_BLOCK_SIZE: 2
+Deduced RSM_TARGET_FILENAME: "
+    assert [ -f "${result}" ]
+}
