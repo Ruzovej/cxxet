@@ -10,6 +10,9 @@ function user_log() {
 }
 
 function setup_file() {
+    run which jq
+    assert_success
+
     user_log "# configuring and building with preset '%s' ... " "${RSM_PRESET}"
     ./compile.bash \
         -DRSM_BUILD_TESTS=ON \
@@ -19,6 +22,7 @@ function setup_file() {
         --target rsm_examples \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
+
     export BIN_DIR="bin/${RSM_PRESET}"
     export RSM_DEFAULT_BLOCK_SIZE=2
     export RSM_VERBOSE=1
@@ -329,7 +333,7 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["C","X"]'
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result}")" 20000
-    
+
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 3
 
     assert_equal "$(jq -e -c '[.traceEvents[] | select(.ph == "C")] | map(.args | keys[]) | unique | sort' "${result}")" '["x","y"]'
