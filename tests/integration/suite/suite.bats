@@ -279,6 +279,10 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
 
     assert [ -f "${result}" ]
 }
@@ -292,6 +296,10 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
 
     assert [ -f "${result}" ]
 }
