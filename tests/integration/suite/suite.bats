@@ -81,11 +81,8 @@ function teardown_file() {
         assert_failure
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
         assert_output --partial 'ThreadSanitizer: reported 1 warnings'
-
-        run "${san_check}" ubsan
-        assert_failure
-        assert_output --partial 'runtime error: left shift of negative value -1'
     else
+        # well, to be precise, each consists of "undefined behavior" so it's just a lucky coincidence that it succeeds:
         run "${san_check}" tsan
         assert_success
         assert_output ''

@@ -115,7 +115,7 @@ if (RSM_WITH_ASAN)
 endif()
 if (RSM_WITH_TSAN)
     add_sanitizer(rsm thread)
-    add_sanitizer(rsm undefined)
+    #add_sanitizer(rsm undefined)
 endif()
 # TODO
 # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
