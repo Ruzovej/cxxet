@@ -16,6 +16,7 @@ function setup_file() {
     user_log "# configuring and building with preset '%s' ... " "${RSM_PRESET}"
     ./compile.bash \
         -DRSM_BUILD_TESTS=ON \
+        -DRSM_BUILD_EXAMPLES=ON \
         --preset "${RSM_PRESET}" \
         --target infra_sanitizer_check \
         --target rsm_examples \
