@@ -342,3 +342,10 @@ Deduced RSM_TARGET_FILENAME: "
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
+
+# TODO:
+# * empty file (because of no trace events in the source code, not taking the branch where they are, forgetting to manually flush it, ...)
+# * no file at all - not specifying it in the source code, or overwriting it there (when taken from env. variable)
+# * test that all related env. variables are correctly obtained & printed out
+# * manual dumping (without `defer = true`) into multiple files from single process
+# * all event kinds in one file
