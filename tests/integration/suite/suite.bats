@@ -22,7 +22,7 @@ function setup_file() {
     export BIN_DIR="bin/${RSM_PRESET}"
     export RSM_DEFAULT_BLOCK_SIZE=2
     export RSM_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/suite.bats.${RSM_PRESET}.XXX")"
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rsm.suite.bats.${RSM_PRESET}.XXXXXX")"
 }
 
 function setup() {
@@ -159,7 +159,24 @@ function teardown_file() {
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
     assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 32
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["B","E"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["","Pyramid level","RAII duration test","RAII inner duration","RAII outer duration","RAII thread duration test","main - joining threads","main - spawning threads","manual duration test","manual inner duration","manual outer duration","manual thread duration test"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "Pyramid level")] | length' "${result}")" 6
+
+    assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
 @test "Complete markers example" {
@@ -171,6 +188,7 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+
     assert [ -f "${result}" ]
 }
 
@@ -183,6 +201,7 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+
     assert [ -f "${result}" ]
 }
 
@@ -195,6 +214,7 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+
     assert [ -f "${result}" ]
 }
 
@@ -207,6 +227,7 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+
     assert [ -f "${result}" ]
 }
 
@@ -219,5 +240,6 @@ Deduced RSM_TARGET_FILENAME: "
     assert_output "Deduced RSM_OUTPUT_FORMAT: 0
 Deduced RSM_DEFAULT_BLOCK_SIZE: 2
 Deduced RSM_TARGET_FILENAME: "
+
     assert [ -f "${result}" ]
 }
