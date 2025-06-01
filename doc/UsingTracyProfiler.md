@@ -21,7 +21,7 @@ $ time cmake --build tracy/build_import -j "$(nproc)"
 
 ```bash
 # generate trace file
-$ rsm/bin/release/rsm_dummy_app 0 /tmp/trace.json
+$ rsm/bin/release/rsm_example_counter_2 /tmp/trace.json
 ...
 # convert it to `tracy` format
 $ tracy/build_import/tracy-import-chrome /tmp/trace.json /tmp/trace.tracy
