@@ -42,6 +42,15 @@ else()
     set(RSM_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
 endif()
 
+include(FetchContent)
+
+FetchContent_Declare(
+    doctest
+    GIT_REPOSITORY https://github.com/doctest/doctest.git
+    GIT_TAG        v2.4.11
+)
+FetchContent_MakeAvailable(doctest)
+
 function(add_unix_compiler_flags target)
     # TODO
     # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
@@ -173,11 +182,47 @@ target_include_directories(
         PUBLIC
         "include"
 )
+# hide the unit tests - users of this library aren't allowed to use the unit testing framework:
+target_link_libraries(
+    rsm
+        PRIVATE
+        doctest::doctest
+)
+target_compile_definitions(
+    rsm
+        PRIVATE
+        DOCTEST_CONFIG_DISABLE
+)
 
 # tests, etc.:
 if (RSM_BUILD_TESTS)
     add_subdirectory(tests/infra)
-    add_subdirectory(tests/unit)
+
+    add_executable(
+        rsm_unit_tests
+            tests/unit/doctest_main.cpp
+            ${RSM_LIB_SOURCES}
+            tests/unit/impl/event/list/event_list_test.cpp
+            tests/unit/impl/sink_test.cpp
+    )
+    target_include_directories(
+        rsm_unit_tests
+            PRIVATE
+            "include"
+    )
+    target_link_libraries(
+        rsm_unit_tests
+            PRIVATE
+            doctest::doctest
+    )
+    target_compile_definitions(
+        rsm_unit_tests
+            PRIVATE
+            DOCTEST_CONFIG_SUPER_FAST_ASSERTS
+            DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
+    )
+    add_unix_compiler_flags(rsm_unit_tests)
+    add_sanitizers(rsm_unit_tests)
 endif()
 
 if (RSM_BUILD_EXAMPLES)
