@@ -25,7 +25,7 @@ set(RSM_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using wi
 # implied by options:
 set(RSM_LIB_KIND "STATIC")
 if (RSM_BUILD_SHARED)
-    set(RSM_LIB_KIND "SHARED") # TODO fix this
+    set(RSM_LIB_KIND "SHARED")
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${RSM_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
@@ -41,24 +41,6 @@ if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
 else()
     set(RSM_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
 endif()
-
-# TODO refactor:
-function(add_sanitizer target sanitizer)
-    target_compile_options(
-        ${target}
-            PUBLIC
-            -fsanitize=${sanitizer}
-            -fno-sanitize-recover=all
-            -fno-omit-frame-pointer
-    )
-    target_link_options(
-        ${target}
-            PUBLIC
-            -fsanitize=${sanitizer}
-            -fno-sanitize-recover=all
-            -fno-omit-frame-pointer
-    )
-endfunction()
 
 function(add_unix_compiler_flags target)
     # TODO
@@ -107,6 +89,24 @@ function(add_unix_compiler_flags target)
 endfunction()
 
 function(add_sanitizers target)
+    # TODO refactor:
+    function(add_sanitizer target sanitizer)
+        target_compile_options(
+            ${target}
+                PUBLIC
+                -fsanitize=${sanitizer}
+                -fno-sanitize-recover=all
+                -fno-omit-frame-pointer
+        )
+        target_link_options(
+            ${target}
+                PUBLIC
+                -fsanitize=${sanitizer}
+                -fno-sanitize-recover=all
+                -fno-omit-frame-pointer
+        )
+    endfunction()
+
     if (RSM_WITH_ASAN)
         add_sanitizer(${target} address)
         add_sanitizer(${target} leak)
@@ -115,8 +115,9 @@ function(add_sanitizers target)
     if (RSM_WITH_TSAN)
         add_sanitizer(${target} thread)
     endif()
-    get_target_property(target_type ${target} TYPE)
-    if (target_type STREQUAL "SHARED_LIBRARY")
+
+    get_target_property(INPUT_TARGET_TYPE ${target} TYPE)
+    if (INPUT_TARGET_TYPE STREQUAL "SHARED_LIBRARY")
         target_compile_options(
             ${target}
                 PRIVATE
@@ -132,12 +133,12 @@ function(add_sanitizers target)
         if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
             target_compile_options(
                 ${target}
-                    PRIVATE # or PUBLIC?!
+                    PUBLIC
                     -fPIE
             )
             target_link_options(
                 ${target}
-                    PRIVATE # or PUBLIC?!
+                    PUBLIC
                     -pie
             )
         endif()
