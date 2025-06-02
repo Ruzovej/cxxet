@@ -5,8 +5,8 @@
 #include "impl/utils.hpp"
 
 #define RSM_MARK_DURATION(...)                                                 \
-  ::rsm::mark_duration RSM_IMPL_IMPLICIT_MARKER_NAME(                          \
-      RSM_IMPLICIT_DURATION_MARKER_, __LINE__) {                               \
+  ::rsm::mark_duration RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,     \
+                                                     __LINE__) {               \
     __VA_ARGS__                                                                \
   }
 
