@@ -42,15 +42,6 @@ else()
     set(RSM_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
 endif()
 
-# source files:
-# https://cmake.org/cmake/help/latest/command/file.html#filesystem
-file(
-    GLOB_RECURSE
-    rsm_sources
-        CONFIGURE_DEPENDS
-        "src/*.cpp"
-)
-
 # TODO refactor:
 function(add_sanitizer target sanitizer)
     target_compile_options(
@@ -69,12 +60,105 @@ function(add_sanitizer target sanitizer)
     )
 endfunction()
 
-# core library:
+function(add_unix_compiler_flags target)
+    # TODO
+    # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
+    # * refactor:
+    set(RSM_UNIX_COMPILER_FLAGS
+        -Wall
+        -Wextra
+        -pedantic
+        -Werror
+        -Wshadow
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Wcast-align
+        -Wconversion
+        -Wsign-conversion
+        -Wmisleading-indentation
+        -Wdouble-promotion
+        -Wformat=2
+        -Wnull-dereference
+        -Wimplicit-fallthrough
+        -Wno-error=deprecated-declarations # TODO remove this or not?!
+    )
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(
+            RSM_COMPILER_FLAGS
+                ${RSM_UNIX_COMPILER_FLAGS}
+                -Wduplicated-cond
+                -Wduplicated-branches
+                -Wlogical-op
+                -Wuseless-cast
+        )
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(
+            RSM_COMPILER_FLAGS
+                ${RSM_UNIX_COMPILER_FLAGS}
+                -Weffc++
+        )
+    endif()
+
+    target_compile_options(
+        ${target}
+            PUBLIC
+            ${RSM_COMPILER_FLAGS}
+    )
+endfunction()
+
+function(add_sanitizers target)
+    if (RSM_WITH_ASAN)
+        add_sanitizer(${target} address)
+        add_sanitizer(${target} leak)
+        add_sanitizer(${target} undefined)
+    endif()
+    if (RSM_WITH_TSAN)
+        add_sanitizer(${target} thread)
+    endif()
+    get_target_property(target_type ${target} TYPE)
+    if (target_type STREQUAL "SHARED_LIBRARY")
+        target_compile_options(
+            ${target}
+                PRIVATE
+                -fvisibility=hidden
+        )
+        # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
+        target_compile_options(
+            ${target}
+                PUBLIC
+                -fPIC
+        )
+    else()
+        if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
+            target_compile_options(
+                ${target}
+                    PRIVATE # or PUBLIC?!
+                    -fPIE
+            )
+            target_link_options(
+                ${target}
+                    PRIVATE # or PUBLIC?!
+                    -pie
+            )
+        endif()
+    endif()
+endfunction()
+
+# core library; source files:
+# https://cmake.org/cmake/help/latest/command/file.html#filesystem
+file(
+    GLOB_RECURSE
+    RSM_LIB_SOURCES
+        CONFIGURE_DEPENDS
+        "src/*.cpp"
+)
 add_library(
     rsm
         ${RSM_LIB_KIND}
-        ${rsm_sources}
+        ${RSM_LIB_SOURCES}
 )
+add_unix_compiler_flags(rsm)
+add_sanitizers(rsm)
 if (RSM_BUILD_SHARED)
     set_target_properties( # seems useful -> TODO polish it later
         rsm
@@ -82,81 +166,11 @@ if (RSM_BUILD_SHARED)
             VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
             SOVERSION 0 # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
     )
-    # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
-    target_compile_options(
-        rsm
-            PRIVATE
-            -fvisibility=hidden
-            -fPIC
-    )
-else()
-    if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
-        target_compile_options(
-            rsm
-                PRIVATE
-                -fPIE
-        )
-        target_link_options(
-            rsm
-                PRIVATE
-                -pie
-        )
-    endif()
 endif()
 target_include_directories(
     rsm
         PUBLIC
         "include"
-)
-if (RSM_WITH_ASAN)
-    add_sanitizer(rsm address)
-    add_sanitizer(rsm leak)
-    add_sanitizer(rsm undefined)
-endif()
-if (RSM_WITH_TSAN)
-    add_sanitizer(rsm thread)
-endif()
-# TODO
-# * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
-# * refactor:
-set(RSM_UNIX_COMPILER_FLAGS
-    -Wall
-    -Wextra
-    -pedantic
-    -Werror
-    -Wshadow
-    -Wnon-virtual-dtor
-    -Wold-style-cast
-    -Wcast-align
-    -Wconversion
-    -Wsign-conversion
-    -Wmisleading-indentation
-    -Wdouble-promotion
-    -Wformat=2
-    -Wnull-dereference
-    -Wimplicit-fallthrough
-    -Wno-error=deprecated-declarations # TODO remove this or not?!
-)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(
-        RSM_COMPILER_FLAGS
-            ${RSM_UNIX_COMPILER_FLAGS}
-            -Wduplicated-cond
-            -Wduplicated-branches
-            -Wlogical-op
-            -Wuseless-cast
-    )
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(
-        RSM_COMPILER_FLAGS
-            ${RSM_UNIX_COMPILER_FLAGS}
-            -Weffc++
-    )
-endif()
-target_compile_options(
-    rsm
-        PUBLIC
-        ${RSM_COMPILER_FLAGS}
 )
 
 # tests, etc.:
