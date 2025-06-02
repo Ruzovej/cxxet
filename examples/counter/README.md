@@ -4,4 +4,4 @@ Counter markers are used to track changing numerical values over time. They _may
 
 ## Notes
 
-* Counter value type is `double`, which should have enough precision for most use cases.
+* Counter value type is `double`, which should have enough precision for vast majority of use cases.

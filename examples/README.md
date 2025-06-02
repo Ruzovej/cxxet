@@ -17,5 +17,5 @@ It's lightweight library that generates `chrome trace` format output, which can 
 
 ## Performance Tips
 
-* Use `RSM_thread_local_sink_reserve(capacity)` when you know how many events you'll generate.
+* Use `RSM_thread_local_sink_reserve(capacity)` anytime when you know how many events will be generated; at least preallocate buffer for markers by a call to `RSM_init_thread_local_sink()` (at most once per thread and before any `RSM_thread_local_sink_reserve(...)` call).
 * Markers have (low?) overhead that can accumulate within high-frequency usage.
