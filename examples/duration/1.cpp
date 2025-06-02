@@ -15,7 +15,7 @@ int main(int argc, char const **argv) {
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   {
-    RSM_MARK_DURATION("RAII duration test");
+    RSM_mark_duration("RAII duration test");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
@@ -26,7 +26,7 @@ int main(int argc, char const **argv) {
   RSM_mark_duration_begin("main - spawning threads");
   std::thread t1{[]() {
     RSM_init_thread_local_sink();
-    RSM_MARK_DURATION("RAII thread duration test");
+    RSM_mark_duration("RAII thread duration test");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }};
   std::thread t2{[]() {
@@ -39,11 +39,11 @@ int main(int argc, char const **argv) {
 
   // Test overlapping durations:
   {
-    RSM_MARK_DURATION("RAII outer duration");
+    RSM_mark_duration("RAII outer duration");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
     {
-      RSM_MARK_DURATION("RAII inner duration");
+      RSM_mark_duration("RAII inner duration");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 

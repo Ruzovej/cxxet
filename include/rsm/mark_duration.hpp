@@ -4,9 +4,9 @@
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
-#define RSM_MARK_DURATION(...)                                                 \
-  ::rsm::mark_duration RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,     \
-                                                     __LINE__) {               \
+#define RSM_mark_duration(...)                                                 \
+  rsm::mark_duration RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,       \
+                                                   __LINE__) {                 \
     __VA_ARGS__                                                                \
   }
 
