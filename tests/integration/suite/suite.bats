@@ -20,6 +20,7 @@ function setup_file() {
         --preset "${RSM_PRESET}" \
         --target infra_sanitizer_check \
         --target rsm_examples \
+        --target rsm_unit_tests \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
 
@@ -66,7 +67,7 @@ function teardown_file() {
 #    assert_output '2nd'
 #}
 
-@test "sanitizers work as expected" {
+@test "Sanitizers work as expected" {
     local san_check="${BIN_DIR}/infra_sanitizer_check"
     if [[ "${RSM_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
@@ -294,9 +295,69 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
-# TODO:
-# * empty file (because of no trace events in the source code, not taking the branch where they are, forgetting to manually flush it, ...)
-# * no file at all - not specifying it in the source code, or overwriting it there (when taken from env. variable)
-# * test that all related env. variables are correctly obtained & printed out
-# * manual dumping (without `defer = true`) into multiple files from single process
-# * all event kinds in one file
+# TODO end-user usage:
+# * Empty file (e.g., due to no trace events in the source code, not taking the branch where they are, or forgetting to manually flush it).
+# * No file at all (e.g., not specifying it in the source code, or overwriting it there when taken from an environment variable).
+# * Test that all related environment variables are correctly obtained and printed out.
+# * Manual dumping (without `defer = true`) into multiple files from a single process.
+# * All event types in one file.
+
+@test "Shared library symbol visibility" {
+    local shared_lib="${BIN_DIR}/librsm.so"
+
+    if ! [[ -f "${shared_lib}" ]]; then
+        return
+    fi
+
+    run nm -D -C "${shared_lib}"
+    assert_success
+    local nm_output="${output}"
+
+    # only those symbols should be exported:
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " RSM_")" 5
+
+    # those definitely not:
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::impl::")" 0
+}
+
+@test "Unit tests runner contains expected symbols" {
+    if ! [[ -f "${BIN_DIR}/librsm.so" ]]; then
+        return
+    fi
+
+    run nm -C "${BIN_DIR}/rsm_unit_tests"
+    assert_success
+    local nm_output="$output"
+
+    # contains internal implementation symbols & `doctest` stuff:
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::")" 0
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
+}
+
+@test "Examples & unit test runner properly depend on shared library if built this way" {
+    if ! [[ -f "${BIN_DIR}/librsm.so" ]]; then
+        return
+    fi
+
+    run ldd "${BIN_DIR}/rsm_unit_tests"
+    refute_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_complete_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_counter_2"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_instant_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_counter_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_duration_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_instant_2"
+    assert_output --partial "librsm.so"
+}

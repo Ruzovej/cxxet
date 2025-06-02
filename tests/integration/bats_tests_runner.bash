@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function bats_runner() {
+function bats_tests_runner() {
     local num_rounds=1
 
     while (( $# > 0 )); do

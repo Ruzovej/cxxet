@@ -1,3 +1,5 @@
+#ifdef RSM_WITH_UNIT_TESTS
+
 #include "impl/central_sink.hpp"
 #include "impl/local_sink.hpp"
 
@@ -134,3 +136,5 @@ TEST_CASE("sink cascade") {
 }
 
 } // namespace rsm::impl
+
+#endif
