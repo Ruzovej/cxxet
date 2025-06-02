@@ -13,7 +13,7 @@ RSM_thread_local_sink_reserve(int const minimum_free_capacity) noexcept;
 
 RSM_IMPL_API void RSM_flush_thread_local_sink() noexcept;
 
-RSM_IMPL_API void RSM_flush_all_collected_events(
+RSM_IMPL_API void RSM_flush_global_sink(
     rsm::output::format const fmt = rsm::output::format::chrome_trace,
     char const *const filename = nullptr, // `== nullptr` => no-op; to be more
                                           // precise: discard everything

@@ -34,9 +34,9 @@ void RSM_thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
 
 void RSM_flush_thread_local_sink() noexcept { thread_sink.flush(); }
 
-void RSM_flush_all_collected_events(rsm::output::format const fmt,
-                                    char const *const filename,
-                                    bool const defer_flush) noexcept {
+void RSM_flush_global_sink(rsm::output::format const fmt,
+                           char const *const filename,
+                           bool const defer_flush) noexcept {
   sink_props.set_target_format(fmt).set_target_filename(filename);
   if (!defer_flush) {
     global_sink.flush();

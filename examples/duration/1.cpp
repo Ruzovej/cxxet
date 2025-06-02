@@ -8,8 +8,7 @@
 
 int main(int argc, char const **argv) {
   char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
-  RSM_flush_all_collected_events(rsm::output::format::chrome_trace, filename,
-                                 true);
+  RSM_flush_global_sink(rsm::output::format::chrome_trace, filename, true);
 
   RSM_init_thread_local_sink();
 
