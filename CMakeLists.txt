@@ -202,8 +202,6 @@ if (RSM_BUILD_TESTS)
         rsm_unit_tests
             tests/unit/doctest_main.cpp
             ${RSM_LIB_SOURCES}
-            tests/unit/impl/event/list/event_list_test.cpp
-            tests/unit/impl/sink_test.cpp
     )
     target_include_directories(
         rsm_unit_tests
@@ -220,6 +218,7 @@ if (RSM_BUILD_TESTS)
             PRIVATE
             DOCTEST_CONFIG_SUPER_FAST_ASSERTS
             DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
+            RSM_WITH_UNIT_TESTS
     )
     add_unix_compiler_flags(rsm_unit_tests)
     add_sanitizers(rsm_unit_tests)
