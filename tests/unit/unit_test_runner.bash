@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function unit_runner() {
+function unit_test_runner() {
     local num_rounds=1
 
     while (($# > 0)); do
