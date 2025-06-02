@@ -14,25 +14,25 @@ int main(int argc, char const **argv) {
   RSM_MARK_INSTANT("main thread beginning");
 
   {
-    RSM_MARK_COMPLETE("main thread, local scope");
+    RSM_mark_complete("main thread, local scope");
 
     // Unfortunately, using non-default scope (== `...::thread`), makes `chrome`
     // & ui.perfetto.dev display it somehow unusably ...
 
     std::thread t1{[]() {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      RSM_MARK_COMPLETE("thread 1");
+      RSM_mark_complete("thread 1");
       RSM_MARK_INSTANT("thread 1 started");
     }};
 
     std::thread t2{[]() {
-      RSM_MARK_COMPLETE("thread 2");
+      RSM_mark_complete("thread 2");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       RSM_MARK_INSTANT("thread 2 started");
     }};
 
     std::thread t3{[]() {
-      RSM_MARK_COMPLETE("thread 3");
+      RSM_mark_complete("thread 3");
       RSM_MARK_INSTANT("thread 3 started");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }};

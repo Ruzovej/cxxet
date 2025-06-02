@@ -5,9 +5,9 @@
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
-#define RSM_MARK_COMPLETE(...)                                                 \
-  ::rsm::mark_complete RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,     \
-                                                     __LINE__)(__VA_ARGS__)
+#define RSM_mark_complete(...)                                                 \
+  rsm::mark_complete RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,       \
+                                                   __LINE__)(__VA_ARGS__)
 
 namespace rsm {
 

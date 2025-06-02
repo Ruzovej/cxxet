@@ -24,7 +24,7 @@ int main(int argc, char const **argv) {
   char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
   RSM_flush_global_sink(rsm::output::format::chrome_trace, filename, true);
 
-  RSM_MARK_COMPLETE("Counter example 2");
+  RSM_mark_complete("Counter example 2");
 
   int const num_points{10'000};
   // step traits:
@@ -40,14 +40,14 @@ int main(int argc, char const **argv) {
   }};
 
   {
-    RSM_MARK_COMPLETE("RSM_thread_local_sink_reserve");
+    RSM_mark_complete("RSM_thread_local_sink_reserve");
     RSM_thread_local_sink_reserve(
         num_points * 2 // ...
-        + 3            // those 3 extra `RSM_MARK_COMPLETE`s above and below ...
+        + 3            // those 3 extra `RSM_mark_complete`s above and below ...
     );
   }
 
-  RSM_MARK_COMPLETE("Euler method iterations");
+  RSM_mark_complete("Euler method iterations");
   for (int i{0}; i < num_points; ++i) {
     RSM_MARK_COUNTERS("y", y, "x", x);
     y = euler_method(fn, x, y, h, steps_for_point);

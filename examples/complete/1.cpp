@@ -5,7 +5,7 @@
 #include "rsm/mark_complete.hpp"
 
 static void pyramid(int const level) {
-  RSM_MARK_COMPLETE(__FUNCTION__);
+  RSM_mark_complete(__FUNCTION__);
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
   if (level > 0) {
     pyramid(level - 1);
@@ -15,22 +15,22 @@ static void pyramid(int const level) {
 
 int main(int argc, char const **argv) {
   RSM_init_thread_local_sink();
-  RSM_MARK_COMPLETE(__FUNCTION__);
+  RSM_mark_complete(__FUNCTION__);
 
   char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
   RSM_flush_global_sink(rsm::output::format::chrome_trace, filename, true);
 
   std::thread t1{[]() {
     RSM_init_thread_local_sink();
-    RSM_MARK_COMPLETE("scope 1.1");
+    RSM_mark_complete("scope 1.1");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     {
-      RSM_MARK_COMPLETE("scope 2.1");
+      RSM_mark_complete("scope 2.1");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     {
-      RSM_MARK_COMPLETE("scope 2.2");
+      RSM_mark_complete("scope 2.2");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
