@@ -4,7 +4,7 @@
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
-#define RSM_MARK_COUNTERS(...) ::rsm::mark_counters_call(__VA_ARGS__)
+#define RSM_mark_counters(...) rsm::mark_counters_call(__VA_ARGS__)
 
 namespace rsm {
 

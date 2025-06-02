@@ -49,7 +49,7 @@ int main(int argc, char const **argv) {
 
   RSM_mark_complete("Euler method iterations");
   for (int i{0}; i < num_points; ++i) {
-    RSM_MARK_COUNTERS("y", y, "x", x);
+    RSM_mark_counters("y", y, "x", x);
     y = euler_method(fn, x, y, h, steps_for_point);
     x += h * steps_for_point;
   }
