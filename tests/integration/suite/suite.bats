@@ -294,9 +294,14 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
-# TODO:
-# * empty file (because of no trace events in the source code, not taking the branch where they are, forgetting to manually flush it, ...)
-# * no file at all - not specifying it in the source code, or overwriting it there (when taken from env. variable)
-# * test that all related env. variables are correctly obtained & printed out
-# * manual dumping (without `defer = true`) into multiple files from single process
-# * all event kinds in one file
+# TODO end-user usage:
+# * Empty file (e.g., due to no trace events in the source code, not taking the branch where they are, or forgetting to manually flush it).
+# * No file at all (e.g., not specifying it in the source code, or overwriting it there when taken from an environment variable).
+# * Test that all related environment variables are correctly obtained and printed out.
+# * Manual dumping (without `defer = true`) into multiple files from a single process.
+# * All event types in one file.
+
+# TODO check compilation results (when built as a shared library):
+# * `nm -D -C librsm.so.0.1.0` -> ensure it doesn't list any "hidden" symbols, anything from `doctest`, etc. and count exported `RSM_...` symbols.
+# * `rsm_unit_tests` works correctly and contains the above-mentioned forbidden symbols (e.g., via `nm -C rsm_unit_tests`).
+
