@@ -4,13 +4,6 @@
 
 #include <cassert>
 
-#ifdef RSM_WITH_UNIT_TESTS
-#include <doctest/doctest.h>
-#ifdef DOCTEST_CONFIG_DISABLE
-#error "incompatible configuration options!"
-#endif
-#endif
-
 #include <type_traits>
 #include <utility>
 
@@ -108,6 +101,8 @@ long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
 } // namespace rsm::impl::event
 
 #ifdef RSM_WITH_UNIT_TESTS
+
+#include <doctest/doctest.h>
 
 namespace rsm::impl {
 

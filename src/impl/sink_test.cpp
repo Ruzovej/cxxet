@@ -1,7 +1,4 @@
 #ifdef RSM_WITH_UNIT_TESTS
-#ifdef DOCTEST_CONFIG_DISABLE
-#error "incompatible configuration options!"
-#endif
 
 #include "impl/central_sink.hpp"
 #include "impl/local_sink.hpp"

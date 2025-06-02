@@ -44,13 +44,6 @@ endif()
 
 include(FetchContent)
 
-FetchContent_Declare(
-    doctest
-    GIT_REPOSITORY https://github.com/doctest/doctest.git
-    GIT_TAG        v2.4.11
-)
-FetchContent_MakeAvailable(doctest)
-
 function(add_unix_compiler_flags target)
     # TODO
     # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
@@ -182,21 +175,17 @@ target_include_directories(
         PUBLIC
         "include"
 )
-# hide the unit tests - users of this library aren't allowed to use the unit testing framework:
-target_link_libraries(
-    rsm
-        PRIVATE
-        doctest::doctest
-)
-target_compile_definitions(
-    rsm
-        PRIVATE
-        DOCTEST_CONFIG_DISABLE
-)
 
 # tests, etc.:
 if (RSM_BUILD_TESTS)
     add_subdirectory(tests/infra)
+
+    FetchContent_Declare(
+        doctest
+        GIT_REPOSITORY https://github.com/doctest/doctest.git
+        GIT_TAG        v2.4.11
+    )
+    FetchContent_MakeAvailable(doctest)
 
     add_executable(
         rsm_unit_tests
