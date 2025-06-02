@@ -20,6 +20,7 @@ function setup_file() {
         --preset "${RSM_PRESET}" \
         --target infra_sanitizer_check \
         --target rsm_examples \
+        --target rsm_unit_tests \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
 
@@ -66,7 +67,7 @@ function teardown_file() {
 #    assert_output '2nd'
 #}
 
-@test "sanitizers work as expected" {
+@test "Sanitizers work as expected" {
     local san_check="${BIN_DIR}/infra_sanitizer_check"
     if [[ "${RSM_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
@@ -301,7 +302,62 @@ Deduced RSM_TARGET_FILENAME: "
 # * Manual dumping (without `defer = true`) into multiple files from a single process.
 # * All event types in one file.
 
-# TODO check compilation results (when built as a shared library):
-# * `nm -D -C librsm.so.0.1.0` -> ensure it doesn't list any "hidden" symbols, anything from `doctest`, etc. and count exported `RSM_...` symbols.
-# * `rsm_unit_tests` works correctly and contains the above-mentioned forbidden symbols (e.g., via `nm -C rsm_unit_tests`).
+@test "Shared library symbol visibility" {
+    local shared_lib="${BIN_DIR}/librsm.so"
 
+    if ! [[ -f "${shared_lib}" ]]; then
+        return
+    fi
+
+    run nm -D -C "${shared_lib}"
+    assert_success
+    local nm_output="${output}"
+
+    # only those symbols should be exported:
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " RSM_")" 5
+
+    # those definitely not:
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::impl::")" 0
+}
+
+@test "Unit tests runner contains expected symbols" {
+    if ! [[ -f "${BIN_DIR}/librsm.so" ]]; then
+        return
+    fi
+
+    run nm -C "${BIN_DIR}/rsm_unit_tests"
+    assert_success
+    local nm_output="$output"
+
+    # contains internal implementation symbols & `doctest` stuff:
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::")" 0
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
+}
+
+@test "Examples & unit test runner properly depend on shared library if built this way" {
+    if ! [[ -f "${BIN_DIR}/librsm.so" ]]; then
+        return
+    fi
+
+    run ldd "${BIN_DIR}/rsm_unit_tests"
+    refute_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_complete_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_counter_2"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_instant_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_counter_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_duration_1"
+    assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_instant_2"
+    assert_output --partial "librsm.so"
+}
