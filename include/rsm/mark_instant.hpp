@@ -4,7 +4,7 @@
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
-#define RSM_MARK_INSTANT(...) ::rsm::mark_instant(__VA_ARGS__)
+#define RSM_mark_instant(...) rsm::mark_instant(__VA_ARGS__)
 
 namespace rsm {
 

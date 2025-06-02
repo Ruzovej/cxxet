@@ -11,7 +11,7 @@ int main(int argc, char const **argv) {
 
   RSM_init_thread_local_sink();
 
-  RSM_MARK_INSTANT("main thread beginning");
+  RSM_mark_instant("main thread beginning");
 
   {
     RSM_mark_complete("main thread, local scope");
@@ -22,18 +22,18 @@ int main(int argc, char const **argv) {
     std::thread t1{[]() {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       RSM_mark_complete("thread 1");
-      RSM_MARK_INSTANT("thread 1 started");
+      RSM_mark_instant("thread 1 started");
     }};
 
     std::thread t2{[]() {
       RSM_mark_complete("thread 2");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      RSM_MARK_INSTANT("thread 2 started");
+      RSM_mark_instant("thread 2 started");
     }};
 
     std::thread t3{[]() {
       RSM_mark_complete("thread 3");
-      RSM_MARK_INSTANT("thread 3 started");
+      RSM_mark_instant("thread 3 started");
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }};
 
@@ -44,7 +44,7 @@ int main(int argc, char const **argv) {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-  RSM_MARK_INSTANT("main terminating");
+  RSM_mark_instant("main terminating");
 
   return 0;
 }
