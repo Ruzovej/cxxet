@@ -4,10 +4,10 @@
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
-// Provide either same string as to the corresponding `RSM_MARK_DURATION_BEGIN`
+// Provide either same string as to the corresponding `RSM_mark_duration_begin`
 // call, `nullptr` or nothing at all. This is so ui.perfetto.dev processes it
 // correctly.
-#define RSM_MARK_DURATION_END(...) ::rsm::mark_duration_end(__VA_ARGS__)
+#define RSM_mark_duration_end(...) rsm::mark_duration_end(__VA_ARGS__)
 
 namespace rsm {
 

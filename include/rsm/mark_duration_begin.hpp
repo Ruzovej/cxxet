@@ -4,7 +4,7 @@
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
-#define RSM_MARK_DURATION_BEGIN(...) ::rsm::mark_duration_begin(__VA_ARGS__)
+#define RSM_mark_duration_begin(...) rsm::mark_duration_begin(__VA_ARGS__)
 
 namespace rsm {
 
