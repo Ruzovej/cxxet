@@ -43,6 +43,7 @@ void RSM_flush_global_sink(rsm::output::format const fmt,
   }
 }
 
+// TODO rename and "hide":
 void RSM_IMPL_append_event(rsm::impl::event::any const &evt) noexcept {
   thread_sink.append_event(evt);
 }

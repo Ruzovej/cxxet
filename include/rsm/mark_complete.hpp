@@ -1,7 +1,5 @@
 #pragma once
 
-#include "impl/event/any.hpp"
-#include "impl/event/kind/complete.hpp"
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
@@ -11,22 +9,19 @@
 
 namespace rsm {
 
-struct mark_complete {
+struct RSM_IMPL_API mark_complete {
   inline mark_complete(char const *aDesc) noexcept
       : desc{aDesc}, start{impl::now()} {}
 
-  inline ~mark_complete() noexcept {
-    auto const end{impl::as_int_ns(impl::now())};
-    auto const begin{impl::as_int_ns(start)};
-    auto const duration{end - begin};
-    RSM_IMPL_append_event(impl::event::complete{desc, begin, duration});
-  }
+  inline ~mark_complete() noexcept { submit(impl::now()); }
 
 private:
   mark_complete(mark_complete const &) = delete;
   mark_complete &operator=(mark_complete const &) = delete;
   mark_complete(mark_complete &&) = delete;
   mark_complete &operator=(mark_complete &&) = delete;
+
+  void submit(impl::timepoint_t const end) noexcept;
 
   const char *const desc;
   impl::timepoint_t const start;
