@@ -1,6 +1,5 @@
 #pragma once
 
-#include "impl/event/any.hpp"
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
@@ -11,9 +10,11 @@
 
 namespace rsm {
 
+RSM_IMPL_API void submit_duration_end(char const *const desc,
+                                      long long const timestamp_ns) noexcept;
+
 inline void mark_duration_end(char const *desc = nullptr) noexcept {
-  RSM_IMPL_append_event(
-      impl::event::duration_end{desc, impl::as_int_ns(impl::now())});
+  submit_duration_end(desc, impl::as_int_ns(impl::now()));
 }
 
 } // namespace rsm
