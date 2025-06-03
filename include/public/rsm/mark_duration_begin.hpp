@@ -5,7 +5,7 @@
 
 namespace rsm {
 
-RSM_IMPL_API void submit_duration_begin(char const *const desc,
+CXXST_IMPL_API void submit_duration_begin(char const *const desc,
                                         long long const timestamp_ns) noexcept;
 
 inline void mark_duration_begin(char const *const desc) noexcept {

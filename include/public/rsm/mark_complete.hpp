@@ -5,7 +5,7 @@
 
 namespace rsm {
 
-struct RSM_IMPL_API mark_complete {
+struct CXXST_IMPL_API mark_complete {
   inline mark_complete(char const *aDesc) noexcept
       : desc{aDesc}, start{impl::now()} {}
 

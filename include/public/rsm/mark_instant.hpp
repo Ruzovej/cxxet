@@ -6,7 +6,7 @@
 
 namespace rsm {
 
-RSM_IMPL_API void submit_instant(char const *const desc, scope_t const scope,
+CXXST_IMPL_API void submit_instant(char const *const desc, scope_t const scope,
                                  long long const timestamp_ns) noexcept;
 
 inline void mark_instant(char const *const desc,

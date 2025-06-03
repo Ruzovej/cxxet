@@ -21,7 +21,7 @@ static thread_local bool was_initialized{false};
 void init_thread_local_sink() noexcept {
 #ifndef NDEBUG
   assert(!was_initialized &&
-         "RSM_init_thread_local_sink() called multiple times");
+         "CXXST_init_thread_local_sink() called multiple times");
   was_initialized = true;
 #endif
 

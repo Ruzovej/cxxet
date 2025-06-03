@@ -34,7 +34,7 @@ function unit_test_runner() {
             printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Executing %s unit tests:\n' "${preset}"
             if [[ "${round}" -eq 1 ]]; then
                 ./compile.bash \
-                    -DRSM_BUILD_TESTS=ON \
+                    -DCXXST_BUILD_TESTS=ON \
                     --preset "${preset}" \
                     --target rsm_unit_tests \
                     --polite-ln-compile_commands

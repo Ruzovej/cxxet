@@ -16,30 +16,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # options:
-set(RSM_BUILD_EXAMPLES "OFF" CACHE BOOL "Build all examples")
-set(RSM_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
-set(RSM_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
-set(RSM_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
-set(RSM_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
+set(CXXST_BUILD_EXAMPLES "OFF" CACHE BOOL "Build all examples")
+set(CXXST_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
+set(CXXST_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
+set(CXXST_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
+set(CXXST_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
 # implied by options:
-set(RSM_LIB_KIND "STATIC")
-if (RSM_BUILD_SHARED)
-    set(RSM_LIB_KIND "SHARED")
+set(CXXST_LIB_KIND "STATIC")
+if (CXXST_BUILD_SHARED)
+    set(CXXST_LIB_KIND "SHARED")
 endif()
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${RSM_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${RSM_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${RSM_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CXXST_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CXXST_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CXXST_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
 
-if (RSM_WITH_ASAN AND RSM_WITH_TSAN)
+if (CXXST_WITH_ASAN AND CXXST_WITH_TSAN)
     message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
 endif()
 
-if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
-    set(RSM_BUILD_TESTS "ON")
+if (CXXST_WITH_ASAN OR CXXST_WITH_TSAN)
+    set(CXXST_BUILD_TESTS "ON")
 else()
-    set(RSM_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
+    set(CXXST_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
 endif()
 
 include(FetchContent)
@@ -48,7 +48,7 @@ function(add_unix_compiler_flags target)
     # TODO
     # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
     # * refactor:
-    set(RSM_UNIX_COMPILER_FLAGS
+    set(CXXST_UNIX_COMPILER_FLAGS
         -Wall
         -Wextra
         -pedantic
@@ -68,8 +68,8 @@ function(add_unix_compiler_flags target)
     )
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         set(
-            RSM_COMPILER_FLAGS
-                ${RSM_UNIX_COMPILER_FLAGS}
+            CXXST_COMPILER_FLAGS
+                ${CXXST_UNIX_COMPILER_FLAGS}
                 -Wduplicated-cond
                 -Wduplicated-branches
                 -Wlogical-op
@@ -77,8 +77,8 @@ function(add_unix_compiler_flags target)
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(
-            RSM_COMPILER_FLAGS
-                ${RSM_UNIX_COMPILER_FLAGS}
+            CXXST_COMPILER_FLAGS
+                ${CXXST_UNIX_COMPILER_FLAGS}
                 -Weffc++
         )
     endif()
@@ -86,7 +86,7 @@ function(add_unix_compiler_flags target)
     target_compile_options(
         ${target}
             PUBLIC
-            ${RSM_COMPILER_FLAGS}
+            ${CXXST_COMPILER_FLAGS}
     )
 endfunction()
 
@@ -109,12 +109,12 @@ function(add_sanitizers target)
         )
     endfunction()
 
-    if (RSM_WITH_ASAN)
+    if (CXXST_WITH_ASAN)
         add_sanitizer(${target} address)
         add_sanitizer(${target} leak)
         add_sanitizer(${target} undefined)
     endif()
-    if (RSM_WITH_TSAN)
+    if (CXXST_WITH_TSAN)
         add_sanitizer(${target} thread)
     endif()
 
@@ -132,7 +132,7 @@ function(add_sanitizers target)
                 -fPIC
         )
     else()
-        if (RSM_WITH_ASAN OR RSM_WITH_TSAN)
+        if (CXXST_WITH_ASAN OR CXXST_WITH_TSAN)
             target_compile_options(
                 ${target}
                     PUBLIC
@@ -151,18 +151,18 @@ endfunction()
 # https://cmake.org/cmake/help/latest/command/file.html#filesystem
 file(
     GLOB_RECURSE
-    RSM_LIB_SOURCES
+    CXXST_LIB_SOURCES
         CONFIGURE_DEPENDS
         "src/*.cpp"
 )
 add_library(
     rsm
-        ${RSM_LIB_KIND}
-        ${RSM_LIB_SOURCES}
+        ${CXXST_LIB_KIND}
+        ${CXXST_LIB_SOURCES}
 )
 add_unix_compiler_flags(rsm)
 add_sanitizers(rsm)
-if (RSM_BUILD_SHARED)
+if (CXXST_BUILD_SHARED)
     set_target_properties( # seems useful -> TODO polish it later
         rsm
             PROPERTIES
@@ -192,7 +192,7 @@ target_include_directories(
 )
 
 # tests, etc.:
-if (RSM_BUILD_TESTS)
+if (CXXST_BUILD_TESTS)
     add_subdirectory(tests/infra)
 
     FetchContent_Declare(
@@ -205,7 +205,7 @@ if (RSM_BUILD_TESTS)
     add_executable(
         rsm_unit_tests
             tests/unit/doctest_main.cpp
-            ${RSM_LIB_SOURCES}
+            ${CXXST_LIB_SOURCES}
     )
     target_include_directories(
         rsm_unit_tests
@@ -223,12 +223,12 @@ if (RSM_BUILD_TESTS)
             PRIVATE
             DOCTEST_CONFIG_SUPER_FAST_ASSERTS
             DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
-            RSM_WITH_UNIT_TESTS
+            CXXST_WITH_UNIT_TESTS
     )
     add_unix_compiler_flags(rsm_unit_tests)
     add_sanitizers(rsm_unit_tests)
 endif()
 
-if (RSM_BUILD_EXAMPLES)
+if (CXXST_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()

@@ -21,9 +21,9 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
                                                        : "/dev/stdout"};
-  RSM_flush_global_sink(rsm::output::format::chrome_trace, filename, true);
+  CXXST_flush_global_sink(rsm::output::format::chrome_trace, filename, true);
 
-  RSM_mark_complete("Counter example 2");
+  CXXST_mark_complete("Counter example 2");
 
   int const num_points{10'000};
   // step traits:
@@ -39,16 +39,16 @@ int main(int argc, char const **argv) {
   }};
 
   {
-    RSM_mark_complete("RSM_thread_local_sink_reserve");
-    RSM_thread_local_sink_reserve(
+    CXXST_mark_complete("CXXST_thread_local_sink_reserve");
+    CXXST_thread_local_sink_reserve(
         num_points * 2 // ...
-        + 3            // those 3 extra `RSM_mark_complete`s above and below ...
+        + 3            // those 3 extra `CXXST_mark_complete`s above and below ...
     );
   }
 
-  RSM_mark_complete("Euler method iterations");
+  CXXST_mark_complete("Euler method iterations");
   for (int i{0}; i < num_points; ++i) {
-    RSM_mark_counters("y", y, "x", x);
+    CXXST_mark_counters("y", y, "x", x);
     y = euler_method(fn, x, y, h, steps_for_point);
     x += h * steps_for_point;
   }

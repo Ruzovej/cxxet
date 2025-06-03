@@ -7,7 +7,7 @@
 
 namespace rsm {
 
-RSM_IMPL_API void submit_counter(char const *const name,
+CXXST_IMPL_API void submit_counter(char const *const name,
                                  long long const timestamp_ns,
                                  double const value) noexcept;
 

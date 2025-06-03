@@ -1,4 +1,4 @@
-#ifdef RSM_WITH_UNIT_TESTS
+#ifdef CXXST_WITH_UNIT_TESTS
 
 #include "impl/central_sink.hpp"
 #include "impl/local_sink.hpp"

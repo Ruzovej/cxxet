@@ -13,21 +13,21 @@ function setup_file() {
     run which jq
     assert_success
 
-    user_log "# configuring and building with preset '%s' ... " "${RSM_PRESET}"
+    user_log "# configuring and building with preset '%s' ... " "${CXXST_PRESET}"
     ./compile.bash \
-        -DRSM_BUILD_TESTS=ON \
-        -DRSM_BUILD_EXAMPLES=ON \
-        --preset "${RSM_PRESET}" \
+        -DCXXST_BUILD_TESTS=ON \
+        -DCXXST_BUILD_EXAMPLES=ON \
+        --preset "${CXXST_PRESET}" \
         --target infra_sanitizer_check \
         --target rsm_examples \
         --target rsm_unit_tests \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
 
-    export BIN_DIR="bin/${RSM_PRESET}"
-    export RSM_DEFAULT_BLOCK_SIZE=2
-    export RSM_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rsm.suite.bats.${RSM_PRESET}.XXXXXX")"
+    export BIN_DIR="bin/${CXXST_PRESET}"
+    export CXXST_DEFAULT_BLOCK_SIZE=2
+    export CXXST_VERBOSE=1
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rsm.suite.bats.${CXXST_PRESET}.XXXXXX")"
 }
 
 function setup() {
@@ -69,7 +69,7 @@ function teardown_file() {
 
 @test "Sanitizers work as expected" {
     local san_check="${BIN_DIR}/infra_sanitizer_check"
-    if [[ "${RSM_PRESET}" =~ asan* ]]; then
+    if [[ "${CXXST_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
         assert_output --partial "runtime error: index 2 out of bounds for type 'int [2]'"
@@ -82,7 +82,7 @@ function teardown_file() {
         run "${san_check}" ubsan
         assert_failure
         assert_output --partial 'runtime error: left shift of negative value -1'
-    elif [[ "${RSM_PRESET}" =~ tsan* ]]; then
+    elif [[ "${CXXST_PRESET}" =~ tsan* ]]; then
         run "${san_check}" tsan
         assert_failure
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
@@ -119,9 +119,9 @@ function teardown_file() {
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
-Deduced RSM_DEFAULT_BLOCK_SIZE: 2
-Deduced RSM_TARGET_FILENAME: "
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
     refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
     refute_output --partial "ThreadSanitizer"
     refute_output --partial "LeakSanitizer"
@@ -154,9 +154,9 @@ Deduced RSM_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
-Deduced RSM_DEFAULT_BLOCK_SIZE: 2
-Deduced RSM_TARGET_FILENAME: "
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
     refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
     refute_output --partial "ThreadSanitizer"
     refute_output --partial "LeakSanitizer"
@@ -189,9 +189,9 @@ Deduced RSM_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
-Deduced RSM_DEFAULT_BLOCK_SIZE: 2
-Deduced RSM_TARGET_FILENAME: "
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
     refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
     refute_output --partial "ThreadSanitizer"
     refute_output --partial "LeakSanitizer"
@@ -224,9 +224,9 @@ Deduced RSM_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
-Deduced RSM_DEFAULT_BLOCK_SIZE: 2
-Deduced RSM_TARGET_FILENAME: "
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
     refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
     refute_output --partial "ThreadSanitizer"
     refute_output --partial "LeakSanitizer"
@@ -263,9 +263,9 @@ Deduced RSM_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
-Deduced RSM_DEFAULT_BLOCK_SIZE: 2
-Deduced RSM_TARGET_FILENAME: "
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
     refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
     refute_output --partial "ThreadSanitizer"
     refute_output --partial "LeakSanitizer"
@@ -304,9 +304,9 @@ Deduced RSM_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced RSM_OUTPUT_FORMAT: 0
-Deduced RSM_DEFAULT_BLOCK_SIZE: 2
-Deduced RSM_TARGET_FILENAME: "
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
     refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
     refute_output --partial "ThreadSanitizer"
     refute_output --partial "LeakSanitizer"
@@ -326,7 +326,7 @@ Deduced RSM_TARGET_FILENAME: "
 
     assert_equal "$(jq -e -c '[.traceEvents[] | select(.ph == "C")] | map(.args | keys[]) | unique | sort' "${result}")" '["x","y"]'
 
-    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["Counter","Counter example 2","Euler method iterations","RSM_thread_local_sink_reserve"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["Counter","Counter example 2","Euler method iterations","CXXST_thread_local_sink_reserve"]'
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
