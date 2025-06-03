@@ -1,7 +1,7 @@
 #pragma once
 
-#include "impl/event/common.hpp"
 #include "cxxst/scope.hpp"
+#include "impl/event/common.hpp"
 
 namespace cxxst::impl::event {
 

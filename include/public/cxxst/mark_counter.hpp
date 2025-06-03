@@ -8,8 +8,8 @@
 namespace cxxst {
 
 CXXST_IMPL_API void submit_counter(char const *const name,
-                                 long long const timestamp_ns,
-                                 double const value) noexcept;
+                                   long long const timestamp_ns,
+                                   double const value) noexcept;
 
 template <typename... Args>
 void mark_counters(long long const timestamp_ns, char const *const name,
