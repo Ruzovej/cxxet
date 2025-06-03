@@ -181,6 +181,16 @@ target_include_directories(
         "include/private"
 )
 
+add_library(
+    rsm_bare
+        INTERFACE
+)
+target_include_directories(
+    rsm_bare
+        INTERFACE
+        "include/bare"
+)
+
 # tests, etc.:
 if (RSM_BUILD_TESTS)
     add_subdirectory(tests/infra)

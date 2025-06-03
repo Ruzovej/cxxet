@@ -107,6 +107,12 @@ function teardown_file() {
     fi
 }
 
+@test "Bare duration markers example" {
+    run "${BIN_DIR}/rsm_example_duration_1_bare"
+    assert_success
+    assert_output ""
+}
+
 @test "Duration markers example" {
     local executable="${BIN_DIR}/rsm_example_duration_1"
     local result="${TMP_RESULT_DIR}/example_duration.json"
@@ -134,6 +140,12 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.name == "Pyramid level")] | length' "${result}")" 6
 
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("pid") and has("tid"))' "${result}")" 'true'
+}
+
+@test "Bare complete markers example" {
+    run "${BIN_DIR}/rsm_example_complete_1_bare"
+    assert_success
+    assert_output ""
 }
 
 @test "Complete markers example" {
@@ -165,6 +177,12 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("dur") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
+@test "Bare instant markers 1 example" {
+    run "${BIN_DIR}/rsm_example_instant_1_bare"
+    assert_success
+    assert_output ""
+}
+
 @test "Instant markers example 1" {
     local executable="${BIN_DIR}/rsm_example_instant_1"
     local result="${TMP_RESULT_DIR}/example_instant_1.json"
@@ -192,6 +210,12 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["main thread flushing all markers","main thread started","thread 1 started","thread 2 started","thread 3 started"]'
 
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("s") and has("pid") and has("tid"))' "${result}")" 'true'
+}
+
+@test "Bare instant markers 2 example" {
+    run "${BIN_DIR}/rsm_example_instant_2_bare"
+    assert_success
+    assert_output ""
 }
 
 @test "Instant markers example 2" {
@@ -225,6 +249,12 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | all(has("name") and has("ph") and has("ts") and has("s") and has("pid") and has("tid"))' "${result}")" 'true'
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph != "i")] | all(has("name") and has("ph") and has("ts") and has("dur") and has("pid") and has("tid") and (has("s") | not))' "${result}")" 'true'
+}
+
+@test "Bare counter markers 1 example" {
+    run "${BIN_DIR}/rsm_example_counter_1_bare"
+    assert_success
+    assert_output ""
 }
 
 @test "Counter markers example 1" {
@@ -262,6 +292,12 @@ Deduced RSM_TARGET_FILENAME: "
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
+@test "Bare counter markers 2 example" {
+    run "${BIN_DIR}/rsm_example_counter_2_bare"
+    assert_success
+    assert_output ""
+}
+
 @test "Counter markers example 2" {
     local executable="${BIN_DIR}/rsm_example_counter_2"
     local result="${TMP_RESULT_DIR}/example_counter_2.json"
@@ -296,7 +332,7 @@ Deduced RSM_TARGET_FILENAME: "
 }
 
 # TODO end-user usage:
-# * Empty file (e.g., due to no trace events in the source code, not taking the branch where they are, or forgetting to manually flush it).
+# * Empty file (e.g., not taking the branch where they are, or forgetting to manually flush it).
 # * No file at all (e.g., not specifying it in the source code, or overwriting it there when taken from an environment variable).
 # * Test that all related environment variables are correctly obtained and printed out.
 # * Manual dumping (without `defer = true`) into multiple files from a single process.
@@ -360,4 +396,22 @@ Deduced RSM_TARGET_FILENAME: "
 
     run ldd "${BIN_DIR}/rsm_example_instant_2"
     assert_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_complete_1_bare"
+    refute_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_counter_2_bare"
+    refute_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_instant_1_bare"
+    refute_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_counter_1_bare"
+    refute_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_duration_1_bare"
+    refute_output --partial "librsm.so"
+
+    run ldd "${BIN_DIR}/rsm_example_instant_2_bare"
+    refute_output --partial "librsm.so"
 }
