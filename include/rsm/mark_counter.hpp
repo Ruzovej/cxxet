@@ -1,6 +1,5 @@
 #pragma once
 
-#include "impl/event/any.hpp"
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
@@ -8,10 +7,14 @@
 
 namespace rsm {
 
+RSM_IMPL_API void submit_counter(long long const timestamp_ns,
+                                 char const *const name,
+                                 double const value) noexcept;
+
 template <typename... Args>
 void mark_counters(long long const timestamp_ns, char const *const name,
                    double const value, Args &&...args) noexcept {
-  RSM_IMPL_append_event(impl::event::counter{name, timestamp_ns, value});
+  submit_counter(timestamp_ns, name, value);
   if constexpr (sizeof...(args) > 0) {
     mark_counters(timestamp_ns, std::forward<Args>(args)...);
   }
