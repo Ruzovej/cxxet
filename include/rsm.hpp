@@ -1,8 +1,6 @@
 #pragma once
 
-#include "impl/event/any.hpp"
 #include "impl/linkage_macros.hpp"
-#include "impl/utils.hpp"
 #include "rsm_output_format.hpp"
 
 // call at most once per thread, and not after `RSM_thread_local_sink_reserve`:

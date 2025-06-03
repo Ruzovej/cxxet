@@ -1,4 +1,5 @@
 #include "rsm.hpp"
+#include "impl/thread_local_sink_submit_event.hpp"
 
 #include <cassert>
 
@@ -43,7 +44,10 @@ void RSM_flush_global_sink(rsm::output::format const fmt,
   }
 }
 
-// TODO rename and "hide":
-void RSM_IMPL_append_event(rsm::impl::event::any const &evt) noexcept {
+namespace rsm::impl {
+
+void thread_local_sink_submit_event(impl::event::any const &evt) noexcept {
   thread_sink.append_event(evt);
 }
+
+} // namespace rsm::impl
