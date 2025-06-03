@@ -7,7 +7,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 namespace {
 
@@ -67,14 +67,14 @@ char const *parse_string(char const *const str_value) { return str_value; }
 } // namespace
 
 sink_properties::sink_properties() noexcept
-    : verbose{parse_env_variable("RSM_VERBOSE", parse_bool, false, false)},
-      target_format{parse_env_variable("RSM_OUTPUT_FORMAT", parse_output_format,
+    : verbose{parse_env_variable("CXXST_VERBOSE", parse_bool, false, false)},
+      target_format{parse_env_variable("CXXST_OUTPUT_FORMAT", parse_output_format,
                                        output::format::chrome_trace, verbose)},
       default_list_node_capacity{
-          parse_env_variable("RSM_DEFAULT_BLOCK_SIZE", parse_int, 64, verbose)},
-      target_filename{parse_env_variable("RSM_TARGET_FILENAME", parse_string,
+          parse_env_variable("CXXST_DEFAULT_BLOCK_SIZE", parse_int, 64, verbose)},
+      target_filename{parse_env_variable("CXXST_TARGET_FILENAME", parse_string,
                                          nullptr, verbose)} {
   // ...
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

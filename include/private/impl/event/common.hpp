@@ -2,7 +2,7 @@
 
 #include <tuple>
 
-namespace rsm::impl::event {
+namespace cxxst::impl::event {
 
 // inspired by
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
@@ -48,4 +48,4 @@ template <type_t bound_type = type_t::unknown> struct common {
   }
 };
 
-} // namespace rsm::impl::event
+} // namespace cxxst::impl::event

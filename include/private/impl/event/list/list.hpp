@@ -6,7 +6,7 @@
 
 #include "impl/event/any.hpp"
 
-namespace rsm::impl::event {
+namespace cxxst::impl::event {
 
 struct list {
   union raw_element;
@@ -76,4 +76,4 @@ private:
   int default_capacity{64};
 };
 
-} // namespace rsm::impl::event
+} // namespace cxxst::impl::event

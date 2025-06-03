@@ -1,6 +1,6 @@
 #include "impl/local_sink.hpp"
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 local_sink::local_sink(central_sink &aParent) noexcept : parent{aParent} {
   events.set_default_node_capacity(
@@ -27,4 +27,4 @@ void local_sink::reserve(int const minimum_free_capacity) noexcept {
   events.reserve();
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

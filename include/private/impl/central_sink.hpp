@@ -5,7 +5,7 @@
 #include "impl/event/list/list.hpp"
 #include "impl/sink_properties.hpp"
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 struct central_sink {
   explicit central_sink(sink_properties const &aTraits);
@@ -33,4 +33,4 @@ protected: // because of testing ...
   event::list events;
 };
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

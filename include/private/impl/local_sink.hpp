@@ -3,7 +3,7 @@
 #include "impl/central_sink.hpp"
 #include "impl/event/list/list.hpp"
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 struct local_sink {
   explicit local_sink(central_sink &aParent) noexcept;
@@ -28,4 +28,4 @@ protected: // because of testing ...
   event::list events;
 };
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

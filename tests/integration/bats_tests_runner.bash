@@ -39,7 +39,7 @@ function bats_tests_runner() {
         (( round++ ))
         local preset
         for preset in "${test_presets[@]}"; do
-            RSM_PRESET="${preset}" \
+            CXXST_PRESET="${preset}" \
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive tests/integration/suite
         done
     done

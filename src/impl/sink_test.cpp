@@ -1,11 +1,11 @@
-#ifdef RSM_WITH_UNIT_TESTS
+#ifdef CXXST_WITH_UNIT_TESTS
 
 #include "impl/central_sink.hpp"
 #include "impl/local_sink.hpp"
 
 #include <doctest/doctest.h>
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 template <typename base_sink> struct test_sink : base_sink {
   using base_sink::base_sink;
@@ -128,6 +128,6 @@ TEST_CASE("sink cascade") {
   }
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl
 
 #endif

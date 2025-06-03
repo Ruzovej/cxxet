@@ -1,8 +1,8 @@
 #pragma once
 
-#include "rsm/output_format.hpp"
+#include "cxxst/output_format.hpp"
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 struct sink_properties {
   bool verbose;
@@ -29,4 +29,4 @@ private:
   sink_properties &operator=(sink_properties &&) = delete;
 };
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

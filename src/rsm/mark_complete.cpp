@@ -1,9 +1,9 @@
-#include "rsm/mark_complete.hpp"
+#include "cxxst/mark_complete.hpp"
 
 #include "impl/event/kind/complete.hpp"
 #include "impl/thread_local_sink_submit_event.hpp"
 
-namespace rsm {
+namespace cxxst {
 
 void mark_complete::submit(impl::timepoint_t const finish) noexcept {
   auto const begin{impl::as_int_ns(start)};
@@ -12,4 +12,4 @@ void mark_complete::submit(impl::timepoint_t const finish) noexcept {
       impl::event::complete{desc, begin, duration});
 }
 
-} // namespace rsm
+} // namespace cxxst

@@ -1,4 +1,4 @@
-#include "rsm/sink_control.hpp"
+#include "cxxst/sink_control.hpp"
 #include "impl/thread_local_sink_submit_event.hpp"
 
 #include <cassert>
@@ -9,7 +9,7 @@
 #include "impl/local_sink.hpp"
 #include "impl/sink_properties.hpp"
 
-namespace rsm {
+namespace cxxst {
 
 static impl::sink_properties sink_props{};
 static impl::central_sink global_sink{sink_props};
@@ -21,7 +21,7 @@ static thread_local bool was_initialized{false};
 void init_thread_local_sink() noexcept {
 #ifndef NDEBUG
   assert(!was_initialized &&
-         "RSM_init_thread_local_sink() called multiple times");
+         "CXXST_init_thread_local_sink() called multiple times");
   was_initialized = true;
 #endif
 
@@ -37,7 +37,7 @@ void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
 
 void flush_thread_local_sink() noexcept { thread_sink.flush(); }
 
-void flush_global_sink(rsm::output::format const fmt,
+void flush_global_sink(cxxst::output::format const fmt,
                        char const *const filename,
                        bool const defer_flush) noexcept {
   sink_props.set_target_format(fmt).set_target_filename(filename);
@@ -53,4 +53,4 @@ void thread_local_sink_submit_event(event::any const &evt) noexcept {
 }
 
 } // namespace impl
-} // namespace rsm
+} // namespace cxxst

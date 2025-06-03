@@ -11,14 +11,14 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "RSM_BUILD_SHARED": "ON"
+                "CXXST_BUILD_SHARED": "ON"
             }
         },
         {
             "name": "release",
             "inherits": "default",
             "cacheVariables": {
-                "RSM_OUTPUT_DIRECTORY": "${sourceDir}/bin/release",
+                "CXXST_OUTPUT_DIRECTORY": "${sourceDir}/bin/release",
                 "CMAKE_BUILD_TYPE": "Release"
             }
         },
@@ -26,7 +26,7 @@
             "name": "relwithdebinfo",
             "inherits": "default",
             "cacheVariables": {
-                "RSM_OUTPUT_DIRECTORY": "${sourceDir}/bin/relwithdebinfo",
+                "CXXST_OUTPUT_DIRECTORY": "${sourceDir}/bin/relwithdebinfo",
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         },
@@ -34,23 +34,23 @@
             "name": "asan",
             "inherits": "relwithdebinfo",
             "cacheVariables": {
-                "RSM_OUTPUT_DIRECTORY": "${sourceDir}/bin/asan",
-                "RSM_WITH_ASAN": "ON"
+                "CXXST_OUTPUT_DIRECTORY": "${sourceDir}/bin/asan",
+                "CXXST_WITH_ASAN": "ON"
             }
         },
         {
             "name": "tsan",
             "inherits": "relwithdebinfo",
             "cacheVariables": {
-                "RSM_OUTPUT_DIRECTORY": "${sourceDir}/bin/tsan",
-                "RSM_WITH_TSAN": "ON"
+                "CXXST_OUTPUT_DIRECTORY": "${sourceDir}/bin/tsan",
+                "CXXST_WITH_TSAN": "ON"
             }
         },
         {
             "name": "debug",
             "inherits": "default",
             "cacheVariables": {
-                "RSM_OUTPUT_DIRECTORY": "${sourceDir}/bin/debug",
+                "CXXST_OUTPUT_DIRECTORY": "${sourceDir}/bin/debug",
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
@@ -58,16 +58,16 @@
             "name": "asan_d",
             "inherits": "debug",
             "cacheVariables": {
-                "RSM_OUTPUT_DIRECTORY": "${sourceDir}/bin/asan_d",
-                "RSM_WITH_ASAN": "ON"
+                "CXXST_OUTPUT_DIRECTORY": "${sourceDir}/bin/asan_d",
+                "CXXST_WITH_ASAN": "ON"
             }
         },
         {
             "name": "tsan_d",
             "inherits": "debug",
             "cacheVariables": {
-                "RSM_OUTPUT_DIRECTORY": "${sourceDir}/bin/tsan_d",
-                "RSM_WITH_TSAN": "ON"
+                "CXXST_OUTPUT_DIRECTORY": "${sourceDir}/bin/tsan_d",
+                "CXXST_WITH_TSAN": "ON"
             }
         }
     ],

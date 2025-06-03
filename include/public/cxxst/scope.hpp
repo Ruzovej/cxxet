@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rsm {
+namespace cxxst {
 
 enum class scope_t : char {
   global = 'g',

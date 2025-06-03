@@ -2,7 +2,7 @@
 
 set -e
 
-rsm_preset=tsan
+cxxst_preset=tsan
 targets=()
 defines=()
 force_compile_commands_symlink='true'
@@ -10,7 +10,7 @@ force_compile_commands_symlink='true'
 while (( $# > 0 )); do
     case "$1" in
         --preset)
-            rsm_preset="$2"
+            cxxst_preset="$2"
             shift 2
             ;;
         --target)
@@ -37,10 +37,10 @@ num_jobs="$(nproc)"
     set -x
     cmake \
         -S . \
-        -B "build/${rsm_preset}" \
+        -B "build/${cxxst_preset}" \
         "${defines[@]}" \
-        --preset "${rsm_preset}" #\
-        # --graphviz="graphviz/${rsm_preset}"
+        --preset "${cxxst_preset}" #\
+        # --graphviz="graphviz/${cxxst_preset}"
 )
 
 [[ "${force_compile_commands_symlink}" == 'false' && -f compile_commands.json ]] \
@@ -49,14 +49,14 @@ num_jobs="$(nproc)"
     ln \
         --symbolic \
         --force \
-        "build/${rsm_preset}/compile_commands.json" \
+        "build/${cxxst_preset}/compile_commands.json" \
         compile_commands.json
 )
 
 (
     set -x
     cmake \
-        --build "build/${rsm_preset}" \
+        --build "build/${cxxst_preset}" \
         -j "${num_jobs}" \
         "${targets[@]}"
 )

@@ -2,12 +2,12 @@
 
 #include <utility>
 
-#include "rsm/macros/linkage.h"
-#include "rsm/timepoint.hpp"
+#include "cxxst/macros/linkage.h"
+#include "cxxst/timepoint.hpp"
 
-namespace rsm {
+namespace cxxst {
 
-RSM_IMPL_API void submit_counter(char const *const name,
+CXXST_IMPL_API void submit_counter(char const *const name,
                                  long long const timestamp_ns,
                                  double const value) noexcept;
 
@@ -27,4 +27,4 @@ inline void mark_counters_call(char const *const name, double const value,
   mark_counters(now_ns, name, value, std::forward<Args>(args)...);
 }
 
-} // namespace rsm
+} // namespace cxxst

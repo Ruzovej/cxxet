@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace rsm::impl::event {
+namespace cxxst::impl::event {
 
 namespace {
 
@@ -98,13 +98,13 @@ int list::get_current_free_capacity() const noexcept {
 
 long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
 
-} // namespace rsm::impl::event
+} // namespace cxxst::impl::event
 
-#ifdef RSM_WITH_UNIT_TESTS
+#ifdef CXXST_WITH_UNIT_TESTS
 
 #include <doctest/doctest.h>
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 TEST_CASE("event::list") {
   event::list l;
@@ -266,6 +266,6 @@ TEST_CASE("event::list") {
   }
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl
 
 #endif
