@@ -326,7 +326,7 @@ Deduced CXXST_TARGET_FILENAME: "
 
     assert_equal "$(jq -e -c '[.traceEvents[] | select(.ph == "C")] | map(.args | keys[]) | unique | sort' "${result}")" '["x","y"]'
 
-    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["Counter","Counter example 2","Euler method iterations","CXXST_thread_local_sink_reserve"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["CXXST_thread_local_sink_reserve","Counter","Counter example 2","Euler method iterations"]'
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
