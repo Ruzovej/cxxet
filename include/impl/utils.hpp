@@ -9,15 +9,9 @@
 #error "Unsupported platform"
 #endif
 
-#include "impl/event/any.hpp"
-#include "impl/linkage_macros.hpp"
-
 #define RSM_IMPL_IMPLICIT_MARKER_NAME_JOIN(name, line) name##line
 #define RSM_IMPL_IMPLICIT_MARKER_NAME(name, line)                              \
   RSM_IMPL_IMPLICIT_MARKER_NAME_JOIN(name, line)
-
-void RSM_IMPL_API
-RSM_IMPL_append_event(rsm::impl::event::any const &evt) noexcept;
 
 namespace rsm::impl {
 

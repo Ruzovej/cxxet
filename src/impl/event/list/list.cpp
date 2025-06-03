@@ -162,15 +162,9 @@ TEST_CASE("event::list") {
 
     new (&a[3].evt.cntr) event::counter{7, 8, 9, "test counter", 20, 42.666};
 
-    new (&a[4].evt.inst) event::instant{45,
-                                        78,
-                                        89,
-                                        "test instant",
-                                        event::instant::scope_t::thread,
-                                        'R',
-                                        32109,
-                                        2'000'000'001,
-                                        25};
+    new (&a[4].evt.inst) event::instant{
+        45, 78, 89, "test instant", scope_t::thread, 'R', 32109, 2'000'000'001,
+        25};
 
     SUBCASE("without reserve()") {
       l.append(a[0]);

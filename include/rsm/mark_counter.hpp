@@ -1,17 +1,22 @@
 #pragma once
 
-#include "impl/event/any.hpp"
+#include <utility>
+
 #include "impl/linkage_macros.hpp"
 #include "impl/utils.hpp"
 
-#define RSM_MARK_COUNTERS(...) ::rsm::mark_counters_call(__VA_ARGS__)
+#define RSM_mark_counters(...) rsm::mark_counters_call(__VA_ARGS__)
 
 namespace rsm {
+
+RSM_IMPL_API void submit_counter(char const *const name,
+                                 long long const timestamp_ns,
+                                 double const value) noexcept;
 
 template <typename... Args>
 void mark_counters(long long const timestamp_ns, char const *const name,
                    double const value, Args &&...args) noexcept {
-  RSM_IMPL_append_event(impl::event::counter{name, timestamp_ns, value});
+  submit_counter(name, timestamp_ns, value);
   if constexpr (sizeof...(args) > 0) {
     mark_counters(timestamp_ns, std::forward<Args>(args)...);
   }

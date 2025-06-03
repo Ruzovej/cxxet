@@ -1,4 +1,5 @@
 #include "rsm.hpp"
+#include "impl/thread_local_sink_submit_event.hpp"
 
 #include <cassert>
 
@@ -34,15 +35,19 @@ void RSM_thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
 
 void RSM_flush_thread_local_sink() noexcept { thread_sink.flush(); }
 
-void RSM_flush_all_collected_events(rsm::output::format const fmt,
-                                    char const *const filename,
-                                    bool const defer_flush) noexcept {
+void RSM_flush_global_sink(rsm::output::format const fmt,
+                           char const *const filename,
+                           bool const defer_flush) noexcept {
   sink_props.set_target_format(fmt).set_target_filename(filename);
   if (!defer_flush) {
     global_sink.flush();
   }
 }
 
-void RSM_IMPL_append_event(rsm::impl::event::any const &evt) noexcept {
+namespace rsm::impl {
+
+void thread_local_sink_submit_event(impl::event::any const &evt) noexcept {
   thread_sink.append_event(evt);
 }
+
+} // namespace rsm::impl
