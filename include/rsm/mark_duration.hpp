@@ -11,7 +11,7 @@
 
 namespace rsm {
 
-struct RSM_IMPL_API mark_duration {
+struct mark_duration {
   inline mark_duration(char const *desc) noexcept {
     RSM_mark_duration_begin(desc);
   }
