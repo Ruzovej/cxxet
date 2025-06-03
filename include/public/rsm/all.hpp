@@ -18,18 +18,19 @@
 
 #define RSM_mark_counters(...) rsm::mark_counters_call(__VA_ARGS__)
 
-#define RSM_mark_duration(...)                                                 \
+#define RSM_mark_duration(description)                                         \
   rsm::mark_duration RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,       \
                                                    __LINE__) {                 \
-    __VA_ARGS__                                                                \
+    description                                                                \
   }
 
-#define RSM_mark_duration_begin(...) rsm::mark_duration_begin(__VA_ARGS__)
+#define RSM_mark_duration_begin(description)                                   \
+  rsm::mark_duration_begin(description)
 
 // Provide either same string as to the corresponding `RSM_mark_duration_begin`
 // call, `nullptr` or nothing at all. This is so ui.perfetto.dev processes it
 // correctly.
-#define RSM_mark_duration_end(...) rsm::mark_duration_end(__VA_ARGS__)
+#define RSM_mark_duration_end(description) rsm::mark_duration_end(description)
 
 #define RSM_mark_instant(...) rsm::mark_instant(__VA_ARGS__)
 
