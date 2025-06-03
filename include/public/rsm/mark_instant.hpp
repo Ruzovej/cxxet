@@ -4,8 +4,6 @@
 #include "rsm/scope.hpp"
 #include "rsm/timepoint.hpp"
 
-#define RSM_mark_instant(...) rsm::mark_instant(__VA_ARGS__)
-
 namespace rsm {
 
 RSM_IMPL_API void submit_instant(char const *const desc, scope_t const scope,

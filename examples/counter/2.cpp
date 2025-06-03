@@ -1,8 +1,6 @@
 #include <cmath>
 
-#include "rsm.hpp"
-#include "rsm/mark_complete.hpp"
-#include "rsm/mark_counter.hpp"
+#include "rsm/all.hpp"
 
 namespace {
 

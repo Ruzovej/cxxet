@@ -1,9 +1,7 @@
 #include <chrono>
 #include <thread>
 
-#include "rsm.hpp"
-#include "rsm/mark_complete.hpp"
-#include "rsm/mark_instant.hpp"
+#include "rsm/all.hpp"
 
 int main(int argc, char const **argv) {
   char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};

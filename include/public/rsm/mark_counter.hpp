@@ -5,8 +5,6 @@
 #include "rsm/macros/linkage.h"
 #include "rsm/timepoint.hpp"
 
-#define RSM_mark_counters(...) rsm::mark_counters_call(__VA_ARGS__)
-
 namespace rsm {
 
 RSM_IMPL_API void submit_counter(char const *const name,

@@ -1,8 +1,7 @@
 #include <chrono>
 #include <thread>
 
-#include "rsm.hpp"
-#include "rsm/mark_complete.hpp"
+#include "rsm/all.hpp"
 
 static void pyramid(int const level) {
   RSM_mark_complete(__FUNCTION__);

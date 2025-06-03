@@ -3,8 +3,6 @@
 #include "rsm/macros/linkage.h"
 #include "rsm/timepoint.hpp"
 
-#define RSM_mark_duration_begin(...) rsm::mark_duration_begin(__VA_ARGS__)
-
 namespace rsm {
 
 RSM_IMPL_API void submit_duration_begin(char const *const desc,

@@ -3,11 +3,6 @@
 #include "rsm/macros/linkage.h"
 #include "rsm/timepoint.hpp"
 
-// Provide either same string as to the corresponding `RSM_mark_duration_begin`
-// call, `nullptr` or nothing at all. This is so ui.perfetto.dev processes it
-// correctly.
-#define RSM_mark_duration_end(...) rsm::mark_duration_end(__VA_ARGS__)
-
 namespace rsm {
 
 RSM_IMPL_API void submit_duration_end(char const *const desc,
