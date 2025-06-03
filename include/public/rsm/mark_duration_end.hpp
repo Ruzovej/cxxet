@@ -1,7 +1,7 @@
 #pragma once
 
-#include "impl/linkage_macros.hpp"
-#include "impl/utils.hpp"
+#include "rsm/macros/linkage.h"
+#include "rsm/timepoint.hpp"
 
 // Provide either same string as to the corresponding `RSM_mark_duration_begin`
 // call, `nullptr` or nothing at all. This is so ui.perfetto.dev processes it

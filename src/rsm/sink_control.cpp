@@ -1,4 +1,4 @@
-#include "rsm.hpp"
+#include "rsm/sink_control.hpp"
 #include "impl/thread_local_sink_submit_event.hpp"
 
 #include <cassert>
@@ -9,14 +9,16 @@
 #include "impl/local_sink.hpp"
 #include "impl/sink_properties.hpp"
 
-static rsm::impl::sink_properties sink_props{};
-static rsm::impl::central_sink global_sink{sink_props};
-static thread_local rsm::impl::local_sink thread_sink{global_sink};
+namespace rsm {
+
+static impl::sink_properties sink_props{};
+static impl::central_sink global_sink{sink_props};
+static thread_local impl::local_sink thread_sink{global_sink};
 #ifndef NDEBUG
 static thread_local bool was_initialized{false};
 #endif
 
-void RSM_init_thread_local_sink() noexcept {
+void init_thread_local_sink() noexcept {
 #ifndef NDEBUG
   assert(!was_initialized &&
          "RSM_init_thread_local_sink() called multiple times");
@@ -26,28 +28,29 @@ void RSM_init_thread_local_sink() noexcept {
   thread_sink.reserve();
 }
 
-void RSM_thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
+void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
 #ifndef NDEBUG
   was_initialized = true;
 #endif
   thread_sink.reserve(minimum_free_capacity);
 }
 
-void RSM_flush_thread_local_sink() noexcept { thread_sink.flush(); }
+void flush_thread_local_sink() noexcept { thread_sink.flush(); }
 
-void RSM_flush_global_sink(rsm::output::format const fmt,
-                           char const *const filename,
-                           bool const defer_flush) noexcept {
+void flush_global_sink(rsm::output::format const fmt,
+                       char const *const filename,
+                       bool const defer_flush) noexcept {
   sink_props.set_target_format(fmt).set_target_filename(filename);
   if (!defer_flush) {
     global_sink.flush();
   }
 }
 
-namespace rsm::impl {
+namespace impl {
 
-void thread_local_sink_submit_event(impl::event::any const &evt) noexcept {
+void thread_local_sink_submit_event(event::any const &evt) noexcept {
   thread_sink.append_event(evt);
 }
 
-} // namespace rsm::impl
+} // namespace impl
+} // namespace rsm

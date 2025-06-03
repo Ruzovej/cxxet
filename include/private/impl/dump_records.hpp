@@ -1,7 +1,7 @@
 #pragma once
 
 #include "impl/event/list/list.hpp"
-#include "rsm_output_format.hpp"
+#include "rsm/output_format.hpp"
 
 namespace rsm::impl {
 

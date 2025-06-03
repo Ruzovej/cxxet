@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rsm/macros/implicit_name.h"
 #include "rsm/mark_duration_begin.hpp"
 #include "rsm/mark_duration_end.hpp"
 

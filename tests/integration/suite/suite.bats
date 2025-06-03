@@ -314,8 +314,7 @@ Deduced RSM_TARGET_FILENAME: "
     local nm_output="${output}"
 
     # only such symbols should be exported:
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " RSM_")" 4
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::")" 5
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::")" 9
 
     # those definitely not:
     assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
