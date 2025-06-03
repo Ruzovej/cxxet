@@ -1,4 +1,4 @@
-# Instant Markers Examples
+# Instant markers examples
 
 Instant markers are used to mark specific points in time during program execution.
 

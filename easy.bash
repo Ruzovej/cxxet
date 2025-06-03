@@ -6,11 +6,11 @@ printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nCompiling examples in "release" mode:\n\n'
 time ./compile.bash --preset release -DRSM_BUILD_EXAMPLES=ON -DRSM_BUILD_TESTS=ON
 printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nExecuting compiled examples:\n\n'
 
-printf -- '-=-=-=-=-=-=-=-=-=-=-=-\nExecuting predefined "bats" tests:\n\n'
-time ./tests.bash --bats
-
 printf -- '-=-=-=-=-=-=-=-=-=-=-=-\nExecuting predefined unit tests:\n\n'
 time ./tests.bash --unit
+
+printf -- '-=-=-=-=-=-=-=-=-=-=-=-\nExecuting predefined "bats" tests:\n\n'
+time ./tests.bash --bats
 
 set -x
 
