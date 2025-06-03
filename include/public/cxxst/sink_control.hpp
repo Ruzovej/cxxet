@@ -4,7 +4,8 @@
 #include "cxxst/output_format.hpp"
 
 namespace cxxst {
-// call at most once per thread, and not after `CXXST_thread_local_sink_reserve`:
+// call at most once per thread, and not after
+// `CXXST_thread_local_sink_reserve`:
 CXXST_IMPL_API void init_thread_local_sink() noexcept;
 
 CXXST_IMPL_API void

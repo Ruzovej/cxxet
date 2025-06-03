@@ -1,7 +1,7 @@
 #pragma once
 
-#include "impl/event/list/list.hpp"
 #include "cxxst/output_format.hpp"
+#include "impl/event/list/list.hpp"
 
 namespace cxxst::impl {
 
