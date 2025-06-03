@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "rsm/all.hpp"
+#include "cxxst/all.hpp"
 
 namespace {
 
@@ -21,7 +21,7 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
                                                        : "/dev/stdout"};
-  CXXST_flush_global_sink(rsm::output::format::chrome_trace, filename, true);
+  CXXST_flush_global_sink(cxxst::output::format::chrome_trace, filename, true);
 
   CXXST_mark_complete("Counter example 2");
 

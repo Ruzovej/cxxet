@@ -2,10 +2,10 @@
 
 #include <iostream>
 
+#include "cxxst/timepoint.hpp"
 #include "impl/dump_records.hpp"
-#include "rsm/timepoint.hpp"
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 central_sink::central_sink(sink_properties const &aTraits)
     : time_point{as_int_ns(now())}, traits{aTraits} {}
@@ -32,4 +32,4 @@ void central_sink::drain(event::list &aEvents) noexcept {
   events.drain_other(aEvents);
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

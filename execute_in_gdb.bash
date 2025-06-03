@@ -3,7 +3,7 @@
 set -e
 
 preset="${1:-asan_d}"
-executable="${2:-rsm_example_counter_2}"
+executable="${2:-cxxst_example_counter_2}"
 
 printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nCompiling "%s" in "%s" mode:\n\n' "${executable}" "${preset}"
 time ./compile.bash \

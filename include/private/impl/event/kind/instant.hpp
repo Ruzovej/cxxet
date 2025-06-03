@@ -1,9 +1,9 @@
 #pragma once
 
 #include "impl/event/common.hpp"
-#include "rsm/scope.hpp"
+#include "cxxst/scope.hpp"
 
-namespace rsm::impl::event {
+namespace cxxst::impl::event {
 
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.lenwiilchoxp
 
@@ -43,4 +43,4 @@ struct instant {
   }
 };
 
-} // namespace rsm::impl::event
+} // namespace cxxst::impl::event

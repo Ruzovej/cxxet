@@ -1,9 +1,9 @@
 #pragma once
 
-#include "rsm/macros/linkage.h"
-#include "rsm/timepoint.hpp"
+#include "cxxst/macros/linkage.h"
+#include "cxxst/timepoint.hpp"
 
-namespace rsm {
+namespace cxxst {
 
 struct CXXST_IMPL_API mark_complete {
   inline mark_complete(char const *aDesc) noexcept
@@ -23,4 +23,4 @@ private:
   impl::timepoint_t const start;
 };
 
-} // namespace rsm
+} // namespace cxxst

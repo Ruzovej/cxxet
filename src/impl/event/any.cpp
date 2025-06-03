@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <variant>
 
-namespace rsm::impl::event {
+namespace cxxst::impl::event {
 
 namespace {
 
@@ -54,4 +54,4 @@ static_assert(min_size < max_size); // TODO add explicit padding to every event
 static_assert(sizeof(any) == max_size,
               "`any` should have same size as the internal union it wraps!");
 
-} // namespace rsm::impl::event
+} // namespace cxxst::impl::event

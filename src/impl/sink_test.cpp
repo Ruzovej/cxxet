@@ -5,7 +5,7 @@
 
 #include <doctest/doctest.h>
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 template <typename base_sink> struct test_sink : base_sink {
   using base_sink::base_sink;
@@ -128,6 +128,6 @@ TEST_CASE("sink cascade") {
   }
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl
 
 #endif

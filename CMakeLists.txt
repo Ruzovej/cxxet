@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(
-    runtime_simple_markers
+    cplusplus_simple_tracing
     DESCRIPTION "TODO"
     LANGUAGES CXX # TODO later maybe even `C`?!
 )
@@ -156,37 +156,37 @@ file(
         "src/*.cpp"
 )
 add_library(
-    rsm
+    cxxst
         ${CXXST_LIB_KIND}
         ${CXXST_LIB_SOURCES}
 )
-add_unix_compiler_flags(rsm)
-add_sanitizers(rsm)
+add_unix_compiler_flags(cxxst)
+add_sanitizers(cxxst)
 if (CXXST_BUILD_SHARED)
     set_target_properties( # seems useful -> TODO polish it later
-        rsm
+        cxxst
             PROPERTIES
             VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
             SOVERSION 0 # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
     )
 endif()
 target_include_directories(
-    rsm
+    cxxst
         PUBLIC
         "include/public"
 )
 target_include_directories(
-    rsm
+    cxxst
         PRIVATE
         "include/private"
 )
 
 add_library(
-    rsm_bare
+    cxxst_bare
         INTERFACE
 )
 target_include_directories(
-    rsm_bare
+    cxxst_bare
         INTERFACE
         "include/bare"
 )
@@ -203,30 +203,30 @@ if (CXXST_BUILD_TESTS)
     FetchContent_MakeAvailable(doctest)
 
     add_executable(
-        rsm_unit_tests
+        cxxst_unit_tests
             tests/unit/doctest_main.cpp
             ${CXXST_LIB_SOURCES}
     )
     target_include_directories(
-        rsm_unit_tests
+        cxxst_unit_tests
             PRIVATE
             "include/public"
             "include/private"
     )
     target_link_libraries(
-        rsm_unit_tests
+        cxxst_unit_tests
             PRIVATE
             doctest::doctest
     )
     target_compile_definitions(
-        rsm_unit_tests
+        cxxst_unit_tests
             PRIVATE
             DOCTEST_CONFIG_SUPER_FAST_ASSERTS
             DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
             CXXST_WITH_UNIT_TESTS
     )
-    add_unix_compiler_flags(rsm_unit_tests)
-    add_sanitizers(rsm_unit_tests)
+    add_unix_compiler_flags(cxxst_unit_tests)
+    add_sanitizers(cxxst_unit_tests)
 endif()
 
 if (CXXST_BUILD_EXAMPLES)

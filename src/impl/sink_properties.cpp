@@ -7,7 +7,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 namespace {
 
@@ -77,4 +77,4 @@ sink_properties::sink_properties() noexcept
   // ...
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

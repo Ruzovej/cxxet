@@ -9,7 +9,7 @@
 #include "impl/event/kind/duration.hpp"
 #include "impl/event/kind/instant.hpp"
 
-namespace rsm::impl::event {
+namespace cxxst::impl::event {
 
 struct any {
   union {
@@ -78,4 +78,4 @@ struct any {
   }
 };
 
-} // namespace rsm::impl::event
+} // namespace cxxst::impl::event

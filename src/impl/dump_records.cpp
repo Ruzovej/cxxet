@@ -15,7 +15,7 @@
 
 #include "impl/event/any.hpp"
 
-namespace rsm::impl {
+namespace cxxst::impl {
 
 namespace {
 
@@ -231,4 +231,4 @@ void dump_records(impl::event::list const &list,
   file.close();
 }
 
-} // namespace rsm::impl
+} // namespace cxxst::impl

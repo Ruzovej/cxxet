@@ -19,15 +19,15 @@ function setup_file() {
         -DCXXST_BUILD_EXAMPLES=ON \
         --preset "${CXXST_PRESET}" \
         --target infra_sanitizer_check \
-        --target rsm_examples \
-        --target rsm_unit_tests \
+        --target cxxst_examples \
+        --target cxxst_unit_tests \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
 
     export BIN_DIR="bin/${CXXST_PRESET}"
     export CXXST_DEFAULT_BLOCK_SIZE=2
     export CXXST_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rsm.suite.bats.${CXXST_PRESET}.XXXXXX")"
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxst.suite.bats.${CXXST_PRESET}.XXXXXX")"
 }
 
 function setup() {
@@ -108,13 +108,13 @@ function teardown_file() {
 }
 
 @test "Bare duration markers example" {
-    run "${BIN_DIR}/rsm_example_duration_1_bare"
+    run "${BIN_DIR}/cxxst_example_duration_1_bare"
     assert_success
     assert_output ""
 }
 
 @test "Duration markers example" {
-    local executable="${BIN_DIR}/rsm_example_duration_1"
+    local executable="${BIN_DIR}/cxxst_example_duration_1"
     local result="${TMP_RESULT_DIR}/example_duration.json"
 
     run "${executable}" "${result}"
@@ -143,13 +143,13 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Bare complete markers example" {
-    run "${BIN_DIR}/rsm_example_complete_1_bare"
+    run "${BIN_DIR}/cxxst_example_complete_1_bare"
     assert_success
     assert_output ""
 }
 
 @test "Complete markers example" {
-    local executable="${BIN_DIR}/rsm_example_complete_1"
+    local executable="${BIN_DIR}/cxxst_example_complete_1"
     local result="${TMP_RESULT_DIR}/example_complete.json"
 
     run "${executable}" "${result}"
@@ -178,13 +178,13 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Bare instant markers 1 example" {
-    run "${BIN_DIR}/rsm_example_instant_1_bare"
+    run "${BIN_DIR}/cxxst_example_instant_1_bare"
     assert_success
     assert_output ""
 }
 
 @test "Instant markers example 1" {
-    local executable="${BIN_DIR}/rsm_example_instant_1"
+    local executable="${BIN_DIR}/cxxst_example_instant_1"
     local result="${TMP_RESULT_DIR}/example_instant_1.json"
 
     run "${executable}" "${result}"
@@ -213,13 +213,13 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Bare instant markers 2 example" {
-    run "${BIN_DIR}/rsm_example_instant_2_bare"
+    run "${BIN_DIR}/cxxst_example_instant_2_bare"
     assert_success
     assert_output ""
 }
 
 @test "Instant markers example 2" {
-    local executable="${BIN_DIR}/rsm_example_instant_2"
+    local executable="${BIN_DIR}/cxxst_example_instant_2"
     local result="${TMP_RESULT_DIR}/example_instant_2.json"
 
     run "${executable}" "${result}"
@@ -252,13 +252,13 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Bare counter markers 1 example" {
-    run "${BIN_DIR}/rsm_example_counter_1_bare"
+    run "${BIN_DIR}/cxxst_example_counter_1_bare"
     assert_success
     assert_output ""
 }
 
 @test "Counter markers example 1" {
-    local executable="${BIN_DIR}/rsm_example_counter_1"
+    local executable="${BIN_DIR}/cxxst_example_counter_1"
     local result="${TMP_RESULT_DIR}/example_counter_1.json"
 
     run "${executable}" "${result}"
@@ -293,13 +293,13 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Bare counter markers 2 example" {
-    run "${BIN_DIR}/rsm_example_counter_2_bare"
+    run "${BIN_DIR}/cxxst_example_counter_2_bare"
     assert_success
     assert_output ""
 }
 
 @test "Counter markers example 2" {
-    local executable="${BIN_DIR}/rsm_example_counter_2"
+    local executable="${BIN_DIR}/cxxst_example_counter_2"
     local result="${TMP_RESULT_DIR}/example_counter_2.json"
 
     run "${executable}" "${result}"
@@ -339,7 +339,7 @@ Deduced CXXST_TARGET_FILENAME: "
 # * All event types in one file.
 
 @test "Shared library symbol visibility" {
-    local shared_lib="${BIN_DIR}/librsm.so"
+    local shared_lib="${BIN_DIR}/libcxxst.so"
 
     if ! [[ -f "${shared_lib}" ]]; then
         return
@@ -350,68 +350,68 @@ Deduced CXXST_TARGET_FILENAME: "
     local nm_output="${output}"
 
     # only such symbols should be exported:
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::")" 9
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " cxxst::")" 9
 
     # those definitely not:
     assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::impl::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " cxxst::impl::")" 0
 }
 
 @test "Unit tests runner contains expected symbols" {
-    if ! [[ -f "${BIN_DIR}/librsm.so" ]]; then
+    if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
         return
     fi
 
-    run nm -C "${BIN_DIR}/rsm_unit_tests"
+    run nm -C "${BIN_DIR}/cxxst_unit_tests"
     assert_success
     local nm_output="$output"
 
     # contains internal implementation symbols & `doctest` stuff:
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " rsm::")" 0
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " cxxst::")" 0
     assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
 }
 
 @test "Examples & unit test runner properly depend on shared library if built this way" {
-    if ! [[ -f "${BIN_DIR}/librsm.so" ]]; then
+    if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
         return
     fi
 
-    run ldd "${BIN_DIR}/rsm_unit_tests"
-    refute_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_unit_tests"
+    refute_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_complete_1"
-    assert_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_complete_1"
+    assert_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_counter_2"
-    assert_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_counter_2"
+    assert_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_instant_1"
-    assert_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_instant_1"
+    assert_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_counter_1"
-    assert_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_counter_1"
+    assert_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_duration_1"
-    assert_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_duration_1"
+    assert_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_instant_2"
-    assert_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_instant_2"
+    assert_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_complete_1_bare"
-    refute_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_complete_1_bare"
+    refute_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_counter_2_bare"
-    refute_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_counter_2_bare"
+    refute_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_instant_1_bare"
-    refute_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_instant_1_bare"
+    refute_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_counter_1_bare"
-    refute_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_counter_1_bare"
+    refute_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_duration_1_bare"
-    refute_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_duration_1_bare"
+    refute_output --partial "libcxxst.so"
 
-    run ldd "${BIN_DIR}/rsm_example_instant_2_bare"
-    refute_output --partial "librsm.so"
+    run ldd "${BIN_DIR}/cxxst_example_instant_2_bare"
+    refute_output --partial "libcxxst.so"
 }
