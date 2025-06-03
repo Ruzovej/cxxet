@@ -1,6 +1,7 @@
 #pragma once
 
 #include "impl/event/common.hpp"
+#include "rsm/scope.hpp"
 
 namespace rsm::impl::event {
 
@@ -8,12 +9,6 @@ namespace rsm::impl::event {
 
 struct instant {
   static constexpr type_t t{type_t::instant};
-
-  enum class scope_t : char {
-    global = 'g',
-    process = 'p',
-    thread = 't',
-  };
 
   common<t> evt;
   scope_t scope;

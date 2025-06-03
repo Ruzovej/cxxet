@@ -126,9 +126,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
           longlong_ns_to_double_us(e.timestamp_ns - time_point_zero)};
       out << "\"ts\":" << timestamp << ',';
 
-      auto const scope{
-          static_cast<std::underlying_type_t<event::instant::scope_t>>(
-              e.scope)};
+      auto const scope{static_cast<std::underlying_type_t<scope_t>>(e.scope)};
       out << "\"s\":\"" << scope << "\",";
       break;
     }
