@@ -21,7 +21,7 @@ private:
   mark_complete(mark_complete &&) = delete;
   mark_complete &operator=(mark_complete &&) = delete;
 
-  void submit(impl::timepoint_t const end) noexcept;
+  void submit(impl::timepoint_t const finish) noexcept;
 
   const char *const desc;
   impl::timepoint_t const start;
