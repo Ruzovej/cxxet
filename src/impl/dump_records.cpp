@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "rsm_output_format.hpp"
+#include "impl/event/any.hpp"
 
 namespace rsm::impl {
 

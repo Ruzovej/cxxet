@@ -1,10 +1,8 @@
 #pragma once
 
-#include "impl/linkage_macros.hpp"
-#include "impl/utils.hpp"
+#include "rsm/macros/linkage.h"
 #include "rsm/scope.hpp"
-
-#define RSM_mark_instant(...) rsm::mark_instant(__VA_ARGS__)
+#include "rsm/timepoint.hpp"
 
 namespace rsm {
 

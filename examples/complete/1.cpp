@@ -1,8 +1,7 @@
 #include <chrono>
 #include <thread>
 
-#include "rsm.hpp"
-#include "rsm/mark_complete.hpp"
+#include "rsm/all.hpp"
 
 static void pyramid(int const level) {
   RSM_mark_complete(__FUNCTION__);
@@ -17,7 +16,8 @@ int main(int argc, char const **argv) {
   RSM_init_thread_local_sink();
   RSM_mark_complete(__FUNCTION__);
 
-  char const *const filename{argc > 1 ? argv[1] : "/dev/stdout"};
+  [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
+                                                       : "/dev/stdout"};
   RSM_flush_global_sink(rsm::output::format::chrome_trace, filename, true);
 
   std::thread t1{[]() {

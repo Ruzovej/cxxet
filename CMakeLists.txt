@@ -173,7 +173,22 @@ endif()
 target_include_directories(
     rsm
         PUBLIC
-        "include"
+        "include/public"
+)
+target_include_directories(
+    rsm
+        PRIVATE
+        "include/private"
+)
+
+add_library(
+    rsm_bare
+        INTERFACE
+)
+target_include_directories(
+    rsm_bare
+        INTERFACE
+        "include/bare"
 )
 
 # tests, etc.:
@@ -195,7 +210,8 @@ if (RSM_BUILD_TESTS)
     target_include_directories(
         rsm_unit_tests
             PRIVATE
-            "include"
+            "include/public"
+            "include/private"
     )
     target_link_libraries(
         rsm_unit_tests

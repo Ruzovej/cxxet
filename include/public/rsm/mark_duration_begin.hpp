@@ -1,9 +1,7 @@
 #pragma once
 
-#include "impl/linkage_macros.hpp"
-#include "impl/utils.hpp"
-
-#define RSM_mark_duration_begin(...) rsm::mark_duration_begin(__VA_ARGS__)
+#include "rsm/macros/linkage.h"
+#include "rsm/timepoint.hpp"
 
 namespace rsm {
 

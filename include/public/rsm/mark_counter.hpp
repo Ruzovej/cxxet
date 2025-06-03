@@ -2,10 +2,8 @@
 
 #include <utility>
 
-#include "impl/linkage_macros.hpp"
-#include "impl/utils.hpp"
-
-#define RSM_mark_counters(...) rsm::mark_counters_call(__VA_ARGS__)
+#include "rsm/macros/linkage.h"
+#include "rsm/timepoint.hpp"
 
 namespace rsm {
 

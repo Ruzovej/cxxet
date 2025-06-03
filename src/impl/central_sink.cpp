@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "impl/dump_records.hpp"
-#include "impl/utils.hpp"
+#include "rsm/timepoint.hpp"
 
 namespace rsm::impl {
 

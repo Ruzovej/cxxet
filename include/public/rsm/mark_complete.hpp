@@ -1,11 +1,7 @@
 #pragma once
 
-#include "impl/linkage_macros.hpp"
-#include "impl/utils.hpp"
-
-#define RSM_mark_complete(...)                                                 \
-  rsm::mark_complete RSM_IMPL_IMPLICIT_MARKER_NAME(RSM_IMPLICIT_MARKER_,       \
-                                                   __LINE__)(__VA_ARGS__)
+#include "rsm/macros/linkage.h"
+#include "rsm/timepoint.hpp"
 
 namespace rsm {
 

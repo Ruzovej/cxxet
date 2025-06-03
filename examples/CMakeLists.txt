@@ -14,9 +14,21 @@ function(add_example target_name source_file)
             rsm
     )
 
+    add_executable(
+        ${target_name}_bare
+            ${source_file}
+    )
+
+    target_link_libraries(
+        ${target_name}_bare
+            PRIVATE
+            rsm_bare
+    )
+
     add_dependencies(
         rsm_examples
             ${target_name}
+            ${target_name}_bare
     )
 endfunction()
 
