@@ -5,7 +5,7 @@
 
 namespace rsm {
 
-void submit_counter(long long const timestamp_ns, char const *const name,
+void submit_counter(char const *const name, long long const timestamp_ns,
                     double const value) noexcept {
   impl::thread_local_sink_submit_event(
       impl::event::counter{name, timestamp_ns, value});

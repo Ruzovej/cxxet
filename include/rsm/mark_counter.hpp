@@ -9,14 +9,14 @@
 
 namespace rsm {
 
-RSM_IMPL_API void submit_counter(long long const timestamp_ns,
-                                 char const *const name,
+RSM_IMPL_API void submit_counter(char const *const name,
+                                 long long const timestamp_ns,
                                  double const value) noexcept;
 
 template <typename... Args>
 void mark_counters(long long const timestamp_ns, char const *const name,
                    double const value, Args &&...args) noexcept {
-  submit_counter(timestamp_ns, name, value);
+  submit_counter(name, timestamp_ns, value);
   if constexpr (sizeof...(args) > 0) {
     mark_counters(timestamp_ns, std::forward<Args>(args)...);
   }
