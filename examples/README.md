@@ -6,14 +6,18 @@ It's lightweight library that generates `chrome trace` format output, which can 
 
 ## Example categories
 
-* **[instant/](instant/)**
-  * Marker for point-in-time events.
+* **[complete/](complete/)**
+  * Marker for measuring time spans, with begin and end merged into single event.
 * **[counter/](counter/)**
   * Marker for tracking changing values over time.
 * **[duration/](duration/)**
   * Markers for measuring time spans, with begin and end marked separately.
-* **[complete/](complete/)**
-  * Marker for measuring time spans, with begin and end merged into single event.
+* **[for_tests/](for_tests/)**
+  * Various examples showing how to (not) use provided library.
+* **[instant/](instant/)**
+  * Marker for point-in-time events.
+
+Examples are executed in acompanying `bats` test suite, while asserting on the output and desired behavior. See [`suite.bats`](../tests/integration/suite/suite.bats) for more details.
 
 ## Performance Tips
 
