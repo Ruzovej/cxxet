@@ -325,7 +325,6 @@ Deduced CXXST_TARGET_FILENAME: "
 
 # TODO end-user usage:
 # * Test that all related environment variables are correctly obtained and printed out.
-# * Manual dumping (without `defer = true`) into multiple files from a single process.
 # * All event types in one file.
 
 @test "Initialization alone" {
@@ -419,7 +418,7 @@ Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: ${output_file}"
     assert_output --partial "write(1, "
     refute_output --regexp "write\([^1]" # ditto
-    refute [ -f "${output_file}" ] # internally this setting was overwritten ...
+    refute [ -f "${output_file}" ]       # internally this setting was overwritten ...
 
     # Test the bare version too
     executable="${BIN_DIR}/cxxst_test_empty_file_2_bare"
@@ -428,6 +427,45 @@ Deduced CXXST_TARGET_FILENAME: ${output_file}"
     assert_success
     refute_sanitizer_output
     refute_output --partial "write("
+}
+
+@test "Split recorded events into multiple files" {
+    local executable="${BIN_DIR}/cxxst_split_files"
+    local result1="${TMP_RESULT_DIR}/example_test_split_1.json"
+    local result2="${TMP_RESULT_DIR}/example_test_split_2.json"
+    local result3="${TMP_RESULT_DIR}/example_test_split_3.json"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ] # should contain exactly one `complete`:
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 1
+
+    assert [ -f "${result2}" ] # should contain exactly one `instant`:
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 1
+
+    assert [ -f "${result3}" ] # should contain exactly one `counter`:
+    assert_equal "$(jq -e '.traceEvents | length' "${result3}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_split_files_bare"
+    rm "${result1}" "${result2}" "${result3}"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    refute [ -f "${result2}" ]
+    refute [ -f "${result3}" ]
 }
 
 @test "Shared library symbol visibility" {

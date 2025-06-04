@@ -76,3 +76,8 @@ add_example(
     cxxst_test_empty_file_2
         "for_tests/empty_file_2.cpp"
 )
+
+add_example(
+    cxxst_split_files
+        "for_tests/split_files.cpp"
+)
