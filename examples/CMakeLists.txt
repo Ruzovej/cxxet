@@ -66,3 +66,8 @@ add_example(
     cxxst_test_init
         "for_tests/only_init.cpp"
 )
+
+add_example(
+    cxxst_test_empty_file
+        "for_tests/empty_file.cpp"
+)

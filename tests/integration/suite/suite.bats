@@ -321,7 +321,6 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 # TODO end-user usage:
-# * Empty file (e.g., not taking the branch where they are, or forgetting to manually flush it).
 # * No file at all (e.g., not specifying it in the source code, or overwriting it there when taken from an environment variable).
 # * Test that all related environment variables are correctly obtained and printed out.
 # * Manual dumping (without `defer = true`) into multiple files from a single process.
@@ -357,6 +356,39 @@ Deduced CXXST_TARGET_FILENAME: "
     refute_sanitizer_output
 
     refute [ -f "${result}" ]
+}
+
+@test "Empty or incomplete file - events recorded but incorrectly flushed" {
+    local executable="${BIN_DIR}/cxxst_test_empty_file"
+    local result1="${TMP_RESULT_DIR}/example_test_empty_file_1.json"
+    local result2="${TMP_RESULT_DIR}/example_test_empty_file_2.json"
+    local result3="${TMP_RESULT_DIR}/example_test_empty_file_3.json"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    assert [ -f "${result2}" ]
+    assert_not_equal "$(wc -c <"${result2}")" 0
+    assert [ -f "${result3}" ]
+    assert_not_equal "$(wc -c <"${result3}")" 0
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_test_empty_file_bare"
+    rm "${result2}" "${result3}"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    refute [ -f "${result2}" ]
+    refute [ -f "${result3}" ]
 }
 
 @test "Shared library symbol visibility" {

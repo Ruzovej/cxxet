@@ -38,6 +38,7 @@ void list::destroy() noexcept {
     delete[] first;
     first = next;
   }
+  last = nullptr;
 }
 
 void list::append(any const &event) noexcept {
