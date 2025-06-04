@@ -9,6 +9,13 @@ function user_log() {
     printf "${fmt_string}" "$@" >&3
 }
 
+function refute_sanitizer_output() {
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+}
+
 function setup_file() {
     run which jq
     assert_success
@@ -122,10 +129,7 @@ function teardown_file() {
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -157,10 +161,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -192,10 +193,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -227,10 +225,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -266,10 +261,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -307,10 +299,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -347,10 +336,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     refute [ -f "${result}" ]
 
@@ -359,10 +345,7 @@ Deduced CXXST_TARGET_FILENAME: "
     run "${executable}" "${result}"
     assert_success
     assert_output ""
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     refute [ -f "${result}" ]
 
@@ -371,10 +354,7 @@ Deduced CXXST_TARGET_FILENAME: "
     run "${executable}" "${result}"
     assert_success
     assert_output ""
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     refute [ -f "${result}" ]
 }
