@@ -338,6 +338,47 @@ Deduced CXXST_TARGET_FILENAME: "
 # * Manual dumping (without `defer = true`) into multiple files from a single process.
 # * All event types in one file.
 
+@test "Initialization alone" {
+    local executable="${BIN_DIR}/cxxst_test_init"
+    local result="${TMP_RESULT_DIR}/example_test_init.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    refute [ -f "${result}" ]
+
+    export CXXST_VERBOSE=0
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output ""
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    refute [ -f "${result}" ]
+
+    executable="${BIN_DIR}/cxxst_test_init_bare"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output ""
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+
+    refute [ -f "${result}" ]
+}
+
 @test "Shared library symbol visibility" {
     local shared_lib="${BIN_DIR}/libcxxst.so"
 

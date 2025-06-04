@@ -61,3 +61,8 @@ add_example(
     cxxst_example_complete_1
         "complete/1.cpp"
 )
+
+add_example(
+    cxxst_test_init
+        "for_tests/only_init.cpp"
+)
