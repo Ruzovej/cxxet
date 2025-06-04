@@ -81,3 +81,8 @@ add_example(
     cxxst_split_files
         "for_tests/split_files.cpp"
 )
+
+add_example(
+    cxxst_reading_env
+        "for_tests/reading_env.cpp"
+)

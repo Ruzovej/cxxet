@@ -57,6 +57,12 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
                           argc > 3 ? argv[3] : "/dev/stdout",
                           true); // deferred flush ... will happen after
-                                 // implicitly flushing thread_local sink.
+  // implicitly flushing thread_local sink. In this particular case, it's, in
+  // the end, equivalent to this (with explicit flush):
+  /*
+    CXXST_flush_thread_local_sink();
+    CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
+                            argc > 3 ? argv[3] : "/dev/stdout");
+  */
   return 0;
 }

@@ -324,7 +324,6 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 # TODO end-user usage:
-# * Test that all related environment variables are correctly obtained and printed out.
 # * All event types in one file.
 
 @test "Initialization alone" {
@@ -465,6 +464,52 @@ Deduced CXXST_TARGET_FILENAME: "
 
     refute [ -f "${result1}" ]
     refute [ -f "${result2}" ]
+    refute [ -f "${result3}" ]
+}
+
+@test "Properly reading env. variables" {
+    local executable="${BIN_DIR}/cxxst_reading_env"
+    local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
+    local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
+    local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
+
+    export CXXST_TARGET_FILENAME="${result1}"
+    export CXXST_DEFAULT_BLOCK_SIZE=1
+    run "${executable}" "${result1}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 1
+Deduced CXXST_TARGET_FILENAME: ${result1}"
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ]
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 3
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result1}")" 1
+
+    export CXXST_VERBOSE=0
+    export CXXST_TARGET_FILENAME="${result2}"
+    run "${executable}" "${result2}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    assert [ -f "${result2}" ]
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 3
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result2}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result2}")" 1
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_reading_env_bare"
+
+    export CXXST_TARGET_FILENAME="${result3}"
+    run "${executable}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
     refute [ -f "${result3}" ]
 }
 
