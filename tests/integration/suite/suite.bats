@@ -324,7 +324,6 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 # TODO end-user usage:
-# * No file at all (e.g., not specifying it in the source code, or overwriting it there when taken from an environment variable).
 # * Test that all related environment variables are correctly obtained and printed out.
 # * Manual dumping (without `defer = true`) into multiple files from a single process.
 # * All event types in one file.
