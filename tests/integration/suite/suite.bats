@@ -22,6 +22,8 @@ function setup_file() {
     assert_success
     run which strace
     assert_success
+    run which nm
+    assert_success
 
     user_log "# configuring and building with preset '%s' ... " "${CXXST_PRESET}"
     ./compile.bash \
