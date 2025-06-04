@@ -3,11 +3,27 @@
 function bats_tests_runner() {
     local num_rounds=1
 
+    local test_presets=(
+        asan_d
+        asan
+        tsan_d
+        tsan
+        release
+    )
+
     while (( $# > 0 )); do
         case "$1" in
             -r|--rounds)
                 shift
                 num_rounds="$1"
+                ;;
+            -p|--preset)
+                shift
+                if [[ -z "$1" ]]; then
+                    echo "Error: No preset specified after -p/--preset option."
+                    return 1
+                fi
+                test_presets=("$1")
                 ;;
             *)
                 break
@@ -22,14 +38,6 @@ function bats_tests_runner() {
     local args=(
         --timing
         #--tap
-    )
-
-    local test_presets=(
-        asan_d
-        asan
-        tsan_d
-        tsan
-        release
     )
 
     local round=1

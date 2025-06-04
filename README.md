@@ -29,8 +29,6 @@ TODO ...
 
 Maybe create github issues for those?
 
-* better & wider test coverage
-  * [recommendation](https://github.com/Ruzovej/compare_unit_test_frameworks/blob/main/docs/g++_release.md#doctest-with-macro-as-above--using-binary-asserts) for unit test usage
 * benchmarking
   * try reimplementing the `cxxst::marker` to don't hold all the data, but "save" them immediately and update end time on `submit`/d-ror (by holding only pointer to this particular record)
 * add more output formats (e.g. implied by this conversation: <https://chatgpt.com/share/681b2833-c728-8003-9e28-a4e1c1c35196>)

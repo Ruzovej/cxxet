@@ -61,3 +61,28 @@ add_example(
     cxxst_example_complete_1
         "complete/1.cpp"
 )
+
+add_example(
+    cxxst_test_init
+        "for_tests/only_init.cpp"
+)
+
+add_example(
+    cxxst_test_empty_file_1
+        "for_tests/empty_file_1.cpp"
+)
+
+add_example(
+    cxxst_test_empty_file_2
+        "for_tests/empty_file_2.cpp"
+)
+
+add_example(
+    cxxst_split_files
+        "for_tests/split_files.cpp"
+)
+
+add_example(
+    cxxst_reading_env
+        "for_tests/reading_env.cpp"
+)

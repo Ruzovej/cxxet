@@ -9,8 +9,20 @@ function user_log() {
     printf "${fmt_string}" "$@" >&3
 }
 
+function refute_sanitizer_output() {
+    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
+    refute_output --partial "ThreadSanitizer"
+    refute_output --partial "LeakSanitizer"
+    refute_output --partial "AddressSanitizer"
+}
+
 function setup_file() {
+    # needed tools:
     run which jq
+    assert_success
+    run which strace
+    assert_success
+    run which nm
     assert_success
 
     user_log "# configuring and building with preset '%s' ... " "${CXXST_PRESET}"
@@ -122,10 +134,7 @@ function teardown_file() {
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -157,10 +166,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -192,10 +198,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -227,10 +230,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -266,10 +266,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -307,10 +304,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXST_TARGET_FILENAME: "
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
+    refute_sanitizer_output
 
     assert [ -f "${result}" ]
 
@@ -332,17 +326,200 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 # TODO end-user usage:
-# * Empty file (e.g., not taking the branch where they are, or forgetting to manually flush it).
-# * No file at all (e.g., not specifying it in the source code, or overwriting it there when taken from an environment variable).
-# * Test that all related environment variables are correctly obtained and printed out.
-# * Manual dumping (without `defer = true`) into multiple files from a single process.
 # * All event types in one file.
+
+@test "Initialization alone" {
+    local executable="${BIN_DIR}/cxxst_test_init"
+    local result="${TMP_RESULT_DIR}/example_test_init.json"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    refute [ -f "${result}" ]
+
+    export CXXST_VERBOSE=0
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result}" ]
+
+    executable="${BIN_DIR}/cxxst_test_init_bare"
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result}" ]
+}
+
+@test "Empty or incomplete file - events recorded but incorrectly flushed" {
+    local executable="${BIN_DIR}/cxxst_test_empty_file_1"
+    local result1="${TMP_RESULT_DIR}/example_test_empty_file_1.json"
+    local result2="${TMP_RESULT_DIR}/example_test_empty_file_2.json"
+    local result3="${TMP_RESULT_DIR}/example_test_empty_file_3.json"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    assert [ -f "${result2}" ]
+    assert_not_equal "$(wc -c <"${result2}")" 0
+    assert [ -f "${result3}" ]
+    assert_not_equal "$(wc -c <"${result3}")" 0
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_test_empty_file_1_bare"
+    rm "${result2}" "${result3}"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    refute [ -f "${result2}" ]
+    refute [ -f "${result3}" ]
+}
+
+@test "Empty file - forgetting to specify it" {
+    if [[ "${CXXST_PRESET}" =~ .san* ]]; then
+        skip "strace doesn't work with sanitizers"
+    fi
+
+    local executable="${BIN_DIR}/cxxst_test_empty_file_2"
+
+    run strace "${executable}"
+    assert_success
+    refute_sanitizer_output
+    assert_output --partial "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    assert_output --partial "write(1, "
+    refute_output --regexp "write\([^1]" # `stdout` ... see the asserts above which requires exactly that
+
+    local output_file="${TMP_RESULT_DIR}/cxxst_test_empty_file_2.json"
+    export CXXST_TARGET_FILENAME="${output_file}"
+    run strace "${executable}"
+    assert_success
+    refute_sanitizer_output
+    assert_output --partial "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: ${output_file}"
+    assert_output --partial "write(1, "
+    refute_output --regexp "write\([^1]" # ditto
+    refute [ -f "${output_file}" ]       # internally this setting was overwritten ...
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_test_empty_file_2_bare"
+
+    run strace "${executable}"
+    assert_success
+    refute_sanitizer_output
+    refute_output --partial "write("
+}
+
+@test "Split recorded events into multiple files" {
+    local executable="${BIN_DIR}/cxxst_split_files"
+    local result1="${TMP_RESULT_DIR}/example_test_split_1.json"
+    local result2="${TMP_RESULT_DIR}/example_test_split_2.json"
+    local result3="${TMP_RESULT_DIR}/example_test_split_3.json"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ] # should contain exactly one `complete`:
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 1
+
+    assert [ -f "${result2}" ] # should contain exactly one `instant`:
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 1
+
+    assert [ -f "${result3}" ] # should contain exactly one `counter`:
+    assert_equal "$(jq -e '.traceEvents | length' "${result3}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_split_files_bare"
+    rm "${result1}" "${result2}" "${result3}"
+
+    run "${executable}" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    refute [ -f "${result2}" ]
+    refute [ -f "${result3}" ]
+}
+
+@test "Properly reading env. variables" {
+    local executable="${BIN_DIR}/cxxst_reading_env"
+    local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
+    local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
+    local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
+
+    export CXXST_TARGET_FILENAME="${result1}"
+    export CXXST_DEFAULT_BLOCK_SIZE=1
+    run "${executable}" "${result1}"
+    assert_success
+    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 1
+Deduced CXXST_TARGET_FILENAME: ${result1}"
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ]
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 3
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result1}")" 1
+
+    export CXXST_VERBOSE=0
+    export CXXST_TARGET_FILENAME="${result2}"
+    run "${executable}" "${result2}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    assert [ -f "${result2}" ]
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 3
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result2}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result2}")" 1
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_reading_env_bare"
+
+    export CXXST_TARGET_FILENAME="${result3}"
+    run "${executable}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result3}" ]
+}
 
 @test "Shared library symbol visibility" {
     local shared_lib="${BIN_DIR}/libcxxst.so"
 
     if ! [[ -f "${shared_lib}" ]]; then
-        return
+        skip "shared lib. not found - probably built as a static library"
     fi
 
     run nm -D -C "${shared_lib}"
@@ -367,7 +544,7 @@ cxxst::thread_local_sink_reserve(int)"
 
 @test "Unit tests runner contains expected symbols" {
     if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
-        return
+        skip "shared lib. not found - probably built as a static library"
     fi
 
     run nm -C "${BIN_DIR}/cxxst_unit_tests"
@@ -381,7 +558,7 @@ cxxst::thread_local_sink_reserve(int)"
 
 @test "Examples & unit test runner properly depend on shared library if built this way" {
     if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
-        return
+        skip "shared lib. not found - probably built as a static library"
     fi
 
     run ldd "${BIN_DIR}/cxxst_unit_tests"

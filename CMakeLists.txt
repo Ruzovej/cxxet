@@ -155,41 +155,6 @@ file(
         CONFIGURE_DEPENDS
         "src/*.cpp"
 )
-add_library(
-    cxxst
-        ${CXXST_LIB_KIND}
-        ${CXXST_LIB_SOURCES}
-)
-add_unix_compiler_flags(cxxst)
-add_sanitizers(cxxst)
-if (CXXST_BUILD_SHARED)
-    set_target_properties( # seems useful -> TODO polish it later
-        cxxst
-            PROPERTIES
-            VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
-            SOVERSION 0 # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
-    )
-endif()
-target_include_directories(
-    cxxst
-        PUBLIC
-        "include/public"
-)
-target_include_directories(
-    cxxst
-        PRIVATE
-        "include/private"
-)
-
-add_library(
-    cxxst_bare
-        INTERFACE
-)
-target_include_directories(
-    cxxst_bare
-        INTERFACE
-        "include/bare"
-)
 
 # tests, etc.:
 if (CXXST_BUILD_TESTS)
@@ -228,6 +193,42 @@ if (CXXST_BUILD_TESTS)
     add_unix_compiler_flags(cxxst_unit_tests)
     add_sanitizers(cxxst_unit_tests)
 endif()
+
+add_library(
+    cxxst
+        ${CXXST_LIB_KIND}
+        ${CXXST_LIB_SOURCES}
+)
+add_unix_compiler_flags(cxxst)
+add_sanitizers(cxxst)
+if (CXXST_BUILD_SHARED)
+    set_target_properties( # seems useful -> TODO polish it later
+        cxxst
+            PROPERTIES
+            VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
+            SOVERSION 0 # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
+    )
+endif()
+target_include_directories(
+    cxxst
+        PUBLIC
+        "include/public"
+)
+target_include_directories(
+    cxxst
+        PRIVATE
+        "include/private"
+)
+
+add_library(
+    cxxst_bare
+        INTERFACE
+)
+target_include_directories(
+    cxxst_bare
+        INTERFACE
+        "include/bare"
+)
 
 if (CXXST_BUILD_EXAMPLES)
     add_subdirectory(examples)
