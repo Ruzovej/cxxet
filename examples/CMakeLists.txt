@@ -68,6 +68,11 @@ add_example(
 )
 
 add_example(
-    cxxst_test_empty_file
-        "for_tests/empty_file.cpp"
+    cxxst_test_empty_file_1
+        "for_tests/empty_file_1.cpp"
+)
+
+add_example(
+    cxxst_test_empty_file_2
+        "for_tests/empty_file_2.cpp"
 )

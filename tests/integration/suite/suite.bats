@@ -17,7 +17,10 @@ function refute_sanitizer_output() {
 }
 
 function setup_file() {
+    # needed tools:
     run which jq
+    assert_success
+    run which strace
     assert_success
 
     user_log "# configuring and building with preset '%s' ... " "${CXXST_PRESET}"
@@ -359,7 +362,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Empty or incomplete file - events recorded but incorrectly flushed" {
-    local executable="${BIN_DIR}/cxxst_test_empty_file"
+    local executable="${BIN_DIR}/cxxst_test_empty_file_1"
     local result1="${TMP_RESULT_DIR}/example_test_empty_file_1.json"
     local result2="${TMP_RESULT_DIR}/example_test_empty_file_2.json"
     local result3="${TMP_RESULT_DIR}/example_test_empty_file_3.json"
@@ -378,7 +381,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_not_equal "$(wc -c <"${result3}")" 0
 
     # Test the bare version too
-    executable="${BIN_DIR}/cxxst_test_empty_file_bare"
+    executable="${BIN_DIR}/cxxst_test_empty_file_1_bare"
     rm "${result2}" "${result3}"
 
     run "${executable}" "${result1}" "${result2}" "${result3}"
@@ -391,11 +394,48 @@ Deduced CXXST_TARGET_FILENAME: "
     refute [ -f "${result3}" ]
 }
 
+@test "Empty file - forgetting to specify it" {
+    if [[ "${CXXST_PRESET}" =~ .san* ]]; then
+        skip "strace doesn't work with sanitizers"
+    fi
+
+    local executable="${BIN_DIR}/cxxst_test_empty_file_2"
+
+    run strace "${executable}"
+    assert_success
+    refute_sanitizer_output
+    assert_output --partial "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: "
+    assert_output --partial "write(1, "
+    refute_output --regexp "write\([^1]" # `stdout` ... see the asserts above which requires exactly that
+
+    local output_file="${TMP_RESULT_DIR}/cxxst_test_empty_file_2.json"
+    export CXXST_TARGET_FILENAME="${output_file}"
+    run strace "${executable}"
+    assert_success
+    refute_sanitizer_output
+    assert_output --partial "Deduced CXXST_OUTPUT_FORMAT: 0
+Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXST_TARGET_FILENAME: ${output_file}"
+    assert_output --partial "write(1, "
+    refute_output --regexp "write\([^1]" # ditto
+    refute [ -f "${output_file}" ] # internally this setting was overwritten ...
+
+    # Test the bare version too
+    executable="${BIN_DIR}/cxxst_test_empty_file_2_bare"
+
+    run strace "${executable}"
+    assert_success
+    refute_sanitizer_output
+    refute_output --partial "write("
+}
+
 @test "Shared library symbol visibility" {
     local shared_lib="${BIN_DIR}/libcxxst.so"
 
     if ! [[ -f "${shared_lib}" ]]; then
-        return
+        skip "shared lib. not found - probably built as a static library"
     fi
 
     run nm -D -C "${shared_lib}"
@@ -420,7 +460,7 @@ cxxst::thread_local_sink_reserve(int)"
 
 @test "Unit tests runner contains expected symbols" {
     if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
-        return
+        skip "shared lib. not found - probably built as a static library"
     fi
 
     run nm -C "${BIN_DIR}/cxxst_unit_tests"
@@ -434,7 +474,7 @@ cxxst::thread_local_sink_reserve(int)"
 
 @test "Examples & unit test runner properly depend on shared library if built this way" {
     if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
-        return
+        skip "shared lib. not found - probably built as a static library"
     fi
 
     run ldd "${BIN_DIR}/cxxst_unit_tests"
