@@ -24,7 +24,9 @@ private:
 
   central_sink &parent;
 
-protected: // because of testing ...
+#ifdef CXXST_WITH_UNIT_TESTS
+protected:
+#endif
   event::list events;
 };
 

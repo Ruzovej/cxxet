@@ -526,7 +526,7 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     assert_success
     local nm_output="${output}"
 
-    # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude and primitive replacement for running `abi-diff`:
+    # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
     assert_equal "$(printf '%s' "${nm_output}" | grep " cxxst::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxst::flush_global_sink(cxxst::output::format, char const*, bool)
 cxxst::flush_thread_local_sink()
 cxxst::init_thread_local_sink()
