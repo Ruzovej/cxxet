@@ -6,6 +6,10 @@
 
 namespace cxxst::impl {
 
+sink::sink() noexcept = default;
+
+sink::~sink() noexcept = default;
+
 void sink::flush_to_file(long long const time_point_zero,
                          cxxst::output::format const fmt,
                          char const *const filename) noexcept {
