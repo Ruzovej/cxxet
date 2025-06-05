@@ -29,7 +29,9 @@ private:
   long long const time_point;
   sink_properties const &traits;
 
-protected: // because of testing ...
+#ifdef CXXST_WITH_UNIT_TESTS
+protected:
+#endif
   event::list events;
 };
 
