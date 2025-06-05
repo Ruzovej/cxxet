@@ -13,7 +13,7 @@ namespace cxxst {
 
 static impl::sink_properties sink_props{};
 static impl::central_sink global_sink{sink_props};
-static thread_local impl::local_sink thread_sink{global_sink};
+static thread_local impl::local_sink thread_sink{&global_sink};
 #ifndef NDEBUG
 static thread_local bool was_initialized{false};
 #endif
@@ -25,14 +25,16 @@ void init_thread_local_sink() noexcept {
   was_initialized = true;
 #endif
 
-  thread_sink.reserve();
+  thread_sink.reserve(sink_props.default_list_node_capacity);
 }
 
 void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
 #ifndef NDEBUG
   was_initialized = true;
 #endif
-  thread_sink.reserve(minimum_free_capacity);
+  thread_sink.reserve(minimum_free_capacity <= 0
+                          ? sink_props.default_list_node_capacity
+                          : minimum_free_capacity);
 }
 
 void flush_thread_local_sink() noexcept { thread_sink.flush(); }
