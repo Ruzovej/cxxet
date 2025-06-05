@@ -1,13 +1,12 @@
 #pragma once
 
-#include "impl/central_sink.hpp"
-#include "impl/event/list/list.hpp"
+#include "impl/sink.hpp"
 
 namespace cxxst::impl {
 
-struct local_sink {
-  explicit local_sink(central_sink &aParent) noexcept;
-  ~local_sink() noexcept;
+struct local_sink : sink {
+  explicit local_sink(sink *aParent) noexcept;
+  ~local_sink() noexcept override;
 
   void append_event(event::any const &evt) noexcept;
 
@@ -22,12 +21,7 @@ private:
   local_sink(local_sink &&) = delete;
   local_sink &operator=(local_sink &&) = delete;
 
-  central_sink &parent;
-
-#ifdef CXXST_WITH_UNIT_TESTS
-protected:
-#endif
-  event::list events;
+  sink *parent;
 };
 
 } // namespace cxxst::impl
