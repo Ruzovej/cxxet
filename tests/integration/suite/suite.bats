@@ -469,12 +469,10 @@ Deduced CXXST_TARGET_FILENAME: "
     refute [ -f "${result3}" ]
 }
 
-@test "Properly reading env. variables" {
+@test "Properly read env. variables" {
     local executable="${BIN_DIR}/cxxst_reading_env"
-    local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
-    local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
-    local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
 
+    local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
     export CXXST_TARGET_FILENAME="${result1}"
     export CXXST_DEFAULT_BLOCK_SIZE=1
     run "${executable}" "${result1}"
@@ -490,6 +488,7 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result1}")" 1
 
+    local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
     export CXXST_VERBOSE=0
     export CXXST_TARGET_FILENAME="${result2}"
     run "${executable}" "${result2}"
@@ -504,6 +503,7 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result2}")" 1
 
     # Test the bare version too
+    local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
     executable="${BIN_DIR}/cxxst_reading_env_bare"
 
     export CXXST_TARGET_FILENAME="${result3}"
