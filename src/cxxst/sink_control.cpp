@@ -12,9 +12,11 @@
 
 namespace cxxst {
 
-static impl::sink_properties sink_props{};
-static impl::central_sink global_sink{sink_props};
-static thread_local std::optional<impl::local_sink> thread_sink;
+namespace {
+impl::sink_properties const sink_props{};
+impl::central_sink global_sink{sink_props};
+thread_local std::optional<impl::local_sink> thread_sink;
+} // namespace
 
 void init_thread_local_sink() noexcept {
   assert(thread_sink == std::nullopt &&
@@ -40,10 +42,7 @@ void flush_thread_local_sink() noexcept {
 void flush_global_sink(cxxst::output::format const fmt,
                        char const *const filename,
                        bool const defer_flush) noexcept {
-  sink_props.set_target_format(fmt).set_target_filename(filename);
-  if (!defer_flush) {
-    global_sink.flush();
-  }
+  global_sink.flush(fmt, filename, defer_flush);
 }
 
 namespace impl {
