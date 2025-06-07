@@ -2,18 +2,18 @@
 
 #include <mutex>
 
-#include "impl/event/list/list.hpp"
+#include "impl/sink.hpp"
 #include "impl/sink_properties.hpp"
 
 namespace cxxst::impl {
 
-struct central_sink {
+struct central_sink : sink {
   explicit central_sink(sink_properties const &aTraits);
-  ~central_sink() noexcept;
+  ~central_sink() noexcept override;
 
   void flush() noexcept;
 
-  void drain(event::list &aEvents) noexcept;
+  void drain(sink &other) noexcept override final;
 
   [[nodiscard]] sink_properties const &get_traits() const noexcept {
     return traits;
@@ -28,11 +28,6 @@ private:
   std::mutex mtx;
   long long const time_point;
   sink_properties const &traits;
-
-#ifdef CXXST_WITH_UNIT_TESTS
-protected:
-#endif
-  event::list events;
 };
 
 } // namespace cxxst::impl

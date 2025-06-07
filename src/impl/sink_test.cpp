@@ -42,7 +42,7 @@ TEST_CASE("sink cascade") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<central_sink> root{traits};
-    test_sink<local_sink> leaf{root};
+    test_sink<local_sink> leaf{&root};
 
     leaf.append_event(a[0]);
     leaf.append_event(a[1]);
@@ -66,11 +66,11 @@ TEST_CASE("sink cascade") {
     REQUIRE_EQ(counter, 2);
   }
 
-  SUBCASE("two 'leafs'") {
+  SUBCASE("two 'leafs', tree") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<central_sink> root{traits};
-    test_sink<local_sink> leaf1{root}, leaf2{root};
+    test_sink<local_sink> leaf1{&root}, leaf2{&root};
 
     leaf1.append_event(a[0]);
     leaf2.append_event(a[1]);
@@ -101,18 +101,51 @@ TEST_CASE("sink cascade") {
     REQUIRE_EQ(counter, 2);
   }
 
+  SUBCASE("two 'leafs', linear") {
+    sink_properties traits{};
+    traits.set_target_filename("/dev/null");
+    test_sink<central_sink> root{traits};
+    test_sink<local_sink> leaf1{&root}, leaf2{&leaf1};
+
+    leaf1.append_event(a[0]);
+    leaf2.append_event(a[1]);
+
+    leaf2.flush();
+
+    n = leaf1.apply([&counter, &a](long long const, long long const,
+                                   event::any const &evt) {
+      REQUIRE_EQ(evt, a[counter++]);
+    });
+
+    REQUIRE(leaf2.empty());
+    REQUIRE_EQ(n, counter);
+    REQUIRE_EQ(counter, 2);
+
+    leaf1.flush();
+
+    counter = 0;
+    n = root.apply([&counter, &a](long long const, long long const,
+                                  event::any const &evt) {
+      REQUIRE_EQ(evt, a[counter++]);
+    });
+
+    REQUIRE(leaf1.empty());
+    REQUIRE_EQ(n, counter);
+    REQUIRE_EQ(counter, 2);
+  }
+
   SUBCASE("flush upon destruction") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<central_sink> root{traits};
 
     SUBCASE("without reserve") {
-      test_sink<local_sink> leaf{root};
+      test_sink<local_sink> leaf{&root};
       leaf.append_event(a[0]);
     }
 
     SUBCASE("with reserve") {
-      test_sink<local_sink> leaf{root};
+      test_sink<local_sink> leaf{&root};
       leaf.reserve(traits.default_list_node_capacity);
       leaf.append_event(a[0]);
     }
