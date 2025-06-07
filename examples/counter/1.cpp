@@ -21,11 +21,13 @@ int main(int argc, char const **argv) {
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   std::thread t1{[]() {
+    CXXST_init_thread_local_sink();
     CXXST_mark_counters("thread 1 operations", 42.0);
     CXXST_mark_counters("RAM [MB]", 3.1, "cpu utilization", 62.0);
   }};
 
   std::thread t2{[]() {
+    CXXST_init_thread_local_sink();
     CXXST_mark_counters("RAM [MB]", 3.3, "cpu utilization", 52.0);
     CXXST_mark_counters("thread 2 operations", 85.3);
   }};

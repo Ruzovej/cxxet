@@ -17,11 +17,20 @@ int main(int argc, char const **argv) {
   // Unfortunately, using non-default scope (== `...::thread`), makes `chrome` &
   // ui.perfetto.dev display it somehow unusably ...
 
-  std::thread t1{[]() { CXXST_mark_instant("thread 1 started"); }};
+  std::thread t1{[]() {
+    CXXST_init_thread_local_sink();
+    CXXST_mark_instant("thread 1 started");
+  }};
 
-  std::thread t2{[]() { CXXST_mark_instant("thread 2 started"); }};
+  std::thread t2{[]() {
+    CXXST_init_thread_local_sink();
+    CXXST_mark_instant("thread 2 started");
+  }};
 
-  std::thread t3{[]() { CXXST_mark_instant("thread 3 started"); }};
+  std::thread t3{[]() {
+    CXXST_init_thread_local_sink();
+    CXXST_mark_instant("thread 3 started");
+  }};
 
   CXXST_mark_instant("main thread flushing all markers");
 
