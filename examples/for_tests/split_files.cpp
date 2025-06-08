@@ -13,7 +13,7 @@ void flush_to_file_now(char const *const filename, bool const rereserve) {
 } // namespace
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
-  CXXST_init_thread_local_sink();
+  CXXST_thread_local_sink_reserve();
 
   // honestly, this functionality isn't prepared for multithreading ... since
   // all thread_local sinks flush to the same global one (protected by

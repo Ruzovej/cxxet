@@ -12,8 +12,7 @@ struct local_sink : sink {
 
   void flush() noexcept;
 
-  // `minimum_free_capacity <= 0` => use setting from parent
-  void reserve(int const minimum_free_capacity = 0) noexcept;
+  void reserve(int const minimum_free_capacity) noexcept;
 
 private:
   local_sink(local_sink const &) = delete;
@@ -22,6 +21,7 @@ private:
   local_sink &operator=(local_sink &&) = delete;
 
   sink *parent;
+  int default_node_capacity{};
 };
 
 } // namespace cxxst::impl

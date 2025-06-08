@@ -35,10 +35,6 @@
 
 #define CXXST_mark_instant(...) cxxst::mark_instant(__VA_ARGS__)
 
-// call at most once per thread, and not after
-// `CXXST_thread_local_sink_reserve`:
-#define CXXST_init_thread_local_sink() cxxst::init_thread_local_sink()
-
 #define CXXST_thread_local_sink_reserve(minimum_free_capacity)                 \
   cxxst::thread_local_sink_reserve(minimum_free_capacity)
 

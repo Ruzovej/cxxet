@@ -12,8 +12,6 @@
 
 #define CXXST_mark_instant(...)
 
-#define CXXST_init_thread_local_sink(...)
-
 #define CXXST_thread_local_sink_reserve(...)
 
 #define CXXST_flush_thread_local_sink(...)

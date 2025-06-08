@@ -3,7 +3,6 @@
 #include "cxxst/all.hpp"
 
 static void thread_local_sink_lifecycle() {
-  CXXST_init_thread_local_sink();
   CXXST_thread_local_sink_reserve(1);
   CXXST_flush_thread_local_sink();
 }

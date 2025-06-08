@@ -8,7 +8,7 @@ int main(int argc, char const **argv) {
                                                        : "/dev/stdout"};
   CXXST_flush_global_sink(cxxst::output::format::chrome_trace, filename, true);
 
-  CXXST_init_thread_local_sink();
+  CXXST_thread_local_sink_reserve();
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
@@ -21,13 +21,13 @@ int main(int argc, char const **argv) {
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   std::thread t1{[]() {
-    CXXST_init_thread_local_sink();
+    CXXST_thread_local_sink_reserve();
     CXXST_mark_counters("thread 1 operations", 42.0);
     CXXST_mark_counters("RAM [MB]", 3.1, "cpu utilization", 62.0);
   }};
 
   std::thread t2{[]() {
-    CXXST_init_thread_local_sink();
+    CXXST_thread_local_sink_reserve();
     CXXST_mark_counters("RAM [MB]", 3.3, "cpu utilization", 52.0);
     CXXST_mark_counters("thread 2 operations", 85.3);
   }};
