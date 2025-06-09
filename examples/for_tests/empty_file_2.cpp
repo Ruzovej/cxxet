@@ -15,7 +15,7 @@ void record_some_events() {
 
   CXXST_mark_counters("lost counter", 42.0);
 
-  CXXST_flush_thread_local_sink();
+  CXXST_sink_thread_flush();
 }
 
 } // namespace

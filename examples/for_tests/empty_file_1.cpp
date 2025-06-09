@@ -60,7 +60,7 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   // implicitly flushing thread_local sink. In this particular case, it's, in
   // the end, equivalent to this (with explicit flush):
   /*
-    CXXST_flush_thread_local_sink();
+    CXXST_sink_thread_flush();
     CXXST_sink_global_flush(cxxst::output::format::chrome_trace,
                             argc > 3 ? argv[3] : "/dev/stdout");
   */

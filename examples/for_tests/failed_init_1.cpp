@@ -5,7 +5,7 @@
 static void improper_cxxst_usage() {
   // incorrect, because `CXXST_thread_local_sink_reserve(...)` should have been
   // called:
-  CXXST_flush_thread_local_sink();
+  CXXST_sink_thread_flush();
 }
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {

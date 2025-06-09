@@ -27,7 +27,7 @@ void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
                            : minimum_free_capacity);
 }
 
-void flush_thread_local_sink() noexcept {
+void sink_thread_flush() noexcept {
   assert(thread_sink != std::nullopt && "thread local sink not initialized!");
   thread_sink->flush();
 }

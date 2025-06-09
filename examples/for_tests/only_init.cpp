@@ -5,7 +5,7 @@
 static void thread_local_sink_lifecycle() {
   CXXST_thread_local_sink_reserve(1);
   // do whatever You need between those ...
-  CXXST_flush_thread_local_sink(); // not necessary, it will be flushed
+  CXXST_sink_thread_flush(); // not necessary, it will be flushed
                                    // implicitly too - unless You want to do
                                    // more work after that ...
 

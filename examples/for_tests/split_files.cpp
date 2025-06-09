@@ -3,7 +3,7 @@
 namespace {
 
 void flush_to_file_now(char const *const filename, bool const rereserve) {
-  CXXST_flush_thread_local_sink();
+  CXXST_sink_thread_flush();
   CXXST_sink_global_flush(cxxst::output::format::chrome_trace, filename);
   if (rereserve) {
     CXXST_thread_local_sink_reserve(1);

@@ -34,7 +34,7 @@ int main(int argc, char const **argv) {
 
   CXXST_mark_instant("main thread flushing all markers");
 
-  CXXST_flush_thread_local_sink();
+  CXXST_sink_thread_flush();
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
