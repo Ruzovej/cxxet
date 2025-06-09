@@ -35,9 +35,9 @@
 
 #define CXXST_mark_instant(...) cxxst::mark_instant(__VA_ARGS__)
 
-#define CXXST_thread_local_sink_reserve(minimum_free_capacity)                 \
-  cxxst::thread_local_sink_reserve(minimum_free_capacity)
+#define CXXST_sink_thread_reserve(minimum_free_capacity)                       \
+  cxxst::sink_thread_reserve(minimum_free_capacity)
 
-#define CXXST_flush_thread_local_sink() cxxst::flush_thread_local_sink()
+#define CXXST_sink_thread_flush() cxxst::sink_thread_flush()
 
-#define CXXST_flush_global_sink(...) cxxst::flush_global_sink(__VA_ARGS__)
+#define CXXST_sink_global_flush(...) cxxst::sink_global_flush(__VA_ARGS__)

@@ -21,7 +21,7 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
                                                        : "/dev/stdout"};
-  CXXST_flush_global_sink(cxxst::output::format::chrome_trace, filename, true);
+  CXXST_sink_global_flush(cxxst::output::format::chrome_trace, filename, true);
 
   CXXST_mark_complete("Counter example 2");
 
@@ -39,8 +39,8 @@ int main(int argc, char const **argv) {
   }};
 
   {
-    CXXST_mark_complete("CXXST_thread_local_sink_reserve");
-    CXXST_thread_local_sink_reserve(
+    CXXST_mark_complete("CXXST_sink_thread_reserve");
+    CXXST_sink_thread_reserve(
         num_points * 2 // ...
         + 3 // those 3 extra `CXXST_mark_complete`s above and below ...
     );

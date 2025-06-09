@@ -11,7 +11,7 @@ std::condition_variable go_cv;
 bool go{false};
 
 void record_some_events(bool const wait) {
-  CXXST_thread_local_sink_reserve();
+  CXXST_sink_thread_reserve();
 
   CXXST_mark_complete("a complete event that disappears");
 
@@ -39,7 +39,7 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   record_some_events(false);
   // but don't flush the thread-local sink...
 
-  CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
+  CXXST_sink_global_flush(cxxst::output::format::chrome_trace,
                           argc > 1 ? argv[1] : "/dev/stdout"); // will be empty
 
   {
@@ -51,17 +51,17 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
 
   // won't contain markers from main thread ... forgot to explicitly flush them
   // -> they will be implicitly flushed on thread exit ...:
-  CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
+  CXXST_sink_global_flush(cxxst::output::format::chrome_trace,
                           argc > 2 ? argv[2] : "/dev/stdout");
 
-  CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
+  CXXST_sink_global_flush(cxxst::output::format::chrome_trace,
                           argc > 3 ? argv[3] : "/dev/stdout",
                           true); // deferred flush ... will happen after
   // implicitly flushing thread_local sink. In this particular case, it's, in
   // the end, equivalent to this (with explicit flush):
   /*
-    CXXST_flush_thread_local_sink();
-    CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
+    CXXST_sink_thread_flush();
+    CXXST_sink_global_flush(cxxst::output::format::chrome_trace,
                             argc > 3 ? argv[3] : "/dev/stdout");
   */
   return 0;

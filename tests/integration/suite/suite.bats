@@ -320,7 +320,7 @@ Deduced CXXST_TARGET_FILENAME: "
 
     assert_equal "$(jq -e -c '[.traceEvents[] | select(.ph == "C")] | map(.args | keys[]) | unique | sort' "${result}")" '["x","y"]'
 
-    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["CXXST_thread_local_sink_reserve","Counter","Counter example 2","Euler method iterations"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["CXXST_sink_thread_reserve","Counter","Counter example 2","Euler method iterations"]'
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
@@ -544,14 +544,14 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     local nm_output="${output}"
 
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
-    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxst::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxst::flush_global_sink(cxxst::output::format, char const*, bool)
-cxxst::flush_thread_local_sink()
-cxxst::mark_complete::submit(timespec)
+    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxst::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxst::mark_complete::submit(timespec)
+cxxst::sink_global_flush(cxxst::output::format, char const*, bool)
+cxxst::sink_thread_flush()
+cxxst::sink_thread_reserve(int)
 cxxst::submit_counter(char const*, long long, double)
 cxxst::submit_duration_begin(char const*, long long)
 cxxst::submit_duration_end(char const*, long long)
-cxxst::submit_instant(char const*, cxxst::scope_t, long long)
-cxxst::thread_local_sink_reserve(int)"
+cxxst::submit_instant(char const*, cxxst::scope_t, long long)"
 
     # those definitely not:
     assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0

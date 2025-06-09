@@ -5,7 +5,7 @@
 namespace {
 
 void record_some_events() {
-  CXXST_thread_local_sink_reserve();
+  CXXST_sink_thread_reserve();
 
   CXXST_mark_complete("a complete event that disappears");
 
@@ -15,7 +15,7 @@ void record_some_events() {
 
   CXXST_mark_counters("lost counter", 42.0);
 
-  CXXST_flush_thread_local_sink();
+  CXXST_sink_thread_flush();
 }
 
 } // namespace
@@ -23,7 +23,7 @@ void record_some_events() {
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   record_some_events();
 
-  CXXST_flush_global_sink(
+  CXXST_sink_global_flush(
       cxxst::output::format::chrome_trace,
       nullptr, // file won't be created/overwritten - `nullptr` means to discard
                // all recorded events ...

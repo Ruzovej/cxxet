@@ -1,7 +1,7 @@
 #include "cxxst/all.hpp"
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
-  CXXST_thread_local_sink_reserve();
+  CXXST_sink_thread_reserve();
 
   CXXST_mark_complete("main");
 

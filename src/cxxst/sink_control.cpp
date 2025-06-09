@@ -18,7 +18,7 @@ impl::central_sink global_sink{sink_props};
 thread_local std::optional<impl::local_sink> thread_sink;
 } // namespace
 
-void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
+void sink_thread_reserve(int const minimum_free_capacity) noexcept {
   if (thread_sink == std::nullopt) {
     thread_sink.emplace(&global_sink);
   }
@@ -27,12 +27,12 @@ void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
                            : minimum_free_capacity);
 }
 
-void flush_thread_local_sink() noexcept {
+void sink_thread_flush() noexcept {
   assert(thread_sink != std::nullopt && "thread local sink not initialized!");
   thread_sink->flush();
 }
 
-void flush_global_sink(cxxst::output::format const fmt,
+void sink_global_flush(cxxst::output::format const fmt,
                        char const *const filename,
                        bool const defer_flush) noexcept {
   global_sink.flush(fmt, filename, defer_flush);
