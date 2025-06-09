@@ -21,5 +21,5 @@ Examples are executed in acompanying `bats` test suite, while asserting on the o
 
 ## Performance Tips
 
-* Use `CXXST_thread_local_sink_reserve(capacity)` anytime when you know how many events will be generated; at least preallocate buffer for markers by a call to `CXXST_init_thread_local_sink()` (at most once per thread and before any `CXXST_thread_local_sink_reserve(...)` call).
+* Use `CXXST_sink_thread_reserve(capacity)` anytime when you know how many events will be generated; at least preallocate buffer for markers by a call to `CXXST_init_thread_local_sink()` (at most once per thread and before any `CXXST_sink_thread_reserve(...)` call).
 * Markers have (low?) overhead that can accumulate within high-frequency usage.

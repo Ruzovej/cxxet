@@ -39,8 +39,8 @@ int main(int argc, char const **argv) {
   }};
 
   {
-    CXXST_mark_complete("CXXST_thread_local_sink_reserve");
-    CXXST_thread_local_sink_reserve(
+    CXXST_mark_complete("CXXST_sink_thread_reserve");
+    CXXST_sink_thread_reserve(
         num_points * 2 // ...
         + 3 // those 3 extra `CXXST_mark_complete`s above and below ...
     );

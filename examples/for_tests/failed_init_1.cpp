@@ -3,7 +3,7 @@
 #include "cxxst/all.hpp"
 
 static void improper_cxxst_usage() {
-  // incorrect, because `CXXST_thread_local_sink_reserve(...)` should have been
+  // incorrect, because `CXXST_sink_thread_reserve(...)` should have been
   // called:
   CXXST_sink_thread_flush();
 }

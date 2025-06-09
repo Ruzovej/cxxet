@@ -13,7 +13,7 @@ static void pyramid(int const level) {
 }
 
 int main(int argc, char const **argv) {
-  CXXST_thread_local_sink_reserve();
+  CXXST_sink_thread_reserve();
   CXXST_mark_complete(__FUNCTION__);
 
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
@@ -21,7 +21,7 @@ int main(int argc, char const **argv) {
   CXXST_sink_global_flush(cxxst::output::format::chrome_trace, filename, true);
 
   std::thread t1{[]() {
-    CXXST_thread_local_sink_reserve();
+    CXXST_sink_thread_reserve();
     CXXST_mark_complete("scope 1.1");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     {
@@ -37,7 +37,7 @@ int main(int argc, char const **argv) {
   }};
 
   std::thread t2{[]() {
-    CXXST_thread_local_sink_reserve();
+    CXXST_sink_thread_reserve();
     pyramid(4);
   }};
 

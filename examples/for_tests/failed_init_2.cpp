@@ -5,7 +5,7 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
                           argc > 1 ? argv[1] : "/dev/stdout",
                           true); // whatever, in this example ...
 
-  // incorrect, because `CXXST_thread_local_sink_reserve(...)` should have been
+  // incorrect, because `CXXST_sink_thread_reserve(...)` should have been
   // called:
   CXXST_mark_complete("will crash on exit ...");
 
