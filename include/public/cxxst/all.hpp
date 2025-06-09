@@ -35,7 +35,7 @@
 
 #define CXXST_mark_instant(...) cxxst::mark_instant(__VA_ARGS__)
 
-#define CXXST_sink_thread_reserve(minimum_free_capacity)                 \
+#define CXXST_sink_thread_reserve(minimum_free_capacity)                       \
   cxxst::sink_thread_reserve(minimum_free_capacity)
 
 #define CXXST_sink_thread_flush() cxxst::sink_thread_flush()
