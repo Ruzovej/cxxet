@@ -23,7 +23,7 @@ void record_some_events() {
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   record_some_events();
 
-  CXXST_flush_global_sink(
+  CXXST_sink_global_flush(
       cxxst::output::format::chrome_trace,
       nullptr, // file won't be created/overwritten - `nullptr` means to discard
                // all recorded events ...

@@ -23,7 +23,7 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   std::thread{thread_local_sink_lifecycle}.join();
   t2.join();
 
-  CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
+  CXXST_sink_global_flush(cxxst::output::format::chrome_trace,
                           argc > 1 ? argv[1] : "/dev/stdout");
 
   return 0;

@@ -6,7 +6,7 @@
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
                                                        : "/dev/stdout"};
-  CXXST_flush_global_sink(cxxst::output::format::chrome_trace, filename, true);
+  CXXST_sink_global_flush(cxxst::output::format::chrome_trace, filename, true);
 
   CXXST_thread_local_sink_reserve();
 

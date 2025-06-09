@@ -32,7 +32,7 @@ void flush_thread_local_sink() noexcept {
   thread_sink->flush();
 }
 
-void flush_global_sink(cxxst::output::format const fmt,
+void sink_global_flush(cxxst::output::format const fmt,
                        char const *const filename,
                        bool const defer_flush) noexcept {
   global_sink.flush(fmt, filename, defer_flush);

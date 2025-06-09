@@ -16,4 +16,4 @@
 
 #define CXXST_flush_thread_local_sink(...)
 
-#define CXXST_flush_global_sink(...)
+#define CXXST_sink_global_flush(...)

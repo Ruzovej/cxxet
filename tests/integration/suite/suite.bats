@@ -544,9 +544,9 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     local nm_output="${output}"
 
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
-    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxst::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxst::flush_global_sink(cxxst::output::format, char const*, bool)
-cxxst::flush_thread_local_sink()
+    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxst::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxst::flush_thread_local_sink()
 cxxst::mark_complete::submit(timespec)
+cxxst::sink_global_flush(cxxst::output::format, char const*, bool)
 cxxst::submit_counter(char const*, long long, double)
 cxxst::submit_duration_begin(char const*, long long)
 cxxst::submit_duration_end(char const*, long long)
