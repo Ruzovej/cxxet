@@ -7,7 +7,7 @@ function initialize_bats() {
         get_bats_package \
             tests/integration/external \
             bats-core \
-            1.11.0
+            1.12.0
 
         get_bats_package \
             tests/integration/external/bats-helper \
