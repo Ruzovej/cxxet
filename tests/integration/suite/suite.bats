@@ -320,6 +320,13 @@ Deduced CXXST_TARGET_FILENAME: "
     local executable="${BIN_DIR}/cxxst_test_init"
     local result="${TMP_RESULT_DIR}/example_test_init.json"
 
+    run "${executable}_bare" "${result}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result}" ]
+
     run "${executable}" "${result}"
     assert_success
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
@@ -337,15 +344,6 @@ Deduced CXXST_TARGET_FILENAME: "
     refute_sanitizer_output
 
     refute [ -f "${result}" ]
-
-    executable="${BIN_DIR}/cxxst_test_init_bare"
-
-    run "${executable}" "${result}"
-    assert_success
-    assert_output ""
-    refute_sanitizer_output
-
-    refute [ -f "${result}" ]
 }
 
 @test "Empty or incomplete file - events recorded but incorrectly flushed" {
@@ -353,6 +351,15 @@ Deduced CXXST_TARGET_FILENAME: "
     local result1="${TMP_RESULT_DIR}/example_test_empty_file_1.json"
     local result2="${TMP_RESULT_DIR}/example_test_empty_file_2.json"
     local result3="${TMP_RESULT_DIR}/example_test_empty_file_3.json"
+
+    run "${executable}_bare" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    refute [ -f "${result2}" ]
+    refute [ -f "${result3}" ]
 
     run "${executable}" "${result1}" "${result2}" "${result3}"
     assert_success
@@ -366,19 +373,6 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_not_equal "$(wc -c <"${result2}")" 0
     assert [ -f "${result3}" ]
     assert_not_equal "$(wc -c <"${result3}")" 0
-
-    # Test the bare version too
-    executable="${BIN_DIR}/cxxst_test_empty_file_1_bare"
-    rm "${result2}" "${result3}"
-
-    run "${executable}" "${result1}" "${result2}" "${result3}"
-    assert_success
-    assert_output ""
-    refute_sanitizer_output
-
-    refute [ -f "${result1}" ]
-    refute [ -f "${result2}" ]
-    refute [ -f "${result3}" ]
 }
 
 @test "Empty file - forgetting to specify it" {
@@ -387,6 +381,11 @@ Deduced CXXST_TARGET_FILENAME: "
     fi
 
     local executable="${BIN_DIR}/cxxst_test_empty_file_2"
+
+    run strace "${executable}_bare"
+    assert_success
+    refute_sanitizer_output
+    refute_output --partial "write("
 
     run strace "${executable}"
     assert_success
@@ -408,14 +407,6 @@ Deduced CXXST_TARGET_FILENAME: ${output_file}"
     assert_output --partial "write(1, "
     refute_output --regexp "write\([^1]" # ditto
     refute [ -f "${output_file}" ]       # internally this setting was overwritten ...
-
-    # Test the bare version too
-    executable="${BIN_DIR}/cxxst_test_empty_file_2_bare"
-
-    run strace "${executable}"
-    assert_success
-    refute_sanitizer_output
-    refute_output --partial "write("
 }
 
 @test "Split recorded events into multiple files" {
@@ -423,6 +414,15 @@ Deduced CXXST_TARGET_FILENAME: ${output_file}"
     local result1="${TMP_RESULT_DIR}/example_test_split_1.json"
     local result2="${TMP_RESULT_DIR}/example_test_split_2.json"
     local result3="${TMP_RESULT_DIR}/example_test_split_3.json"
+
+    run "${executable}_bare" "${result1}" "${result2}" "${result3}"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+    refute [ -f "${result2}" ]
+    refute [ -f "${result3}" ]
 
     run "${executable}" "${result1}" "${result2}" "${result3}"
     assert_success
@@ -442,19 +442,6 @@ Deduced CXXST_TARGET_FILENAME: "
     assert [ -f "${result3}" ] # should contain exactly one `counter`:
     assert_equal "$(jq -e '.traceEvents | length' "${result3}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
-
-    # Test the bare version too
-    executable="${BIN_DIR}/cxxst_test_split_files_bare"
-    rm "${result1}" "${result2}" "${result3}"
-
-    run "${executable}" "${result1}" "${result2}" "${result3}"
-    assert_success
-    assert_output ""
-    refute_sanitizer_output
-
-    refute [ -f "${result1}" ]
-    refute [ -f "${result2}" ]
-    refute [ -f "${result3}" ]
 }
 
 @test "Properly read env. variables" {
@@ -462,26 +449,21 @@ Deduced CXXST_TARGET_FILENAME: "
 
     local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
     export CXXST_TARGET_FILENAME="${result1}"
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
+    refute_sanitizer_output
+
+    refute [ -f "${result1}" ]
+
+    local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
+    export CXXST_TARGET_FILENAME="${result2}"
     export CXXST_DEFAULT_BLOCK_SIZE=1
-    run "${executable}" "${result1}"
+    run "${executable}"
     assert_success
     assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
 Deduced CXXST_DEFAULT_BLOCK_SIZE: 1
-Deduced CXXST_TARGET_FILENAME: ${result1}"
-    refute_sanitizer_output
-
-    assert [ -f "${result1}" ]
-    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 3
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 1
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 1
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result1}")" 1
-
-    local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
-    export CXXST_VERBOSE=0
-    export CXXST_TARGET_FILENAME="${result2}"
-    run "${executable}" "${result2}"
-    assert_success
-    assert_output ""
+Deduced CXXST_TARGET_FILENAME: ${result2}"
     refute_sanitizer_output
 
     assert [ -f "${result2}" ]
@@ -490,17 +472,19 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result2}")" 1
 
-    # Test the bare version too
     local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
-    executable="${BIN_DIR}/cxxst_test_reading_env_bare"
-
+    export CXXST_VERBOSE=0
     export CXXST_TARGET_FILENAME="${result3}"
-    run "${executable}" "${result3}"
+    run "${executable}"
     assert_success
     assert_output ""
     refute_sanitizer_output
 
-    refute [ -f "${result3}" ]
+    assert [ -f "${result3}" ]
+    assert_equal "$(jq -e '.traceEvents | length' "${result3}")" 3
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result3}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result3}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
 }
 
 @test "Improper initialization 1" {
@@ -556,7 +540,7 @@ cxxst::submit_instant(char const*, cxxst::scope_t, long long)"
     local nm_output="$output"
 
     # contains internal implementation symbols & `doctest` stuff:
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " cxxst::")" 0
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " cxxst::impl::")" 0
     assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
 }
 
