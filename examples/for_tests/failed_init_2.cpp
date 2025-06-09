@@ -1,0 +1,13 @@
+#include "cxxst/all.hpp"
+
+int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
+  CXXST_flush_global_sink(cxxst::output::format::chrome_trace,
+                          argc > 1 ? argv[1] : "/dev/stdout",
+                          true); // whatever, in this example ...
+
+  // incorrect, because `CXXST_thread_local_sink_reserve(...)` should have been
+  // called:
+  CXXST_mark_complete("will crash on exit ...");
+
+  return 0;
+}
