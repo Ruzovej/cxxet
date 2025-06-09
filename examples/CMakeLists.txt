@@ -78,21 +78,21 @@ add_example(
 )
 
 add_example(
-    cxxst_split_files
+    cxxst_test_split_files
         "for_tests/split_files.cpp"
 )
 
 add_example(
-    cxxst_reading_env
+    cxxst_test_reading_env
         "for_tests/reading_env.cpp"
 )
 
 add_example(
-    cxxst_failed_init_1
+    cxxst_test_failed_init_1
         "for_tests/failed_init_1.cpp"
 )
 
 add_example(
-    cxxst_failed_init_2
+    cxxst_test_failed_init_2
         "for_tests/failed_init_2.cpp"
 )
