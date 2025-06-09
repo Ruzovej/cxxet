@@ -119,15 +119,13 @@ function teardown_file() {
     fi
 }
 
-@test "Bare duration markers example" {
-    run "${BIN_DIR}/cxxst_example_duration_1_bare"
-    assert_success
-    assert_output ""
-}
-
 @test "Duration markers example" {
     local executable="${BIN_DIR}/cxxst_example_duration_1"
     local result="${TMP_RESULT_DIR}/example_duration.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
 
     run "${executable}" "${result}"
     assert_success
@@ -151,15 +149,13 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
-@test "Bare complete markers example" {
-    run "${BIN_DIR}/cxxst_example_complete_1_bare"
-    assert_success
-    assert_output ""
-}
-
 @test "Complete markers example" {
     local executable="${BIN_DIR}/cxxst_example_complete_1"
     local result="${TMP_RESULT_DIR}/example_complete.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
 
     run "${executable}" "${result}"
     assert_success
@@ -183,15 +179,13 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("dur") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
-@test "Bare instant markers 1 example" {
-    run "${BIN_DIR}/cxxst_example_instant_1_bare"
-    assert_success
-    assert_output ""
-}
-
 @test "Instant markers example 1" {
     local executable="${BIN_DIR}/cxxst_example_instant_1"
     local result="${TMP_RESULT_DIR}/example_instant_1.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
 
     run "${executable}" "${result}"
     assert_success
@@ -215,15 +209,13 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("s") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
-@test "Bare instant markers 2 example" {
-    run "${BIN_DIR}/cxxst_example_instant_2_bare"
-    assert_success
-    assert_output ""
-}
-
 @test "Instant markers example 2" {
     local executable="${BIN_DIR}/cxxst_example_instant_2"
     local result="${TMP_RESULT_DIR}/example_instant_2.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
 
     run "${executable}" "${result}"
     assert_success
@@ -251,15 +243,13 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph != "i")] | all(has("name") and has("ph") and has("ts") and has("dur") and has("pid") and has("tid") and (has("s") | not))' "${result}")" 'true'
 }
 
-@test "Bare counter markers 1 example" {
-    run "${BIN_DIR}/cxxst_example_counter_1_bare"
-    assert_success
-    assert_output ""
-}
-
 @test "Counter markers example 1" {
     local executable="${BIN_DIR}/cxxst_example_counter_1"
     local result="${TMP_RESULT_DIR}/example_counter_1.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
 
     run "${executable}" "${result}"
     assert_success
@@ -289,15 +279,13 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_equal "$(jq -e '.traceEvents | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
-@test "Bare counter markers 2 example" {
-    run "${BIN_DIR}/cxxst_example_counter_2_bare"
-    assert_success
-    assert_output ""
-}
-
 @test "Counter markers example 2" {
     local executable="${BIN_DIR}/cxxst_example_counter_2"
     local result="${TMP_RESULT_DIR}/example_counter_2.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
 
     run "${executable}" "${result}"
     assert_success
