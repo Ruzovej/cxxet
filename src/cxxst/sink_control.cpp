@@ -28,9 +28,8 @@ void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
 }
 
 void flush_thread_local_sink() noexcept {
-  if (thread_sink != std::nullopt) {
-    thread_sink->flush();
-  }
+  assert(thread_sink != std::nullopt && "thread local sink not initialized!");
+  thread_sink->flush();
 }
 
 void flush_global_sink(cxxst::output::format const fmt,

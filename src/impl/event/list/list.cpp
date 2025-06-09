@@ -54,6 +54,7 @@ void list::safe_append(any const &event, int const node_capacity) noexcept {
 }
 
 bool list::has_free_capacity(int const capacity) const noexcept {
+  assert(capacity > 0 && "node capacity must be positive!");
   return get_current_free_capacity() >= capacity;
 }
 
@@ -166,9 +167,9 @@ TEST_CASE("event::list") {
         25};
 
     SUBCASE("without reserve()") {
-      REQUIRE(l.has_free_capacity(0));
+      REQUIRE_EQ(l.get_current_free_capacity(), 0);
       l.safe_append(a[0], 5);
-      REQUIRE(l.has_free_capacity(4));
+      REQUIRE_EQ(l.get_current_free_capacity(), 4);
 
       n = l.apply([&counter, &a](long long const, long long const,
                                  event::any const &evt) {
@@ -227,21 +228,21 @@ TEST_CASE("event::list") {
 
     SUBCASE("drain") {
       l.reserve(3);
-      REQUIRE(l.has_free_capacity(3));
+      REQUIRE_EQ(l.get_current_free_capacity(), 3);
       l.append(a[0]);
-      REQUIRE(l.has_free_capacity(2));
+      REQUIRE_EQ(l.get_current_free_capacity(), 2);
       l.append(a[1]);
-      REQUIRE(l.has_free_capacity(1));
+      REQUIRE_EQ(l.get_current_free_capacity(), 1);
 
       event::list other;
       // will have to allocate twice (once here, and once later):
       other.reserve(2);
       other.append(a[2]);
-      REQUIRE(other.has_free_capacity(1));
+      REQUIRE_EQ(other.get_current_free_capacity(), 1);
       other.append(a[3]);
-      REQUIRE(other.has_free_capacity(0));
+      REQUIRE_EQ(other.get_current_free_capacity(), 0);
       other.safe_append(a[4], 4);
-      REQUIRE(other.has_free_capacity(3));
+      REQUIRE(other.get_current_free_capacity() >= 3);
 
       l.drain_other(other);
       n = l.apply([&counter, &a](long long const, long long const,

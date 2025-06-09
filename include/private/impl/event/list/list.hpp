@@ -64,13 +64,13 @@ struct list {
 
   [[nodiscard]] long long size() const noexcept;
 
+  int get_current_free_capacity() const noexcept;
+
 private:
   list(list const &) = delete;
   list &operator=(list const &) = delete;
   list(list &&) = delete;
   list &operator=(list &&) = delete;
-
-  int get_current_free_capacity() const noexcept;
 
   static long long get_pid() noexcept;
 

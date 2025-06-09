@@ -15,6 +15,7 @@ void local_sink::append_event(event::any const &evt) noexcept {
 }
 
 void local_sink::flush() noexcept {
+  assert(parent != this);
   if (parent) {
     parent->drain(*this);
   }
