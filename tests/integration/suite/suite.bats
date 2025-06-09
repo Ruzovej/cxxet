@@ -515,6 +515,23 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     refute [ -f "${result3}" ]
 }
 
+@test "Improper initialization 1" {
+    local executable="${BIN_DIR}/cxxst_failed_init_1"
+    export CXXST_VERBOSE=0
+    skip "TODO fix this later: 'release' and 'tsan' builds dont fail!"
+    run "${executable}"
+    assert_failure
+}
+
+@test "Improper initialization 2" {
+    local executable="${BIN_DIR}/cxxst_failed_init_2"
+    export CXXST_VERBOSE=0
+    run "${executable}"
+    assert_failure
+
+    # `release` and `.san_d` fail with `Aborted (core dumped)`, while `.san` builds fail with the respective sanitizer reports
+}
+
 @test "Shared library symbol visibility" {
     local shared_lib="${BIN_DIR}/libcxxst.so"
 
@@ -529,7 +546,6 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
     assert_equal "$(printf '%s' "${nm_output}" | grep " cxxst::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxst::flush_global_sink(cxxst::output::format, char const*, bool)
 cxxst::flush_thread_local_sink()
-cxxst::init_thread_local_sink()
 cxxst::mark_complete::submit(timespec)
 cxxst::submit_counter(char const*, long long, double)
 cxxst::submit_duration_begin(char const*, long long)

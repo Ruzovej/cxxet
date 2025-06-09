@@ -86,3 +86,13 @@ add_example(
     cxxst_reading_env
         "for_tests/reading_env.cpp"
 )
+
+add_example(
+    cxxst_failed_init_1
+        "for_tests/failed_init_1.cpp"
+)
+
+add_example(
+    cxxst_failed_init_2
+        "for_tests/failed_init_2.cpp"
+)

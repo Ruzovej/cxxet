@@ -5,7 +5,7 @@
 namespace {
 
 void record_some_events() {
-  CXXST_init_thread_local_sink();
+  CXXST_thread_local_sink_reserve();
 
   CXXST_mark_complete("a complete event that disappears");
 

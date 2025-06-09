@@ -18,13 +18,6 @@ impl::central_sink global_sink{sink_props};
 thread_local std::optional<impl::local_sink> thread_sink;
 } // namespace
 
-void init_thread_local_sink() noexcept {
-  assert(thread_sink == std::nullopt &&
-         "thread local sink already initialized!");
-  thread_sink.emplace(&global_sink);
-  thread_sink->reserve(sink_props.default_list_node_capacity);
-}
-
 void thread_local_sink_reserve(int const minimum_free_capacity) noexcept {
   if (thread_sink == std::nullopt) {
     thread_sink.emplace(&global_sink);

@@ -42,21 +42,26 @@ void list::destroy() noexcept {
 }
 
 void list::append(any const &event) noexcept {
-  if (get_current_free_capacity() < 1) {
-    reserve(true);
-  }
   new (&last[1 + last[0].meta.size++].evt) any{event};
 }
 
-void list::set_default_node_capacity(int const capacity) noexcept {
-  assert(capacity > 0);
-  default_capacity = capacity;
+void list::safe_append(any const &event, int const node_capacity) noexcept {
+  assert(node_capacity > 0 && "node capacity must be positive!");
+  if (!has_free_capacity(1)) {
+    reserve(node_capacity);
+  }
+  append(event);
 }
 
-void list::reserve(bool const force) noexcept {
-  if (force || (get_current_free_capacity() < default_capacity)) {
+bool list::has_free_capacity(int const capacity) const noexcept {
+  assert(capacity > 0 && "node capacity must be positive!");
+  return get_current_free_capacity() >= capacity;
+}
+
+void list::reserve(int const capacity) noexcept {
+  if (get_current_free_capacity() < capacity) {
     auto target{first ? &last[0].meta.next : &first};
-    *target = allocate_raw_node_elems(default_capacity);
+    *target = allocate_raw_node_elems(capacity);
     last = *target;
   }
 }
@@ -118,16 +123,8 @@ TEST_CASE("event::list") {
       });
     }
 
-    SUBCASE("after reserve() with default capacity") {
-      l.reserve();
-      n = l.apply([](long long const, long long const, event::any const &) {
-        REQUIRE(false);
-      });
-    }
-
-    SUBCASE("after reserve(1) = non-default capacity") {
-      l.set_default_node_capacity(1);
-      l.reserve();
+    SUBCASE("after reserve(1)") {
+      l.reserve(1);
 
       n = l.apply([](long long const, long long const, event::any const &) {
         REQUIRE(false);
@@ -141,6 +138,8 @@ TEST_CASE("event::list") {
       n = l.apply([](long long const, long long const, event::any const &) {
         REQUIRE(false);
       });
+
+      REQUIRE(other.empty());
     }
 
     REQUIRE_EQ(n, 0);
@@ -168,7 +167,9 @@ TEST_CASE("event::list") {
         25};
 
     SUBCASE("without reserve()") {
-      l.append(a[0]);
+      REQUIRE_EQ(l.get_current_free_capacity(), 0);
+      l.safe_append(a[0], 5);
+      REQUIRE_EQ(l.get_current_free_capacity(), 4);
 
       n = l.apply([&counter, &a](long long const, long long const,
                                  event::any const &evt) {
@@ -179,24 +180,10 @@ TEST_CASE("event::list") {
       REQUIRE_EQ(counter, 1);
     }
 
-    SUBCASE("after reserve() with default capacity") {
-      l.reserve();
-      l.append(a[0]);
-      l.append(a[1]);
-
-      n = l.apply([&counter, &a](long long const, long long const,
-                                 event::any const &evt) {
-        REQUIRE_EQ(evt, a[counter++]);
-      });
-
-      REQUIRE_EQ(counter, 2);
-    }
-
-    SUBCASE("after reserve(2) = non-default capacity") {
-      l.set_default_node_capacity(2);
-      l.reserve();
+    SUBCASE("after reserve()") {
+      l.reserve(2);
       for (auto const &evt : a) {
-        l.append(evt);
+        l.safe_append(evt, 1);
       }
 
       n = l.apply([&counter, &a](long long const, long long const,
@@ -209,8 +196,7 @@ TEST_CASE("event::list") {
 
     SUBCASE("drain other") {
       event::list other;
-      other.set_default_node_capacity(2);
-      other.reserve();
+      other.reserve(2);
       other.append(a[0]);
       other.append(a[1]);
 
@@ -226,6 +212,7 @@ TEST_CASE("event::list") {
 
     SUBCASE("drain other empty") {
       event::list other;
+      l.reserve(2);
       l.append(a[0]);
       l.append(a[1]);
 
@@ -240,16 +227,22 @@ TEST_CASE("event::list") {
     }
 
     SUBCASE("drain") {
-      l.set_default_node_capacity(3); // will have one space left
-      l.reserve();
+      l.reserve(3);
+      REQUIRE_EQ(l.get_current_free_capacity(), 3);
       l.append(a[0]);
+      REQUIRE_EQ(l.get_current_free_capacity(), 2);
       l.append(a[1]);
+      REQUIRE_EQ(l.get_current_free_capacity(), 1);
+
       event::list other;
-      other.set_default_node_capacity(2); // will have to allocate twice
-      other.reserve();
+      // will have to allocate twice (once here, and once later):
+      other.reserve(2);
       other.append(a[2]);
+      REQUIRE_EQ(other.get_current_free_capacity(), 1);
       other.append(a[3]);
-      other.append(a[4]);
+      REQUIRE_EQ(other.get_current_free_capacity(), 0);
+      other.safe_append(a[4], 4);
+      REQUIRE(other.get_current_free_capacity() >= 3);
 
       l.drain_other(other);
       n = l.apply([&counter, &a](long long const, long long const,

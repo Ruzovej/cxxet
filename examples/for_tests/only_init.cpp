@@ -3,9 +3,13 @@
 #include "cxxst/all.hpp"
 
 static void thread_local_sink_lifecycle() {
-  CXXST_init_thread_local_sink();
   CXXST_thread_local_sink_reserve(1);
-  CXXST_flush_thread_local_sink();
+  // do whatever You need between those ...
+  CXXST_flush_thread_local_sink(); // not necessary, it will be flushed
+                                   // implicitly too - unless You want to do
+                                   // more work after that ...
+
+  // more work, that doesn't submit any `cxxst` events
 }
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {

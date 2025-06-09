@@ -34,6 +34,8 @@ struct list {
 
   void append(any const &event) noexcept;
 
+  void safe_append(any const &event, int const node_capacity) noexcept;
+
   template <typename callable_t> long long apply(callable_t &&callable) const {
     static_assert(std::is_invocable_r_v<void, // return type
                                         callable_t,
@@ -52,9 +54,9 @@ struct list {
     return cnt;
   }
 
-  void set_default_node_capacity(int const capacity) noexcept;
+  bool has_free_capacity(int const capacity) const noexcept;
 
-  void reserve(bool const force = false) noexcept;
+  void reserve(int const capacity) noexcept;
 
   void drain_other(list &other) noexcept;
 
@@ -62,18 +64,17 @@ struct list {
 
   [[nodiscard]] long long size() const noexcept;
 
+  int get_current_free_capacity() const noexcept;
+
 private:
   list(list const &) = delete;
   list &operator=(list const &) = delete;
   list(list &&) = delete;
   list &operator=(list &&) = delete;
 
-  int get_current_free_capacity() const noexcept;
-
   static long long get_pid() noexcept;
 
   raw_element *first{nullptr}, *last{nullptr};
-  int default_capacity{64};
 };
 
 } // namespace cxxst::impl::event

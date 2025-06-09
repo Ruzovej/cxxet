@@ -8,7 +8,7 @@ int main(int argc, char const **argv) {
                                                        : "/dev/stdout"};
   CXXST_flush_global_sink(cxxst::output::format::chrome_trace, filename, true);
 
-  CXXST_init_thread_local_sink();
+  CXXST_thread_local_sink_reserve();
 
   CXXST_mark_instant("main thread started");
 
@@ -18,17 +18,17 @@ int main(int argc, char const **argv) {
   // ui.perfetto.dev display it somehow unusably ...
 
   std::thread t1{[]() {
-    CXXST_init_thread_local_sink();
+    CXXST_thread_local_sink_reserve();
     CXXST_mark_instant("thread 1 started");
   }};
 
   std::thread t2{[]() {
-    CXXST_init_thread_local_sink();
+    CXXST_thread_local_sink_reserve();
     CXXST_mark_instant("thread 2 started");
   }};
 
   std::thread t3{[]() {
-    CXXST_init_thread_local_sink();
+    CXXST_thread_local_sink_reserve();
     CXXST_mark_instant("thread 3 started");
   }};
 
