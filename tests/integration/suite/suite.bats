@@ -431,7 +431,7 @@ Deduced CXXST_TARGET_FILENAME: ${output_file}"
 }
 
 @test "Split recorded events into multiple files" {
-    local executable="${BIN_DIR}/cxxst_split_files"
+    local executable="${BIN_DIR}/cxxst_test_split_files"
     local result1="${TMP_RESULT_DIR}/example_test_split_1.json"
     local result2="${TMP_RESULT_DIR}/example_test_split_2.json"
     local result3="${TMP_RESULT_DIR}/example_test_split_3.json"
@@ -456,7 +456,7 @@ Deduced CXXST_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
 
     # Test the bare version too
-    executable="${BIN_DIR}/cxxst_split_files_bare"
+    executable="${BIN_DIR}/cxxst_test_split_files_bare"
     rm "${result1}" "${result2}" "${result3}"
 
     run "${executable}" "${result1}" "${result2}" "${result3}"
@@ -470,7 +470,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Properly read env. variables" {
-    local executable="${BIN_DIR}/cxxst_reading_env"
+    local executable="${BIN_DIR}/cxxst_test_reading_env"
 
     local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
     export CXXST_TARGET_FILENAME="${result1}"
@@ -504,7 +504,7 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
 
     # Test the bare version too
     local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
-    executable="${BIN_DIR}/cxxst_reading_env_bare"
+    executable="${BIN_DIR}/cxxst_test_reading_env_bare"
 
     export CXXST_TARGET_FILENAME="${result3}"
     run "${executable}" "${result3}"
@@ -516,7 +516,7 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
 }
 
 @test "Improper initialization 1" {
-    local executable="${BIN_DIR}/cxxst_failed_init_1"
+    local executable="${BIN_DIR}/cxxst_test_failed_init_1"
     export CXXST_VERBOSE=0
     skip "TODO fix this later: 'release' and 'tsan' builds dont fail!"
     run "${executable}"
@@ -524,7 +524,7 @@ Deduced CXXST_TARGET_FILENAME: ${result1}"
 }
 
 @test "Improper initialization 2" {
-    local executable="${BIN_DIR}/cxxst_failed_init_2"
+    local executable="${BIN_DIR}/cxxst_test_failed_init_2"
     export CXXST_VERBOSE=0
     run "${executable}"
     assert_failure
@@ -577,42 +577,14 @@ cxxst::submit_instant(char const*, cxxst::scope_t, long long)"
         skip "shared lib. not found - probably built as a static library"
     fi
 
-    run ldd "${BIN_DIR}/cxxst_unit_tests"
-    refute_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_complete_1"
-    assert_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_counter_2"
-    assert_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_instant_1"
-    assert_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_counter_1"
-    assert_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_duration_1"
-    assert_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_instant_2"
-    assert_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_complete_1_bare"
-    refute_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_counter_2_bare"
-    refute_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_instant_1_bare"
-    refute_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_counter_1_bare"
-    refute_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_duration_1_bare"
-    refute_output --partial "libcxxst.so"
-
-    run ldd "${BIN_DIR}/cxxst_example_instant_2_bare"
-    refute_output --partial "libcxxst.so"
+    for file in "${BIN_DIR}"/cxxst_*; do
+        # user_log "# checking file '%s'\n" "${file}"
+        run ldd "${file}"
+        assert_success
+        if [[ "${file}" =~ _bare$ || "${file}" =~ cxxst_unit_tests$ ]]; then
+            refute_output --partial "libcxxst.so"
+        else
+            assert_output --partial "libcxxst.so"
+        fi
+    done
 }
