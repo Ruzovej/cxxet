@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef CXXST_ENABLE
+
 #include "cxxst/macros/implicit_name.h"
 #include "cxxst/mark_complete.hpp"
 #include "cxxst/mark_counter.hpp"
@@ -41,3 +43,25 @@
 #define CXXST_sink_thread_flush() cxxst::sink_thread_flush()
 
 #define CXXST_sink_global_flush(...) cxxst::sink_global_flush(__VA_ARGS__)
+
+#else
+
+#define CXXST_mark_complete(...)
+
+#define CXXST_mark_counters(...)
+
+#define CXXST_mark_duration(...)
+
+#define CXXST_mark_duration_begin(...)
+
+#define CXXST_mark_duration_end(...)
+
+#define CXXST_mark_instant(...)
+
+#define CXXST_sink_thread_reserve(...)
+
+#define CXXST_sink_thread_flush()
+
+#define CXXST_sink_global_flush(...)
+
+#endif

@@ -212,12 +212,18 @@ endif()
 target_include_directories(
     cxxst
         PUBLIC
+        "include/all"
         "include/public"
 )
 target_include_directories(
     cxxst
         PRIVATE
         "include/private"
+)
+target_compile_definitions(
+    cxxst
+        PUBLIC
+        CXXST_ENABLE
 )
 
 add_library(
@@ -227,7 +233,7 @@ add_library(
 target_include_directories(
     cxxst_bare
         INTERFACE
-        "include/bare"
+        "include/all"
 )
 
 if (CXXST_BUILD_EXAMPLES)
