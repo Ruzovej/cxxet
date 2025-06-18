@@ -15,8 +15,8 @@ int main(int argc, char const **argv) {
   {
     CXXST_mark_complete("main thread, local scope");
 
-    // Unfortunately, using non-default scope (== `cxxst::scope_t::thread`), makes `chrome`
-    // & ui.perfetto.dev display it somehow unusably ...
+    // Unfortunately, using non-default scope (== `cxxst::scope_t::thread`),
+    // makes `chrome` & ui.perfetto.dev display it somehow unusably ...
 
     std::thread t1{[]() {
       CXXST_sink_thread_reserve();
