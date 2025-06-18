@@ -153,7 +153,7 @@ file(
     GLOB_RECURSE
     CXXST_LIB_SOURCES
         CONFIGURE_DEPENDS
-        "src/*.cpp"
+        "src/*.cxx"
 )
 
 # tests, etc.:
@@ -169,7 +169,7 @@ if (CXXST_BUILD_TESTS)
 
     add_executable(
         cxxst_unit_tests
-            tests/unit/doctest_main.cpp
+            tests/unit/doctest_main.cxx
             ${CXXST_LIB_SOURCES}
     )
     target_include_directories(
