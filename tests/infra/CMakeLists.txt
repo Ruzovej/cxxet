@@ -1,5 +1,5 @@
 add_executable(
     infra_sanitizer_check
-        san_check.cpp
+        san_check.cxx
 )
 add_sanitizers(infra_sanitizer_check)

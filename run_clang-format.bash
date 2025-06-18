@@ -9,7 +9,7 @@ fi
 
 find \
     examples include src tests \
-    \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) \
+    \( -name "*.cxx" -o -name "*.hxx" -o -name "*.c" -o -name "*.h" \) \
     -type f \
     -exec \
         clang-format -i {} \;
