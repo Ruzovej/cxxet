@@ -1,5 +1,5 @@
 /*
-  Copyright 2025 Lukáš Růžička (ruzovej@gmail.com, https://github.com/Ruzovej/cxxet)
+  Copyright 2025 Lukáš Růžička
 
   This file is part of cxxet.
 
