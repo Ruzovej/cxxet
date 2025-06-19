@@ -28,10 +28,6 @@ struct sink {
   sink() noexcept;
   virtual ~sink() noexcept;
 
-  void flush_to_file(long long const time_point_zero,
-                     cxxet::output::format const fmt,
-                     char const *const filename) noexcept;
-
   virtual void drain(sink &other) noexcept;
 
 protected:

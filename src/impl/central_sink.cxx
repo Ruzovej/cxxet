@@ -50,7 +50,17 @@ void central_sink::drain(sink &other) noexcept {
 }
 
 void central_sink::do_flush() noexcept {
-  flush_to_file(time_point, fmt, target_filename);
+  if (!events.empty()) {
+    try {
+      if (target_filename) {
+        // is `time_point_zero` needed?!
+        dump_records(events, time_point, fmt, target_filename);
+      }
+      events.destroy();
+    } catch (std::exception const &e) {
+      std::cerr << "Failed to dump records: " << e.what() << '\n';
+    }
+  }
   // to avoid flushing again & rewriting the file implicitly ...:
   target_filename = nullptr;
 }
