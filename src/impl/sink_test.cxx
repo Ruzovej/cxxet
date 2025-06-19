@@ -19,8 +19,12 @@
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
+#include "impl/cascade_sink.hxx"
+#include "impl/cascade_sink_thread_safe.hxx"
 #include "impl/file_sink.hxx"
 #include "impl/thread_sink.hxx"
+
+#include <thread>
 
 #include <doctest/doctest.h>
 
@@ -164,7 +168,7 @@ TEST_CASE("sink cascade") {
     test_sink<file_sink> root{traits};
 
     {
-      test_sink<thread_sink> leaf{&root};
+      thread_sink leaf{&root};
       leaf.reserve(traits.default_list_node_capacity);
       leaf.append_event(a[0]);
     }
@@ -185,17 +189,14 @@ TEST_CASE("sink cascade") {
     test_sink<file_sink> root{traits};
 
     {
-      test_sink<cascade_sink> intermediate{&root};
-      {
+      cascade_sink intermediate{&root};
+      auto const test_fn = [&intermediate, &traits](event::any const &evt) {
         test_sink<thread_sink> leaf{&intermediate};
         leaf.reserve(traits.default_list_node_capacity);
-        leaf.append_event(a[0]);
-      }
-      {
-        test_sink<thread_sink> leaf{&intermediate};
-        leaf.reserve(traits.default_list_node_capacity);
-        leaf.append_event(a[1]);
-      }
+        leaf.append_event(evt);
+      };
+      test_fn(a[0]);
+      test_fn(a[1]);
     }
 
     n = root.apply([&counter, &a](long long const, long long const,
@@ -206,6 +207,39 @@ TEST_CASE("sink cascade") {
     REQUIRE(!root.empty());
     REQUIRE_EQ(n, counter);
     REQUIRE_EQ(counter, 2);
+  }
+
+  SUBCASE("intermediate cascade_sink_thread_safe usage") {
+    sink_properties traits{};
+    traits.set_target_filename("/dev/null");
+    test_sink<file_sink> root{traits};
+
+    {
+      cascade_sink_thread_safe intermediate{&root};
+      auto const test_fn = [&intermediate, &traits](event::any const &evt) {
+        test_sink<thread_sink> leaf{&intermediate};
+        leaf.reserve(traits.default_list_node_capacity);
+        leaf.append_event(evt);
+      };
+      // same indexes ... because order wouldn't be guaranteed:
+      std::thread t1{test_fn, a[0]};
+      std::thread t2{test_fn, a[0]};
+
+      test_fn(a[0]);
+
+      t1.join();
+      t2.join();
+    }
+
+    n = root.apply([&counter, &a](long long const, long long const,
+                                  event::any const &evt) {
+      counter++;
+      REQUIRE_EQ(evt, a[0]);
+    });
+
+    REQUIRE(!root.empty());
+    REQUIRE_EQ(n, counter);
+    REQUIRE_EQ(counter, 3);
   }
 }
 

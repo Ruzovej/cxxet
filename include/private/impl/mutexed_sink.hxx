@@ -25,7 +25,7 @@
 
 namespace cxxet::impl {
 
-struct mutexed_sink : sink {
+struct mutexed_sink : virtual sink {
   mutexed_sink() noexcept;
   ~mutexed_sink() noexcept override;
 

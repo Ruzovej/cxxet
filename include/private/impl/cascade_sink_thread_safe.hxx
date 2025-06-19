@@ -19,23 +19,21 @@
 
 #pragma once
 
-#include "impl/sink.hxx"
+#include "impl/cascade_sink.hxx"
+#include "impl/mutexed_sink.hxx"
 
 namespace cxxet::impl {
 
-struct cascade_sink : virtual sink {
-  explicit cascade_sink(sink *aParent) noexcept;
-  ~cascade_sink() noexcept override;
-
-  void flush() noexcept;
+struct cascade_sink_thread_safe : cascade_sink, mutexed_sink {
+  explicit cascade_sink_thread_safe(sink *aParent) noexcept;
+  ~cascade_sink_thread_safe() noexcept override;
 
 private:
-  cascade_sink(cascade_sink const &) = delete;
-  cascade_sink &operator=(cascade_sink const &) = delete;
-  cascade_sink(cascade_sink &&) = delete;
-  cascade_sink &operator=(cascade_sink &&) = delete;
-
-  sink *parent;
+  cascade_sink_thread_safe(cascade_sink_thread_safe const &) = delete;
+  cascade_sink_thread_safe &
+  operator=(cascade_sink_thread_safe const &) = delete;
+  cascade_sink_thread_safe(cascade_sink_thread_safe &&) = delete;
+  cascade_sink_thread_safe &operator=(cascade_sink_thread_safe &&) = delete;
 };
 
 } // namespace cxxet::impl

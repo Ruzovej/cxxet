@@ -17,25 +17,15 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "impl/cascade_sink_thread_safe.hxx"
 
-#include "impl/sink.hxx"
+#include <cassert>
 
 namespace cxxet::impl {
 
-struct cascade_sink : virtual sink {
-  explicit cascade_sink(sink *aParent) noexcept;
-  ~cascade_sink() noexcept override;
+cascade_sink_thread_safe::cascade_sink_thread_safe(sink *aParent) noexcept
+    : cascade_sink{aParent}, mutexed_sink{} {}
 
-  void flush() noexcept;
-
-private:
-  cascade_sink(cascade_sink const &) = delete;
-  cascade_sink &operator=(cascade_sink const &) = delete;
-  cascade_sink(cascade_sink &&) = delete;
-  cascade_sink &operator=(cascade_sink &&) = delete;
-
-  sink *parent;
-};
+cascade_sink_thread_safe::~cascade_sink_thread_safe() noexcept = default;
 
 } // namespace cxxet::impl
