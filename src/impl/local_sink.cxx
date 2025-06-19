@@ -21,8 +21,6 @@
 
 #include <cassert>
 
-#include <iostream>
-
 namespace cxxet::impl {
 
 local_sink::local_sink(sink *aParent) noexcept : parent{aParent} {}
