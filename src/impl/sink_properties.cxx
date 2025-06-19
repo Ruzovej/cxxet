@@ -50,7 +50,7 @@ value_t parse_env_variable(char const *env_var_name, parse_fn_t const &parse_fn,
   if (verbose) {
     std::cout << "Deduced " << env_var_name << ": ";
     if constexpr (std::is_enum_v<value_t>) {
-      std::cout << static_cast<std::underlying_type_t<value_t>>(value);
+      std::cout << static_cast<long long>(value);
     } else {
       std::cout << value;
     }
