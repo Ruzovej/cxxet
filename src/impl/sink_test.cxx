@@ -178,6 +178,35 @@ TEST_CASE("sink cascade") {
     REQUIRE_EQ(n, counter);
     REQUIRE_EQ(counter, 1);
   }
+
+  SUBCASE("intermediate cascade_sink usage") {
+    sink_properties traits{};
+    traits.set_target_filename("/dev/null");
+    test_sink<file_sink> root{traits};
+
+    {
+      test_sink<cascade_sink> intermediate{&root};
+      {
+        test_sink<thread_sink> leaf{&intermediate};
+        leaf.reserve(traits.default_list_node_capacity);
+        leaf.append_event(a[0]);
+      }
+      {
+        test_sink<thread_sink> leaf{&intermediate};
+        leaf.reserve(traits.default_list_node_capacity);
+        leaf.append_event(a[1]);
+      }
+    }
+
+    n = root.apply([&counter, &a](long long const, long long const,
+                                  event::any const &evt) {
+      REQUIRE_EQ(evt, a[counter++]);
+    });
+
+    REQUIRE(!root.empty());
+    REQUIRE_EQ(n, counter);
+    REQUIRE_EQ(counter, 2);
+  }
 }
 
 } // namespace cxxet::impl
