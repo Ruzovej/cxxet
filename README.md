@@ -4,6 +4,10 @@ TODO ...
 
 [Examples are here](examples/README.md).
 
+## License
+
+![LGPLv3 License](doc/lgplv3-with-text-154x68.png)
+
 ## Explorations
 
 ### Various formats - are they feasible, widely used, etc.?
