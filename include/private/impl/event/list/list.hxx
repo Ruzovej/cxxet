@@ -6,7 +6,7 @@
 
 #include "impl/event/any.hxx"
 
-namespace cxxst::impl::event {
+namespace cxxet::impl::event {
 
 struct list {
   union raw_element;
@@ -77,4 +77,4 @@ private:
   raw_element *first{nullptr}, *last{nullptr};
 };
 
-} // namespace cxxst::impl::event
+} // namespace cxxet::impl::event

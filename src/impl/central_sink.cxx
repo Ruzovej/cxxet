@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-#include "cxxst/timepoint.hxx"
+#include "cxxet/timepoint.hxx"
 #include "impl/dump_records.hxx"
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 central_sink::central_sink(sink_properties const &traits)
     : time_point{as_int_ns(now())}, fmt(traits.target_format),
@@ -37,4 +37,4 @@ void central_sink::do_flush() noexcept {
   target_filename = nullptr;
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

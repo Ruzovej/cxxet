@@ -7,7 +7,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 namespace {
 
@@ -67,15 +67,15 @@ char const *parse_string(char const *const str_value) { return str_value; }
 } // namespace
 
 sink_properties::sink_properties() noexcept
-    : verbose{parse_env_variable("CXXST_VERBOSE", parse_bool, false, false)},
-      target_format{parse_env_variable("CXXST_OUTPUT_FORMAT",
+    : verbose{parse_env_variable("CXXET_VERBOSE", parse_bool, false, false)},
+      target_format{parse_env_variable("CXXET_OUTPUT_FORMAT",
                                        parse_output_format,
                                        output::format::chrome_trace, verbose)},
-      default_list_node_capacity{parse_env_variable("CXXST_DEFAULT_BLOCK_SIZE",
+      default_list_node_capacity{parse_env_variable("CXXET_DEFAULT_BLOCK_SIZE",
                                                     parse_int, 64, verbose)},
-      target_filename{parse_env_variable("CXXST_TARGET_FILENAME", parse_string,
+      target_filename{parse_env_variable("CXXET_TARGET_FILENAME", parse_string,
                                          nullptr, verbose)} {
   // ...
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

@@ -1,4 +1,4 @@
-#include "cxxst/sink_control.hxx"
+#include "cxxet/sink_control.hxx"
 #include "impl/thread_local_sink_submit_event.hxx"
 
 #include <cassert>
@@ -10,7 +10,7 @@
 #include "impl/local_sink.hxx"
 #include "impl/sink_properties.hxx"
 
-namespace cxxst {
+namespace cxxet {
 
 namespace {
 impl::sink_properties const sink_props{};
@@ -32,7 +32,7 @@ void sink_thread_flush() noexcept {
   thread_sink->flush();
 }
 
-void sink_global_flush(cxxst::output::format const fmt,
+void sink_global_flush(cxxet::output::format const fmt,
                        char const *const filename,
                        bool const defer_flush) noexcept {
   global_sink.flush(fmt, filename, defer_flush);
@@ -46,4 +46,4 @@ void thread_local_sink_submit_event(event::any const &evt) noexcept {
 }
 
 } // namespace impl
-} // namespace cxxst
+} // namespace cxxet

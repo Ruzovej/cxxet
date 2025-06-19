@@ -1,11 +1,11 @@
 #pragma once
 
-#include "cxxst/macros/linkage.h"
-#include "cxxst/timepoint.hxx"
+#include "cxxet/macros/linkage.h"
+#include "cxxet/timepoint.hxx"
 
-namespace cxxst {
+namespace cxxet {
 
-struct CXXST_IMPL_API mark_complete {
+struct CXXET_IMPL_API mark_complete {
   inline mark_complete(char const *aDesc) noexcept
       : desc{aDesc}, start{impl::now()} {}
 
@@ -23,4 +23,4 @@ private:
   impl::timepoint_t const start;
 };
 
-} // namespace cxxst
+} // namespace cxxet

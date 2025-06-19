@@ -9,7 +9,7 @@
 #error "Unsupported platform"
 #endif
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 using timepoint_t = struct timespec;
 
@@ -33,4 +33,4 @@ using timepoint_t = struct timespec;
   return static_cast<long long>(t.tv_sec * 1'000'000'000 + t.tv_nsec);
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

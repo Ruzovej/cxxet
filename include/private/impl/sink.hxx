@@ -1,16 +1,16 @@
 #pragma once
 
-#include "cxxst/output_format.hxx"
+#include "cxxet/output_format.hxx"
 #include "impl/event/list/list.hxx"
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 struct sink {
   sink() noexcept;
   virtual ~sink() noexcept;
 
   void flush_to_file(long long const time_point_zero,
-                     cxxst::output::format const fmt,
+                     cxxet::output::format const fmt,
                      char const *const filename) noexcept;
 
   virtual void drain(sink &other) noexcept;
@@ -25,4 +25,4 @@ private:
   sink &operator=(sink &&) = delete;
 };
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

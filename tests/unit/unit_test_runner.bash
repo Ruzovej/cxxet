@@ -34,12 +34,12 @@ function unit_test_runner() {
             printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Executing %s unit tests:\n' "${preset}"
             if [[ "${round}" -eq 1 ]]; then
                 ./compile.bash \
-                    -DCXXST_BUILD_TESTS=ON \
+                    -DCXXET_BUILD_TESTS=ON \
                     --preset "${preset}" \
-                    --target cxxst_unit_tests \
+                    --target cxxet_unit_tests \
                     --polite-ln-compile_commands
             fi
-            "bin/${preset}/cxxst_unit_tests" \
+            "bin/${preset}/cxxet_unit_tests" \
                 --no-intro
             printf '\n'
         done

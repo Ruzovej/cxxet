@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(
-    cplusplus_simple_tracing
-    DESCRIPTION "TODO"
+    cxxet
+    DESCRIPTION "C++ easy tracing"
     LANGUAGES CXX # TODO later maybe even `C`?!
 )
 
@@ -16,30 +16,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # options:
-set(CXXST_BUILD_EXAMPLES "OFF" CACHE BOOL "Build all examples")
-set(CXXST_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
-set(CXXST_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
-set(CXXST_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
-set(CXXST_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
+set(CXXET_BUILD_EXAMPLES "OFF" CACHE BOOL "Build all examples")
+set(CXXET_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
+set(CXXET_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
+set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
+set(CXXET_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
 # implied by options:
-set(CXXST_LIB_KIND "STATIC")
-if (CXXST_BUILD_SHARED)
-    set(CXXST_LIB_KIND "SHARED")
+set(CXXET_LIB_KIND "STATIC")
+if (CXXET_BUILD_SHARED)
+    set(CXXET_LIB_KIND "SHARED")
 endif()
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CXXST_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CXXST_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CXXST_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
 
-if (CXXST_WITH_ASAN AND CXXST_WITH_TSAN)
+if (CXXET_WITH_ASAN AND CXXET_WITH_TSAN)
     message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
 endif()
 
-if (CXXST_WITH_ASAN OR CXXST_WITH_TSAN)
-    set(CXXST_BUILD_TESTS "ON")
+if (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
+    set(CXXET_BUILD_TESTS "ON")
 else()
-    set(CXXST_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
+    set(CXXET_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
 endif()
 
 include(FetchContent)
@@ -48,7 +48,7 @@ function(add_unix_compiler_flags target)
     # TODO
     # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
     # * refactor:
-    set(CXXST_UNIX_COMPILER_FLAGS
+    set(CXXET_UNIX_COMPILER_FLAGS
         -Wall
         -Wextra
         -pedantic
@@ -68,8 +68,8 @@ function(add_unix_compiler_flags target)
     )
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         set(
-            CXXST_COMPILER_FLAGS
-                ${CXXST_UNIX_COMPILER_FLAGS}
+            CXXET_COMPILER_FLAGS
+                ${CXXET_UNIX_COMPILER_FLAGS}
                 -Wduplicated-cond
                 -Wduplicated-branches
                 -Wlogical-op
@@ -77,8 +77,8 @@ function(add_unix_compiler_flags target)
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(
-            CXXST_COMPILER_FLAGS
-                ${CXXST_UNIX_COMPILER_FLAGS}
+            CXXET_COMPILER_FLAGS
+                ${CXXET_UNIX_COMPILER_FLAGS}
                 -Weffc++
         )
     endif()
@@ -86,7 +86,7 @@ function(add_unix_compiler_flags target)
     target_compile_options(
         ${target}
             PUBLIC
-            ${CXXST_COMPILER_FLAGS}
+            ${CXXET_COMPILER_FLAGS}
     )
 endfunction()
 
@@ -109,12 +109,12 @@ function(add_sanitizers target)
         )
     endfunction()
 
-    if (CXXST_WITH_ASAN)
+    if (CXXET_WITH_ASAN)
         add_sanitizer(${target} address)
         add_sanitizer(${target} leak)
         add_sanitizer(${target} undefined)
     endif()
-    if (CXXST_WITH_TSAN)
+    if (CXXET_WITH_TSAN)
         add_sanitizer(${target} thread)
     endif()
 
@@ -132,7 +132,7 @@ function(add_sanitizers target)
                 -fPIC
         )
     else()
-        if (CXXST_WITH_ASAN OR CXXST_WITH_TSAN)
+        if (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
             target_compile_options(
                 ${target}
                     PUBLIC
@@ -151,13 +151,13 @@ endfunction()
 # https://cmake.org/cmake/help/latest/command/file.html#filesystem
 file(
     GLOB_RECURSE
-    CXXST_LIB_SOURCES
+    CXXET_LIB_SOURCES
         CONFIGURE_DEPENDS
         "src/*.cxx"
 )
 
 # tests, etc.:
-if (CXXST_BUILD_TESTS)
+if (CXXET_BUILD_TESTS)
     add_subdirectory(tests/infra)
 
     FetchContent_Declare(
@@ -168,74 +168,74 @@ if (CXXST_BUILD_TESTS)
     FetchContent_MakeAvailable(doctest)
 
     add_executable(
-        cxxst_unit_tests
+        cxxet_unit_tests
             tests/unit/doctest_main.cxx
-            ${CXXST_LIB_SOURCES}
+            ${CXXET_LIB_SOURCES}
     )
     target_include_directories(
-        cxxst_unit_tests
+        cxxet_unit_tests
             PRIVATE
             "include/public"
             "include/private"
     )
     target_link_libraries(
-        cxxst_unit_tests
+        cxxet_unit_tests
             PRIVATE
             doctest::doctest
     )
     target_compile_definitions(
-        cxxst_unit_tests
+        cxxet_unit_tests
             PRIVATE
-            CXXST_WITH_UNIT_TESTS
+            CXXET_WITH_UNIT_TESTS
             DOCTEST_CONFIG_SUPER_FAST_ASSERTS
             DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
     )
-    add_unix_compiler_flags(cxxst_unit_tests)
-    add_sanitizers(cxxst_unit_tests)
+    add_unix_compiler_flags(cxxet_unit_tests)
+    add_sanitizers(cxxet_unit_tests)
 endif()
 
 add_library(
-    cxxst
-        ${CXXST_LIB_KIND}
-        ${CXXST_LIB_SOURCES}
+    cxxet
+        ${CXXET_LIB_KIND}
+        ${CXXET_LIB_SOURCES}
 )
-add_unix_compiler_flags(cxxst)
-add_sanitizers(cxxst)
-if (CXXST_BUILD_SHARED)
+add_unix_compiler_flags(cxxet)
+add_sanitizers(cxxet)
+if (CXXET_BUILD_SHARED)
     set_target_properties( # seems useful -> TODO polish it later
-        cxxst
+        cxxet
             PROPERTIES
             VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
             SOVERSION 0 # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
     )
 endif()
 target_include_directories(
-    cxxst
+    cxxet
         PUBLIC
         "include/all"
         "include/public"
 )
 target_include_directories(
-    cxxst
+    cxxet
         PRIVATE
         "include/private"
 )
 target_compile_definitions(
-    cxxst
+    cxxet
         PUBLIC
-        CXXST_ENABLE
+        CXXET_ENABLE
 )
 
 add_library(
-    cxxst_bare
+    cxxet_bare
         INTERFACE
 )
 target_include_directories(
-    cxxst_bare
+    cxxet_bare
         INTERFACE
         "include/all"
 )
 
-if (CXXST_BUILD_EXAMPLES)
+if (CXXET_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()

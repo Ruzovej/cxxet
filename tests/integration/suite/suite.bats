@@ -25,21 +25,21 @@ function setup_file() {
     run which nm
     assert_success
 
-    user_log "# configuring and building with preset '%s' ... " "${CXXST_PRESET}"
+    user_log "# configuring and building with preset '%s' ... " "${CXXET_PRESET}"
     ./compile.bash \
-        -DCXXST_BUILD_TESTS=ON \
-        -DCXXST_BUILD_EXAMPLES=ON \
-        --preset "${CXXST_PRESET}" \
+        -DCXXET_BUILD_TESTS=ON \
+        -DCXXET_BUILD_EXAMPLES=ON \
+        --preset "${CXXET_PRESET}" \
         --target infra_sanitizer_check \
-        --target cxxst_examples \
-        --target cxxst_unit_tests \
+        --target cxxet_examples \
+        --target cxxet_unit_tests \
         --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
     user_log 'done\n'
 
-    export BIN_DIR="bin/${CXXST_PRESET}"
-    export CXXST_DEFAULT_BLOCK_SIZE=2
-    export CXXST_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxst.suite.bats.${CXXST_PRESET}.XXXXXX")"
+    export BIN_DIR="bin/${CXXET_PRESET}"
+    export CXXET_DEFAULT_BLOCK_SIZE=2
+    export CXXET_VERBOSE=1
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.suite.bats.${CXXET_PRESET}.XXXXXX")"
 }
 
 function setup() {
@@ -81,7 +81,7 @@ function teardown_file() {
 
 @test "Sanitizers work as expected" {
     local san_check="${BIN_DIR}/infra_sanitizer_check"
-    if [[ "${CXXST_PRESET}" =~ asan* ]]; then
+    if [[ "${CXXET_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
         assert_output --partial "runtime error: index 2 out of bounds for type 'int [2]'"
@@ -94,7 +94,7 @@ function teardown_file() {
         run "${san_check}" ubsan
         assert_failure
         assert_output --partial 'runtime error: left shift of negative value -1'
-    elif [[ "${CXXST_PRESET}" =~ tsan* ]]; then
+    elif [[ "${CXXET_PRESET}" =~ tsan* ]]; then
         run "${san_check}" tsan
         assert_failure
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
@@ -120,7 +120,7 @@ function teardown_file() {
 }
 
 @test "Duration markers example" {
-    local executable="${BIN_DIR}/cxxst_example_duration_1"
+    local executable="${BIN_DIR}/cxxet_example_duration_1"
     local result="${TMP_RESULT_DIR}/example_duration.json"
 
     run "${executable}_bare"
@@ -129,9 +129,9 @@ function teardown_file() {
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     assert [ -f "${result}" ]
@@ -150,7 +150,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Complete markers example" {
-    local executable="${BIN_DIR}/cxxst_example_complete_1"
+    local executable="${BIN_DIR}/cxxet_example_complete_1"
     local result="${TMP_RESULT_DIR}/example_complete.json"
 
     run "${executable}_bare"
@@ -159,9 +159,9 @@ Deduced CXXST_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     assert [ -f "${result}" ]
@@ -180,7 +180,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Instant markers example 1" {
-    local executable="${BIN_DIR}/cxxst_example_instant_1"
+    local executable="${BIN_DIR}/cxxet_example_instant_1"
     local result="${TMP_RESULT_DIR}/example_instant_1.json"
 
     run "${executable}_bare"
@@ -189,9 +189,9 @@ Deduced CXXST_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     assert [ -f "${result}" ]
@@ -210,7 +210,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Instant markers example 2" {
-    local executable="${BIN_DIR}/cxxst_example_instant_2"
+    local executable="${BIN_DIR}/cxxet_example_instant_2"
     local result="${TMP_RESULT_DIR}/example_instant_2.json"
 
     run "${executable}_bare"
@@ -219,9 +219,9 @@ Deduced CXXST_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     assert [ -f "${result}" ]
@@ -244,7 +244,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Counter markers example 1" {
-    local executable="${BIN_DIR}/cxxst_example_counter_1"
+    local executable="${BIN_DIR}/cxxet_example_counter_1"
     local result="${TMP_RESULT_DIR}/example_counter_1.json"
 
     run "${executable}_bare"
@@ -253,9 +253,9 @@ Deduced CXXST_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     assert [ -f "${result}" ]
@@ -280,7 +280,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Counter markers example 2" {
-    local executable="${BIN_DIR}/cxxst_example_counter_2"
+    local executable="${BIN_DIR}/cxxet_example_counter_2"
     local result="${TMP_RESULT_DIR}/example_counter_2.json"
 
     run "${executable}_bare"
@@ -289,9 +289,9 @@ Deduced CXXST_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     assert [ -f "${result}" ]
@@ -308,7 +308,7 @@ Deduced CXXST_TARGET_FILENAME: "
 
     assert_equal "$(jq -e -c '[.traceEvents[] | select(.ph == "C")] | map(.args | keys[]) | unique | sort' "${result}")" '["x","y"]'
 
-    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["CXXST_sink_thread_reserve","Counter","Counter example 2","Euler method iterations"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["CXXET_sink_thread_reserve","Counter","Counter example 2","Euler method iterations"]'
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
@@ -317,7 +317,7 @@ Deduced CXXST_TARGET_FILENAME: "
 # * All event types in one file.
 
 @test "Initialization alone" {
-    local executable="${BIN_DIR}/cxxst_test_init"
+    local executable="${BIN_DIR}/cxxet_test_init"
     local result="${TMP_RESULT_DIR}/example_test_init.json"
 
     run "${executable}_bare" "${result}"
@@ -329,14 +329,14 @@ Deduced CXXST_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     refute [ -f "${result}" ]
 
-    export CXXST_VERBOSE=0
+    export CXXET_VERBOSE=0
 
     run "${executable}" "${result}"
     assert_success
@@ -347,7 +347,7 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Empty or incomplete file - events recorded but incorrectly flushed" {
-    local executable="${BIN_DIR}/cxxst_test_empty_file_1"
+    local executable="${BIN_DIR}/cxxet_test_empty_file_1"
     local result1="${TMP_RESULT_DIR}/example_test_empty_file_1.json"
     local result2="${TMP_RESULT_DIR}/example_test_empty_file_2.json"
     local result3="${TMP_RESULT_DIR}/example_test_empty_file_3.json"
@@ -363,9 +363,9 @@ Deduced CXXST_TARGET_FILENAME: "
 
     run "${executable}" "${result1}" "${result2}" "${result3}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     refute [ -f "${result1}" ]
@@ -376,11 +376,11 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Empty file - forgetting to specify it" {
-    if [[ "${CXXST_PRESET}" =~ .san* ]]; then
+    if [[ "${CXXET_PRESET}" =~ .san* ]]; then
         skip "strace doesn't work with sanitizers"
     fi
 
-    local executable="${BIN_DIR}/cxxst_test_empty_file_2"
+    local executable="${BIN_DIR}/cxxet_test_empty_file_2"
 
     run strace "${executable}_bare"
     assert_success
@@ -390,27 +390,27 @@ Deduced CXXST_TARGET_FILENAME: "
     run strace "${executable}"
     assert_success
     refute_sanitizer_output
-    assert_output --partial "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     assert_output --partial "write(1, "
     refute_output --regexp "write\([^1]" # `stdout` ... see the asserts above which requires exactly that
 
-    local output_file="${TMP_RESULT_DIR}/cxxst_test_empty_file_2.json"
-    export CXXST_TARGET_FILENAME="${output_file}"
+    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file_2.json"
+    export CXXET_TARGET_FILENAME="${output_file}"
     run strace "${executable}"
     assert_success
     refute_sanitizer_output
-    assert_output --partial "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: ${output_file}"
+    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: ${output_file}"
     assert_output --partial "write(1, "
     refute_output --regexp "write\([^1]" # ditto
     refute [ -f "${output_file}" ]       # internally this setting was overwritten ...
 }
 
 @test "Split recorded events into multiple files" {
-    local executable="${BIN_DIR}/cxxst_test_split_files"
+    local executable="${BIN_DIR}/cxxet_test_split_files"
     local result1="${TMP_RESULT_DIR}/example_test_split_1.json"
     local result2="${TMP_RESULT_DIR}/example_test_split_2.json"
     local result3="${TMP_RESULT_DIR}/example_test_split_3.json"
@@ -426,9 +426,9 @@ Deduced CXXST_TARGET_FILENAME: ${output_file}"
 
     run "${executable}" "${result1}" "${result2}" "${result3}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXST_TARGET_FILENAME: "
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
     assert [ -f "${result1}" ] # should contain exactly one `complete`:
@@ -445,10 +445,10 @@ Deduced CXXST_TARGET_FILENAME: "
 }
 
 @test "Properly read env. variables" {
-    local executable="${BIN_DIR}/cxxst_test_reading_env"
+    local executable="${BIN_DIR}/cxxet_test_reading_env"
 
     local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
-    export CXXST_TARGET_FILENAME="${result1}"
+    export CXXET_TARGET_FILENAME="${result1}"
     run "${executable}_bare"
     assert_success
     assert_output ""
@@ -457,13 +457,13 @@ Deduced CXXST_TARGET_FILENAME: "
     refute [ -f "${result1}" ]
 
     local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
-    export CXXST_TARGET_FILENAME="${result2}"
-    export CXXST_DEFAULT_BLOCK_SIZE=1
+    export CXXET_TARGET_FILENAME="${result2}"
+    export CXXET_DEFAULT_BLOCK_SIZE=1
     run "${executable}"
     assert_success
-    assert_output "Deduced CXXST_OUTPUT_FORMAT: 0
-Deduced CXXST_DEFAULT_BLOCK_SIZE: 1
-Deduced CXXST_TARGET_FILENAME: ${result2}"
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 1
+Deduced CXXET_TARGET_FILENAME: ${result2}"
     refute_sanitizer_output
 
     assert [ -f "${result2}" ]
@@ -473,8 +473,8 @@ Deduced CXXST_TARGET_FILENAME: ${result2}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result2}")" 1
 
     local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
-    export CXXST_VERBOSE=0
-    export CXXST_TARGET_FILENAME="${result3}"
+    export CXXET_VERBOSE=0
+    export CXXET_TARGET_FILENAME="${result3}"
     run "${executable}"
     assert_success
     assert_output ""
@@ -488,16 +488,16 @@ Deduced CXXST_TARGET_FILENAME: ${result2}"
 }
 
 @test "Improper initialization 1" {
-    local executable="${BIN_DIR}/cxxst_test_failed_init_1"
-    export CXXST_VERBOSE=0
+    local executable="${BIN_DIR}/cxxet_test_failed_init_1"
+    export CXXET_VERBOSE=0
     skip "TODO fix this later: 'release' and 'tsan' builds dont fail!"
     run "${executable}"
     assert_failure
 }
 
 @test "Improper initialization 2" {
-    local executable="${BIN_DIR}/cxxst_test_failed_init_2"
-    export CXXST_VERBOSE=0
+    local executable="${BIN_DIR}/cxxet_test_failed_init_2"
+    export CXXET_VERBOSE=0
     run "${executable}"
     assert_failure
 
@@ -505,7 +505,7 @@ Deduced CXXST_TARGET_FILENAME: ${result2}"
 }
 
 @test "Shared library symbol visibility" {
-    local shared_lib="${BIN_DIR}/libcxxst.so"
+    local shared_lib="${BIN_DIR}/libcxxet.so"
 
     if ! [[ -f "${shared_lib}" ]]; then
         skip "shared lib. not found - probably built as a static library"
@@ -516,47 +516,47 @@ Deduced CXXST_TARGET_FILENAME: ${result2}"
     local nm_output="${output}"
 
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
-    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxst::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxst::mark_complete::submit(timespec)
-cxxst::sink_global_flush(cxxst::output::format, char const*, bool)
-cxxst::sink_thread_flush()
-cxxst::sink_thread_reserve(int)
-cxxst::submit_counter(char const*, long long, double)
-cxxst::submit_duration_begin(char const*, long long)
-cxxst::submit_duration_end(char const*, long long)
-cxxst::submit_instant(char const*, cxxst::scope_t, long long)"
+    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxet::mark_complete::submit(timespec)
+cxxet::sink_global_flush(cxxet::output::format, char const*, bool)
+cxxet::sink_thread_flush()
+cxxet::sink_thread_reserve(int)
+cxxet::submit_counter(char const*, long long, double)
+cxxet::submit_duration_begin(char const*, long long)
+cxxet::submit_duration_end(char const*, long long)
+cxxet::submit_instant(char const*, cxxet::scope_t, long long)"
 
     # those definitely not:
     assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " cxxst::impl::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c " cxxet::impl::")" 0
 }
 
 @test "Unit tests runner contains expected symbols" {
-    if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
+    if ! [[ -f "${BIN_DIR}/libcxxet.so" ]]; then
         skip "shared lib. not found - probably built as a static library"
     fi
 
-    run nm -C "${BIN_DIR}/cxxst_unit_tests"
+    run nm -C "${BIN_DIR}/cxxet_unit_tests"
     assert_success
     local nm_output="$output"
 
     # contains internal implementation symbols & `doctest` stuff:
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " cxxst::impl::")" 0
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " cxxet::impl::")" 0
     assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
 }
 
 @test "Examples & unit test runner properly depend on shared library if built this way" {
-    if ! [[ -f "${BIN_DIR}/libcxxst.so" ]]; then
+    if ! [[ -f "${BIN_DIR}/libcxxet.so" ]]; then
         skip "shared lib. not found - probably built as a static library"
     fi
 
-    for file in "${BIN_DIR}"/cxxst_*; do
+    for file in "${BIN_DIR}"/cxxet_*; do
         # user_log "# checking file '%s'\n" "${file}"
         run ldd "${file}"
         assert_success
-        if [[ "${file}" =~ _bare$ || "${file}" =~ cxxst_unit_tests$ ]]; then
-            refute_output --partial "libcxxst.so"
+        if [[ "${file}" =~ _bare$ || "${file}" =~ cxxet_unit_tests$ ]]; then
+            refute_output --partial "libcxxet.so"
         else
-            assert_output --partial "libcxxst.so"
+            assert_output --partial "libcxxet.so"
         fi
     done
 }

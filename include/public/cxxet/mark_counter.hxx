@@ -2,12 +2,12 @@
 
 #include <utility>
 
-#include "cxxst/macros/linkage.h"
-#include "cxxst/timepoint.hxx"
+#include "cxxet/macros/linkage.h"
+#include "cxxet/timepoint.hxx"
 
-namespace cxxst {
+namespace cxxet {
 
-CXXST_IMPL_API void submit_counter(char const *const name,
+CXXET_IMPL_API void submit_counter(char const *const name,
                                    long long const timestamp_ns,
                                    double const value) noexcept;
 
@@ -27,4 +27,4 @@ inline void mark_counters_call(char const *const name, double const value,
   mark_counters(now_ns, name, value, std::forward<Args>(args)...);
 }
 
-} // namespace cxxst
+} // namespace cxxet

@@ -2,11 +2,11 @@
 
 #include <mutex>
 
-#include "cxxst/output_format.hxx"
+#include "cxxet/output_format.hxx"
 #include "impl/sink.hxx"
 #include "impl/sink_properties.hxx"
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 struct central_sink : sink {
   explicit central_sink(sink_properties const &traits);
@@ -31,4 +31,4 @@ private:
   char const *target_filename;
 };
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

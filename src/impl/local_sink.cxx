@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 local_sink::local_sink(sink *aParent) noexcept : parent{aParent} {}
 
@@ -27,4 +27,4 @@ void local_sink::reserve(int const minimum_free_capacity) noexcept {
   events.reserve(default_node_capacity);
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

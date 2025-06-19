@@ -1,9 +1,9 @@
 #pragma once
 
-#include "cxxst/mark_duration_begin.hxx"
-#include "cxxst/mark_duration_end.hxx"
+#include "cxxet/mark_duration_begin.hxx"
+#include "cxxet/mark_duration_end.hxx"
 
-namespace cxxst {
+namespace cxxet {
 
 struct mark_duration {
   inline mark_duration(char const *desc) noexcept { mark_duration_begin(desc); }
@@ -17,4 +17,4 @@ private:
   mark_duration &operator=(mark_duration &&) = delete;
 };
 
-} // namespace cxxst
+} // namespace cxxet

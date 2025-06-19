@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "cxxst/all.hxx"
+#include "cxxet/all.hxx"
 
 namespace {
 
@@ -21,9 +21,9 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
                                                        : "/dev/stdout"};
-  CXXST_sink_global_flush(cxxst::output::format::chrome_trace, filename, true);
+  CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename, true);
 
-  CXXST_mark_complete("Counter example 2");
+  CXXET_mark_complete("Counter example 2");
 
   int const num_points{10'000};
   // step traits:
@@ -39,16 +39,16 @@ int main(int argc, char const **argv) {
   }};
 
   {
-    CXXST_mark_complete("CXXST_sink_thread_reserve");
-    CXXST_sink_thread_reserve(
+    CXXET_mark_complete("CXXET_sink_thread_reserve");
+    CXXET_sink_thread_reserve(
         num_points * 2 // ...
-        + 3 // those 3 extra `CXXST_mark_complete`s above and below ...
+        + 3 // those 3 extra `CXXET_mark_complete`s above and below ...
     );
   }
 
-  CXXST_mark_complete("Euler method iterations");
+  CXXET_mark_complete("Euler method iterations");
   for (int i{0}; i < num_points; ++i) {
-    CXXST_mark_counters("y", y, "x", x);
+    CXXET_mark_counters("y", y, "x", x);
     y = euler_method(fn, x, y, h, steps_for_point);
     x += h * steps_for_point;
   }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "cxxst/output_format.hxx"
+#include "cxxet/output_format.hxx"
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 struct sink_properties {
   bool verbose;
@@ -29,4 +29,4 @@ private:
   sink_properties &operator=(sink_properties &&) = delete;
 };
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

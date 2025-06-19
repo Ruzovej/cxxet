@@ -4,14 +4,14 @@
 
 #include "impl/dump_records.hxx"
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 sink::sink() noexcept = default;
 
 sink::~sink() noexcept = default;
 
 void sink::flush_to_file(long long const time_point_zero,
-                         cxxst::output::format const fmt,
+                         cxxet::output::format const fmt,
                          char const *const filename) noexcept {
   if (!events.empty()) {
     try {
@@ -32,4 +32,4 @@ void sink::drain(sink &other) noexcept {
   }
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl
