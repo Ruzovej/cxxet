@@ -1,4 +1,4 @@
-# C++ easy tracing
+# `cxxet` = C++ easy tracing
 
 TODO ...
 
