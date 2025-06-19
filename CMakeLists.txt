@@ -186,9 +186,9 @@ if (CXXST_BUILD_TESTS)
     target_compile_definitions(
         cxxst_unit_tests
             PRIVATE
+            CXXST_WITH_UNIT_TESTS
             DOCTEST_CONFIG_SUPER_FAST_ASSERTS
             DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
-            CXXST_WITH_UNIT_TESTS
     )
     add_unix_compiler_flags(cxxst_unit_tests)
     add_sanitizers(cxxst_unit_tests)
