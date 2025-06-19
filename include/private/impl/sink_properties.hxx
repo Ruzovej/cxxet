@@ -24,22 +24,20 @@
 namespace cxxet::impl {
 
 struct sink_properties {
+  long long const time_point_zero_ns;
   bool verbose;
-  output::format target_format;
+  output::format default_target_format;
   int default_list_node_capacity;
-  char const *target_filename;
+  char const *default_target_filename;
 
   sink_properties() noexcept;
 
+#ifdef CXXET_WITH_UNIT_TESTS
   sink_properties &set_target_filename(char const *const filename) noexcept {
-    target_filename = filename;
+    default_target_filename = filename;
     return *this;
   }
-
-  sink_properties &set_target_format(output::format const fmt) noexcept {
-    target_format = fmt;
-    return *this;
-  }
+#endif
 
 private:
   sink_properties(sink_properties const &) = delete;

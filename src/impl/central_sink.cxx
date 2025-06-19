@@ -21,14 +21,13 @@
 
 #include <iostream>
 
-#include "cxxet/timepoint.hxx"
 #include "impl/dump_records.hxx"
 
 namespace cxxet::impl {
 
 central_sink::central_sink(sink_properties const &traits)
-    : time_point{as_int_ns(now())}, fmt(traits.target_format),
-      target_filename(traits.target_filename) {}
+    : time_point{traits.time_point_zero_ns}, fmt(traits.default_target_format),
+      target_filename(traits.default_target_filename) {}
 
 central_sink::~central_sink() noexcept {
   std::lock_guard lck{mtx};

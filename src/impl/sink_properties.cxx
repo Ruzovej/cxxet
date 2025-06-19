@@ -18,6 +18,7 @@
 */
 
 #include "impl/sink_properties.hxx"
+#include "cxxet/timepoint.hxx"
 
 #include <cstdlib>
 
@@ -86,14 +87,16 @@ char const *parse_string(char const *const str_value) { return str_value; }
 } // namespace
 
 sink_properties::sink_properties() noexcept
-    : verbose{parse_env_variable("CXXET_VERBOSE", parse_bool, false, false)},
-      target_format{parse_env_variable("CXXET_OUTPUT_FORMAT",
-                                       parse_output_format,
-                                       output::format::chrome_trace, verbose)},
+    : time_point_zero_ns{as_int_ns(now())}, verbose{parse_env_variable(
+                                                "CXXET_VERBOSE", parse_bool,
+                                                false, false)},
+      default_target_format{
+          parse_env_variable("CXXET_OUTPUT_FORMAT", parse_output_format,
+                             output::format::chrome_trace, verbose)},
       default_list_node_capacity{parse_env_variable("CXXET_DEFAULT_BLOCK_SIZE",
                                                     parse_int, 64, verbose)},
-      target_filename{parse_env_variable("CXXET_TARGET_FILENAME", parse_string,
-                                         nullptr, verbose)} {
+      default_target_filename{parse_env_variable(
+          "CXXET_TARGET_FILENAME", parse_string, nullptr, verbose)} {
   // ...
 }
 
