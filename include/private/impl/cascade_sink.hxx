@@ -27,11 +27,7 @@ struct cascade_sink : sink {
   explicit cascade_sink(sink *aParent) noexcept;
   ~cascade_sink() noexcept override;
 
-  void append_event(event::any const &evt) noexcept;
-
   void flush() noexcept;
-
-  void reserve(int const minimum_free_capacity) noexcept;
 
 private:
   cascade_sink(cascade_sink const &) = delete;
@@ -40,7 +36,6 @@ private:
   cascade_sink &operator=(cascade_sink &&) = delete;
 
   sink *parent;
-  int default_node_capacity{};
 };
 
 } // namespace cxxet::impl

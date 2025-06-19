@@ -17,21 +17,24 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/cascade_sink.hxx"
+#include "impl/thread_sink.hxx"
 
 #include <cassert>
 
 namespace cxxet::impl {
 
-cascade_sink::cascade_sink(sink *aParent) noexcept : parent{aParent} {}
+thread_sink::thread_sink(sink *aParent) noexcept : cascade_sink{aParent} {}
 
-cascade_sink::~cascade_sink() noexcept { flush(); }
+thread_sink::~thread_sink() noexcept = default;
 
-void cascade_sink::flush() noexcept {
-  assert(parent != this);
-  if (parent) {
-    parent->drain(*this);
-  }
+void thread_sink::append_event(event::any const &evt) noexcept {
+  events.safe_append(evt, default_node_capacity);
+}
+
+void thread_sink::reserve(int const minimum_free_capacity) noexcept {
+  assert(minimum_free_capacity > 0);
+  default_node_capacity = minimum_free_capacity;
+  events.reserve(default_node_capacity);
 }
 
 } // namespace cxxet::impl

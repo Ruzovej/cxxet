@@ -19,8 +19,8 @@
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
-#include "impl/cascade_sink.hxx"
 #include "impl/file_sink.hxx"
+#include "impl/thread_sink.hxx"
 
 #include <doctest/doctest.h>
 
@@ -61,7 +61,7 @@ TEST_CASE("sink cascade") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<file_sink> root{traits};
-    test_sink<cascade_sink> leaf{&root};
+    test_sink<thread_sink> leaf{&root};
     leaf.reserve(2);
 
     leaf.append_event(a[0]);
@@ -90,7 +90,7 @@ TEST_CASE("sink cascade") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<file_sink> root{traits};
-    test_sink<cascade_sink> leaf1{&root}, leaf2{&root};
+    test_sink<thread_sink> leaf1{&root}, leaf2{&root};
     leaf1.reserve(1);
     leaf2.reserve(1);
 
@@ -127,7 +127,7 @@ TEST_CASE("sink cascade") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
     test_sink<file_sink> root{traits};
-    test_sink<cascade_sink> leaf1{&root}, leaf2{&leaf1};
+    test_sink<thread_sink> leaf1{&root}, leaf2{&leaf1};
     leaf1.reserve(1);
     leaf2.reserve(1);
 
@@ -164,7 +164,7 @@ TEST_CASE("sink cascade") {
     test_sink<file_sink> root{traits};
 
     {
-      test_sink<cascade_sink> leaf{&root};
+      test_sink<thread_sink> leaf{&root};
       leaf.reserve(traits.default_list_node_capacity);
       leaf.append_event(a[0]);
     }
