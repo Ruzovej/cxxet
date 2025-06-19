@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <mutex>
-
 #include "cxxet/output_format.hxx"
 #include "impl/mutexed_sink.hxx"
 #include "impl/sink_properties.hxx"
