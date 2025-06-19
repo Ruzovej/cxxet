@@ -19,7 +19,7 @@
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
-#include "impl/central_sink.hxx"
+#include "impl/file_sink.hxx"
 #include "impl/local_sink.hxx"
 
 #include <doctest/doctest.h>
@@ -60,7 +60,7 @@ TEST_CASE("sink cascade") {
   SUBCASE("one 'leaf'") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<central_sink> root{traits};
+    test_sink<file_sink> root{traits};
     test_sink<local_sink> leaf{&root};
     leaf.reserve(2);
 
@@ -89,7 +89,7 @@ TEST_CASE("sink cascade") {
   SUBCASE("two 'leafs', tree") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<central_sink> root{traits};
+    test_sink<file_sink> root{traits};
     test_sink<local_sink> leaf1{&root}, leaf2{&root};
     leaf1.reserve(1);
     leaf2.reserve(1);
@@ -126,7 +126,7 @@ TEST_CASE("sink cascade") {
   SUBCASE("two 'leafs', linear") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<central_sink> root{traits};
+    test_sink<file_sink> root{traits};
     test_sink<local_sink> leaf1{&root}, leaf2{&leaf1};
     leaf1.reserve(1);
     leaf2.reserve(1);
@@ -161,7 +161,7 @@ TEST_CASE("sink cascade") {
   SUBCASE("flush upon destruction") {
     sink_properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<central_sink> root{traits};
+    test_sink<file_sink> root{traits};
 
     {
       test_sink<local_sink> leaf{&root};

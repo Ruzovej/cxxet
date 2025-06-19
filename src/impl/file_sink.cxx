@@ -17,7 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/central_sink.hxx"
+#include "impl/file_sink.hxx"
 
 #include <iostream>
 
@@ -25,17 +25,17 @@
 
 namespace cxxet::impl {
 
-central_sink::central_sink(sink_properties const &traits)
+file_sink::file_sink(sink_properties const &traits)
     : time_point{traits.time_point_zero_ns}, fmt(traits.default_target_format),
       target_filename(traits.default_target_filename) {}
 
-central_sink::~central_sink() noexcept {
+file_sink::~file_sink() noexcept {
   std::lock_guard lck{mtx};
   do_flush();
 }
 
-void central_sink::flush(output::format const aFmt, char const *const aFilename,
-                         bool const defer) noexcept {
+void file_sink::flush(output::format const aFmt, char const *const aFilename,
+                      bool const defer) noexcept {
   std::lock_guard lck{mtx};
   fmt = aFmt;
   target_filename = aFilename;
@@ -44,12 +44,12 @@ void central_sink::flush(output::format const aFmt, char const *const aFilename,
   }
 }
 
-void central_sink::drain(sink &other) noexcept {
+void file_sink::drain(sink &other) noexcept {
   std::lock_guard lck{mtx};
   sink::drain(other);
 }
 
-void central_sink::do_flush() noexcept {
+void file_sink::do_flush() noexcept {
   if (!events.empty()) {
     try {
       if (target_filename) {

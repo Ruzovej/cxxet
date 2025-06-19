@@ -27,9 +27,9 @@
 
 namespace cxxet::impl {
 
-struct central_sink : sink {
-  explicit central_sink(sink_properties const &traits);
-  ~central_sink() noexcept override;
+struct file_sink : sink {
+  explicit file_sink(sink_properties const &traits);
+  ~file_sink() noexcept override;
 
   void flush(output::format const aFmt, char const *const aFilename,
              bool const defer) noexcept;
@@ -37,10 +37,10 @@ struct central_sink : sink {
   void drain(sink &other) noexcept override final;
 
 private:
-  central_sink(central_sink const &) = delete;
-  central_sink &operator=(central_sink const &) = delete;
-  central_sink(central_sink &&) = delete;
-  central_sink &operator=(central_sink &&) = delete;
+  file_sink(file_sink const &) = delete;
+  file_sink &operator=(file_sink const &) = delete;
+  file_sink(file_sink &&) = delete;
+  file_sink &operator=(file_sink &&) = delete;
 
   void do_flush() noexcept;
 
