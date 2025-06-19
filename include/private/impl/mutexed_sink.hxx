@@ -31,6 +31,9 @@ struct mutexed_sink : virtual sink {
 
   void drain(sink &other) noexcept override final;
 
+protected:
+  std::mutex &get_mutex() noexcept;
+
 private:
   mutexed_sink(mutexed_sink const &) = delete;
   mutexed_sink &operator=(mutexed_sink const &) = delete;
@@ -38,9 +41,6 @@ private:
   mutexed_sink &operator=(mutexed_sink &&) = delete;
 
   std::mutex mtx;
-
-protected:
-  std::mutex &get_mutex() noexcept;
 };
 
 } // namespace cxxet::impl

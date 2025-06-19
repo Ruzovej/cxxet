@@ -35,7 +35,6 @@ file_sink::file_sink(sink_properties const &traits) noexcept
                 traits.default_target_filename} {}
 
 file_sink::~file_sink() noexcept {
-  std::lock_guard lck{get_mutex()};
   do_flush();
 }
 
