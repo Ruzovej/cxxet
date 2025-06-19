@@ -17,36 +17,19 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include <mutex>
-
-#include "cxxet/output_format.hxx"
 #include "impl/mutexed_sink.hxx"
-#include "impl/sink_properties.hxx"
 
 namespace cxxet::impl {
 
-struct file_sink : mutexed_sink {
-  explicit file_sink(long long const aTime_point, output::format const aFmt,
-                     char const *const aTarget_filename) noexcept;
-  explicit file_sink(sink_properties const &traits) noexcept;
-  ~file_sink() noexcept override;
+mutexed_sink::mutexed_sink() noexcept = default;
 
-  void flush(output::format const aFmt, char const *const aFilename,
-             bool const defer) noexcept;
+mutexed_sink::~mutexed_sink() noexcept = default;
 
-private:
-  file_sink(file_sink const &) = delete;
-  file_sink &operator=(file_sink const &) = delete;
-  file_sink(file_sink &&) = delete;
-  file_sink &operator=(file_sink &&) = delete;
+void mutexed_sink::drain(sink &other) noexcept {
+  std::lock_guard lck{get_mutex()};
+  sink::drain(other);
+}
 
-  void do_flush() noexcept;
-
-  long long const time_point;
-  output::format fmt;
-  char const *target_filename;
-};
+std::mutex &mutexed_sink::get_mutex() noexcept { return mtx; }
 
 } // namespace cxxet::impl

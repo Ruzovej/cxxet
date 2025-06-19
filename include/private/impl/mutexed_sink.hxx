@@ -21,32 +21,26 @@
 
 #include <mutex>
 
-#include "cxxet/output_format.hxx"
-#include "impl/mutexed_sink.hxx"
-#include "impl/sink_properties.hxx"
+#include "impl/sink.hxx"
 
 namespace cxxet::impl {
 
-struct file_sink : mutexed_sink {
-  explicit file_sink(long long const aTime_point, output::format const aFmt,
-                     char const *const aTarget_filename) noexcept;
-  explicit file_sink(sink_properties const &traits) noexcept;
-  ~file_sink() noexcept override;
+struct mutexed_sink : sink {
+  mutexed_sink() noexcept;
+  ~mutexed_sink() noexcept override;
 
-  void flush(output::format const aFmt, char const *const aFilename,
-             bool const defer) noexcept;
+  void drain(sink &other) noexcept override final;
 
 private:
-  file_sink(file_sink const &) = delete;
-  file_sink &operator=(file_sink const &) = delete;
-  file_sink(file_sink &&) = delete;
-  file_sink &operator=(file_sink &&) = delete;
+  mutexed_sink(mutexed_sink const &) = delete;
+  mutexed_sink &operator=(mutexed_sink const &) = delete;
+  mutexed_sink(mutexed_sink &&) = delete;
+  mutexed_sink &operator=(mutexed_sink &&) = delete;
 
-  void do_flush() noexcept;
+  std::mutex mtx;
 
-  long long const time_point;
-  output::format fmt;
-  char const *target_filename;
+protected:
+  std::mutex &get_mutex() noexcept;
 };
 
 } // namespace cxxet::impl

@@ -27,30 +27,26 @@ namespace cxxet::impl {
 
 file_sink::file_sink(long long const aTime_point, output::format const aFmt,
                      char const *const aTarget_filename) noexcept
-    : time_point{aTime_point}, fmt{aFmt}, target_filename{aTarget_filename} {}
+    : mutexed_sink{}, time_point{aTime_point}, fmt{aFmt},
+      target_filename{aTarget_filename} {}
 
 file_sink::file_sink(sink_properties const &traits) noexcept
     : file_sink{traits.time_point_zero_ns, traits.default_target_format,
                 traits.default_target_filename} {}
 
 file_sink::~file_sink() noexcept {
-  std::lock_guard lck{mtx};
+  std::lock_guard lck{get_mutex()};
   do_flush();
 }
 
 void file_sink::flush(output::format const aFmt, char const *const aFilename,
                       bool const defer) noexcept {
-  std::lock_guard lck{mtx};
+  std::lock_guard lck{get_mutex()};
   fmt = aFmt;
   target_filename = aFilename;
   if (!defer) {
     do_flush();
   }
-}
-
-void file_sink::drain(sink &other) noexcept {
-  std::lock_guard lck{mtx};
-  sink::drain(other);
 }
 
 void file_sink::do_flush() noexcept {
