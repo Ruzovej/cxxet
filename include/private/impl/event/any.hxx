@@ -9,7 +9,7 @@
 #include "impl/event/kind/duration.hxx"
 #include "impl/event/kind/instant.hxx"
 
-namespace cxxst::impl::event {
+namespace cxxet::impl::event {
 
 struct any {
   union {
@@ -78,4 +78,4 @@ struct any {
   }
 };
 
-} // namespace cxxst::impl::event
+} // namespace cxxet::impl::event

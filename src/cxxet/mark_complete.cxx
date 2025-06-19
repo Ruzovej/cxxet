@@ -1,9 +1,9 @@
-#include "cxxst/mark_complete.hxx"
+#include "cxxet/mark_complete.hxx"
 
 #include "impl/event/kind/complete.hxx"
 #include "impl/thread_local_sink_submit_event.hxx"
 
-namespace cxxst {
+namespace cxxet {
 
 void mark_complete::submit(impl::timepoint_t const finish) noexcept {
   auto const begin{impl::as_int_ns(start)};
@@ -12,4 +12,4 @@ void mark_complete::submit(impl::timepoint_t const finish) noexcept {
       impl::event::complete{desc, begin, duration});
 }
 
-} // namespace cxxst
+} // namespace cxxet

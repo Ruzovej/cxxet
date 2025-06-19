@@ -1,11 +1,11 @@
-#ifdef CXXST_WITH_UNIT_TESTS
+#ifdef CXXET_WITH_UNIT_TESTS
 
 #include "impl/central_sink.hxx"
 #include "impl/local_sink.hxx"
 
 #include <doctest/doctest.h>
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 template <typename base_sink> struct test_sink : base_sink {
   using base_sink::base_sink;
@@ -161,6 +161,6 @@ TEST_CASE("sink cascade") {
   }
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl
 
 #endif

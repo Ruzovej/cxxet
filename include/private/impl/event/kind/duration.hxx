@@ -2,7 +2,7 @@
 
 #include "impl/event/common.hxx"
 
-namespace cxxst::impl::event {
+namespace cxxet::impl::event {
 
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.nso4gcezn7n1
 
@@ -53,4 +53,4 @@ struct duration_end {
   }
 };
 
-} // namespace cxxst::impl::event
+} // namespace cxxet::impl::event

@@ -2,7 +2,7 @@
 
 set -e
 
-cxxst_preset=tsan
+cxxet_preset=tsan
 targets=()
 defines=()
 force_compile_commands_symlink='true'
@@ -10,7 +10,7 @@ force_compile_commands_symlink='true'
 while (( $# > 0 )); do
     case "$1" in
         --preset)
-            cxxst_preset="$2"
+            cxxet_preset="$2"
             shift 2
             ;;
         --target)
@@ -37,10 +37,10 @@ num_jobs="$(nproc)"
     set -x
     cmake \
         -S . \
-        -B "build/${cxxst_preset}" \
+        -B "build/${cxxet_preset}" \
         "${defines[@]}" \
-        --preset "${cxxst_preset}" #\
-        # --graphviz="graphviz/${cxxst_preset}"
+        --preset "${cxxet_preset}" #\
+        # --graphviz="graphviz/${cxxet_preset}"
 )
 
 [[ "${force_compile_commands_symlink}" == 'false' && -f compile_commands.json ]] \
@@ -49,14 +49,14 @@ num_jobs="$(nproc)"
     ln \
         --symbolic \
         --force \
-        "build/${cxxst_preset}/compile_commands.json" \
+        "build/${cxxet_preset}/compile_commands.json" \
         compile_commands.json
 )
 
 (
     set -x
     cmake \
-        --build "build/${cxxst_preset}" \
+        --build "build/${cxxet_preset}" \
         -j "${num_jobs}" \
         "${targets[@]}"
 )

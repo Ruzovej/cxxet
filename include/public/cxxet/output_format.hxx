@@ -1,6 +1,6 @@
 #pragma once
 
-namespace cxxst::output {
+namespace cxxet::output {
 
 enum class format : int {
   chrome_trace =
@@ -8,4 +8,4 @@ enum class format : int {
   raw_naive_v0 = 1,
 };
 
-} // namespace cxxst::output
+} // namespace cxxet::output

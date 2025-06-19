@@ -15,7 +15,7 @@
 
 #include "impl/event/any.hxx"
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 namespace {
 
@@ -231,4 +231,4 @@ void dump_records(impl::event::list const &list,
   file.close();
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

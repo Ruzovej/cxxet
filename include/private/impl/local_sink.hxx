@@ -2,7 +2,7 @@
 
 #include "impl/sink.hxx"
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 struct local_sink : sink {
   explicit local_sink(sink *aParent) noexcept;
@@ -24,4 +24,4 @@ private:
   int default_node_capacity{};
 };
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl

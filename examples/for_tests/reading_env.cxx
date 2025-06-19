@@ -1,13 +1,13 @@
-#include "cxxst/all.hxx"
+#include "cxxet/all.hxx"
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
-  CXXST_sink_thread_reserve();
+  CXXET_sink_thread_reserve();
 
-  CXXST_mark_complete("main");
+  CXXET_mark_complete("main");
 
-  CXXST_mark_instant("instant");
+  CXXET_mark_instant("instant");
 
-  CXXST_mark_counters("counter", 42.0);
+  CXXET_mark_counters("counter", 42.0);
 
   return 0;
 }

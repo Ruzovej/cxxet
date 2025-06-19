@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace cxxst::impl::event {
+namespace cxxet::impl::event {
 
 namespace {
 
@@ -104,13 +104,13 @@ int list::get_current_free_capacity() const noexcept {
 
 long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
 
-} // namespace cxxst::impl::event
+} // namespace cxxet::impl::event
 
-#ifdef CXXST_WITH_UNIT_TESTS
+#ifdef CXXET_WITH_UNIT_TESTS
 
 #include <doctest/doctest.h>
 
-namespace cxxst::impl {
+namespace cxxet::impl {
 
 TEST_CASE("event::list") {
   event::list l;
@@ -260,6 +260,6 @@ TEST_CASE("event::list") {
   }
 }
 
-} // namespace cxxst::impl
+} // namespace cxxet::impl
 
 #endif
