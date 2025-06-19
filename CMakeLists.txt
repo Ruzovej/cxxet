@@ -186,6 +186,7 @@ if (CXXET_BUILD_TESTS)
     target_compile_definitions(
         cxxet_unit_tests
             PRIVATE
+            CXXET_ENABLE
             CXXET_WITH_UNIT_TESTS
             DOCTEST_CONFIG_SUPER_FAST_ASSERTS
             DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
