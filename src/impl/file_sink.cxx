@@ -25,9 +25,13 @@
 
 namespace cxxet::impl {
 
-file_sink::file_sink(sink_properties const &traits)
-    : time_point{traits.time_point_zero_ns}, fmt(traits.default_target_format),
-      target_filename(traits.default_target_filename) {}
+file_sink::file_sink(long long const aTime_point, output::format const aFmt,
+                     char const *const aTarget_filename) noexcept
+    : time_point{aTime_point}, fmt{aFmt}, target_filename{aTarget_filename} {}
+
+file_sink::file_sink(sink_properties const &traits) noexcept
+    : file_sink{traits.time_point_zero_ns, traits.default_target_format,
+                traits.default_target_filename} {}
 
 file_sink::~file_sink() noexcept {
   std::lock_guard lck{mtx};

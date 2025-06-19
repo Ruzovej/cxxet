@@ -28,7 +28,9 @@
 namespace cxxet::impl {
 
 struct file_sink : sink {
-  explicit file_sink(sink_properties const &traits);
+  explicit file_sink(long long const aTime_point, output::format const aFmt,
+                     char const *const aTarget_filename) noexcept;
+  explicit file_sink(sink_properties const &traits) noexcept;
   ~file_sink() noexcept override;
 
   void flush(output::format const aFmt, char const *const aFilename,
