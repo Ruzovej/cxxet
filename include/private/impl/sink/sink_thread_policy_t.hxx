@@ -19,28 +19,15 @@
 
 #pragma once
 
-#include <mutex>
+#include <type_traits>
 
-#include "impl/sink.hxx"
+#include "impl/sink/thread_safe.hxx"
+#include "impl/sink/thread_unsafe.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-struct mutexed_sink : virtual sink {
-  mutexed_sink() noexcept;
-  ~mutexed_sink() noexcept override;
+template <bool thread_safe_v>
+using sink_thread_policy_t =
+    std::conditional_t<thread_safe_v, thread_safe, thread_unsafe>;
 
-  void drain(sink &other) noexcept override final;
-
-protected:
-  std::mutex &get_mutex() noexcept;
-
-private:
-  mutexed_sink(mutexed_sink const &) = delete;
-  mutexed_sink &operator=(mutexed_sink const &) = delete;
-  mutexed_sink(mutexed_sink &&) = delete;
-  mutexed_sink &operator=(mutexed_sink &&) = delete;
-
-  std::mutex mtx;
-};
-
-} // namespace cxxet::impl
+}

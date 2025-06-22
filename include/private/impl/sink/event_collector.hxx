@@ -19,25 +19,25 @@
 
 #pragma once
 
-#include "impl/cascade_sink.hxx"
+#include "impl/sink/cascade.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-struct thread_sink : cascade_sink {
-  explicit thread_sink(sink *aParent) noexcept;
-  ~thread_sink() noexcept override;
+struct event_collector : cascade<false> {
+  explicit event_collector(sink_base *aParent) noexcept;
+  ~event_collector() noexcept override;
 
   void append_event(event::any const &evt) noexcept;
 
   void reserve(int const minimum_free_capacity) noexcept;
 
 private:
-  thread_sink(thread_sink const &) = delete;
-  thread_sink &operator=(thread_sink const &) = delete;
-  thread_sink(thread_sink &&) = delete;
-  thread_sink &operator=(thread_sink &&) = delete;
+  event_collector(event_collector const &) = delete;
+  event_collector &operator=(event_collector const &) = delete;
+  event_collector(event_collector &&) = delete;
+  event_collector &operator=(event_collector &&) = delete;
 
   int default_node_capacity{};
 };
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

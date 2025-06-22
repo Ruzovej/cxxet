@@ -17,23 +17,18 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "impl/sink/sink_base.hxx"
 
-#include "impl/cascade_sink.hxx"
-#include "impl/mutexed_sink.hxx"
+namespace cxxet::impl::sink {
 
-namespace cxxet::impl {
+sink_base::sink_base() noexcept = default;
 
-struct cascade_sink_thread_safe : cascade_sink, mutexed_sink {
-  explicit cascade_sink_thread_safe(sink *aParent) noexcept;
-  ~cascade_sink_thread_safe() noexcept override;
+sink_base::~sink_base() noexcept = default;
 
-private:
-  cascade_sink_thread_safe(cascade_sink_thread_safe const &) = delete;
-  cascade_sink_thread_safe &
-  operator=(cascade_sink_thread_safe const &) = delete;
-  cascade_sink_thread_safe(cascade_sink_thread_safe &&) = delete;
-  cascade_sink_thread_safe &operator=(cascade_sink_thread_safe &&) = delete;
-};
+bool sink_base::has_events() const noexcept { return !events.empty(); }
 
-} // namespace cxxet::impl
+void sink_base::do_drain(sink_base &other) noexcept {
+  events.drain_other(other.events);
+}
+
+} // namespace cxxet::impl::sink

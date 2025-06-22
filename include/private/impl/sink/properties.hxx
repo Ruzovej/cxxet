@@ -17,15 +17,33 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/cascade_sink_thread_safe.hxx"
+#pragma once
 
-#include <cassert>
+#include "cxxet/output_format.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-cascade_sink_thread_safe::cascade_sink_thread_safe(sink *aParent) noexcept
-    : cascade_sink{aParent}, mutexed_sink{} {}
+struct properties {
+  long long const time_point_zero_ns;
+  bool verbose;
+  output::format default_target_format;
+  int default_list_node_capacity;
+  char const *default_target_filename;
 
-cascade_sink_thread_safe::~cascade_sink_thread_safe() noexcept = default;
+  properties() noexcept;
 
-} // namespace cxxet::impl
+#ifdef CXXET_WITH_UNIT_TESTS
+  properties &set_target_filename(char const *const filename) noexcept {
+    default_target_filename = filename;
+    return *this;
+  }
+#endif
+
+private:
+  properties(properties const &) = delete;
+  properties &operator=(properties const &) = delete;
+  properties(properties &&) = delete;
+  properties &operator=(properties &&) = delete;
+};
+
+} // namespace cxxet::impl::sink

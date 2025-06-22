@@ -17,24 +17,25 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/thread_sink.hxx"
+#include "impl/sink/event_collector.hxx"
 
 #include <cassert>
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-thread_sink::thread_sink(sink *aParent) noexcept : cascade_sink{aParent} {}
+event_collector::event_collector(sink_base *aParent) noexcept
+    : cascade{aParent} {}
 
-thread_sink::~thread_sink() noexcept = default;
+event_collector::~event_collector() noexcept = default;
 
-void thread_sink::append_event(event::any const &evt) noexcept {
+void event_collector::append_event(event::any const &evt) noexcept {
   events.safe_append(evt, default_node_capacity);
 }
 
-void thread_sink::reserve(int const minimum_free_capacity) noexcept {
+void event_collector::reserve(int const minimum_free_capacity) noexcept {
   assert(minimum_free_capacity > 0);
   default_node_capacity = minimum_free_capacity;
   events.reserve(default_node_capacity);
 }
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

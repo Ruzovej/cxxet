@@ -19,25 +19,29 @@
 
 #pragma once
 
-#include "impl/sink.hxx"
+#include <mutex>
 
-namespace cxxet::impl {
+#include "impl/sink/sink_base.hxx"
 
-struct cascade_sink : virtual sink {
-  explicit cascade_sink(sink *aParent) noexcept;
-  ~cascade_sink() noexcept override;
+namespace cxxet::impl::sink {
 
-  void set_parent(sink *aParent) noexcept;
+struct thread_safe : sink_base {
+  explicit thread_safe() noexcept;
+  ~thread_safe() noexcept override;
 
-  void flush() noexcept;
+  void drain(sink_base &other) noexcept override final;
+
+protected:
+  std::mutex mtx;
+
+  void lock() noexcept;
+  void unlock() noexcept;
 
 private:
-  cascade_sink(cascade_sink const &) = delete;
-  cascade_sink &operator=(cascade_sink const &) = delete;
-  cascade_sink(cascade_sink &&) = delete;
-  cascade_sink &operator=(cascade_sink &&) = delete;
-
-  sink *parent;
+  thread_safe(thread_safe const &) = delete;
+  thread_safe &operator=(thread_safe const &) = delete;
+  thread_safe(thread_safe &&) = delete;
+  thread_safe &operator=(thread_safe &&) = delete;
 };
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

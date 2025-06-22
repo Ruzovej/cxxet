@@ -19,31 +19,28 @@
 
 #pragma once
 
-#include "cxxet/output_format.hxx"
+#include "impl/event/list/list.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-struct sink_properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  output::format default_target_format;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+struct sink_base {
+  sink_base() noexcept;
+  virtual ~sink_base() noexcept;
 
-  sink_properties() noexcept;
+  virtual void drain(sink_base &other) noexcept = 0;
 
-#ifdef CXXET_WITH_UNIT_TESTS
-  sink_properties &set_target_filename(char const *const filename) noexcept {
-    default_target_filename = filename;
-    return *this;
-  }
-#endif
+  bool has_events() const noexcept;
+
+protected:
+  event::list events;
+
+  void do_drain(sink_base &other) noexcept;
 
 private:
-  sink_properties(sink_properties const &) = delete;
-  sink_properties &operator=(sink_properties const &) = delete;
-  sink_properties(sink_properties &&) = delete;
-  sink_properties &operator=(sink_properties &&) = delete;
+  sink_base(sink_base const &) = delete;
+  sink_base &operator=(sink_base const &) = delete;
+  sink_base(sink_base &&) = delete;
+  sink_base &operator=(sink_base &&) = delete;
 };
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

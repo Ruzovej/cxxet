@@ -25,16 +25,16 @@
 #include <iostream> // must be there, even if unused ... so `std::cout`, etc. gets initialized before it's potentially used in `sink_properties` ctor
 #include <optional>
 
-#include "impl/file_sink.hxx"
-#include "impl/sink_properties.hxx"
-#include "impl/thread_sink.hxx"
+#include "impl/sink/event_collector.hxx"
+#include "impl/sink/file_sink.hxx"
+#include "impl/sink/properties.hxx"
 
 namespace cxxet {
 
 namespace {
-impl::sink_properties const sink_props{};
-impl::file_sink global_sink{sink_props};
-thread_local std::optional<impl::thread_sink> local_sink;
+impl::sink::properties const sink_props{};
+impl::sink::file_sink<true> global_sink{sink_props};
+thread_local std::optional<impl::sink::event_collector> local_sink;
 } // namespace
 
 void sink_thread_reserve(int const minimum_free_capacity) noexcept {

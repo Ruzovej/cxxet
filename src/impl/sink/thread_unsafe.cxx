@@ -17,22 +17,18 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/sink.hxx"
+#include "impl/sink/thread_unsafe.hxx"
 
-#include <iostream>
+namespace cxxet::impl::sink {
 
-#include "impl/dump_records.hxx"
+thread_unsafe::thread_unsafe() noexcept = default;
 
-namespace cxxet::impl {
+thread_unsafe::~thread_unsafe() noexcept = default;
 
-sink::sink() noexcept = default;
-
-sink::~sink() noexcept = default;
-
-void sink::drain(sink &other) noexcept {
-  if (!other.events.empty()) {
-    events.drain_other(other.events);
+void thread_unsafe::drain(sink_base &other) noexcept {
+  if (other.has_events()) {
+    do_drain(other);
   }
 }
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

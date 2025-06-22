@@ -17,19 +17,23 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/mutexed_sink.hxx"
+#include "impl/sink/thread_safe.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-mutexed_sink::mutexed_sink() noexcept = default;
+thread_safe::thread_safe() noexcept = default;
 
-mutexed_sink::~mutexed_sink() noexcept = default;
+thread_safe::~thread_safe() noexcept = default;
 
-void mutexed_sink::drain(sink &other) noexcept {
-  std::lock_guard lck{get_mutex()};
-  sink::drain(other);
+void thread_safe::drain(sink_base &other) noexcept {
+  if (other.has_events()) {
+    std::lock_guard lck{mtx};
+    do_drain(other);
+  }
 }
 
-std::mutex &mutexed_sink::get_mutex() noexcept { return mtx; }
+void thread_safe::lock() noexcept { mtx.lock(); }
 
-} // namespace cxxet::impl
+void thread_safe::unlock() noexcept { mtx.unlock(); }
+
+} // namespace cxxet::impl::sink

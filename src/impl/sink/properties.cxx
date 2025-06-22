@@ -17,7 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/sink_properties.hxx"
+#include "impl/sink/properties.hxx"
 #include "cxxet/timepoint.hxx"
 
 #include <cstdlib>
@@ -27,7 +27,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
 namespace {
 
@@ -86,7 +86,7 @@ char const *parse_string(char const *const str_value) { return str_value; }
 
 } // namespace
 
-sink_properties::sink_properties() noexcept
+properties::properties() noexcept
     : time_point_zero_ns{as_int_ns(now())}, verbose{parse_env_variable(
                                                 "CXXET_VERBOSE", parse_bool,
                                                 false, false)},
@@ -100,4 +100,4 @@ sink_properties::sink_properties() noexcept
   // ...
 }
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

@@ -20,15 +20,16 @@
 #pragma once
 
 #include "cxxet/output_format.hxx"
-#include "impl/mutexed_sink.hxx"
-#include "impl/sink_properties.hxx"
+#include "impl/sink/properties.hxx"
+#include "impl/sink/sink_thread_policy_t.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-struct file_sink : mutexed_sink {
+template <bool thread_safe_v>
+struct file_sink : sink_thread_policy_t<thread_safe_v> {
   explicit file_sink(long long const aTime_point, output::format const aFmt,
                      char const *const aTarget_filename) noexcept;
-  explicit file_sink(sink_properties const &traits) noexcept;
+  explicit file_sink(properties const &traits) noexcept;
   ~file_sink() noexcept override;
 
   void flush(output::format const aFmt, char const *const aFilename,
@@ -40,6 +41,8 @@ private:
   file_sink(file_sink &&) = delete;
   file_sink &operator=(file_sink &&) = delete;
 
+  using base_class_t = sink_thread_policy_t<thread_safe_v>;
+
   void do_flush() noexcept;
 
   long long const time_point;
@@ -47,4 +50,7 @@ private:
   char const *target_filename;
 };
 
-} // namespace cxxet::impl
+extern template struct file_sink<true>;
+extern template struct file_sink<false>;
+
+} // namespace cxxet::impl::sink

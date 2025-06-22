@@ -19,10 +19,9 @@
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
-#include "impl/cascade_sink.hxx"
-#include "impl/cascade_sink_thread_safe.hxx"
-#include "impl/file_sink.hxx"
-#include "impl/thread_sink.hxx"
+#include "impl/sink/cascade.hxx"
+#include "impl/sink/event_collector.hxx"
+#include "impl/sink/file_sink.hxx"
 
 #include <thread>
 
@@ -62,10 +61,10 @@ TEST_CASE("sink cascade") {
       19, 20, 21, "test instant", scope_t::global, 'c', 321, 1'111'111'111, 25};
 
   SUBCASE("one 'leaf'") {
-    sink_properties traits{};
+    sink::properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<file_sink> root{traits};
-    test_sink<thread_sink> leaf{&root};
+    test_sink<sink::file_sink<false>> root{traits};
+    test_sink<sink::event_collector> leaf{&root};
     leaf.reserve(2);
 
     leaf.append_event(a[0]);
@@ -91,10 +90,10 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("two 'leafs', tree") {
-    sink_properties traits{};
+    sink::properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<file_sink> root{traits};
-    test_sink<thread_sink> leaf1{&root}, leaf2{&root};
+    test_sink<sink::file_sink<false>> root{traits};
+    test_sink<sink::event_collector> leaf1{&root}, leaf2{&root};
     leaf1.reserve(1);
     leaf2.reserve(1);
 
@@ -128,10 +127,10 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("two 'leafs', linear") {
-    sink_properties traits{};
+    sink::properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<file_sink> root{traits};
-    test_sink<thread_sink> leaf1{&root}, leaf2{&leaf1};
+    test_sink<sink::file_sink<false>> root{traits};
+    test_sink<sink::event_collector> leaf1{&root}, leaf2{&leaf1};
     leaf1.reserve(1);
     leaf2.reserve(1);
 
@@ -163,12 +162,12 @@ TEST_CASE("sink cascade") {
   }
 
   SUBCASE("flush upon destruction") {
-    sink_properties traits{};
+    sink::properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<file_sink> root{traits};
+    test_sink<sink::file_sink<false>> root{traits};
 
     {
-      thread_sink leaf{&root};
+      sink::event_collector leaf{&root};
       leaf.reserve(traits.default_list_node_capacity);
       leaf.append_event(a[0]);
     }
@@ -183,15 +182,15 @@ TEST_CASE("sink cascade") {
     REQUIRE_EQ(counter, 1);
   }
 
-  SUBCASE("intermediate cascade_sink usage") {
-    sink_properties traits{};
+  SUBCASE("intermediate sink::cascade<false> usage (thread UNsafe)") {
+    sink::properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<file_sink> root{traits};
+    test_sink<sink::file_sink<false>> root{traits};
 
     {
-      cascade_sink intermediate{&root};
+      sink::cascade<false> intermediate{&root};
       auto const test_fn = [&intermediate, &traits](event::any const &evt) {
-        test_sink<thread_sink> leaf{&intermediate};
+        test_sink<sink::event_collector> leaf{&intermediate};
         leaf.reserve(traits.default_list_node_capacity);
         leaf.append_event(evt);
       };
@@ -209,15 +208,15 @@ TEST_CASE("sink cascade") {
     REQUIRE_EQ(counter, 2);
   }
 
-  SUBCASE("intermediate cascade_sink_thread_safe usage") {
-    sink_properties traits{};
+  SUBCASE("intermediate sink::cascade<true> usage (thread_safe)") {
+    sink::properties traits{};
     traits.set_target_filename("/dev/null");
-    test_sink<file_sink> root{traits};
+    test_sink<sink::file_sink<false>> root{traits};
 
     {
-      cascade_sink_thread_safe intermediate{&root};
+      sink::cascade<true> intermediate{&root};
       auto const test_fn = [&intermediate, &traits](event::any const &evt) {
-        test_sink<thread_sink> leaf{&intermediate};
+        test_sink<sink::event_collector> leaf{&intermediate};
         leaf.reserve(traits.default_list_node_capacity);
         leaf.append_event(evt);
       };
@@ -233,13 +232,39 @@ TEST_CASE("sink cascade") {
 
     n = root.apply([&counter, &a](long long const, long long const,
                                   event::any const &evt) {
-      counter++;
+      ++counter;
       REQUIRE_EQ(evt, a[0]);
     });
 
     REQUIRE(!root.empty());
     REQUIRE_EQ(n, counter);
     REQUIRE_EQ(counter, 3);
+  }
+
+  SUBCASE("sink::file_sink<true> usage (thread safe)") {
+    sink::properties traits{};
+    traits.set_target_filename("/dev/null");
+    test_sink<sink::file_sink<true>> root{traits};
+
+    auto const test_fn = [&root, &traits](event::any const &evt) {
+      sink::event_collector leaf{&root};
+      leaf.reserve(traits.default_list_node_capacity);
+      leaf.append_event(evt);
+    };
+
+    std::thread t{test_fn, a[0]};
+    test_fn(a[0]);
+    t.join();
+
+    n = root.apply([&counter, &a](long long const, long long const,
+                                  event::any const &evt) {
+      ++counter;
+      REQUIRE_EQ(evt, a[0]);
+    });
+
+    REQUIRE(!root.empty());
+    REQUIRE_EQ(n, counter);
+    REQUIRE_EQ(counter, 2);
   }
 }
 

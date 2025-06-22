@@ -19,25 +19,25 @@
 
 #pragma once
 
-#include "cxxet/output_format.hxx"
-#include "impl/event/list/list.hxx"
+#include "impl/sink/sink_base.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-struct sink {
-  sink() noexcept;
-  virtual ~sink() noexcept;
+struct thread_unsafe : sink_base {
+  explicit thread_unsafe() noexcept;
+  ~thread_unsafe() noexcept override;
 
-  virtual void drain(sink &other) noexcept;
+  void drain(sink_base &other) noexcept override final;
 
 protected:
-  event::list events;
+  constexpr void lock() noexcept {}
+  constexpr void unlock() noexcept {}
 
 private:
-  sink(sink const &) = delete;
-  sink &operator=(sink const &) = delete;
-  sink(sink &&) = delete;
-  sink &operator=(sink &&) = delete;
+  thread_unsafe(thread_unsafe const &) = delete;
+  thread_unsafe &operator=(thread_unsafe const &) = delete;
+  thread_unsafe(thread_unsafe &&) = delete;
+  thread_unsafe &operator=(thread_unsafe &&) = delete;
 };
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

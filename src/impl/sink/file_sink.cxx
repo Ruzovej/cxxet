@@ -17,42 +17,51 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/file_sink.hxx"
+#include "impl/sink/file_sink.hxx"
 
 #include <iostream>
 
 #include "impl/dump_records.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-file_sink::file_sink(long long const aTime_point, output::format const aFmt,
-                     char const *const aTarget_filename) noexcept
-    : mutexed_sink{}, time_point{aTime_point}, fmt{aFmt},
+template <bool thread_safe_v>
+file_sink<thread_safe_v>::file_sink(long long const aTime_point,
+                                    output::format const aFmt,
+                                    char const *const aTarget_filename) noexcept
+    : base_class_t{}, time_point{aTime_point}, fmt{aFmt},
       target_filename{aTarget_filename} {}
 
-file_sink::file_sink(sink_properties const &traits) noexcept
+template <bool thread_safe_v>
+file_sink<thread_safe_v>::file_sink(properties const &traits) noexcept
     : file_sink{traits.time_point_zero_ns, traits.default_target_format,
                 traits.default_target_filename} {}
 
-file_sink::~file_sink() noexcept { do_flush(); }
+template <bool thread_safe_v> file_sink<thread_safe_v>::~file_sink() noexcept {
+  do_flush();
+}
 
-void file_sink::flush(output::format const aFmt, char const *const aFilename,
-                      bool const defer) noexcept {
-  std::lock_guard lck{get_mutex()};
+template <bool thread_safe_v>
+void file_sink<thread_safe_v>::flush(output::format const aFmt,
+                                     char const *const aFilename,
+                                     bool const defer) noexcept {
+  base_class_t::lock();
   fmt = aFmt;
   target_filename = aFilename;
   if (!defer) {
     do_flush();
   }
+  base_class_t::unlock();
 }
 
-void file_sink::do_flush() noexcept {
+template <bool thread_safe_v>
+void file_sink<thread_safe_v>::do_flush() noexcept {
   if (target_filename) {
-    if (!events.empty()) {
+    if (!base_class_t::events.empty()) {
       try {
         // is `time_point_zero` needed?!
-        dump_records(events, time_point, fmt, target_filename);
-        events.destroy();
+        dump_records(base_class_t::events, time_point, fmt, target_filename);
+        base_class_t::events.destroy();
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
       }
@@ -62,4 +71,7 @@ void file_sink::do_flush() noexcept {
   }
 }
 
-} // namespace cxxet::impl
+template struct file_sink<true>;
+template struct file_sink<false>;
+
+} // namespace cxxet::impl::sink
