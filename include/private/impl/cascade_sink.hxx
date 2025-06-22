@@ -27,6 +27,8 @@ struct cascade_sink : virtual sink {
   explicit cascade_sink(sink *aParent) noexcept;
   ~cascade_sink() noexcept override;
 
+  void set_parent(sink *aParent) noexcept;
+
   void flush() noexcept;
 
 private:

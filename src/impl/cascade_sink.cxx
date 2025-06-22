@@ -27,6 +27,8 @@ cascade_sink::cascade_sink(sink *aParent) noexcept : parent{aParent} {}
 
 cascade_sink::~cascade_sink() noexcept { flush(); }
 
+void cascade_sink::set_parent(sink *aParent) noexcept { parent = aParent; }
+
 void cascade_sink::flush() noexcept {
   assert(parent != this);
   if (parent) {
