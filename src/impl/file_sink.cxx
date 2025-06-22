@@ -34,9 +34,7 @@ file_sink::file_sink(sink_properties const &traits) noexcept
     : file_sink{traits.time_point_zero_ns, traits.default_target_format,
                 traits.default_target_filename} {}
 
-file_sink::~file_sink() noexcept {
-  do_flush();
-}
+file_sink::~file_sink() noexcept { do_flush(); }
 
 void file_sink::flush(output::format const aFmt, char const *const aFilename,
                       bool const defer) noexcept {
@@ -49,19 +47,19 @@ void file_sink::flush(output::format const aFmt, char const *const aFilename,
 }
 
 void file_sink::do_flush() noexcept {
-  if (!events.empty()) {
-    try {
-      if (target_filename) {
+  if (target_filename) {
+    if (!events.empty()) {
+      try {
         // is `time_point_zero` needed?!
         dump_records(events, time_point, fmt, target_filename);
+        events.destroy();
+      } catch (std::exception const &e) {
+        std::cerr << "Failed to dump records: " << e.what() << '\n';
       }
-      events.destroy();
-    } catch (std::exception const &e) {
-      std::cerr << "Failed to dump records: " << e.what() << '\n';
     }
+    // to avoid flushing again & rewriting the file implicitly ...:
+    target_filename = nullptr;
   }
-  // to avoid flushing again & rewriting the file implicitly ...:
-  target_filename = nullptr;
 }
 
 } // namespace cxxet::impl

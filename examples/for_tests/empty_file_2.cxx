@@ -40,6 +40,8 @@ void record_some_events() {
 } // namespace
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
+  std::thread t{record_some_events};
+
   record_some_events();
 
   CXXET_sink_global_flush(
@@ -47,6 +49,8 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
       nullptr, // file won't be created/overwritten - `nullptr` means to discard
                // all recorded events ...
       true);
+
+  t.join();
 
   return 0;
 }
