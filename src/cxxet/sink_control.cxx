@@ -57,6 +57,11 @@ void sink_global_flush(cxxet::output::format const fmt,
   global_sink.flush(fmt, filename, defer_flush);
 }
 
+void sink_thread_divert_to_sink_global() noexcept {
+  assert(local_sink != std::nullopt && "thread local sink not initialized!");
+  local_sink->set_parent(&global_sink);
+}
+
 namespace impl {
 
 void thread_local_sink_submit_event(event::any const &evt) noexcept {

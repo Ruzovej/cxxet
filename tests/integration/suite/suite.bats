@@ -516,8 +516,15 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     local nm_output="${output}"
 
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
-    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxet::mark_complete::submit(timespec)
+    assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, std::unique_ptr<cxxet::sink_handle, std::default_delete<cxxet::sink_handle> > const&)
+cxxet::cascade_sink_handle::~cascade_sink_handle()
+cxxet::file_sink_handle::make(bool)
+cxxet::file_sink_handle::make(bool, cxxet::output::format, char const*)
+cxxet::file_sink_handle::~file_sink_handle()
+cxxet::mark_complete::submit(timespec)
 cxxet::sink_global_flush(cxxet::output::format, char const*, bool)
+cxxet::sink_handle::~sink_handle()
+cxxet::sink_thread_divert_to_sink_global()
 cxxet::sink_thread_flush()
 cxxet::sink_thread_reserve(int)
 cxxet::submit_counter(char const*, long long, double)
@@ -526,8 +533,8 @@ cxxet::submit_duration_end(char const*, long long)
 cxxet::submit_instant(char const*, cxxet::scope_t, long long)"
 
     # those definitely not:
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " cxxet::impl::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c "doctest::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c "cxxet::impl::")" 0
 }
 
 @test "Unit tests runner contains expected symbols" {

@@ -37,4 +37,6 @@ CXXET_IMPL_API void sink_global_flush(
                                           // precise: discard everything
     bool const defer_flush = false) noexcept;
 
+CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
+
 } // namespace cxxet
