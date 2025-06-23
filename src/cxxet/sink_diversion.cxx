@@ -30,13 +30,13 @@ sink_handle::~sink_handle() noexcept = default;
 
 namespace {
 
-struct sink_handle_holder {
-  virtual ~sink_handle_holder() noexcept = default;
-  virtual void *get_handle() noexcept = 0;
+struct sink_handle_provider {
+  virtual ~sink_handle_provider() noexcept = default;
+  virtual impl::sink::sink_base *get_raw_sink_handle() noexcept = 0;
 };
 
 template <bool thread_safe_v>
-struct file_sink_handle_impl final : file_sink_handle, sink_handle_holder {
+struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
   file_sink_handle_impl() noexcept
       : file_sink_handle{},
         sink{impl::sink::properties::instance().time_point_zero_ns} {}
@@ -47,7 +47,9 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_holder {
     impl::sink::event_collector::thread_local_instance().set_parent(&sink);
   }
 
-  void *get_handle() noexcept override { return &sink; }
+  impl::sink::sink_base *get_raw_sink_handle() noexcept override {
+    return &sink;
+  }
 
   void flush(output::format const fmt, char const *const filename,
              bool const defer) noexcept override {
@@ -71,10 +73,10 @@ file_sink_handle::make(bool const thread_safe) noexcept {
 namespace {
 template <bool thread_safe_v>
 struct cascade_sink_handle_impl final : cascade_sink_handle,
-                                        sink_handle_holder {
+                                        sink_handle_provider {
   cascade_sink_handle_impl(sink_handle *parent) noexcept
-      : sink{reinterpret_cast<impl::sink::sink_base *>(
-            dynamic_cast<sink_handle_holder *>(parent)->get_handle())} {}
+      : sink{dynamic_cast<sink_handle_provider *>(parent)
+                 ->get_raw_sink_handle()} {}
 
   ~cascade_sink_handle_impl() noexcept override = default;
 
@@ -82,7 +84,9 @@ struct cascade_sink_handle_impl final : cascade_sink_handle,
     impl::sink::event_collector::thread_local_instance().set_parent(&sink);
   }
 
-  void *get_handle() noexcept override { return &sink; }
+  impl::sink::sink_base *get_raw_sink_handle() noexcept override {
+    return &sink;
+  }
 
   void flush() noexcept override { sink.flush(); }
 
