@@ -53,8 +53,6 @@ int main(int argc, char const **argv) {
 
   CXXET_mark_instant("main thread flushing all markers");
 
-  CXXET_sink_thread_flush();
-
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   t1.join();

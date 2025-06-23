@@ -23,9 +23,6 @@
 
 #include <cassert>
 
-#include <type_traits>
-#include <utility>
-
 namespace cxxet::impl::event {
 
 namespace {
