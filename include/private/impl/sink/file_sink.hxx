@@ -21,12 +21,12 @@
 
 #include "cxxet/output_format.hxx"
 #include "impl/sink/properties.hxx"
-#include "impl/sink/sink_thread_policy_t.hxx"
+#include "impl/sink/thread_safe_t.hxx"
 
 namespace cxxet::impl::sink {
 
 template <bool thread_safe_v>
-struct file_sink : sink_thread_policy_t<thread_safe_v> {
+struct file_sink : thread_safe_t<thread_safe_v> {
   explicit file_sink(long long const aTime_point) noexcept;
   explicit file_sink(long long const aTime_point, output::format const aFmt,
                      char const *const aTarget_filename) noexcept;
@@ -42,7 +42,7 @@ private:
   file_sink(file_sink &&) = delete;
   file_sink &operator=(file_sink &&) = delete;
 
-  using base_class_t = sink_thread_policy_t<thread_safe_v>;
+  using base_class_t = thread_safe_t<thread_safe_v>;
 
   void do_flush() noexcept;
 

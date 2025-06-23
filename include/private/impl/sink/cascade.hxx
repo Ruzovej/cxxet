@@ -21,12 +21,12 @@
 
 #include <cassert>
 
-#include "impl/sink/sink_thread_policy_t.hxx"
+#include "impl/sink/thread_safe_t.hxx"
 
 namespace cxxet::impl::sink {
 
 template <bool thread_safe_v>
-struct cascade : sink_thread_policy_t<thread_safe_v> {
+struct cascade : thread_safe_t<thread_safe_v> {
   explicit cascade(sink_base *aParent) noexcept
       : base_class_t{}, parent{aParent} {}
 
@@ -59,7 +59,7 @@ private:
   cascade(cascade &&) = delete;
   cascade &operator=(cascade &&) = delete;
 
-  using base_class_t = sink_thread_policy_t<thread_safe_v>;
+  using base_class_t = thread_safe_t<thread_safe_v>;
 
   sink_base *parent;
 };

@@ -26,9 +26,8 @@
 
 namespace cxxet::impl::sink {
 
-// TODO rename it (& file) later ... e.g. `thread_safe_t` or so ...
 template <bool thread_safe_v>
-using sink_thread_policy_t =
+using thread_safe_t =
     std::conditional_t<thread_safe_v, thread_safe, thread_unsafe>;
 
 } // namespace cxxet::impl::sink
