@@ -24,12 +24,17 @@
 namespace cxxet::impl::sink {
 
 struct event_collector : cascade<false> {
-  explicit event_collector(sink_base *aParent) noexcept;
-  ~event_collector() noexcept override;
-
   void append_event(event::any const &evt) noexcept;
 
   void reserve(int const minimum_free_capacity) noexcept;
+
+  static event_collector &thread_local_instance() noexcept;
+
+#ifndef CXXET_WITH_UNIT_TESTS
+private:
+#endif
+  explicit event_collector(sink_base *aParent) noexcept;
+  ~event_collector() noexcept override;
 
 private:
   event_collector(event_collector const &) = delete;

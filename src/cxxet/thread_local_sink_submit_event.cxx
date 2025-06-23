@@ -17,18 +17,14 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "impl/thread_local_sink_submit_event.hxx"
 
-#include <type_traits>
+#include "impl/sink/event_collector.hxx"
 
-#include "impl/sink/thread_safe.hxx"
-#include "impl/sink/thread_unsafe.hxx"
+namespace cxxet::impl {
 
-namespace cxxet::impl::sink {
+void thread_local_sink_submit_event(event::any const &evt) noexcept {
+  sink::event_collector::thread_local_instance().append_event(evt);
+}
 
-// TODO rename it (& file) later ... e.g. `thread_safe_t` or so ...
-template <bool thread_safe_v>
-using sink_thread_policy_t =
-    std::conditional_t<thread_safe_v, thread_safe, thread_unsafe>;
-
-} // namespace cxxet::impl::sink
+} // namespace cxxet::impl

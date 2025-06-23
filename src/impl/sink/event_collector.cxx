@@ -19,23 +19,33 @@
 
 #include "impl/sink/event_collector.hxx"
 
-#include <cassert>
+#include "impl/sink/file_sink.hxx"
 
 namespace cxxet::impl::sink {
-
-event_collector::event_collector(sink_base *aParent) noexcept
-    : cascade{aParent} {}
-
-event_collector::~event_collector() noexcept = default;
 
 void event_collector::append_event(event::any const &evt) noexcept {
   events.safe_append(evt, default_node_capacity);
 }
 
 void event_collector::reserve(int const minimum_free_capacity) noexcept {
-  assert(minimum_free_capacity > 0);
-  default_node_capacity = minimum_free_capacity;
+  default_node_capacity =
+      minimum_free_capacity <= 0
+          ? impl::sink::properties::instance().default_list_node_capacity
+          : minimum_free_capacity;
+
   events.reserve(default_node_capacity);
 }
+
+event_collector &event_collector::thread_local_instance() noexcept {
+  thread_local impl::sink::event_collector local_sink{
+      &sink::file_sink_global_instance() // default parent
+  };
+  return local_sink;
+}
+
+event_collector::event_collector(sink_base *aParent) noexcept
+    : cascade{aParent} {}
+
+event_collector::~event_collector() noexcept = default;
 
 } // namespace cxxet::impl::sink

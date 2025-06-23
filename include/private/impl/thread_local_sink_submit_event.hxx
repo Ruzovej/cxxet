@@ -23,6 +23,6 @@
 
 namespace cxxet::impl {
 
-void thread_local_sink_submit_event(impl::event::any const &evt) noexcept;
+void thread_local_sink_submit_event(event::any const &evt) noexcept;
 
 }
