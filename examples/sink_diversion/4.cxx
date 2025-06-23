@@ -26,8 +26,7 @@
 #include "cxxet/sink_diversion.hxx"
 #endif
 
-namespace {
-void test_block() {
+static void test_block() {
   CXXET_sink_thread_reserve();
 
   CXXET_mark_complete("example: redirecting all events to custom file_sink");
@@ -38,7 +37,6 @@ void test_block() {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
-} // namespace
 
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename1{argc > 1 ? argv[1]
@@ -47,8 +45,6 @@ int main(int argc, char const **argv) {
 #ifdef CXXET_ENABLE
   auto file_sink_local{cxxet::file_sink_handle::make(true)};
   file_sink_local->flush(cxxet::output::format::chrome_trace, filename1, true);
-
-  // file_sink_local->divert_thread_sink_to_this(); // TODO is it needed?!
 #endif
 
   std::thread t1{[&]() {
@@ -119,15 +115,13 @@ int main(int argc, char const **argv) {
   t1.join();
   t2.join();
 
-  {
 #ifdef CXXET_ENABLE
-    file_sink_local->divert_thread_sink_to_this();
+  file_sink_local->divert_thread_sink_to_this();
 #endif
 
-    test_block();
+  test_block();
 
-    CXXET_sink_thread_flush();
-  }
+  CXXET_sink_thread_flush();
 
   return 0;
 }

@@ -33,11 +33,9 @@ sink_handle::~sink_handle() noexcept = default;
 namespace {
 template <bool thread_safe_v>
 struct file_sink_handle_impl final : file_sink_handle {
-  file_sink_handle_impl(output::format const fmt = output::format::chrome_trace,
-                        char const *const filename = nullptr) noexcept
+  file_sink_handle_impl() noexcept
       : file_sink_handle{},
-        sink{impl::sink::properties::instance().time_point_zero_ns, fmt,
-             filename} {}
+        sink{impl::sink::properties::instance().time_point_zero_ns} {}
 
   ~file_sink_handle_impl() noexcept override = default;
 

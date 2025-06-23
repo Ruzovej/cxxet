@@ -46,7 +46,8 @@ private:
 
   void do_flush() noexcept;
 
-  long long const time_point;
+  long long const
+      time_point; // TODO better name (should at least end with units ...)
   output::format fmt{output::format::unknown};
   char const *target_filename{nullptr};
 };

@@ -20,6 +20,7 @@
 #include "impl/sink/event_collector.hxx"
 
 #include "impl/sink/file_sink.hxx"
+#include "impl/sink/properties.hxx"
 
 namespace cxxet::impl::sink {
 

@@ -18,7 +18,6 @@
 */
 
 #include "impl/sink/properties.hxx"
-#include "cxxet/timepoint.hxx"
 
 #include <cstdlib>
 
@@ -26,6 +25,8 @@
 #include <iostream>
 #include <string_view>
 #include <type_traits>
+
+#include "cxxet/timepoint.hxx"
 
 namespace cxxet::impl::sink {
 
