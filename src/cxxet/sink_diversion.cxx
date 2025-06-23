@@ -29,8 +29,14 @@ namespace cxxet {
 sink_handle::~sink_handle() noexcept = default;
 
 namespace {
+
+struct sink_handle_holder {
+  virtual ~sink_handle_holder() noexcept = default;
+  virtual void *get_handle() noexcept = 0;
+};
+
 template <bool thread_safe_v>
-struct file_sink_handle_impl final : file_sink_handle {
+struct file_sink_handle_impl final : file_sink_handle, sink_handle_holder {
   file_sink_handle_impl() noexcept
       : file_sink_handle{},
         sink{impl::sink::properties::instance().time_point_zero_ns} {}
@@ -64,9 +70,11 @@ file_sink_handle::make(bool const thread_safe) noexcept {
 
 namespace {
 template <bool thread_safe_v>
-struct cascade_sink_handle_impl final : cascade_sink_handle {
+struct cascade_sink_handle_impl final : cascade_sink_handle,
+                                        sink_handle_holder {
   cascade_sink_handle_impl(sink_handle *parent) noexcept
-      : sink{reinterpret_cast<impl::sink::sink_base *>(parent->get_handle())} {}
+      : sink{reinterpret_cast<impl::sink::sink_base *>(
+            dynamic_cast<sink_handle_holder *>(parent)->get_handle())} {}
 
   ~cascade_sink_handle_impl() noexcept override = default;
 

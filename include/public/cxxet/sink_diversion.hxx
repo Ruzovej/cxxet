@@ -30,8 +30,6 @@ struct CXXET_IMPL_API sink_handle {
   virtual ~sink_handle() noexcept;
 
   virtual void divert_thread_sink_to_this() noexcept = 0;
-
-  virtual void *get_handle() noexcept = 0;
 };
 
 struct CXXET_IMPL_API file_sink_handle : sink_handle {
@@ -39,7 +37,7 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
   make(bool const thread_safe) noexcept;
 
   virtual void flush(output::format const fmt, char const *const filename,
-                     bool const defer = false) noexcept = 0;
+                     bool const defer) noexcept = 0;
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {
