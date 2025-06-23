@@ -63,6 +63,9 @@
 
 #define CXXET_sink_global_flush(...) cxxet::sink_global_flush(__VA_ARGS__)
 
+#define CXXET_sink_thread_divert_to_sink_global()                              \
+  cxxet::sink_thread_divert_to_sink_global()
+
 // TODO either rename this file (e.g. to `all_markers`) or provide (macro?!)
 // interface to `sink_diversion.hxx`
 
@@ -85,5 +88,7 @@
 #define CXXET_sink_thread_flush()
 
 #define CXXET_sink_global_flush(...)
+
+#define CXXET_sink_thread_divert_to_sink_global()
 
 #endif
