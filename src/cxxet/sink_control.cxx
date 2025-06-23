@@ -32,8 +32,7 @@
 namespace cxxet {
 
 namespace {
-impl::sink::properties const sink_props{};
-impl::sink::file_sink<true> global_sink{sink_props};
+impl::sink::file_sink<true> global_sink{impl::sink::properties::instance()};
 thread_local std::optional<impl::sink::event_collector> local_sink;
 } // namespace
 
@@ -41,9 +40,10 @@ void sink_thread_reserve(int const minimum_free_capacity) noexcept {
   if (local_sink == std::nullopt) {
     local_sink.emplace(&global_sink);
   }
-  local_sink->reserve(minimum_free_capacity <= 0
-                          ? sink_props.default_list_node_capacity
-                          : minimum_free_capacity);
+  local_sink->reserve(
+      minimum_free_capacity <= 0
+          ? impl::sink::properties::instance().default_list_node_capacity
+          : minimum_free_capacity);
 }
 
 void sink_thread_flush() noexcept {

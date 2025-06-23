@@ -86,6 +86,11 @@ char const *parse_string(char const *const str_value) { return str_value; }
 
 } // namespace
 
+properties const &properties::instance() noexcept {
+  static impl::sink::properties const sink_props{};
+  return sink_props;
+}
+
 properties::properties() noexcept
     : time_point_zero_ns{as_int_ns(now())}, verbose{parse_env_variable(
                                                 "CXXET_VERBOSE", parse_bool,

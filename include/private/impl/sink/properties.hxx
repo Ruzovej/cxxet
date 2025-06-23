@@ -30,14 +30,18 @@ struct properties {
   int default_list_node_capacity;
   char const *default_target_filename;
 
-  properties() noexcept;
+  static properties const &instance() noexcept;
 
 #ifdef CXXET_WITH_UNIT_TESTS
   properties &set_target_filename(char const *const filename) noexcept {
     default_target_filename = filename;
     return *this;
   }
+
+#else
+private:
 #endif
+  properties() noexcept;
 
 private:
   properties(properties const &) = delete;
