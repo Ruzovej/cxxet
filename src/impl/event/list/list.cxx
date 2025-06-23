@@ -87,8 +87,10 @@ void list::drain_other(list &other) noexcept {
   assert((first == nullptr) == (last == nullptr));
   assert((other.first == nullptr) == (other.last == nullptr));
   if (last) {
-    last[0].meta.next = std::exchange(other.first, nullptr);
-    last = std::exchange(other.last, nullptr);
+    if (other.last) {
+      last[0].meta.next = std::exchange(other.first, nullptr);
+      last = std::exchange(other.last, nullptr);
+    }
   } else {
     std::swap(first, other.first);
     std::swap(last, other.last);
@@ -211,9 +213,9 @@ TEST_CASE("event::list") {
     }
 
     SUBCASE("drain other") {
+      l.safe_append(a[0], 3);
       event::list other;
       other.reserve(2);
-      other.append(a[0]);
       other.append(a[1]);
 
       l.drain_other(other);
@@ -227,10 +229,8 @@ TEST_CASE("event::list") {
     }
 
     SUBCASE("drain other empty") {
+      l.safe_append(a[0], 6);
       event::list other;
-      l.reserve(2);
-      l.append(a[0]);
-      l.append(a[1]);
 
       l.drain_other(other);
       n = l.apply([&counter, &a](long long const, long long const,
@@ -239,7 +239,7 @@ TEST_CASE("event::list") {
       });
 
       REQUIRE(other.empty());
-      REQUIRE_EQ(counter, 2);
+      REQUIRE_EQ(counter, 1);
     }
 
     SUBCASE("drain") {

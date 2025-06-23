@@ -25,10 +25,6 @@ thread_unsafe::thread_unsafe() noexcept = default;
 
 thread_unsafe::~thread_unsafe() noexcept = default;
 
-void thread_unsafe::drain(sink_base &other) noexcept {
-  if (other.has_events()) {
-    do_drain(other);
-  }
-}
+void thread_unsafe::drain(sink_base &other) noexcept { do_drain(other); }
 
 } // namespace cxxet::impl::sink

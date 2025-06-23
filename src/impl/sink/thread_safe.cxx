@@ -26,10 +26,8 @@ thread_safe::thread_safe() noexcept = default;
 thread_safe::~thread_safe() noexcept = default;
 
 void thread_safe::drain(sink_base &other) noexcept {
-  if (other.has_events()) {
-    std::lock_guard lck{mtx};
-    do_drain(other);
-  }
+  std::lock_guard lck{mtx};
+  do_drain(other);
 }
 
 void thread_safe::lock() noexcept { mtx.lock(); }
