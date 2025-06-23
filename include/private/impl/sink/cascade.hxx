@@ -39,16 +39,16 @@ struct cascade : sink_thread_policy_t<thread_safe_v> {
     base_class_t::unlock();
   }
 
-  void flush() noexcept { do_flush(); }
+  void flush() noexcept { do_flush<false>(); }
 
 private:
-  template <bool inside_dtor = false> void do_flush() noexcept {
+  template <bool inside_dtor> void do_flush() noexcept {
     if (parent) {
-      if constexpr (inside_dtor) {
+      if constexpr (!inside_dtor) {
         base_class_t::lock();
       }
       parent->drain(*this);
-      if constexpr (inside_dtor) {
+      if constexpr (!inside_dtor) {
         base_class_t::unlock();
       }
     }
