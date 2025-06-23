@@ -30,7 +30,6 @@ int main(int argc, char const **argv) {
                                                         : "/dev/stdout"};
 #ifdef CXXET_ENABLE
   auto file_sink_local{cxxet::file_sink_handle::make(true)};
-  file_sink_local->divert_thread_sink_to_this();
   file_sink_local->flush(cxxet::output::format::chrome_trace, filename1, true);
 #endif
 
