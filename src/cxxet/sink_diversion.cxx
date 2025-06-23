@@ -71,7 +71,7 @@ file_sink_handle::~file_sink_handle() noexcept = default;
 namespace {
 template <bool thread_safe_v>
 struct cascade_sink_handle_impl final : cascade_sink_handle {
-  cascade_sink_handle_impl(sink_handle *const parent) noexcept
+  cascade_sink_handle_impl(sink_handle *parent) noexcept
       : sink{reinterpret_cast<impl::sink::sink_base *>(parent->get_handle())} {}
 
   ~cascade_sink_handle_impl() noexcept override = default;
@@ -91,11 +91,11 @@ private:
 
 std::unique_ptr<cascade_sink_handle>
 cascade_sink_handle::make(bool const thread_safe,
-                          std::unique_ptr<sink_handle> const &parent) noexcept {
+                          sink_handle &parent) noexcept {
   if (thread_safe) {
-    return std::make_unique<cascade_sink_handle_impl<true>>(parent.get());
+    return std::make_unique<cascade_sink_handle_impl<true>>(&parent);
   } else {
-    return std::make_unique<cascade_sink_handle_impl<false>>(parent.get());
+    return std::make_unique<cascade_sink_handle_impl<false>>(&parent);
   }
 }
 

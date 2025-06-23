@@ -427,6 +427,36 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result2}")" '["example: redirecting all events to custom file_sink 2 (main thread)","example: redirecting all events to custom file_sink 2 (spawned thread)","within two sleeps 2 (main thread)","within two sleeps 2 (spawned thread)"]'
 }
 
+@test "Custom file_sink & cascade_sink redirection example 4" {
+    local executable="${BIN_DIR}/cxxet_example_local_file_sink_4"
+    local result="${TMP_RESULT_DIR}/example_local_file_sink_4.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 16
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result}")" 8
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 8
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["example: redirecting all events to custom file_sink","within two sleeps"]'
+}
+
 # TODO end-user usage:
 # * All event types in one file.
 
@@ -630,7 +660,7 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     local nm_output="${output}"
 
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
-    assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, std::unique_ptr<cxxet::sink_handle, std::default_delete<cxxet::sink_handle> > const&)
+    assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, cxxet::sink_handle&)
 cxxet::cascade_sink_handle::~cascade_sink_handle()
 cxxet::file_sink_handle::make(bool)
 cxxet::file_sink_handle::~file_sink_handle()

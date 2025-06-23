@@ -58,8 +58,7 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {
   static std::unique_ptr<cascade_sink_handle>
-  make(bool const thread_safe,
-       std::unique_ptr<sink_handle> const &parent) noexcept;
+  make(bool const thread_safe, sink_handle &parent) noexcept;
 
   virtual ~cascade_sink_handle() noexcept;
 
