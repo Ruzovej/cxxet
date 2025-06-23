@@ -351,6 +351,44 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result2}")" '["example: redirecting all events to default & global file_sink ... first","example: redirecting all events to default & global file_sink ... second","within two sleeps ... first","within two sleeps ... second"]'
 }
 
+@test "Custom file_sink redirection example 2" {
+    local executable="${BIN_DIR}/cxxet_example_local_file_sink_2"
+    local result1="${TMP_RESULT_DIR}/example_local_file_sink_2_A.json"
+    local result2="${TMP_RESULT_DIR}/example_local_file_sink_2_B.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
+
+    run "${executable}" "${result1}" "${result2}"
+    assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ]
+    assert [ -f "${result2}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result1}")" '"ns"'
+    assert_equal "$(jq -e '.displayTimeUnit' "${result2}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 4
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 4
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result1}")" '["X","i"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result2}")" '["X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result1}")" '["example: redirecting all events to custom (thread safe) file_sink ... first","example: redirecting all events to custom (thread safe) file_sink ... second","within two sleeps ... first","within two sleeps ... second"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result2}")" '["example: redirecting all events to default & global file_sink ... first","example: redirecting all events to default & global file_sink ... second","within two sleeps ... first","within two sleeps ... second"]'
+}
+
 # TODO end-user usage:
 # * All event types in one file.
 
