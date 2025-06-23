@@ -26,8 +26,6 @@
 
 namespace cxxet {
 
-sink_handle::sink_handle() noexcept = default;
-
 sink_handle::~sink_handle() noexcept = default;
 
 namespace {
@@ -64,8 +62,6 @@ file_sink_handle::make(bool const thread_safe) noexcept {
   }
 }
 
-file_sink_handle::~file_sink_handle() noexcept = default;
-
 namespace {
 template <bool thread_safe_v>
 struct cascade_sink_handle_impl final : cascade_sink_handle {
@@ -96,7 +92,5 @@ cascade_sink_handle::make(bool const thread_safe,
     return std::make_unique<cascade_sink_handle_impl<false>>(&parent);
   }
 }
-
-cascade_sink_handle::~cascade_sink_handle() noexcept = default;
 
 } // namespace cxxet
