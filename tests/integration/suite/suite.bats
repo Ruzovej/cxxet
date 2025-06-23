@@ -673,6 +673,18 @@ cxxet::submit_duration_begin(char const*, long long)
 cxxet::submit_duration_end(char const*, long long)
 cxxet::submit_instant(char const*, cxxet::scope_t, long long)"
 
+    assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
+cxxet::file_sink_handle
+cxxet::sink_handle"
+
+    assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo name for cxxet::" | cut --delimiter ' ' --fields 1-5 --complement | sort -u)" "cxxet::cascade_sink_handle
+cxxet::file_sink_handle
+cxxet::sink_handle"
+
+    assert_equal "$(printf '%s' "${nm_output}" | grep " V vtable for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
+cxxet::file_sink_handle
+cxxet::sink_handle"
+
     # those definitely not:
     assert_equal "$(printf '%s' "${nm_output}" | grep -c "doctest::")" 0
     assert_equal "$(printf '%s' "${nm_output}" | grep -c "cxxet::impl::")" 0
