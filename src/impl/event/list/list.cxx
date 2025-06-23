@@ -160,9 +160,21 @@ TEST_CASE("event::list") {
       REQUIRE(other.empty());
     }
 
+    SUBCASE("drain other empty (but with previous reserve)") {
+      event::list other;
+      other.reserve(3);
+      l.drain_other(other);
+
+      n = l.apply([](long long const, long long const, event::any const &) {
+        REQUIRE(false);
+      });
+
+      REQUIRE(other.empty());
+    }
+
     REQUIRE_EQ(n, 0);
     REQUIRE(l.empty());
-    REQUIRE(l.size() == 0);
+    REQUIRE_EQ(l.size(), 0);
   }
 
   SUBCASE("append & apply") {
@@ -228,11 +240,22 @@ TEST_CASE("event::list") {
       REQUIRE_EQ(counter, 2);
     }
 
-    SUBCASE("drain other empty") {
+    SUBCASE("drain other empty (two times)") {
       l.safe_append(a[0], 6);
       event::list other;
 
       l.drain_other(other);
+      n = l.apply([&counter, &a](long long const, long long const,
+                                 event::any const &evt) {
+        REQUIRE_EQ(evt, a[counter++]);
+      });
+
+      REQUIRE(other.empty());
+      REQUIRE_EQ(counter, 1);
+
+      l.drain_other(other); // drain second time ...
+
+      counter = 0;
       n = l.apply([&counter, &a](long long const, long long const,
                                  event::any const &evt) {
         REQUIRE_EQ(evt, a[counter++]);
