@@ -18,7 +18,6 @@
 */
 
 #include <chrono>
-#include <string>
 #include <thread>
 
 #include "cxxet/all.hxx"
