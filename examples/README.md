@@ -4,22 +4,19 @@ This directory contains examples demonstrating the usage of the `cxxet` library 
 
 It's lightweight library that generates `chrome trace` format output, which can be viewed in Chrome's built-in trace viewer (`chrome://tracing`) or tools like [Perfetto UI](https://ui.perfetto.dev/).
 
-## Example categories
+## Categories
 
-* **[complete/](complete/)**
+* [complete](complete/README.md)
   * Marker for measuring time spans, with begin and end merged into single event.
-* **[counter/](counter/)**
+* [counter](counter/README.md)
   * Marker for tracking changing values over time.
-* **[duration/](duration/)**
+* [duration](duration/README.md)
   * Markers for measuring time spans, with begin and end marked separately.
-* **[for_tests/](for_tests/)**
+* [for_tests](for_tests/README.md)
   * Various examples showing how to (not) use provided library.
-* **[instant/](instant/)**
+* [instant](instant/README.md)
   * Marker for point-in-time events.
+* [sink_diversion](sink_diversion/README.md)
+  * Advanced manipulation and creation of local & intermediate sinks for markers.
 
 Examples are executed in acompanying `bats` test suite, while asserting on the output and desired behavior. See [`suite.bats`](../tests/integration/suite/suite.bats) for more details.
-
-## Performance Tips
-
-* Use `CXXET_sink_thread_reserve(capacity)` anytime when you know how many events will be generated; at least preallocate buffer for markers by a call to `CXXET_init_thread_local_sink()` (at most once per thread and before any `CXXET_sink_thread_reserve(...)` call).
-* Markers have (low?) overhead that can accumulate within high-frequency usage.
