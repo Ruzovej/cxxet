@@ -90,14 +90,12 @@ int main(int argc, char const **argv) {
 
     test_block();
 
-    std::thread t12{[&]() {
+    std::thread{[&]() {
 #ifdef CXXET_ENABLE
       cascade_sink->divert_thread_sink_to_this();
 #endif
       test_block();
-    }};
-
-    t12.join();
+    }}.join();
 
     CXXET_sink_thread_flush();
   }};

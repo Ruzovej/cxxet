@@ -38,7 +38,7 @@ struct sink_handle_provider {
 template <bool thread_safe_v>
 struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
   file_sink_handle_impl() noexcept
-      : file_sink_handle{},
+      : file_sink_handle{}, sink_handle_provider{},
         sink{impl::sink::properties::instance().time_point_zero_ns} {}
 
   ~file_sink_handle_impl() noexcept override = default;
@@ -75,7 +75,8 @@ template <bool thread_safe_v>
 struct cascade_sink_handle_impl final : cascade_sink_handle,
                                         sink_handle_provider {
   cascade_sink_handle_impl(sink_handle *parent) noexcept
-      : sink{dynamic_cast<sink_handle_provider *>(parent)
+      : cascade_sink_handle{}, sink_handle_provider{},
+        sink{dynamic_cast<sink_handle_provider *>(parent)
                  ->get_raw_sink_handle()} {}
 
   ~cascade_sink_handle_impl() noexcept override = default;
