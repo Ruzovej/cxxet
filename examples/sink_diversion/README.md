@@ -1,6 +1,6 @@
 # Sink diversion examples
 
-Generated events can be redirected to different output destinations (sinks) during runtime. This is useful for separating events from your application's execution into different files.
+Generated events from any particular thread can be redirected to its own output destination (sink) during runtime. This is useful for separating unrelated events from your application's execution into different files (e.g. processing independent requests - be it sequentially or in parallel).
 
 ## Examples
 
