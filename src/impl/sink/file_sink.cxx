@@ -66,7 +66,7 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
   } else if (target_filename) {
     if (!base_class_t::events.empty()) {
       try {
-        // is `time_point_zero` needed?!
+        // is `time_point_zero_ns` needed?!
         dump_records(base_class_t::events, time_point_zero_ns, fmt,
                      target_filename);
         base_class_t::events.destroy();
