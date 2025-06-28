@@ -23,7 +23,7 @@
 
 #include "cxxet/macros/implicit_name.h"
 #include "cxxet/mark/complete.hxx"
-#include "cxxet/mark_counter.hxx"
+#include "cxxet/mark/counter.hxx"
 #include "cxxet/mark_duration.hxx"
 #include "cxxet/mark_duration_begin.hxx"
 #include "cxxet/mark_duration_end.hxx"
@@ -37,7 +37,7 @@
   cxxet::mark::complete CXXET_IMPL_IMPLICIT_MARKER_NAME(                       \
       CXXET_IMPLICIT_MARKER_, __LINE__)(description)
 
-#define CXXET_mark_counters(...) cxxet::mark_counters_call(__VA_ARGS__)
+#define CXXET_mark_counters(...) cxxet::mark::do_submit_counters(__VA_ARGS__)
 
 #define CXXET_mark_duration(description)                                       \
   cxxet::mark_duration CXXET_IMPL_IMPLICIT_MARKER_NAME(CXXET_IMPLICIT_MARKER_, \
