@@ -664,14 +664,14 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
 cxxet::file_sink_handle::make(bool)
 cxxet::mark::complete::submit(timespec)
 cxxet::mark::submit_counter(char const*, long long, double)
+cxxet::mark::submit_duration_begin(char const*, long long)
+cxxet::mark::submit_duration_end(char const*, long long)
+cxxet::mark::submit_instant(char const*, cxxet::scope_t, long long)
 cxxet::sink_global_flush(cxxet::output::format, char const*, bool)
 cxxet::sink_handle::~sink_handle()
 cxxet::sink_thread_divert_to_sink_global()
 cxxet::sink_thread_flush()
-cxxet::sink_thread_reserve(int)
-cxxet::submit_duration_begin(char const*, long long)
-cxxet::submit_duration_end(char const*, long long)
-cxxet::submit_instant(char const*, cxxet::scope_t, long long)"
+cxxet::sink_thread_reserve(int)"
 
     assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
 cxxet::file_sink_handle

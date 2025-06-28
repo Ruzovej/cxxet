@@ -24,10 +24,10 @@
 #include "cxxet/macros/implicit_name.h"
 #include "cxxet/mark/complete.hxx"
 #include "cxxet/mark/counter.hxx"
-#include "cxxet/mark_duration.hxx"
-#include "cxxet/mark_duration_begin.hxx"
-#include "cxxet/mark_duration_end.hxx"
-#include "cxxet/mark_instant.hxx"
+#include "cxxet/mark/duration.hxx"
+#include "cxxet/mark/duration_begin.hxx"
+#include "cxxet/mark/duration_end.hxx"
+#include "cxxet/mark/instant.hxx"
 #include "cxxet/output_format.hxx"
 #include "cxxet/scope.hxx"
 #include "cxxet/sink_control.hxx"
@@ -40,21 +40,21 @@
 #define CXXET_mark_counters(...) cxxet::mark::do_submit_counters(__VA_ARGS__)
 
 #define CXXET_mark_duration(description)                                       \
-  cxxet::mark_duration CXXET_IMPL_IMPLICIT_MARKER_NAME(CXXET_IMPLICIT_MARKER_, \
-                                                       __LINE__) {             \
+  cxxet::mark::duration CXXET_IMPL_IMPLICIT_MARKER_NAME(                       \
+      CXXET_IMPLICIT_MARKER_, __LINE__) {                                      \
     description                                                                \
   }
 
 #define CXXET_mark_duration_begin(description)                                 \
-  cxxet::mark_duration_begin(description)
+  cxxet::mark::duration_begin(description)
 
 // Provide either same string as to the corresponding
 // `CXXET_mark_duration_begin` call, `nullptr` or nothing at all. This is so
 // ui.perfetto.dev processes it correctly.
 #define CXXET_mark_duration_end(description)                                   \
-  cxxet::mark_duration_end(description)
+  cxxet::mark::duration_end(description)
 
-#define CXXET_mark_instant(...) cxxet::mark_instant(__VA_ARGS__)
+#define CXXET_mark_instant(...) cxxet::mark::instant(__VA_ARGS__)
 
 #define CXXET_sink_thread_reserve(minimum_free_capacity)                       \
   cxxet::sink_thread_reserve(minimum_free_capacity)

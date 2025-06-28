@@ -17,17 +17,19 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/mark_duration_begin.hxx"
+#pragma once
 
-#include "impl/event/kind/duration.hxx"
-#include "impl/thread_local_sink_submit_event.hxx"
+#include "cxxet/macros/linkage.h"
+#include "cxxet/timepoint.hxx"
 
-namespace cxxet {
+namespace cxxet::mark {
 
-void submit_duration_begin(char const *const desc,
-                           long long const timestamp_ns) noexcept {
-  impl::thread_local_sink_submit_event(
-      impl::event::duration_begin{desc, timestamp_ns});
+CXXET_IMPL_API void
+submit_duration_begin(char const *const desc,
+                      long long const timestamp_ns) noexcept;
+
+inline void duration_begin(char const *const desc) noexcept {
+  submit_duration_begin(desc, impl::as_int_ns(impl::now()));
 }
 
-} // namespace cxxet
+} // namespace cxxet::mark
