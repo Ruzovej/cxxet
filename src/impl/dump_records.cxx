@@ -88,15 +88,15 @@ double longlong_ns_to_double_us(long long const ns) noexcept {
 }
 
 void write_chrome_trace(std::ostream &out, impl::event::list const &list,
-                        long long const time_point_zero) {
+                        long long const time_point_zero_ns) {
   out << "{\"displayTimeUnit\":\"ns\",";
-  // TODO put into some "comment" value of `time_point_zero`
+  // TODO put into some "comment" value of `time_point_zero_ns`
   out << "\"traceEvents\":[";
 
   bool first_record{true};
-  list.apply([time_point_zero, &first_record, &out](long long const pid,
-                                                    long long const thread_id,
-                                                    event::any const &evt) {
+  list.apply([time_point_zero_ns, &first_record,
+              &out](long long const pid, long long const thread_id,
+                    event::any const &evt) {
     if (!first_record) {
       out << ',';
     } else {
@@ -116,7 +116,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       auto const &e{evt.evt.dur_begin};
 
       auto const timestamp{
-          longlong_ns_to_double_us(e.start_ns - time_point_zero)};
+          longlong_ns_to_double_us(e.start_ns - time_point_zero_ns)};
       out << "\"ts\":" << timestamp << ',';
       break;
     }
@@ -124,14 +124,15 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       auto const &e{evt.evt.dur_end};
 
       auto const timestamp{
-          longlong_ns_to_double_us(e.end_ns - time_point_zero)};
+          longlong_ns_to_double_us(e.end_ns - time_point_zero_ns)};
       out << "\"ts\":" << timestamp << ',';
       break;
     }
     case event::type_t::complete: {
       auto const &e{evt.evt.cmpl};
 
-      auto const start{longlong_ns_to_double_us(e.start_ns - time_point_zero)};
+      auto const start{
+          longlong_ns_to_double_us(e.start_ns - time_point_zero_ns)};
       out << "\"ts\":" << start << ',';
 
       auto const duration{longlong_ns_to_double_us(e.duration_ns)};
@@ -142,7 +143,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       auto const &e{evt.evt.inst};
 
       auto const timestamp{
-          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero)};
+          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero_ns)};
       out << "\"ts\":" << timestamp << ',';
 
       auto const scope{static_cast<std::underlying_type_t<scope_t>>(e.scope)};
@@ -153,7 +154,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
       auto const &e{evt.evt.cntr};
 
       auto const timestamp{
-          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero)};
+          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero_ns)};
       out << "\"ts\":" << timestamp << ',';
 
       out << "\"args\":{" << escape_json_string(e.get_quantity_name()) << ":"
@@ -215,7 +216,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
 } // namespace
 
 void dump_records(impl::event::list const &list,
-                  long long const time_point_zero, output::format const fmt,
+                  long long const time_point_zero_ns, output::format const fmt,
                   char const *const filename) {
   std::ofstream file;
   if (filename) {
@@ -234,7 +235,7 @@ void dump_records(impl::event::list const &list,
 
   switch (fmt) {
   case output::format::chrome_trace: {
-    write_chrome_trace(file, list, time_point_zero);
+    write_chrome_trace(file, list, time_point_zero_ns);
     break;
   }
   case output::format::raw_naive_v0: {

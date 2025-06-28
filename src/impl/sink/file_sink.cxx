@@ -26,14 +26,15 @@
 namespace cxxet::impl::sink {
 
 template <bool thread_safe_v>
-file_sink<thread_safe_v>::file_sink(long long const aTime_point) noexcept
-    : base_class_t{}, time_point{aTime_point} {}
+file_sink<thread_safe_v>::file_sink(
+    long long const aTime_point_zero_ns) noexcept
+    : base_class_t{}, time_point_zero_ns{aTime_point_zero_ns} {}
 
 template <bool thread_safe_v>
-file_sink<thread_safe_v>::file_sink(long long const aTime_point,
+file_sink<thread_safe_v>::file_sink(long long const aTime_point_zero_ns,
                                     output::format const aFmt,
                                     char const *const aTarget_filename) noexcept
-    : base_class_t{}, time_point{aTime_point}, fmt{aFmt},
+    : base_class_t{}, time_point_zero_ns{aTime_point_zero_ns}, fmt{aFmt},
       target_filename{aTarget_filename} {}
 
 template <bool thread_safe_v>
@@ -65,8 +66,9 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
   } else if (target_filename) {
     if (!base_class_t::events.empty()) {
       try {
-        // is `time_point_zero` needed?!
-        dump_records(base_class_t::events, time_point, fmt, target_filename);
+        // is `time_point_zero_ns` needed?!
+        dump_records(base_class_t::events, time_point_zero_ns, fmt,
+                     target_filename);
         base_class_t::events.destroy();
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';

@@ -25,10 +25,10 @@
 
 namespace cxxet::impl::sink {
 
-template <bool thread_safe_v>
-struct file_sink : thread_safe_t<thread_safe_v> {
-  explicit file_sink(long long const aTime_point) noexcept;
-  explicit file_sink(long long const aTime_point, output::format const aFmt,
+template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
+  explicit file_sink(long long const aTime_point_zero_ns) noexcept;
+  explicit file_sink(long long const aTime_point_zero_ns,
+                     output::format const aFmt,
                      char const *const aTarget_filename) noexcept;
   explicit file_sink(properties const &traits) noexcept;
   ~file_sink() noexcept override;
@@ -46,8 +46,7 @@ private:
 
   void do_flush() noexcept;
 
-  long long const
-      time_point; // TODO better name (should at least end with units ...)
+  long long const time_point_zero_ns;
   output::format fmt{output::format::unknown};
   char const *target_filename{nullptr};
 };

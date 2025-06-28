@@ -25,8 +25,7 @@
 
 namespace cxxet::impl::sink {
 
-template <bool thread_safe_v>
-struct cascade : thread_safe_t<thread_safe_v> {
+template <bool thread_safe_v> struct cascade : thread_safe_t<thread_safe_v> {
   explicit cascade(sink_base *aParent) noexcept
       : base_class_t{}, parent{aParent} {}
 
