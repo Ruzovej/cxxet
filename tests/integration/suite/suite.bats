@@ -662,7 +662,7 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
     assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, cxxet::sink_handle&)
 cxxet::file_sink_handle::make(bool)
-cxxet::mark_complete::submit(timespec)
+cxxet::mark::complete::submit(timespec)
 cxxet::sink_global_flush(cxxet::output::format, char const*, bool)
 cxxet::sink_handle::~sink_handle()
 cxxet::sink_thread_divert_to_sink_global()

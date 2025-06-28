@@ -17,18 +17,18 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/mark_complete.hxx"
+#include "cxxet/mark/complete.hxx"
 
 #include "impl/event/kind/complete.hxx"
 #include "impl/thread_local_sink_submit_event.hxx"
 
-namespace cxxet {
+namespace cxxet::mark {
 
-void mark_complete::submit(impl::timepoint_t const finish) noexcept {
+void complete::submit(impl::timepoint_t const finish) noexcept {
   auto const begin{impl::as_int_ns(start)};
   auto const duration{impl::as_int_ns(finish) - begin};
   impl::thread_local_sink_submit_event(
       impl::event::complete{desc, begin, duration});
 }
 
-} // namespace cxxet
+} // namespace cxxet::mark

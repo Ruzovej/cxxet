@@ -22,19 +22,19 @@
 #include "cxxet/macros/linkage.h"
 #include "cxxet/timepoint.hxx"
 
-namespace cxxet {
+namespace cxxet::mark {
 
-struct CXXET_IMPL_API mark_complete {
-  inline mark_complete(char const *aDesc) noexcept
+struct CXXET_IMPL_API complete {
+  inline complete(char const *aDesc) noexcept
       : desc{aDesc}, start{impl::now()} {}
 
-  inline ~mark_complete() noexcept { submit(impl::now()); }
+  inline ~complete() noexcept { submit(impl::now()); }
 
 private:
-  mark_complete(mark_complete const &) = delete;
-  mark_complete &operator=(mark_complete const &) = delete;
-  mark_complete(mark_complete &&) = delete;
-  mark_complete &operator=(mark_complete &&) = delete;
+  complete(complete const &) = delete;
+  complete &operator=(complete const &) = delete;
+  complete(complete &&) = delete;
+  complete &operator=(complete &&) = delete;
 
   void submit(impl::timepoint_t const finish) noexcept;
 
@@ -42,4 +42,4 @@ private:
   impl::timepoint_t const start;
 };
 
-} // namespace cxxet
+} // namespace cxxet::mark
