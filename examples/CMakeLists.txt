@@ -63,6 +63,26 @@ add_example(
 )
 
 add_example(
+    cxxet_example_local_file_sink_1
+        "sink_diversion/1.cxx"
+)
+
+add_example(
+    cxxet_example_local_file_sink_2
+        "sink_diversion/2.cxx"
+)
+
+add_example(
+    cxxet_example_local_file_sink_3
+        "sink_diversion/3.cxx"
+)
+
+add_example(
+    cxxet_example_local_file_sink_4
+        "sink_diversion/4.cxx"
+)
+
+add_example(
     cxxet_test_init
         "for_tests/only_init.cxx"
 )

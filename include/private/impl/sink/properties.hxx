@@ -19,28 +19,35 @@
 
 #pragma once
 
-#include "impl/sink.hxx"
+#include "cxxet/output_format.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-struct local_sink : sink {
-  explicit local_sink(sink *aParent) noexcept;
-  ~local_sink() noexcept override;
+struct properties {
+  long long const time_point_zero_ns;
+  bool verbose;
+  output::format default_target_format;
+  int default_list_node_capacity;
+  char const *default_target_filename;
 
-  void append_event(event::any const &evt) noexcept;
+  static properties const &instance() noexcept;
 
-  void flush() noexcept;
+#ifdef CXXET_WITH_UNIT_TESTS
+  properties &set_target_filename(char const *const filename) noexcept {
+    default_target_filename = filename;
+    return *this;
+  }
 
-  void reserve(int const minimum_free_capacity) noexcept;
+#else
+private:
+#endif
+  properties() noexcept;
 
 private:
-  local_sink(local_sink const &) = delete;
-  local_sink &operator=(local_sink const &) = delete;
-  local_sink(local_sink &&) = delete;
-  local_sink &operator=(local_sink &&) = delete;
-
-  sink *parent;
-  int default_node_capacity{};
+  properties(properties const &) = delete;
+  properties &operator=(properties const &) = delete;
+  properties(properties &&) = delete;
+  properties &operator=(properties &&) = delete;
 };
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

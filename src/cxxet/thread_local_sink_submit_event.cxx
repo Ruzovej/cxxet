@@ -17,38 +17,14 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/sink.hxx"
+#include "impl/thread_local_sink_submit_event.hxx"
 
-#include <iostream>
-
-#include "impl/dump_records.hxx"
+#include "impl/sink/event_collector.hxx"
 
 namespace cxxet::impl {
 
-sink::sink() noexcept = default;
-
-sink::~sink() noexcept = default;
-
-void sink::flush_to_file(long long const time_point_zero,
-                         cxxet::output::format const fmt,
-                         char const *const filename) noexcept {
-  if (!events.empty()) {
-    try {
-      if (filename) {
-        // is `time_point_zero` needed?!
-        dump_records(events, time_point_zero, fmt, filename);
-      }
-      events.destroy();
-    } catch (std::exception const &e) {
-      std::cerr << "Failed to dump records: " << e.what() << '\n';
-    }
-  }
-}
-
-void sink::drain(sink &other) noexcept {
-  if (!other.events.empty()) {
-    events.drain_other(other.events);
-  }
+void thread_local_sink_submit_event(event::any const &evt) noexcept {
+  sink::event_collector::thread_local_instance().append_event(evt);
 }
 
 } // namespace cxxet::impl

@@ -18,6 +18,7 @@ TODO ...
 
 ### Competition?
 
+* [`NVIDIA Nsight Systems`](https://developer.nvidia.com/nsight-systems)
 * [`opentracing-cpp`](https://github.com/opentracing/opentracing-cpp)
   * Archived.
   * Seems hard to use.

@@ -17,8 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/sink_properties.hxx"
-#include "cxxet/timepoint.hxx"
+#include "impl/sink/properties.hxx"
 
 #include <cstdlib>
 
@@ -27,7 +26,9 @@
 #include <string_view>
 #include <type_traits>
 
-namespace cxxet::impl {
+#include "cxxet/timepoint.hxx"
+
+namespace cxxet::impl::sink {
 
 namespace {
 
@@ -84,12 +85,18 @@ int parse_int(char const *const str_value) {
 
 char const *parse_string(char const *const str_value) { return str_value; }
 
+long long const static_time_point_zero_ns{as_int_ns(now())};
+
 } // namespace
 
-sink_properties::sink_properties() noexcept
-    : time_point_zero_ns{as_int_ns(now())}, verbose{parse_env_variable(
-                                                "CXXET_VERBOSE", parse_bool,
-                                                false, false)},
+properties const &properties::instance() noexcept {
+  static properties const sink_props_inst{};
+  return sink_props_inst;
+}
+
+properties::properties() noexcept
+    : time_point_zero_ns{static_time_point_zero_ns},
+      verbose{parse_env_variable("CXXET_VERBOSE", parse_bool, false, false)},
       default_target_format{
           parse_env_variable("CXXET_OUTPUT_FORMAT", parse_output_format,
                              output::format::chrome_trace, verbose)},
@@ -100,4 +107,4 @@ sink_properties::sink_properties() noexcept
   // ...
 }
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

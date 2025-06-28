@@ -17,12 +17,18 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "impl/sink/sink_base.hxx"
 
-#include "impl/event/any.hxx"
+namespace cxxet::impl::sink {
 
-namespace cxxet::impl {
+sink_base::sink_base() noexcept = default;
 
-void thread_local_sink_submit_event(event::any const &evt) noexcept;
+sink_base::~sink_base() noexcept = default;
 
+bool sink_base::has_events() const noexcept { return !events.empty(); }
+
+void sink_base::do_drain(sink_base &other) noexcept {
+  events.drain_other(other.events);
 }
+
+} // namespace cxxet::impl::sink

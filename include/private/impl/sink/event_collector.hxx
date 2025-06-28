@@ -19,24 +19,30 @@
 
 #pragma once
 
-#include "cxxet/macros/linkage.h"
-#include "cxxet/output_format.hxx"
+#include "impl/sink/cascade.hxx"
 
-namespace cxxet {
+namespace cxxet::impl::sink {
 
-// call before submitting first marker; non-positive value - use
-// env. or default setting
-CXXET_IMPL_API void
-sink_thread_reserve(int const minimum_free_capacity = 0) noexcept;
+struct event_collector : cascade<false> {
+  void append_event(event::any const &evt) noexcept;
 
-CXXET_IMPL_API void sink_thread_flush() noexcept;
+  void reserve(int const minimum_free_capacity) noexcept;
 
-CXXET_IMPL_API void sink_global_flush(
-    cxxet::output::format const fmt = cxxet::output::format::chrome_trace,
-    char const *const filename = nullptr, // `== nullptr` => no-op; to be more
-                                          // precise: discard everything
-    bool const defer_flush = false) noexcept;
+  static event_collector &thread_local_instance() noexcept;
 
-CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
+#ifndef CXXET_WITH_UNIT_TESTS
+private:
+#endif
+  explicit event_collector(sink_base *aParent) noexcept;
+  ~event_collector() noexcept override;
 
-} // namespace cxxet
+private:
+  event_collector(event_collector const &) = delete;
+  event_collector &operator=(event_collector const &) = delete;
+  event_collector(event_collector &&) = delete;
+  event_collector &operator=(event_collector &&) = delete;
+
+  int default_node_capacity{};
+};
+
+} // namespace cxxet::impl::sink

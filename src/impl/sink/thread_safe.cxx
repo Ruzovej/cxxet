@@ -17,12 +17,21 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "impl/sink/thread_safe.hxx"
 
-#include "impl/event/any.hxx"
+namespace cxxet::impl::sink {
 
-namespace cxxet::impl {
+thread_safe::thread_safe() noexcept = default;
 
-void thread_local_sink_submit_event(event::any const &evt) noexcept;
+thread_safe::~thread_safe() noexcept = default;
 
+void thread_safe::drain(sink_base &other) noexcept {
+  std::lock_guard lck{mtx};
+  do_drain(other);
 }
+
+void thread_safe::lock() noexcept { mtx.lock(); }
+
+void thread_safe::unlock() noexcept { mtx.unlock(); }
+
+} // namespace cxxet::impl::sink

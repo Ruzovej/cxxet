@@ -313,6 +313,150 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
+@test "Custom file_sink redirection example 1" {
+    local executable="${BIN_DIR}/cxxet_example_local_file_sink_1"
+    local result1="${TMP_RESULT_DIR}/example_local_file_sink_1_A.json"
+    local result2="${TMP_RESULT_DIR}/example_local_file_sink_1_B.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
+
+    run "${executable}" "${result1}" "${result2}"
+    assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ]
+    assert [ -f "${result2}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result1}")" '"ns"'
+    assert_equal "$(jq -e '.displayTimeUnit' "${result2}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 4
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 4
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result1}")" '["X","i"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result2}")" '["X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result1}")" '["example: redirecting all events to custom file_sink ... first","example: redirecting all events to custom file_sink ... second","within two sleeps ... first","within two sleeps ... second"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result2}")" '["example: redirecting all events to default & global file_sink ... first","example: redirecting all events to default & global file_sink ... second","within two sleeps ... first","within two sleeps ... second"]'
+}
+
+@test "Custom file_sink redirection example 2" {
+    local executable="${BIN_DIR}/cxxet_example_local_file_sink_2"
+    local result1="${TMP_RESULT_DIR}/example_local_file_sink_2_A.json"
+    local result2="${TMP_RESULT_DIR}/example_local_file_sink_2_B.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
+
+    run "${executable}" "${result1}" "${result2}"
+    assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ]
+    assert [ -f "${result2}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result1}")" '"ns"'
+    assert_equal "$(jq -e '.displayTimeUnit' "${result2}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 4
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 4
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result1}")" '["X","i"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result2}")" '["X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result1}")" '["example: redirecting all events to custom (thread safe) file_sink ... first","example: redirecting all events to custom (thread safe) file_sink ... second","within two sleeps ... first","within two sleeps ... second"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result2}")" '["example: redirecting all events to default & global file_sink ... first","example: redirecting all events to default & global file_sink ... second","within two sleeps ... first","within two sleeps ... second"]'
+}
+
+@test "Custom file_sink redirection example 3" {
+    local executable="${BIN_DIR}/cxxet_example_local_file_sink_3"
+    local result1="${TMP_RESULT_DIR}/example_local_file_sink_3_A.json"
+    local result2="${TMP_RESULT_DIR}/example_local_file_sink_3_B.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
+
+    run "${executable}" "${result1}" "${result2}"
+    assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result1}" ]
+    assert [ -f "${result2}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result1}")" '"ns"'
+    assert_equal "$(jq -e '.displayTimeUnit' "${result2}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result1}")" 4
+    assert_equal "$(jq -e '.traceEvents | length' "${result2}")" 4
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result1}")" '["X","i"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result2}")" '["X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result1}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result2}")" 2
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result1}")" '["example: redirecting all events to custom file_sink 1 (main thread)","example: redirecting all events to custom file_sink 1 (spawned thread)","within two sleeps 1 (main thread)","within two sleeps 1 (spawned thread)"]'
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result2}")" '["example: redirecting all events to custom file_sink 2 (main thread)","example: redirecting all events to custom file_sink 2 (spawned thread)","within two sleeps 2 (main thread)","within two sleeps 2 (spawned thread)"]'
+}
+
+@test "Custom file_sink & cascade_sink redirection example 4" {
+    local executable="${BIN_DIR}/cxxet_example_local_file_sink_4"
+    local result="${TMP_RESULT_DIR}/example_local_file_sink_4.json"
+
+    run "${executable}_bare"
+    assert_success
+    assert_output ""
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 16
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result}")" 8
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 8
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["example: redirecting all events to custom file_sink","within two sleeps"]'
+}
+
 # TODO end-user usage:
 # * All event types in one file.
 
@@ -516,8 +660,12 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     local nm_output="${output}"
 
     # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
-    assert_equal "$(printf '%s' "${nm_output}" | grep " cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort)" "cxxet::mark_complete::submit(timespec)
+    assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, cxxet::sink_handle&)
+cxxet::file_sink_handle::make(bool)
+cxxet::mark_complete::submit(timespec)
 cxxet::sink_global_flush(cxxet::output::format, char const*, bool)
+cxxet::sink_handle::~sink_handle()
+cxxet::sink_thread_divert_to_sink_global()
 cxxet::sink_thread_flush()
 cxxet::sink_thread_reserve(int)
 cxxet::submit_counter(char const*, long long, double)
@@ -525,9 +673,21 @@ cxxet::submit_duration_begin(char const*, long long)
 cxxet::submit_duration_end(char const*, long long)
 cxxet::submit_instant(char const*, cxxet::scope_t, long long)"
 
+    assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
+cxxet::file_sink_handle
+cxxet::sink_handle"
+
+    assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo name for cxxet::" | cut --delimiter ' ' --fields 1-5 --complement | sort -u)" "cxxet::cascade_sink_handle
+cxxet::file_sink_handle
+cxxet::sink_handle"
+
+    assert_equal "$(printf '%s' "${nm_output}" | grep " V vtable for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
+cxxet::file_sink_handle
+cxxet::sink_handle"
+
     # those definitely not:
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c " cxxet::impl::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c "doctest::")" 0
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c "cxxet::impl::")" 0
 }
 
 @test "Unit tests runner contains expected symbols" {

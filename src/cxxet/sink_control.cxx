@@ -18,51 +18,33 @@
 */
 
 #include "cxxet/sink_control.hxx"
-#include "impl/thread_local_sink_submit_event.hxx"
 
-#include <cassert>
-
-#include <iostream> // must be there, even if unused ... so `std::cout`, etc. gets initialized before it's potentially used in `sink_properties` ctor
-#include <optional>
-
-#include "impl/central_sink.hxx"
-#include "impl/local_sink.hxx"
-#include "impl/sink_properties.hxx"
+#include "impl/sink/event_collector.hxx"
+#include "impl/sink/file_sink.hxx"
 
 namespace cxxet {
 
-namespace {
-impl::sink_properties const sink_props{};
-impl::central_sink global_sink{sink_props};
-thread_local std::optional<impl::local_sink> thread_sink;
-} // namespace
+#define CXXET_IMPL_GLOBAL_SINK impl::sink::file_sink_global_instance()
+#define CXXET_IMPL_LOCAL_SINK                                                  \
+  impl::sink::event_collector::thread_local_instance()
 
 void sink_thread_reserve(int const minimum_free_capacity) noexcept {
-  if (thread_sink == std::nullopt) {
-    thread_sink.emplace(&global_sink);
-  }
-  thread_sink->reserve(minimum_free_capacity <= 0
-                           ? sink_props.default_list_node_capacity
-                           : minimum_free_capacity);
+  CXXET_IMPL_LOCAL_SINK.reserve(minimum_free_capacity);
 }
 
-void sink_thread_flush() noexcept {
-  assert(thread_sink != std::nullopt && "thread local sink not initialized!");
-  thread_sink->flush();
-}
+void sink_thread_flush() noexcept { CXXET_IMPL_LOCAL_SINK.flush(); }
 
 void sink_global_flush(cxxet::output::format const fmt,
                        char const *const filename,
                        bool const defer_flush) noexcept {
-  global_sink.flush(fmt, filename, defer_flush);
+  CXXET_IMPL_GLOBAL_SINK.flush(fmt, filename, defer_flush);
 }
 
-namespace impl {
-
-void thread_local_sink_submit_event(event::any const &evt) noexcept {
-  assert(thread_sink != std::nullopt && "thread local sink not initialized!");
-  thread_sink->append_event(evt);
+void sink_thread_divert_to_sink_global() noexcept {
+  CXXET_IMPL_LOCAL_SINK.set_parent(&CXXET_IMPL_GLOBAL_SINK);
 }
 
-} // namespace impl
+#undef CXXET_IMPL_LOCAL_SINK
+#undef CXXET_IMPL_GLOBAL_SINK
+
 } // namespace cxxet

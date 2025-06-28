@@ -19,31 +19,29 @@
 
 #pragma once
 
-#include "cxxet/output_format.hxx"
+#include <mutex>
 
-namespace cxxet::impl {
+#include "impl/sink/sink_base.hxx"
 
-struct sink_properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  output::format default_target_format;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+namespace cxxet::impl::sink {
 
-  sink_properties() noexcept;
+struct thread_safe : sink_base {
+  explicit thread_safe() noexcept;
+  ~thread_safe() noexcept override;
 
-#ifdef CXXET_WITH_UNIT_TESTS
-  sink_properties &set_target_filename(char const *const filename) noexcept {
-    default_target_filename = filename;
-    return *this;
-  }
-#endif
+  void drain(sink_base &other) noexcept override final;
+
+protected:
+  std::mutex mtx;
+
+  void lock() noexcept;
+  void unlock() noexcept;
 
 private:
-  sink_properties(sink_properties const &) = delete;
-  sink_properties &operator=(sink_properties const &) = delete;
-  sink_properties(sink_properties &&) = delete;
-  sink_properties &operator=(sink_properties &&) = delete;
+  thread_safe(thread_safe const &) = delete;
+  thread_safe &operator=(thread_safe const &) = delete;
+  thread_safe(thread_safe &&) = delete;
+  thread_safe &operator=(thread_safe &&) = delete;
 };
 
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink

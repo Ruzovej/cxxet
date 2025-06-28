@@ -19,29 +19,32 @@
 
 #pragma once
 
+#include <memory>
+
+#include "cxxet/macros/linkage.h"
 #include "cxxet/output_format.hxx"
-#include "impl/event/list/list.hxx"
 
-namespace cxxet::impl {
+namespace cxxet {
 
-struct sink {
-  sink() noexcept;
-  virtual ~sink() noexcept;
+struct CXXET_IMPL_API sink_handle {
+  virtual ~sink_handle() noexcept;
 
-  void flush_to_file(long long const time_point_zero,
-                     cxxet::output::format const fmt,
-                     char const *const filename) noexcept;
-
-  virtual void drain(sink &other) noexcept;
-
-protected:
-  event::list events;
-
-private:
-  sink(sink const &) = delete;
-  sink &operator=(sink const &) = delete;
-  sink(sink &&) = delete;
-  sink &operator=(sink &&) = delete;
+  virtual void divert_thread_sink_to_this() noexcept = 0;
 };
 
-} // namespace cxxet::impl
+struct CXXET_IMPL_API file_sink_handle : sink_handle {
+  static std::unique_ptr<file_sink_handle>
+  make(bool const thread_safe) noexcept;
+
+  virtual void flush(output::format const fmt, char const *const filename,
+                     bool const defer) noexcept = 0;
+};
+
+struct CXXET_IMPL_API cascade_sink_handle : sink_handle {
+  static std::unique_ptr<cascade_sink_handle>
+  make(bool const thread_safe, sink_handle &parent) noexcept;
+
+  virtual void flush() noexcept = 0;
+};
+
+} // namespace cxxet

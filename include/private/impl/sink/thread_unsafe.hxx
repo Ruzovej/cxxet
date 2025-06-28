@@ -19,10 +19,25 @@
 
 #pragma once
 
-#include "impl/event/any.hxx"
+#include "impl/sink/sink_base.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-void thread_local_sink_submit_event(event::any const &evt) noexcept;
+struct thread_unsafe : sink_base {
+  explicit thread_unsafe() noexcept;
+  ~thread_unsafe() noexcept override;
 
-}
+  void drain(sink_base &other) noexcept override final;
+
+protected:
+  constexpr void lock() noexcept {}
+  constexpr void unlock() noexcept {}
+
+private:
+  thread_unsafe(thread_unsafe const &) = delete;
+  thread_unsafe &operator=(thread_unsafe const &) = delete;
+  thread_unsafe(thread_unsafe &&) = delete;
+  thread_unsafe &operator=(thread_unsafe &&) = delete;
+};
+
+} // namespace cxxet::impl::sink

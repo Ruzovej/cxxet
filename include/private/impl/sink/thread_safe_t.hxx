@@ -17,33 +17,17 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/local_sink.hxx"
+#pragma once
 
-#include <cassert>
+#include <type_traits>
 
-#include <iostream>
+#include "impl/sink/thread_safe.hxx"
+#include "impl/sink/thread_unsafe.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::sink {
 
-local_sink::local_sink(sink *aParent) noexcept : parent{aParent} {}
+template <bool thread_safe_v>
+using thread_safe_t =
+    std::conditional_t<thread_safe_v, thread_safe, thread_unsafe>;
 
-local_sink::~local_sink() noexcept { flush(); }
-
-void local_sink::append_event(event::any const &evt) noexcept {
-  events.safe_append(evt, default_node_capacity);
-}
-
-void local_sink::flush() noexcept {
-  assert(parent != this);
-  if (parent) {
-    parent->drain(*this);
-  }
-}
-
-void local_sink::reserve(int const minimum_free_capacity) noexcept {
-  assert(minimum_free_capacity > 0);
-  default_node_capacity = minimum_free_capacity;
-  events.reserve(default_node_capacity);
-}
-
-} // namespace cxxet::impl
+} // namespace cxxet::impl::sink
