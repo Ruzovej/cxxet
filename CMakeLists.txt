@@ -6,6 +6,11 @@ project(
     LANGUAGES CXX # TODO later maybe even `C`?!
 )
 
+# Check if this is being used as a subdirectory via FetchContent or add_subdirectory
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(CXXET_CMAKE_FETCHED "ON")
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
 
 #set(CMAKE_C_STANDARD 99)
@@ -157,7 +162,7 @@ file(
 )
 
 # tests, etc.:
-if (CXXET_BUILD_TESTS)
+if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(tests/infra)
 
     FetchContent_Declare(
@@ -237,6 +242,6 @@ target_include_directories(
         "include/all"
 )
 
-if (CXXET_BUILD_EXAMPLES)
+if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(examples)
 endif()
