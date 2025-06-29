@@ -15,7 +15,7 @@ include(FetchContent)
 FetchContent_Declare(
     cxxet
     GIT_REPOSITORY https://github.com/Ruzovej/cxxet.git
-    GIT_TAG        0.1.0
+    GIT_TAG        v0.1.0
 )
 FetchContent_MakeAvailable(cxxet)
 
