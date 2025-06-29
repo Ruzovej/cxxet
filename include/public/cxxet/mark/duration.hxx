@@ -17,17 +17,23 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/mark_instant.hxx"
+#pragma once
 
-#include "impl/event/kind/instant.hxx"
-#include "impl/thread_local_sink_submit_event.hxx"
+#include "cxxet/mark/duration_begin.hxx"
+#include "cxxet/mark/duration_end.hxx"
 
-namespace cxxet {
+namespace cxxet::mark {
 
-void submit_instant(char const *const desc, scope_t const scope,
-                    long long const timestamp_ns) noexcept {
-  impl::thread_local_sink_submit_event(
-      impl::event::instant{desc, scope, timestamp_ns});
-}
+struct duration {
+  inline duration(char const *desc) noexcept { duration_begin(desc); }
 
-} // namespace cxxet
+  inline ~duration() noexcept { duration_end(); }
+
+private:
+  duration(duration const &) = delete;
+  duration &operator=(duration const &) = delete;
+  duration(duration &&) = delete;
+  duration &operator=(duration &&) = delete;
+};
+
+} // namespace cxxet::mark

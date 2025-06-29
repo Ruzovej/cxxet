@@ -17,17 +17,17 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/mark_counter.hxx"
+#include "cxxet/mark/instant.hxx"
 
-#include "impl/event/kind/complete.hxx"
+#include "impl/event/kind/instant.hxx"
 #include "impl/thread_local_sink_submit_event.hxx"
 
-namespace cxxet {
+namespace cxxet::mark {
 
-void submit_counter(char const *const name, long long const timestamp_ns,
-                    double const value) noexcept {
+void submit_instant(char const *const desc, scope_t const scope,
+                    long long const timestamp_ns) noexcept {
   impl::thread_local_sink_submit_event(
-      impl::event::counter{name, timestamp_ns, value});
+      impl::event::instant{desc, scope, timestamp_ns});
 }
 
-} // namespace cxxet
+} // namespace cxxet::mark

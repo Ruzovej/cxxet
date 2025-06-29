@@ -20,17 +20,26 @@
 #pragma once
 
 #include "cxxet/macros/linkage.h"
-#include "cxxet/scope.hxx"
 #include "cxxet/timepoint.hxx"
 
-namespace cxxet {
+namespace cxxet::mark {
 
-CXXET_IMPL_API void submit_instant(char const *const desc, scope_t const scope,
-                                   long long const timestamp_ns) noexcept;
+struct CXXET_IMPL_API complete {
+  inline complete(char const *aDesc) noexcept
+      : desc{aDesc}, start{impl::now()} {}
 
-inline void mark_instant(char const *const desc,
-                         scope_t const scope = scope_t::thread) noexcept {
-  submit_instant(desc, scope, impl::as_int_ns(impl::now()));
-}
+  inline ~complete() noexcept { submit(impl::now()); }
 
-} // namespace cxxet
+private:
+  complete(complete const &) = delete;
+  complete &operator=(complete const &) = delete;
+  complete(complete &&) = delete;
+  complete &operator=(complete &&) = delete;
+
+  void submit(impl::timepoint_t const finish) noexcept;
+
+  const char *const desc;
+  impl::timepoint_t const start;
+};
+
+} // namespace cxxet::mark
