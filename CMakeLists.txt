@@ -6,6 +6,12 @@ project(
     LANGUAGES CXX # TODO later maybe even `C`?!
 )
 
+# Check if this is being used as a subdirectory via FetchContent or add_subdirectory
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    # Force Release build type when used as a dependency
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
 
 #set(CMAKE_C_STANDARD 99)
