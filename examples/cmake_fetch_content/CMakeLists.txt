@@ -12,10 +12,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
 
+# e.g.:
+# $ rm -rf build .cache
+# $ time cmake -S . -B build -DCMAKE_BUILD_TYPE=Release "-DCXXET_ROOT_DIR=/home/lukas/tmp/cxxet"
+# ...
+# $ time cmake --build build -j 20
+# ...
 FetchContent_Declare(
     cxxet
-    GIT_REPOSITORY https://github.com/Ruzovej/cxxet.git
-    GIT_TAG        v0.1.0
+    GIT_REPOSITORY "file://${CXXET_ROOT_DIR}"
+    GIT_TAG v0.1.0 # TODO use current state of the repo ... at least latest commit on checked out branch
 )
 FetchContent_MakeAvailable(cxxet)
 
