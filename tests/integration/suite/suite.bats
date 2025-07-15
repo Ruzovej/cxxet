@@ -2,19 +2,8 @@
 
 load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
-
-function user_log() {
-    local fmt_string="$1"
-    shift
-    printf "${fmt_string}" "$@" >&3
-}
-
-function refute_sanitizer_output() {
-    refute_output --partial "runtime error: " # `ubsan` seems to generate messages such as this one
-    refute_output --partial "ThreadSanitizer"
-    refute_output --partial "LeakSanitizer"
-    refute_output --partial "AddressSanitizer"
-}
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
 
 function setup_file() {
     # needed tools:
@@ -33,7 +22,7 @@ function setup_file() {
         --target infra_sanitizer_check \
         --target cxxet_examples \
         --target cxxet_unit_tests \
-        --polite-ln-compile_commands # 2>&3 1>&3 # TODO use or delete? This displays the output of it in console ...
+        --polite-ln-compile_commands
     user_log 'done\n'
 
     export BIN_DIR="bin/${CXXET_PRESET}"
@@ -54,30 +43,6 @@ function teardown_file() {
     rm -rf "${TMP_RESULT_DIR}"
     #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
 }
-
-# TODO later remove those ...
-#
-#function some_function() {
-#    local msg="${1:-default message}"
-#    local ret_code="${2:-0}"
-#
-#    printf '%s\n' "${msg}"
-#    return "${ret_code}"
-#}
-#
-#@test "first" {
-#    user_log '# doing %s stuff ...\n' '1st'
-#    run some_function 'doing 1st stuff ...'
-#    assert_success
-#    assert_output --partial '1st'
-#}
-#
-#@test "second" {
-#    user_log '# doing 2nd stuff ...\n'
-#    run some_function '2nd' 13
-#    assert_failure 13
-#    assert_output '2nd'
-#}
 
 @test "Sanitizers work as expected" {
     local san_check="${BIN_DIR}/infra_sanitizer_check"
