@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+# TODO rename this file
+
 load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
@@ -28,7 +30,7 @@ function setup_file() {
     export BIN_DIR="bin/${CXXET_PRESET}"
     export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.suite.bats.${CXXET_PRESET}.XXXXXX")"
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.01_suite.bats.${CXXET_PRESET}.XXXXXX")"
 }
 
 function setup() {
@@ -44,6 +46,7 @@ function teardown_file() {
     #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
 }
 
+# TODO move out this test case to its own `*.bats` file & extract the binary from `CMakeLists.txt` to it's own, standalone one
 @test "Sanitizers work as expected" {
     local san_check="${BIN_DIR}/infra_sanitizer_check"
     if [[ "${CXXET_PRESET}" =~ asan* ]]; then

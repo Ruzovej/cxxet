@@ -19,4 +19,4 @@ It's lightweight library that generates `chrome trace` format output, which can 
 * [sink_diversion](sink_diversion/README.md)
   * Advanced manipulation and creation of local & intermediate sinks for markers.
 
-Examples are executed in acompanying `bats` test suite, while asserting on the output and desired behavior. See [`suite.bats`](../tests/integration/suite/suite.bats) for more details.
+Examples are executed in acompanying `bats` test suite, while asserting on the output and desired behavior. See [`01_suite.bats`](../tests/integration/suite/01_suite.bats) for more details.
