@@ -231,6 +231,11 @@ target_compile_definitions(
         PUBLIC
         CXXET_ENABLE
 )
+add_library(
+    cxxet::cxxet
+        ALIAS
+        cxxet
+)
 
 add_library(
     cxxet_bare
@@ -240,6 +245,11 @@ target_include_directories(
     cxxet_bare
         INTERFACE
         "include/all"
+)
+add_library(
+    cxxet::bare
+        ALIAS
+        cxxet_bare
 )
 
 if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
