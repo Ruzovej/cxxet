@@ -44,5 +44,15 @@ add_executable(
 target_link_libraries(
     cxxet_fetch_content_example
         PRIVATE
-        cxxet::cxxet
+        cxxet::trace
+)
+
+add_executable(
+    cxxet_fetch_content_example_bare
+        1.cxx
+)
+target_link_libraries(
+    cxxet_fetch_content_example_bare
+        PRIVATE
+        cxxet::bare
 )

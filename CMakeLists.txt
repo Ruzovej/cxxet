@@ -234,7 +234,7 @@ target_compile_definitions(
         CXXET_ENABLE
 )
 add_library(
-    cxxet::cxxet
+    cxxet::trace
         ALIAS
         cxxet
 )
