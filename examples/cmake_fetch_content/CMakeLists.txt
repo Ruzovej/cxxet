@@ -12,16 +12,28 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
 
-# e.g.:
-# $ rm -rf build .cache
-# $ time cmake -S . -B build -DCMAKE_BUILD_TYPE=Release "-DCXXET_ROOT_DIR=/home/lukas/tmp/cxxet"
+if (NOT DEFINED CXXET_ROOT_DIR)
+    set(CXXET_GIT_REPOSITORY "git@github.com:Ruzovej/cxxet.git")
+else()
+    set(CXXET_GIT_REPOSITORY "file://${CXXET_ROOT_DIR}")
+endif()
+
+if (NOT DEFINED CXXET_TAG)
+    set(CXXET_GIT_TAG "main")
+else()
+    set(CXXET_GIT_TAG "${CXXET_TAG}")
+endif()
+
+# e.g. using repository from github & branch `main` (see defaults above):
+# $ rm -rf build .cache build
+# $ time cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
 # ...
 # $ time cmake --build build -j 20
 # ...
 FetchContent_Declare(
     cxxet
-    GIT_REPOSITORY "file://${CXXET_ROOT_DIR}"
-    GIT_TAG v0.1.0 # TODO use current state of the repo ... at least latest commit on checked out branch
+    GIT_REPOSITORY "${CXXET_GIT_REPOSITORY}"
+    GIT_TAG "${CXXET_GIT_TAG}"
 )
 FetchContent_MakeAvailable(cxxet)
 
@@ -32,5 +44,5 @@ add_executable(
 target_link_libraries(
     cxxet_fetch_content_example
         PRIVATE
-        cxxet
+        cxxet::cxxet
 )
