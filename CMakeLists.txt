@@ -23,7 +23,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # options:
 set(CXXET_BUILD_EXAMPLES "OFF" CACHE BOOL "Build all examples")
 set(CXXET_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
-set(CXXET_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
+set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
 set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
 set(CXXET_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
@@ -33,9 +33,11 @@ if (CXXET_BUILD_SHARED)
     set(CXXET_LIB_KIND "SHARED")
 endif()
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
+if (NOT CXXET_OUTPUT_DIRECTORY STREQUAL "")
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
+endif()
 
 if (CXXET_WITH_ASAN AND CXXET_WITH_TSAN)
     message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
