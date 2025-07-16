@@ -17,7 +17,7 @@ function setup_file() {
     assert_success
 
     user_log "# configuring and building with preset '%s' ... " "${CXXET_PRESET}"
-    ./compile.bash \
+    run ./compile.bash \
         -DCXXET_BUILD_TESTS=ON \
         -DCXXET_BUILD_EXAMPLES=ON \
         --preset "${CXXET_PRESET}" \
@@ -25,6 +25,7 @@ function setup_file() {
         --target cxxet_examples \
         --target cxxet_unit_tests \
         --polite-ln-compile_commands
+    assert_success
     user_log 'done\n'
 
     export BIN_DIR="bin/${CXXET_PRESET}"
