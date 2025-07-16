@@ -21,7 +21,8 @@
 
 namespace {
 
-void flush_to_file_now(char const *const filename, bool const rereserve) {
+void flush_to_file_now([[maybe_unused]] char const *const filename,
+                       [[maybe_unused]] bool const rereserve) {
   CXXET_sink_thread_flush();
   CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename);
   if (rereserve) {
@@ -36,7 +37,7 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
 
   // honestly, this functionality isn't prepared for multithreading ... since
   // all thread_local sinks flush to the same global one (protected by
-  // locked`std::mutex` of course).
+  // locked `std::mutex` of course).
 
   { CXXET_mark_complete("complete"); }
   flush_to_file_now(argc > 1 ? argv[1] : "/dev/stdout", true);

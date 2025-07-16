@@ -92,7 +92,7 @@ function(add_unix_compiler_flags target)
 
     target_compile_options(
         ${target}
-            PUBLIC
+            PRIVATE
             ${CXXET_COMPILER_FLAGS}
     )
 endfunction()

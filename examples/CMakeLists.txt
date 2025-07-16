@@ -4,31 +4,31 @@ add_custom_target(
 
 function(add_example target_name source_file)
     add_executable(
-        ${target_name}
+        "${target_name}"
             ${source_file}
     )
-
     target_link_libraries(
-        ${target_name}
+        "${target_name}"
             PRIVATE
             cxxet
     )
+    add_unix_compiler_flags("${target_name}")
 
     add_executable(
-        ${target_name}_bare
+        "${target_name}_bare"
             ${source_file}
     )
-
     target_link_libraries(
-        ${target_name}_bare
+        "${target_name}_bare"
             PRIVATE
             cxxet_bare
     )
+    add_unix_compiler_flags("${target_name}_bare")
 
     add_dependencies(
         cxxet_examples
-            ${target_name}
-            ${target_name}_bare
+            "${target_name}"
+            "${target_name}_bare"
     )
 endfunction()
 
