@@ -47,8 +47,15 @@ function bats_tests_runner() {
         (( round++ ))
         local preset
         for preset in "${test_presets[@]}"; do
-            CXXET_PRESET="${preset}" \
+        (
+            export CXXET_PRESET="${preset}"
+            export CXXET_PWD="${PWD}"
+            export CXXET_CURRENT_COMMIT_HASH="$(git -C "${CXXET_PWD}" rev-parse HEAD)"
+            export CXXET_UNCOMMITED_CHANGES="$(git -C "${CXXET_PWD}" status --porcelain)"
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive tests/integration/suite
+            #"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/01_suite.bats
+            #"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/02_cmake_fetch_cxxet.bats
+        )
         done
     done
 }
