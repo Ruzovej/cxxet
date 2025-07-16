@@ -16,7 +16,7 @@ function setup_file() {
     run which nm
     assert_success
 
-    user_log "# configuring and building with preset '%s' ... " "${CXXET_PRESET}"
+    user_log "# configuring and building cxxet ... "
     run ./compile.bash \
         -DCXXET_BUILD_TESTS=ON \
         -DCXXET_BUILD_EXAMPLES=ON \

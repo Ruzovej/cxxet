@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
 
 function bats_tests_runner() {
-    local test_presets=(
-        asan_d
-        asan
-        tsan_d
-        tsan
-        release
-    )
+    local test_presets
 
     while (($# > 0)); do
         case "$1" in
         -p | --preset)
             shift
+            if [[ -n "${test_presets[*]}" ]]; then
+                printf "Error: Multiple presets specified. Use only one preset at a time.\n" >&2
+                return 1
+            fi
             if [[ -z "$1" ]]; then
                 echo "Error: No preset specified after -p/--preset option."
                 return 1
@@ -20,8 +18,8 @@ function bats_tests_runner() {
             test_presets=("$1")
             ;;
         *)
-            printf 'Unknown option(s): "%s"\n' "$@" >&2
-            exit 1
+            printf 'Unknown option(s): %s\n' "$*" >&2
+            return 1
             ;;
         esac
         shift
@@ -34,6 +32,16 @@ function bats_tests_runner() {
         --timing
         #--tap
     )
+
+    if [[ -z "${test_presets[*]}" ]]; then
+        test_presets=(
+            asan_d
+            asan
+            tsan_d
+            tsan
+            release
+        )
+    fi
 
     local preset
     for preset in "${test_presets[@]}"; do
