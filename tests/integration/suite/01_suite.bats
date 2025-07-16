@@ -31,6 +31,7 @@ function setup_file() {
     export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_VERBOSE=1
     export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.01_suite.bats.${CXXET_PRESET}.XXXXXX")"
+    user_log "# using tmp dir '%s'\n" "${TMP_RESULT_DIR}"
 }
 
 function setup() {
@@ -42,7 +43,10 @@ function teardown() {
 }
 
 function teardown_file() {
-    rm -rf "${TMP_RESULT_DIR}"
+    if [[ -n "${TMP_RESULT_DIR}" ]]; then
+        rm -rf "${TMP_RESULT_DIR}"
+        user_log '# used tmp dir erased\n'
+    fi
     #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
 }
 

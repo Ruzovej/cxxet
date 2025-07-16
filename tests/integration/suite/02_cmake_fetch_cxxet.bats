@@ -13,7 +13,7 @@ function setup_file() {
     # TODO set those or not?!
     #export CXXET_DEFAULT_BLOCK_SIZE=2
     #export CXXET_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.cmake_fetch_cxxet.bats.XXXXXX")"
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.02_cmake_fetch_cxxet.bats.XXXXXX")"
 
     user_log "# using tmp dir '%s', repository in '%s' and testing its commit '%s'\n" \
         "${TMP_RESULT_DIR}" "${CXXET_PWD:?}" "${CXXET_CURRENT_COMMIT_HASH:?}"
@@ -31,7 +31,10 @@ function teardown() {
 }
 
 function teardown_file() {
-    [[ -z "${TMP_RESULT_DIR}" ]] || rm -rf "${TMP_RESULT_DIR}"
+    if [[ -n "${TMP_RESULT_DIR}" ]]; then
+        rm -rf "${TMP_RESULT_DIR}"
+        user_log '# used tmp dir erased\n'
+    fi
     #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
 }
 
