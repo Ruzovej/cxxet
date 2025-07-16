@@ -23,7 +23,7 @@
 #include <cxxet/all.hxx>
 
 static void pyramid(int const level) {
-  CXXET_mark_complete(__FUNCTION__);
+  CXXET_mark_complete("pyramid");
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
   if (level > 0) {
     pyramid(level - 1);
@@ -32,7 +32,7 @@ static void pyramid(int const level) {
 }
 
 int main(int argc, char const **argv) {
-  CXXET_mark_complete(__FUNCTION__);
+  CXXET_mark_complete("main");
   CXXET_sink_thread_reserve();
 
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
@@ -40,7 +40,7 @@ int main(int argc, char const **argv) {
   CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename, true);
 
   std::thread t{[]() {
-    CXXET_mark_complete(__FUNCTION__);
+    CXXET_mark_complete("other thread ...");
     CXXET_sink_thread_reserve();
     pyramid(4);
   }};
