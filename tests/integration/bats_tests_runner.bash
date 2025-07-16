@@ -6,23 +6,22 @@ function bats_tests_runner() {
     while (($# > 0)); do
         case "$1" in
         -p | --preset)
-            shift
             if [[ -n "${test_presets[*]}" ]]; then
                 printf "Error: Multiple presets specified. Use only one preset at a time.\n" >&2
                 return 1
             fi
-            if [[ -z "$1" ]]; then
-                echo "Error: No preset specified after -p/--preset option."
+            if [[ -z "$2" ]]; then
+                printf "Error: No preset specified after -p/--preset option.\n" >&2
                 return 1
             fi
-            test_presets=("$1")
+            test_presets=("$2")
+            shift 2
             ;;
         *)
             printf 'Unknown option(s): %s\n' "$*" >&2
             return 1
             ;;
         esac
-        shift
     done
 
     source tests/integration/init/initialize_bats.bash
