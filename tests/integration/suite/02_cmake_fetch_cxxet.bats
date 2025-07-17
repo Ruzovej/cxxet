@@ -38,8 +38,8 @@ function setup_file() {
     assert_success
     #user_log '%s\n' "${output}"
 
-    export CXXET_EXAMPLE_EXECUTABLE="${CXXET_BUILD_DIR}/cxxet_fetch_content_example"
-    export CXXET_EXAMPLE_EXECUTABLE_BARE="${CXXET_BUILD_DIR}/cxxet_fetch_content_example_bare"
+    export CXXET_EXAMPLE_EXECUTABLE="${CXXET_BUILD_DIR}/cxxet_fetch_content_direct_usage_example"
+    export CXXET_EXAMPLE_EXECUTABLE_BARE="${CXXET_BUILD_DIR}/cxxet_fetch_content_direct_usage_example_bare"
 }
 
 function setup() {

@@ -38,21 +38,21 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(cxxet)
 
 add_executable(
-    cxxet_fetch_content_example
+    cxxet_fetch_content_direct_usage_example
         direct_usage.cxx
 )
 target_link_libraries(
-    cxxet_fetch_content_example
+    cxxet_fetch_content_direct_usage_example
         PRIVATE
         cxxet::trace
 )
 
 add_executable(
-    cxxet_fetch_content_example_bare
+    cxxet_fetch_content_direct_usage_example_bare
         direct_usage.cxx
 )
 target_link_libraries(
-    cxxet_fetch_content_example_bare
+    cxxet_fetch_content_direct_usage_example_bare
         PRIVATE
         cxxet::bare
 )
