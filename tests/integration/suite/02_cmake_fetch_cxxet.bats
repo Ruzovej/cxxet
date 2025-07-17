@@ -64,7 +64,7 @@ function teardown_file() {
 
     local cxxet_lib_source_files=("$(find "${CXXET_BUILD_DIR}/_deps/cxxet-src/src/" -type f -name '*.cxx')")
     local num_cxxet_lib_source_files="$(printf '%s\n' "${cxxet_lib_source_files[@]}" | wc -l)"
-    local num_examples_built=2 # regular & bare version
+    local num_examples_built=4 # `num. examples` * 2 (for regular & bare version)
     local expected_num_source_files="$((num_cxxet_lib_source_files + num_examples_built))"
 
     # all translation units:
@@ -73,7 +73,7 @@ function teardown_file() {
     # "custom" executables source files:
     assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | length" "${compile_commands}")" "${num_examples_built}"
 
-    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_PWD}/examples/cmake_fetch_content/direct_usage.cxx\"]"
+    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_PWD}/examples/cmake_fetch_content/direct_usage.cxx\",\"${CXXET_PWD}/examples/cmake_fetch_content/shared_lib_foo.cxx\"]"
 
     # fetched `cxxet` source files:
     assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}/_deps/cxxet-build\") ] | length" "${num_cxxet_lib_source_files}")"

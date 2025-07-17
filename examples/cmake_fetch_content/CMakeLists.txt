@@ -58,23 +58,43 @@ target_link_libraries(
 )
 
 add_library(
-    cxxet_fetch_content_shared_lib_foo
+    cxxet_fetch_content_shared_lib_example_foo
         SHARED
         shared_lib_foo.cxx
 )
 target_link_libraries(
-    cxxet_fetch_content_shared_lib_foo
+    cxxet_fetch_content_shared_lib_example_foo
         PRIVATE
         cxxet::trace
 )
 target_compile_options(
-    cxxet_fetch_content_shared_lib_foo
+    cxxet_fetch_content_shared_lib_example_foo
         PRIVATE
         -fvisibility=hidden
 )
-# https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
 target_compile_options(
-    cxxet_fetch_content_shared_lib_foo
+    cxxet_fetch_content_shared_lib_example_foo
+        PRIVATE
+        -fPIC
+)
+
+add_library(
+    cxxet_fetch_content_shared_lib_example_foo_bare
+        SHARED
+        shared_lib_foo.cxx
+)
+target_link_libraries(
+    cxxet_fetch_content_shared_lib_example_foo_bare
+        PRIVATE
+        cxxet::bare
+)
+target_compile_options(
+    cxxet_fetch_content_shared_lib_example_foo_bare
+        PRIVATE
+        -fvisibility=hidden
+)
+target_compile_options(
+    cxxet_fetch_content_shared_lib_example_foo_bare
         PRIVATE
         -fPIC
 )
