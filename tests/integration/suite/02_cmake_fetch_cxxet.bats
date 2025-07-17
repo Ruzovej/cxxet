@@ -38,8 +38,10 @@ function setup_file() {
     assert_success
     #user_log '%s\n' "${output}"
 
-    export CXXET_EXAMPLE_EXECUTABLE="${CXXET_BUILD_DIR}/cxxet_fetch_content_direct_usage_example"
-    export CXXET_EXAMPLE_EXECUTABLE_BARE="${CXXET_BUILD_DIR}/cxxet_fetch_content_direct_usage_example_bare"
+    export CXXET_EXAMPLE_EXECUTABLE_1="${CXXET_BUILD_DIR}/cxxet_fetch_content_direct_usage_example"
+    export CXXET_EXAMPLE_EXECUTABLE_1_BARE="${CXXET_EXAMPLE_EXECUTABLE_1}_bare"
+    export CXXET_EXAMPLE_SO_1="${CXXET_BUILD_DIR}/libcxxet_fetch_content_shared_lib_example_foo.so"
+    export CXXET_EXAMPLE_SO_1_BARE="${CXXET_BUILD_DIR}/libcxxet_fetch_content_shared_lib_example_foo_bare.so"
 }
 
 function setup() {
@@ -82,9 +84,19 @@ function teardown_file() {
 }
 
 @test "Executable with tracing contains expected cxxet symbols" {
-    assert [ -f "${CXXET_EXAMPLE_EXECUTABLE}" ]
+    assert [ -f "${CXXET_EXAMPLE_EXECUTABLE_1}" ]
 
-    run nm -C "${CXXET_EXAMPLE_EXECUTABLE}"
+    run nm -C "${CXXET_EXAMPLE_EXECUTABLE_1}"
+    assert_success
+    local nm_output="${output}"
+
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c "cxxet")" 0
+}
+
+@test "Shared lib. with tracing contains expected cxxet symbols" {
+    assert [ -f "${CXXET_EXAMPLE_SO_1}" ]
+
+    run nm -C -D "${CXXET_EXAMPLE_SO_1}"
     assert_success
     local nm_output="${output}"
 
@@ -92,9 +104,19 @@ function teardown_file() {
 }
 
 @test "Executable with disabled tracing doesn't contain any cxxet symbols" {
-    assert [ -f "${CXXET_EXAMPLE_EXECUTABLE_BARE}" ]
+    assert [ -f "${CXXET_EXAMPLE_EXECUTABLE_1_BARE}" ]
 
-    run nm -C "${CXXET_EXAMPLE_EXECUTABLE_BARE}"
+    run nm -C "${CXXET_EXAMPLE_EXECUTABLE_1_BARE}"
+    assert_success
+    local nm_output="${output}"
+
+    assert_equal "$(printf '%s' "${nm_output}" | grep -c "cxxet")" 0
+}
+
+@test "Shared lib. with disabled tracing doesn't contain any cxxet symbols" {
+    assert [ -f "${CXXET_EXAMPLE_SO_1_BARE}" ]
+
+    run nm -C -D "${CXXET_EXAMPLE_SO_1_BARE}"
     assert_success
     local nm_output="${output}"
 
@@ -104,7 +126,7 @@ function teardown_file() {
 @test "Using 'fetch_content-ed' cxxet to trace given application" {
     local result="${TMP_RESULT_DIR}/traced.json"
 
-    run "${CXXET_EXAMPLE_EXECUTABLE}" "${result}"
+    run "${CXXET_EXAMPLE_EXECUTABLE_1}" "${result}"
     assert_success
     assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
 Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
@@ -125,14 +147,20 @@ Deduced CXXET_TARGET_FILENAME: "
 @test "Using 'fetch_content-ed' cxxet_bare to not trace given application" {
     local target_file="${TMP_RESULT_DIR}/bare.json"
 
-    run "${CXXET_EXAMPLE_EXECUTABLE_BARE}" "${target_file}"
+    run "${CXXET_EXAMPLE_EXECUTABLE_1_BARE}" "${target_file}"
     assert_success
     assert_output ""
     refute [ -f "${target_file}" ]
 }
 
 # TODO tests:
-#   * shared library depending on `cxxet`
-#       * application using it
-#   * application/... using `cxxet` built as a shared library
-#   * verify no examples/tests/... are built
+#   * [x] (user defined) shared library depending on `cxxet`
+#       * [ ] application using it
+#       * [ ] static version too?
+#       * [ ] manually check `nm ...` output and adjust tests above accordingly
+#   * [ ] application/... using `cxxet` built as a shared library
+#       * this amounts to 6 combinations
+#           * app + shared/static lib -> 2
+#           * user shared/static lib + shared/static lib -> 2 * 2 = 4
+#       * test all, or skip some?!
+#   * [x] verify no examples/tests/... are built
