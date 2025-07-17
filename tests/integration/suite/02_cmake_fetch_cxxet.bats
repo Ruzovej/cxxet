@@ -3,16 +3,14 @@
 load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
-#load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output" # TODO most probably not needed ...
 
 function setup_file() {
     if [[ "${CXXET_PRESET:-release}" != 'release' ]]; then
         skip "this should test only 'release' build(s), current preset is '${CXXET_PRESET}'"
     fi
 
-    # TODO set those or not?!
-    #export CXXET_DEFAULT_BLOCK_SIZE=2
-    #export CXXET_VERBOSE=1
+    export CXXET_DEFAULT_BLOCK_SIZE=2 # torture it little bit
+    export CXXET_VERBOSE=1
     export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.02_cmake_fetch_cxxet.bats.XXXXXX")"
 
     user_log "# using tmp dir '%s', repository in '%s' and testing its commit '%s'%s\n" \
@@ -108,6 +106,9 @@ function teardown_file() {
 
     run "${CXXET_EXAMPLE_EXECUTABLE}" "${result}"
     assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
     assert [ -f "${result}" ]
 
     # observe only basic properties, more detailed tests are in `01_suite.bats`:
@@ -126,6 +127,7 @@ function teardown_file() {
 
     run "${CXXET_EXAMPLE_EXECUTABLE_BARE}" "${target_file}"
     assert_success
+    assert_output ""
     refute [ -f "${target_file}" ]
 }
 
