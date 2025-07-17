@@ -39,7 +39,7 @@ FetchContent_MakeAvailable(cxxet)
 
 add_executable(
     cxxet_fetch_content_example
-        1.cxx
+        direct_usage.cxx
 )
 target_link_libraries(
     cxxet_fetch_content_example
@@ -49,7 +49,7 @@ target_link_libraries(
 
 add_executable(
     cxxet_fetch_content_example_bare
-        1.cxx
+        direct_usage.cxx
 )
 target_link_libraries(
     cxxet_fetch_content_example_bare
