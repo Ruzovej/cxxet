@@ -56,3 +56,25 @@ target_link_libraries(
         PRIVATE
         cxxet::bare
 )
+
+add_library(
+    cxxet_fetch_content_shared_lib_foo
+        SHARED
+        shared_lib_foo.cxx
+)
+target_link_libraries(
+    cxxet_fetch_content_shared_lib_foo
+        PRIVATE
+        cxxet::trace
+)
+target_compile_options(
+    cxxet_fetch_content_shared_lib_foo
+        PRIVATE
+        -fvisibility=hidden
+)
+# https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
+target_compile_options(
+    cxxet_fetch_content_shared_lib_foo
+        PRIVATE
+        -fPIC
+)
