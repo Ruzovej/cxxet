@@ -126,21 +126,7 @@ function(add_sanitizers target)
     endif()
 
     get_target_property(INPUT_TARGET_TYPE ${target} TYPE)
-    if (INPUT_TARGET_TYPE STREQUAL "SHARED_LIBRARY")
-        target_compile_options(
-            ${target}
-                PRIVATE
-                -fvisibility=hidden
-                -fPIC # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
-        )
-    else()
-        #if(CXXET_CMAKE_FETCHED)
-        #    target_compile_options(
-        #        ${target}
-        #            PRIVATE
-        #            -fPIC
-        #    )
-        #else
+    if (NOT INPUT_TARGET_TYPE STREQUAL "SHARED_LIBRARY")
         if (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
             target_compile_options(
                 ${target}
@@ -153,6 +139,20 @@ function(add_sanitizers target)
                     -pie
             )
         endif()
+    endif()
+endfunction()
+
+function(add_shared_lib_flags target)
+    get_target_property(INPUT_TARGET_TYPE ${target} TYPE)
+    if (INPUT_TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+        target_compile_options(
+            ${target}
+                PRIVATE
+                -fvisibility=hidden
+                -fPIC # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
+        )
+    else()
+        message(FATAL_ERROR "'add_shared_lib_flags' called on a target that is not a shared library: ${target}")
     endif()
 endfunction()
 
@@ -212,6 +212,7 @@ add_library(
 add_unix_compiler_flags(cxxet)
 add_sanitizers(cxxet)
 if (CXXET_BUILD_SHARED)
+    add_shared_lib_flags(cxxet)
     set_target_properties( # seems useful -> TODO polish it later
         cxxet
             PROPERTIES
