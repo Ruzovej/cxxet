@@ -74,10 +74,6 @@ target_compile_options(
     cxxet_fetch_content_shared_lib_example_foo
         PRIVATE
         -fvisibility=hidden
-)
-target_compile_options(
-    cxxet_fetch_content_shared_lib_example_foo
-        PRIVATE
         -fPIC
 )
 
@@ -95,9 +91,5 @@ target_compile_options(
     cxxet_fetch_content_shared_lib_example_foo_bare
         PRIVATE
         -fvisibility=hidden
-)
-target_compile_options(
-    cxxet_fetch_content_shared_lib_example_foo_bare
-        PRIVATE
         -fPIC
 )
