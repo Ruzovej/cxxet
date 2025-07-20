@@ -22,6 +22,7 @@ function setup_file() {
     export CXXET_BUILD_DIR="${TMP_RESULT_DIR}/build"
 
     # When using `Ninja`, `compile_commands.json` contains a bit different paths -> default generator is fixed
+    user_log "# configuring and building cxxet cmake fetch_content examples ... "
     run cmake \
         -S "${CXXET_PWD}/examples/cmake_fetch_content" \
         -B "${CXXET_BUILD_DIR}" \
@@ -29,6 +30,7 @@ function setup_file() {
         -DCMAKE_BUILD_TYPE=Release \
         -DCXXET_ROOT_DIR="${CXXET_PWD}" \
         -DCXXET_TAG="${CXXET_CURRENT_COMMIT_HASH}"
+    user_log 'done\n'
     assert_success
     #user_log '%s\n' "${output}"
 
