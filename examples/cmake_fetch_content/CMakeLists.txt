@@ -67,7 +67,7 @@ add_library(
 )
 target_link_libraries(
     cxxet_fetch_content_shared_lib_example_foo
-        PRIVATE
+        PUBLIC
         cxxet::trace
 )
 target_compile_options(
@@ -77,6 +77,16 @@ target_compile_options(
         -fPIC
 )
 
+add_executable(
+    cxxet_fetch_content_indirect_usage_example
+        indirect_usage.cxx
+)
+target_link_libraries(
+    cxxet_fetch_content_indirect_usage_example
+        PRIVATE
+        cxxet_fetch_content_shared_lib_example_foo
+)
+
 add_library(
     cxxet_fetch_content_shared_lib_example_foo_bare
         SHARED
@@ -84,7 +94,7 @@ add_library(
 )
 target_link_libraries(
     cxxet_fetch_content_shared_lib_example_foo_bare
-        PRIVATE
+        PUBLIC
         cxxet::bare
 )
 target_compile_options(
@@ -92,4 +102,14 @@ target_compile_options(
         PRIVATE
         -fvisibility=hidden
         -fPIC
+)
+
+add_executable(
+    cxxet_fetch_content_indirect_usage_example_bare
+        indirect_usage.cxx
+)
+target_link_libraries(
+    cxxet_fetch_content_indirect_usage_example_bare
+        PRIVATE
+        cxxet_fetch_content_shared_lib_example_foo_bare
 )

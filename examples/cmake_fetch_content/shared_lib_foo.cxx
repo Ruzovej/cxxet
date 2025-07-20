@@ -27,7 +27,7 @@
 
 namespace {
 void pyramid(unsigned const level) {
-  CXXET_mark_complete("foo_pyramid");
+  CXXET_mark_complete("pyramid_foo");
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
   if (level > 0) {
     pyramid(level - 1);
@@ -52,7 +52,7 @@ some_class::some_class(int const ii) {
   if (ii < 0 || ii % 2 != 0) {
     throw std::runtime_error("Invalid argument: must be even and positive");
   }
-  i = static_cast<unsigned>(ii);
+  i = static_cast<unsigned>(ii / 2);
 }
 
 void some_class::work() noexcept { perform_work(i); }
