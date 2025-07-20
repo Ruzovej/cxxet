@@ -134,13 +134,14 @@ function(add_sanitizers target)
                 -fPIC # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
         )
     else()
-        if(CXXET_CMAKE_FETCHED)
-            target_compile_options(
-                ${target}
-                    PRIVATE
-                    -fPIC
-            )
-        elseif (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
+        #if(CXXET_CMAKE_FETCHED)
+        #    target_compile_options(
+        #        ${target}
+        #            PRIVATE
+        #            -fPIC
+        #    )
+        #else
+        if (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
             target_compile_options(
                 ${target}
                     PRIVATE

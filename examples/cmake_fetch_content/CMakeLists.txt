@@ -30,6 +30,7 @@ endif()
 # ...
 # $ time cmake --build build -j "$(nproc)"
 # ...
+set(CXXET_BUILD_SHARED "ON") # to force building the fetched library as an `*.so`
 FetchContent_Declare(
     cxxet
     GIT_REPOSITORY "${CXXET_GIT_REPOSITORY}"
