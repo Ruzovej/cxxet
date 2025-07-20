@@ -28,7 +28,7 @@ endif()
 # $ rm -rf build .cache build
 # $ time cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
 # ...
-# $ time cmake --build build -j 20
+# $ time cmake --build build -j "$(nproc)"
 # ...
 FetchContent_Declare(
     cxxet
@@ -36,6 +36,8 @@ FetchContent_Declare(
     GIT_TAG "${CXXET_GIT_TAG}"
 )
 FetchContent_MakeAvailable(cxxet)
+
+# TODO declare only one target instead of two (using `cxxet::trace` vs. `cxxet::bare`), and decide which version to use based on a variable
 
 add_executable(
     cxxet_fetch_content_direct_usage_example
