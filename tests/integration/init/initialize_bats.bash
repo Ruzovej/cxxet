@@ -20,6 +20,7 @@ function initialize_bats() {
             2.1.0
     )
 
+    export CUSTOM_BATS_HELPERS_DIRECTORY="${PWD}/tests/integration/custom_helpers"
     export BATS_CORE_DIRECTORY="${PWD}/tests/integration/external/bats-core"
     export BATS_HELPER_DIRECTORY="${PWD}/tests/integration/external/bats-helper"
     #export BATS_EXTENSIONS_DIRECTORY="${PWD}/tests/integration/helper/bats-extensions"

@@ -1,35 +1,27 @@
 #!/usr/bin/env bash
 
 function bats_tests_runner() {
-    local num_rounds=1
+    local test_presets
 
-    local test_presets=(
-        asan_d
-        asan
-        tsan_d
-        tsan
-        release
-    )
-
-    while (( $# > 0 )); do
+    while (($# > 0)); do
         case "$1" in
-            -r|--rounds)
-                shift
-                num_rounds="$1"
-                ;;
-            -p|--preset)
-                shift
-                if [[ -z "$1" ]]; then
-                    echo "Error: No preset specified after -p/--preset option."
-                    return 1
-                fi
-                test_presets=("$1")
-                ;;
-            *)
-                break
-                ;;
+        -p | --preset)
+            if [[ -n "${test_presets[*]}" ]]; then
+                printf "Error: Multiple presets specified. Use only one preset at a time.\n" >&2
+                return 1
+            fi
+            if [[ -z "$2" ]]; then
+                printf "Error: No preset specified after -p/--preset option.\n" >&2
+                return 1
+            fi
+            test_presets=("$2")
+            shift 2
+            ;;
+        *)
+            printf 'Unknown option(s): %s\n' "$*" >&2
+            return 1
+            ;;
         esac
-        shift
     done
 
     source tests/integration/init/initialize_bats.bash
@@ -40,15 +32,27 @@ function bats_tests_runner() {
         #--tap
     )
 
-    local round=1
-    while (( round <= num_rounds )); do
-        [[ "${num_rounds}" -eq 1 ]] \
-            || printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Executing bats tests round no. %s/%s:\n\n' "${round}" "${num_rounds}"
-        (( round++ ))
-        local preset
-        for preset in "${test_presets[@]}"; do
-            CXXET_PRESET="${preset}" \
+    if [[ -z "${test_presets[*]}" ]]; then
+        test_presets=(
+            asan_d
+            asan
+            tsan_d
+            tsan
+            release
+        )
+    fi
+
+    local preset
+    for preset in "${test_presets[@]}"; do
+        printf 'Running bats tests with preset %s:\n' "${preset}"
+        (
+            export CXXET_PRESET="${preset}"
+            export CXXET_PWD="${PWD}"
+            export CXXET_CURRENT_COMMIT_HASH="$(git -C "${CXXET_PWD}" rev-parse HEAD)"
+            export CXXET_UNCOMMITED_CHANGES="$(git -C "${CXXET_PWD}" status --porcelain)"
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive tests/integration/suite
-        done
+            #"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/01_suite.bats
+            #"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/02_cmake_fetch_cxxet.bats
+        )
     done
 }

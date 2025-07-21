@@ -6,6 +6,11 @@ project(
     LANGUAGES CXX # TODO later maybe even `C`?!
 )
 
+# Check if this is being used as a subdirectory via FetchContent or add_subdirectory
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(CXXET_CMAKE_FETCHED "ON")
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
 
 #set(CMAKE_C_STANDARD 99)
@@ -18,7 +23,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # options:
 set(CXXET_BUILD_EXAMPLES "OFF" CACHE BOOL "Build all examples")
 set(CXXET_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
-set(CXXET_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/implicit" CACHE PATH "Folder with compilation results")
+set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
 set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
 set(CXXET_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
@@ -28,9 +33,11 @@ if (CXXET_BUILD_SHARED)
     set(CXXET_LIB_KIND "SHARED")
 endif()
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
+if (NOT CXXET_CMAKE_FETCHED)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled archives" FORCE)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled libraries" FORCE)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY}" CACHE PATH "Folder with compiled executables" FORCE)
+endif()
 
 if (CXXET_WITH_ASAN AND CXXET_WITH_TSAN)
     message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
@@ -85,7 +92,7 @@ function(add_unix_compiler_flags target)
 
     target_compile_options(
         ${target}
-            PUBLIC
+            PRIVATE
             ${CXXET_COMPILER_FLAGS}
     )
 endfunction()
@@ -119,31 +126,33 @@ function(add_sanitizers target)
     endif()
 
     get_target_property(INPUT_TARGET_TYPE ${target} TYPE)
+    if (NOT INPUT_TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+        if (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
+            target_compile_options(
+                ${target}
+                    PRIVATE
+                    -fPIE
+            )
+            target_link_options(
+                ${target}
+                    PRIVATE
+                    -pie
+            )
+        endif()
+    endif()
+endfunction()
+
+function(add_shared_lib_flags target)
+    get_target_property(INPUT_TARGET_TYPE ${target} TYPE)
     if (INPUT_TARGET_TYPE STREQUAL "SHARED_LIBRARY")
         target_compile_options(
             ${target}
                 PRIVATE
                 -fvisibility=hidden
-        )
-        # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
-        target_compile_options(
-            ${target}
-                PUBLIC
-                -fPIC
+                -fPIC # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fPIC
         )
     else()
-        if (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
-            target_compile_options(
-                ${target}
-                    PUBLIC
-                    -fPIE
-            )
-            target_link_options(
-                ${target}
-                    PUBLIC
-                    -pie
-            )
-        endif()
+        message(FATAL_ERROR "'add_shared_lib_flags' called on a target that is not a shared library: ${target}")
     endif()
 endfunction()
 
@@ -157,7 +166,7 @@ file(
 )
 
 # tests, etc.:
-if (CXXET_BUILD_TESTS)
+if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(tests/infra)
 
     FetchContent_Declare(
@@ -203,6 +212,7 @@ add_library(
 add_unix_compiler_flags(cxxet)
 add_sanitizers(cxxet)
 if (CXXET_BUILD_SHARED)
+    add_shared_lib_flags(cxxet)
     set_target_properties( # seems useful -> TODO polish it later
         cxxet
             PROPERTIES
@@ -226,6 +236,11 @@ target_compile_definitions(
         PUBLIC
         CXXET_ENABLE
 )
+add_library(
+    cxxet::trace
+        ALIAS
+        cxxet
+)
 
 add_library(
     cxxet_bare
@@ -236,7 +251,12 @@ target_include_directories(
         INTERFACE
         "include/all"
 )
+add_library(
+    cxxet::bare
+        ALIAS
+        cxxet_bare
+)
 
-if (CXXET_BUILD_EXAMPLES)
+if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(examples)
 endif()
