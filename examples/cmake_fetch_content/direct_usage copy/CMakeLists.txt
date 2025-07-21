@@ -30,7 +30,6 @@ endif()
 # ...
 # $ time cmake --build build -j "$(nproc)"
 # ...
-set(CXXET_BUILD_SHARED "ON" CACHE BOOL "Force building the fetched library as an '*.so' so it correctly links with the below defined shared lib." FORCE)
 FetchContent_Declare(
     cxxet
     GIT_REPOSITORY "${CXXET_GIT_REPOSITORY}"
@@ -58,58 +57,4 @@ target_link_libraries(
     cxxet_fetch_content_direct_usage_example_bare
         PRIVATE
         cxxet::bare
-)
-
-add_library(
-    cxxet_fetch_content_shared_lib_example_foo
-        SHARED
-        shared_lib_foo.cxx
-)
-target_link_libraries(
-    cxxet_fetch_content_shared_lib_example_foo
-        PUBLIC
-        cxxet::trace
-)
-target_compile_options(
-    cxxet_fetch_content_shared_lib_example_foo
-        PRIVATE
-        -fvisibility=hidden
-        -fPIC
-)
-
-add_executable(
-    cxxet_fetch_content_indirect_usage_example
-        indirect_usage.cxx
-)
-target_link_libraries(
-    cxxet_fetch_content_indirect_usage_example
-        PRIVATE
-        cxxet_fetch_content_shared_lib_example_foo
-)
-
-add_library(
-    cxxet_fetch_content_shared_lib_example_foo_bare
-        SHARED
-        shared_lib_foo.cxx
-)
-target_link_libraries(
-    cxxet_fetch_content_shared_lib_example_foo_bare
-        PUBLIC
-        cxxet::bare
-)
-target_compile_options(
-    cxxet_fetch_content_shared_lib_example_foo_bare
-        PRIVATE
-        -fvisibility=hidden
-        -fPIC
-)
-
-add_executable(
-    cxxet_fetch_content_indirect_usage_example_bare
-        indirect_usage.cxx
-)
-target_link_libraries(
-    cxxet_fetch_content_indirect_usage_example_bare
-        PRIVATE
-        cxxet_fetch_content_shared_lib_example_foo_bare
 )
