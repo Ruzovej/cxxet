@@ -11,7 +11,7 @@ function setup_file() {
 
     export CXXET_DEFAULT_BLOCK_SIZE=2 # torture it little bit
     export CXXET_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.02_cmake_fetch_cxxet.bats.XXXXXX")"
+    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.03_cmake_fetch_cxxet_indirect_usage.bats.XXXXXX")"
 
     user_log "# using tmp dir '%s', repository in '%s' and testing its commit '%s'%s\n" \
         "${TMP_RESULT_DIR}" \
