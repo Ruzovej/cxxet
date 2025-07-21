@@ -75,7 +75,7 @@ function teardown_file() {
     # "custom" executables source files:
     assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | length" "${compile_commands}")" "${num_examples_built}"
 
-    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_PWD}/examples/cmake_fetch_content/direct_usage.cxx\"]"
+    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_PWD}/examples/cmake_fetch_content/direct_usage/direct_usage.cxx\"]"
 
     # fetched `cxxet` source files:
     assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}/_deps/cxxet-build\") ] | length" "${num_cxxet_lib_source_files}")"
