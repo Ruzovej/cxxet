@@ -173,22 +173,3 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_output ""
     refute [ -f "${target_file}" ]
 }
-
-# TODO tests:
-#   * [x] user defined library depending on `cxxet`:
-#       * [x] application using it
-#       * [x] shared version
-#       * [ ] static version
-#       * [ ] manually check `nm ...` output and adjust tests above accordingly to assert on more specific information (right now only check presence or absence of anything containing `cxxet`)
-#   * [ ] application/... using `cxxet` built as a shared library
-#       * this amounts to 6 combinations:
-#           * user app + cxxet shared/static lib -> 2:
-#               * [x] app + shared lib
-#               * [ ] app + static lib
-#           * user app + shared/static lib + cxxet shared/static lib -> 2 * 2 = 4:
-#               * [x] shared lib + shared lib
-#               * [ ] shared lib + static lib
-#               * [ ] static lib + shared lib
-#               * [ ] static lib + static lib
-#       * test all, or skip some?!
-#   * [x] verify no examples/tests/... are built
