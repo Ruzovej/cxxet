@@ -42,7 +42,7 @@ private:
   event_collector(event_collector &&) = delete;
   event_collector &operator=(event_collector &&) = delete;
 
-  int default_node_capacity{};
+  int default_node_capacity;
 };
 
 } // namespace cxxet::impl::sink

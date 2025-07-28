@@ -604,21 +604,26 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
 }
 
-@test "Improper initialization 1" {
-    local executable="${BIN_DIR}/cxxet_test_failed_init_1"
-    export CXXET_VERBOSE=0
-    skip "TODO fix this later: 'release' and 'tsan' builds dont fail!"
-    run "${executable}"
-    assert_failure
+@test "Suboptimal initialization 1" {
+    local executable="${BIN_DIR}/cxxet_test_suboptimal_init_1"
+
+    run "${executable}" 
+    assert_success
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+
 }
 
-@test "Improper initialization 2" {
-    local executable="${BIN_DIR}/cxxet_test_failed_init_2"
-    export CXXET_VERBOSE=0
-    run "${executable}"
-    assert_failure
+@test "Suboptimal initialization 2" {
+    local executable="${BIN_DIR}/cxxet_test_suboptimal_init_2"
 
-    # `release` and `.san_d` fail with `Aborted (core dumped)`, while `.san` builds fail with the respective sanitizer reports
+    run "${executable}" # no output file -> writes to `stdout`
+    assert_success
+    assert_output --partial 'Deduced CXXET_DEFAULT_BLOCK_SIZE: 2'
+    assert_output --partial '"name":"Suboptimal duration begin","ph":"B"'
+    assert_output --partial '"name":"Some complete","ph":"X"'
+    assert_output --partial '"name":"Some duration end","ph":"E"'
 }
 
 @test "Shared library symbol visibility" {

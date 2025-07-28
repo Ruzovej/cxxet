@@ -22,8 +22,8 @@
 #include "cxxet/all.hxx"
 
 static void improper_cxxet_usage() {
-  // incorrect, because `CXXET_sink_thread_reserve(...)` should have been
-  // called:
+  // `CXXET_sink_thread_reserve(...)` should have been called, this would have
+  // suboptimal performance in case any markers are used
   CXXET_sink_thread_flush();
 }
 
