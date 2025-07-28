@@ -606,22 +606,24 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
 
 @test "Suboptimal initialization 1" {
     local executable="${BIN_DIR}/cxxet_test_suboptimal_init_1"
-    export CXXET_VERBOSE=0
 
     run "${executable}" 
     assert_success
-    assert_output ""
+    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+
 }
 
 @test "Suboptimal initialization 2" {
     local executable="${BIN_DIR}/cxxet_test_suboptimal_init_2"
-    export CXXET_VERBOSE=0
 
     run "${executable}" # no output file -> writes to `stdout`
     assert_success
+    assert_output --partial 'Deduced CXXET_DEFAULT_BLOCK_SIZE: 2'
     assert_output --partial '"name":"Suboptimal duration begin","ph":"B"'
-    assert_output --partial '"name":"Suboptimal complete","ph":"X"'
-    assert_output --partial '"name":"Suboptimal duration end","ph":"E"'
+    assert_output --partial '"name":"Some complete","ph":"X"'
+    assert_output --partial '"name":"Some duration end","ph":"E"'
 }
 
 @test "Shared library symbol visibility" {
