@@ -617,7 +617,7 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     local executable="${BIN_DIR}/cxxet_test_suboptimal_init_2"
     export CXXET_VERBOSE=0
 
-    run "${executable}"
+    run "${executable}" # no output file -> writes to `stdout`
     assert_success
     assert_output --partial '"name":"Suboptimal duration begin","ph":"B"'
     assert_output --partial '"name":"Suboptimal complete","ph":"X"'
