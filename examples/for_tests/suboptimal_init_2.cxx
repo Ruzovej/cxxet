@@ -21,12 +21,16 @@
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   CXXET_sink_global_flush(cxxet::output::format::chrome_trace,
-                          argc > 1 ? argv[1] : "/dev/stdout",
-                          true); // whatever, in this example ...
+                          argc > 1 ? argv[1] : "/dev/stdout", true);
 
-  // incorrect, because `CXXET_sink_thread_reserve(...)` should have been
-  // called:
-  CXXET_mark_complete("will crash on exit ...");
+  // suboptimal performance - will perform the initialization as part of the
+  // "event flush". To prevent this, `CXXET_sink_thread_reserve(...)` should
+  // have been called before first such marker:
+  CXXET_mark_duration_begin("Suboptimal duration begin");
+  do {
+    CXXET_mark_complete("Suboptimal complete");
+  } while (false); // ensures more readable formatting
+  CXXET_mark_duration_end("Suboptimal duration end");
 
   return 0;
 }

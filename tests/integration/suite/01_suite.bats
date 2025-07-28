@@ -604,21 +604,24 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
 }
 
-@test "Improper initialization 1" {
-    local executable="${BIN_DIR}/cxxet_test_failed_init_1"
+@test "Suboptimal initialization 1" {
+    local executable="${BIN_DIR}/cxxet_test_suboptimal_init_1"
     export CXXET_VERBOSE=0
-    skip "TODO fix this later: 'release' and 'tsan' builds dont fail!"
-    run "${executable}"
-    assert_failure
+
+    run "${executable}" 
+    assert_success
+    assert_output ""
 }
 
-@test "Improper initialization 2" {
-    local executable="${BIN_DIR}/cxxet_test_failed_init_2"
+@test "Suboptimal initialization 2" {
+    local executable="${BIN_DIR}/cxxet_test_suboptimal_init_2"
     export CXXET_VERBOSE=0
-    run "${executable}"
-    assert_failure
 
-    # `release` and `.san_d` fail with `Aborted (core dumped)`, while `.san` builds fail with the respective sanitizer reports
+    run "${executable}"
+    assert_success
+    assert_output --partial '"name":"Suboptimal duration begin","ph":"B"'
+    assert_output --partial '"name":"Suboptimal complete","ph":"X"'
+    assert_output --partial '"name":"Suboptimal duration end","ph":"E"'
 }
 
 @test "Shared library symbol visibility" {

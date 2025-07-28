@@ -45,7 +45,9 @@ event_collector &event_collector::thread_local_instance() noexcept {
 }
 
 event_collector::event_collector(sink_base *aParent) noexcept
-    : cascade{aParent} {}
+    : cascade{aParent},
+      default_node_capacity{
+          impl::sink::properties::instance().default_list_node_capacity} {}
 
 event_collector::~event_collector() noexcept = default;
 

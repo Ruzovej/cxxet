@@ -24,11 +24,11 @@ add_example(
 )
 
 add_example(
-    cxxet_test_failed_init_1
-        "failed_init_1.cxx"
+    cxxet_test_suboptimal_init_1
+        "suboptimal_init_1.cxx"
 )
 
 add_example(
-    cxxet_test_failed_init_2
-        "failed_init_2.cxx"
+    cxxet_test_suboptimal_init_2
+        "suboptimal_init_2.cxx"
 )
