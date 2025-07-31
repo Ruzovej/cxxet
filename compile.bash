@@ -9,11 +9,11 @@ force_compile_commands_symlink='true'
 
 while (( $# > 0 )); do
     case "$1" in
-        --preset)
+        --preset|-p)
             cxxet_preset="$2"
             shift 2
             ;;
-        --target)
+        --target|-t)
             targets+=("$1" "$2")
             shift 2
             ;;
