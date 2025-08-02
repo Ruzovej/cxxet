@@ -1,20 +1,27 @@
 # `cxxet` = C++ easy tracing
 
-TODO ...
-
-[Examples are here](examples/README.md).
-
 ## License
 
 ![LGPLv3 License](doc/lgplv3-with-text-154x68.png)
 
+## Introduction
+
+TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & visual profiling for Prague `C++` meetup](https://github.com/Ruzovej/visual_and_intrusive_profiling_presentation) here.
+
+## Examples
+
+[Examples are here](examples/README.md).
+
 ## Explorations
 
-### Various formats - are they feasible, widely used, etc.?
+### (Various?) format(s) - are they feasible, widely used, etc.?
 
-* [using `Tracy` profiler to display saved traces](doc/UsingTracyProfiler.md)
 * [`Chrome trace` format](doc/UsingChromeTrace.md)
+  * currently used, the only option so far and seems it will suffice
+* [using `Tracy` profiler to display saved traces](doc/UsingTracyProfiler.md)
+  * TODO would it be feasible to implement `Tracy's` internal format too?!
 * TODO explore formats described in <https://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html>
+* TODO some nice [article](https://igortodorovskiibm.github.io/blog/2024/09/19/tracing/) 
 
 ### Competition?
 
