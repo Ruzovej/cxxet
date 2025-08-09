@@ -3,8 +3,8 @@
 set -e
 
 cxxet_include scripts/common/docker_image_name
-cxxet_include scripts/common/dockerfile_name
 cxxet_include scripts/common/docker_validate_image_name_base
+cxxet_include scripts/common/dockerfile_name
 cxxet_include scripts/common/ensure_docker_is_allowed
 cxxet_include scripts/common/list_dockerfiles
 
