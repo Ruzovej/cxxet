@@ -36,7 +36,6 @@ function bats_runner() {
             export CXXET_PRESET="${preset}"
 
             printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n' >&2
-
             printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for bats tests:\n' "${preset}" >&2
             compile \
                 --preset "${preset}" \
