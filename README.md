@@ -14,7 +14,7 @@ TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & 
 
 ## Development and management in general
 
-When having `bash` available, use `cxxet_manage.bash` to do all the work, e.g. compilation, preparing `docker` image for development, and so on.
+When having `bash` available, use `cxxet_manage.bash` to do all the work, e.g. compilation, preparing `docker` image(s) for development, and so on.
 
 ### Preparing & using `docker` environment
 
