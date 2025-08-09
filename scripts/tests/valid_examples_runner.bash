@@ -12,7 +12,7 @@ function valid_examples_runner() {
     compile \
         --preset "${preset}" \
         --target cxxet_examples \
-        --polite-ln-compile_commands >&2
+        --ignore-compile_commands >&2
 
     local bin_dir="${CXXET_ROOT_DIR}/bin/${preset}"
     local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%d_%H-%M-%S)"

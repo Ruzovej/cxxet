@@ -24,7 +24,7 @@ function compile() {
                 defines+=("$1")
                 shift 1
                 ;;
-            --polite-ln-compile_commands)
+            --ignore-compile_commands)
                 force_compile_commands_symlink='false'
                 shift 1
                 ;;

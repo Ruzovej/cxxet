@@ -42,7 +42,7 @@ function bats_runner() {
                 --target infra_sanitizer_check \
                 --target cxxet_examples \
                 --target cxxet_unit_tests \
-                --polite-ln-compile_commands >&2
+                --ignore-compile_commands >&2
 
             printf -- '-=-=-=-=-=-=-=- Executing %s bats tests:\n' "${preset}" >&2
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive tests/integration/suite

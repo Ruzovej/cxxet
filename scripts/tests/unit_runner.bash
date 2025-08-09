@@ -20,7 +20,7 @@ function unit_runner() {
         compile \
             --preset "${preset}" \
             --target cxxet_unit_tests \
-            --polite-ln-compile_commands >&2
+            --ignore-compile_commands >&2
 
         printf -- '-=-=-=-=-=-=-=- Executing %s unit tests:\n' "${preset}" >&2
         "bin/${preset}/cxxet_unit_tests" \
