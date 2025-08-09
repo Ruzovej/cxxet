@@ -39,7 +39,9 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   // all thread_local sinks flush to the same global one (protected by
   // locked `std::mutex` of course).
 
-  { CXXET_mark_complete("complete"); }
+  {
+    CXXET_mark_complete("complete");
+  }
   flush_to_file_now(argc > 1 ? argv[1] : "/dev/stdout", true);
 
   CXXET_mark_instant("instant");

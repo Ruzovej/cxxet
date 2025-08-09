@@ -5,6 +5,8 @@ RUN apt update \
     && apt install -y --no-install-recommends \
         ca-certificates \
         clang-19 \
+# TODO maybe fix exact version, so reformats doesn't happen "unexpectedly":
+        clang-format-19 \
         cmake \
         curl \
         git \
@@ -18,7 +20,8 @@ RUN apt update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/bin/clang-19 /usr/local/bin/clang \
-    && ln -s /usr/bin/clang++-19 /usr/local/bin/clang++
+    && ln -s /usr/bin/clang++-19 /usr/local/bin/clang++ \
+    && ln -s /usr/bin/clang-format-19 /usr/local/bin/clang-format
 
 ENV LANG=C.UTF-8
 

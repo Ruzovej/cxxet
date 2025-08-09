@@ -39,8 +39,8 @@ struct counter {
   constexpr counter(char const aFlag1, short const aFlag2, int const aFlag4,
                     char const *const name, long long const aTimestamp_ns,
                     double const aValue) noexcept
-      : evt{aFlag1, aFlag2, aFlag4, name},
-        timestamp_ns{aTimestamp_ns}, value{aValue} {}
+      : evt{aFlag1, aFlag2, aFlag4, name}, timestamp_ns{aTimestamp_ns},
+        value{aValue} {}
 
   [[nodiscard]] constexpr char const *get_quantity_name() const noexcept {
     return evt.desc;
