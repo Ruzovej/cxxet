@@ -22,11 +22,11 @@ If you don't have all tools/compilers/... available and don't want to install th
 
 ```bash
 # `XYZ` is valid image name or `--help`/`-h`:
-$ ./cxxet_manage.bash docker_build_image XYZ # builds given image
+$ ./cxxet_manage.bash docker_build_image XYZ # builds given image (or displays help ...)
 ...
-$ ./cxxet_manage.bash docker_interactive XYZ # enters interactive (bash) shell in it
+$ ./cxxet_manage.bash docker_interactive XYZ # enters interactive (bash) shell in it (or displays help ...)
 ...
-# all further commands can be used inside via the `cxxet_manage.bash` script too, e.g.:
+# all further commands are executed inside via the `cxxet_manage.bash` script too, e.g.:
 $ ./cxxet_manage.bash compile ...
 ...
 ```
