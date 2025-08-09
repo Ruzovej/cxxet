@@ -19,6 +19,7 @@ set -e
 
 source "${CXXET_ROOT_DIR}/scripts/base/cxxet_include.bash"
 cxxet_include scripts/base/cxxet_list_files
+cxxet_include scripts/base/cxxet_require_command
 
 COMMAND_NAME="$1"
 (

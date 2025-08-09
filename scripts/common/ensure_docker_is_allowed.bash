@@ -4,10 +4,7 @@ set -e
 
 function ensure_docker_is_allowed() {
     if [[ -z "${CXXET_AVOID_DOCKER}" ]]; then
-        if ! command -v docker &> /dev/null; then
-            printf 'Error: Docker is not installed or not in PATH\n' >&2
-            exit 1
-        fi
+        cxxet_require_command docker
 
         return 0
     else
