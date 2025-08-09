@@ -12,6 +12,25 @@ TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & 
 
 [Examples are here](examples/README.md).
 
+## Development and management in general
+
+When having `bash` available, use `cxxet_manage.bash` to do all the work, e.g. compilation, preparing `docker` image for development, and so on.
+
+### Preparing & using `docker` environment
+
+If you don't have all tools/compilers/... available and don't want to install them "directly" (see their list in respective `Dockerfile`s), corresponding `docker` image(s) can be built & used:
+
+```bash
+# `XYZ` is valid image name or `--help`/`-h`:
+$ ./cxxet_manage.bash docker_build_image XYZ # builds given image
+...
+$ ./cxxet_manage.bash docker_interactive XYZ # enters interactive (bash) shell in it
+...
+# all further commands can be used inside via the `cxxet_manage.bash` script too, e.g.:
+$ ./cxxet_manage.bash compile ...
+...
+```
+
 ## Explorations
 
 ### (Various?) format(s) - are they feasible, widely used, etc.?
