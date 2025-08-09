@@ -1,11 +1,5 @@
 # `cxxet` = C++ easy tracing
 
-{{TOC}}
-
-[[_TOC_]]
-
-[TOC]
-
 ## License
 
 ![LGPLv3 License](doc/lgplv3-with-text-154x68.png)
