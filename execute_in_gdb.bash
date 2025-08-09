@@ -8,7 +8,6 @@ executable="${2:-cxxet_example_counter_2}"
 printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nCompiling "%s" in "%s" mode:\n\n' "${executable}" "${preset}"
 time ./compile.bash \
     --preset "${preset}" \
-    -DCXXET_BUILD_TESTS=ON \
     --target "${executable}"
 
 printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nExecuting compiled "%s" within gdb:\n\n' "${executable}"

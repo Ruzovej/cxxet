@@ -18,8 +18,6 @@ function setup_file() {
 
     user_log "# configuring and building cxxet ... "
     run ./compile.bash \
-        -DCXXET_BUILD_TESTS=ON \
-        -DCXXET_BUILD_EXAMPLES=ON \
         --preset "${CXXET_PRESET}" \
         --target infra_sanitizer_check \
         --target cxxet_examples \

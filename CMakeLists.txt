@@ -21,7 +21,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # options:
-set(CXXET_BUILD_EXAMPLES "OFF" CACHE BOOL "Build all examples")
+set(CXXET_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
+set(CXXET_BUILD_TESTS "ON" CACHE BOOL "Build tests")
 set(CXXET_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
 set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
 set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
@@ -41,12 +42,6 @@ endif()
 
 if (CXXET_WITH_ASAN AND CXXET_WITH_TSAN)
     message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
-endif()
-
-if (CXXET_WITH_ASAN OR CXXET_WITH_TSAN)
-    set(CXXET_BUILD_TESTS "ON")
-else()
-    set(CXXET_BUILD_TESTS "OFF" CACHE BOOL "Build tests")
 endif()
 
 include(FetchContent)
