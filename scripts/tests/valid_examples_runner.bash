@@ -5,7 +5,20 @@ set -e
 cxxet_include scripts/commands/compile
 
 function valid_examples_runner() {
+    # don't "test" all reasonable presets but only single one:
     local preset="${1:-release}"
+    while (( $# > 0 )); do
+        case "$1" in
+            -p|--preset)
+                preset="${2:?No preset specified!}"
+                shift 2
+                ;;
+            *)
+                printf 'Unknown option: %s\n' "$1" >&2
+                exit 1
+                ;;
+        esac
+    done
 
     printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n' >&2
     printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for examples:\n' "${preset}" >&2
@@ -15,7 +28,7 @@ function valid_examples_runner() {
         --ignore-compile_commands >&2
 
     local bin_dir="${CXXET_ROOT_DIR}/bin/${preset}"
-    local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%d_%H-%M-%S)"
+    local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H:%M:%S)"
     mkdir -p "${target_dir}"
 
     printf -- '-=-=-=-=-=-=-=- Executing %s examples:\n' "${preset}" >&2

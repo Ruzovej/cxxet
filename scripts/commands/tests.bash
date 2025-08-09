@@ -9,9 +9,10 @@ cxxet_include scripts/tests/valid_examples_runner
 function tests() {
     case "$1" in
         -a|--all)
-            unit_runner
-            valid_examples_runner
-            bats_runner
+            shift
+            unit_runner "$@"
+            valid_examples_runner "$@"
+            bats_runner "$@"
             ;;
         -b|--bats)
             shift
