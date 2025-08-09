@@ -1,11 +1,18 @@
 FROM debian:bookworm
 
 RUN apt update \
-    && apt install -y  \
+    && apt upgrade -y \
+    && apt install -y --no-install-recommends \
+        ca-certificates \
         clang-19 \
         cmake \
+        curl \
         git \
+        less \
+        libclang-19-dev \
+        libclang-rt-19-dev \
         make \
+        patch \
         ninja-build \
         vim \
     && rm -rf /var/lib/apt/lists/*
