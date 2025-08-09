@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 function get_bats_package() {
+    cxxet_require_command curl
+
     local base_dir="${1:?Missing target dir!}"
     local package_name="${2:?Missing package name!}"
     local package_version="${3:?Missing package version!}"

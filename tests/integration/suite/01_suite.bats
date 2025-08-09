@@ -8,24 +8,6 @@ load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
 
 function setup_file() {
-    # needed tools:
-    run which jq
-    assert_success
-    run which strace
-    assert_success
-    run which nm
-    assert_success
-
-    user_log "# configuring and building cxxet ... "
-    run ./compile.bash \
-        --preset "${CXXET_PRESET}" \
-        --target infra_sanitizer_check \
-        --target cxxet_examples \
-        --target cxxet_unit_tests \
-        --polite-ln-compile_commands
-    assert_success
-    user_log 'done\n'
-
     export BIN_DIR="bin/${CXXET_PRESET}"
     export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_VERBOSE=1
