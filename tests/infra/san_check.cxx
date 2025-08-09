@@ -40,7 +40,7 @@ void trigger_tsan() {
 }
 
 void trigger_ubsan() {
-  int i{-1};
+  [[maybe_unused]] int i{-1};
   i <<= 1;
 }
 

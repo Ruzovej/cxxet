@@ -2,9 +2,9 @@
 
 set -e
 
-printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nCompiling examples in "release" mode:\n\n'
-time ./compile.bash --preset release -DCXXET_BUILD_EXAMPLES=ON -DCXXET_BUILD_TESTS=ON
-printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nExecuting compiled examples:\n\n'
+#printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nCompiling examples in "release" mode:\n\n'
+#time ./compile.bash --preset release -DCXXET_BUILD_EXAMPLES=ON -DCXXET_BUILD_TESTS=ON
+#printf '\n-=-=-=-=-=-=-=-=-=-=-=-\nExecuting compiled examples:\n\n'
 
 printf -- '-=-=-=-=-=-=-=-=-=-=-=-\nExecuting predefined unit tests:\n\n'
 time ./tests.bash --unit
