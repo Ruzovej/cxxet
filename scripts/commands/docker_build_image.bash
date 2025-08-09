@@ -15,11 +15,6 @@ function docker_build_image() {
         return 0
     fi
 
-    local user_id="$(id -u)"
-    local group_id="$(id -g)"
-    local user_name="$(id -un)"
-    local group_name="$(id -gn)"
-
     local image_name_base="$1"
     if [[ -z "${image_name_base}" ]]; then
         printf 'Error: Image name base is required!\n' >&2
@@ -36,6 +31,11 @@ function docker_build_image() {
         done
         exit 1
     fi
+
+    local user_id="$(id -u)"
+    local group_id="$(id -g)"
+    local user_name="$(id -un)"
+    local group_name="$(id -gn)"
 
     local tag="$(docker_image_name "${image_name_base}")"
 
