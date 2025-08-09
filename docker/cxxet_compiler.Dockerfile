@@ -13,6 +13,7 @@ RUN apt update \
         clang-format-${CLANG_VERSION} \
         cmake \
         curl \
+        gdb \
         git \
         jq \
         less \
@@ -22,6 +23,7 @@ RUN apt update \
         libtsan2 \
         libubsan1 \
         lld-${CLANG_VERSION} \
+        lldb-${CLANG_VERSION} \
         llvm-${CLANG_VERSION} \
         llvm-${CLANG_VERSION}-linker-tools \
         llvm-${CLANG_VERSION}-tools \
@@ -37,6 +39,7 @@ RUN install_alternative() { update-alternatives --install "/usr/bin/$1" "$1" "/u
     && install_alternative clang-format ${CLANG_VERSION} \
     && install_alternative clang++ ${CLANG_VERSION} \
     && install_alternative ld.lld ${CLANG_VERSION} \
+    && install_alternative lldb ${CLANG_VERSION} \
     && install_alternative llvm-addr2line ${CLANG_VERSION} \
     && install_alternative llvm-ar ${CLANG_VERSION} \
     && install_alternative llvm-nm ${CLANG_VERSION} \

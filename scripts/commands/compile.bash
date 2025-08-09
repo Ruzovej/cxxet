@@ -35,7 +35,6 @@ function compile() {
         esac
     done
 
-    local num_jobs="$(nproc)"
     (
         set -x
         cmake \
@@ -56,6 +55,7 @@ function compile() {
             "${CXXET_ROOT_DIR}/compile_commands.json"
     )
 
+    local num_jobs="$(nproc)"
     (
         set -x
         cmake \
