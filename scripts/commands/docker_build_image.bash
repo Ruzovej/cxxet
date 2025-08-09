@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
 cxxet_include scripts/common/docker_image_name
+cxxet_include scripts/common/ensure_docker_is_allowed
 
 function docker_build_image() {
+    ensure_docker_is_allowed
+
     function usage() {
         printf 'Usage: docker_build_image <image_name_base>\n' >&2
     }
