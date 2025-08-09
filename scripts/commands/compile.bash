@@ -9,7 +9,6 @@ function compile() {
     local targets=()
     local defines=()
     local force_compile_commands_symlink='true'
-    local linker='lld'
 
     while (( $# > 0 )); do
         case "$1" in
@@ -28,10 +27,6 @@ function compile() {
             --polite-ln-compile_commands)
                 force_compile_commands_symlink='false'
                 shift 1
-                ;;
-            --linker|-l)
-                linker="${2:?No linker specified!}"
-                shift 2
                 ;;
             *)
                 printf 'Unknown option: %s\n' "$1"

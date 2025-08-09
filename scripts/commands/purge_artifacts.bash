@@ -7,4 +7,5 @@ function purge_artifacts() {
         "${CXXET_ROOT_DIR}/bin" \
         "${CXXET_ROOT_DIR}/build" \
         "${CXXET_ROOT_DIR}/compile_commands.json"
+    # TODO is it enough? Or even more ... e.g. everything that is listed in (any) `.gitignore`?!
 }
