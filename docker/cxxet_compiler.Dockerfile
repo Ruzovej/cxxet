@@ -14,7 +14,13 @@ RUN apt update \
         cmake \
         curl \
         git \
+        jq \
         less \
+        libasan8 \
+        libclang-rt-${CLANG_VERSION}-dev \
+        liblsan0 \
+        libtsan2 \
+        libubsan1 \
         lld-${CLANG_VERSION} \
         llvm-${CLANG_VERSION} \
         llvm-${CLANG_VERSION}-linker-tools \
@@ -22,6 +28,7 @@ RUN apt update \
         make \
         patch \
         ninja-build \
+        strace \
         vim \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,6 +40,7 @@ RUN install_alternative() { update-alternatives --install "/usr/bin/$1" "$1" "/u
     && install_alternative llvm-addr2line ${CLANG_VERSION} \
     && install_alternative llvm-ar ${CLANG_VERSION} \
     && install_alternative llvm-nm ${CLANG_VERSION} \
+    && update-alternatives --install /usr/bin/nm nm "/usr/bin/llvm-nm-${CLANG_VERSION}" 100 \
     && install_alternative llvm-objcopy ${CLANG_VERSION} \
     && install_alternative llvm-objdump ${CLANG_VERSION} \
     && install_alternative llvm-ranlib ${CLANG_VERSION} \
