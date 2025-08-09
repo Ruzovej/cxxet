@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+
 cxxet_include scripts/common/docker_image_name
+cxxet_include scripts/common/docker_validate_image_name_base
 cxxet_include scripts/common/ensure_docker_is_allowed
 
 function docker_build_image() {
@@ -16,27 +19,18 @@ function docker_build_image() {
     fi
 
     local image_name_base="$1"
-    if [[ -z "${image_name_base}" ]]; then
-        printf 'Error: Image name base is required!\n' >&2
+
+    docker_validate_image_name_base "${image_name_base}" || {
         usage
         exit 1
-    fi
-
-    local dockerfile_path="${CXXET_ROOT_DIR}/docker/${image_name_base}.Dockerfile"
-    if [[ ! -f "${dockerfile_path}" ]]; then
-        printf 'Error: Dockerfile "%s" not found! Possible options are:\n' "${dockerfile_path}" >&2
-        local candidate_file
-        for candidate_file in "${CXXET_ROOT_DIR}/docker/"*.Dockerfile; do
-            printf ' - %s\n' "$(basename "${candidate_file}" .Dockerfile)" >&2
-        done
-        exit 1
-    fi
+    }
 
     local user_id="$(id -u)"
     local group_id="$(id -g)"
     local user_name="$(id -un)"
     local group_name="$(id -gn)"
 
+    local dockerfile_path="$(dockerfile_name "${image_name_base}")"
     local tag="$(docker_image_name "${image_name_base}")"
 
     (

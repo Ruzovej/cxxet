@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+
 cxxet_include scripts/common/docker_run
+cxxet_include scripts/common/docker_validate_image_name_base
 cxxet_include scripts/common/ensure_docker_is_allowed
 
 function docker_interactive() {
@@ -17,11 +20,10 @@ function docker_interactive() {
 
     local image_name_base="$1"
 
-    if [[ -z "${image_name_base}" ]]; then
-        printf 'Error: Image name base is required!\n' >&2
+    docker_validate_image_name_base "${image_name_base}" || {
         usage
         exit 1
-    fi
+    }
 
     docker_run \
         --interactive \

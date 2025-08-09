@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 cxxet_include scripts/common/docker_image_name
 cxxet_include scripts/common/ensure_docker_is_allowed
 
