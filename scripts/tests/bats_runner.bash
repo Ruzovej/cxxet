@@ -64,10 +64,10 @@ function bats_runner() {
                 --ignore-compile_commands >&2
 
             printf -- '-=-=-=-=-=-=-=- Executing %s bats tests:\n' "${preset}" >&2
-            "${BATS_EXECUTABLE}" "${args[@]}" --recursive tests/integration/suite
-            #"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/01_suite.bats
-            #"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/02_cmake_fetch_cxxet_direct_usage.bats
-            #"${BATS_EXECUTABLE}" "${args[@]}" tests/integration/suite/03_cmake_fetch_cxxet_indirect_usage.bats
+            "${BATS_EXECUTABLE}" "${args[@]}" --recursive "${CXXET_ROOT_DIR}/tests/integration/suite"
+            #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/01_suite.bats"
+            #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/02_cmake_fetch_cxxet_direct_usage.bats"
+            #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/03_cmake_fetch_cxxet_indirect_usage.bats"
 
             printf '\n' >&2
         done
