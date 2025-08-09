@@ -4,7 +4,7 @@ cxxet_include scripts/common/docker_image_name
 cxxet_include scripts/common/ensure_docker_is_allowed
 
 function docker_run() {
-    is_docker_allowed
+    ensure_docker_is_allowed
 
     local user_id="$(id -u)"
     local group_id="$(id -g)"
