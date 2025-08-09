@@ -3,14 +3,17 @@
 set -e
 
 cxxet_include scripts/common/docker_image_name
+cxxet_include scripts/common/dockerfile_name
 cxxet_include scripts/common/docker_validate_image_name_base
 cxxet_include scripts/common/ensure_docker_is_allowed
+cxxet_include scripts/common/list_dockerfiles
 
 function docker_build_image() {
     ensure_docker_is_allowed
 
     function usage() {
         printf 'Usage: docker_build_image <image_name_base>\n' >&2
+        list_dockerfiles
     }
 
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then

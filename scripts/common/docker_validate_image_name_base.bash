@@ -12,12 +12,8 @@ function docker_validate_image_name_base() {
         if [[ -z "${image_name_base}" ]]; then
             printf 'Error: Image name base is required!\n' >&2
         else
-            printf 'Error: Dockerfile for image "%s" not found! Possible options are:\n' "${image_name_base}" >&2
+            printf 'Error: Dockerfile for image "%s" not found!\n' "${image_name_base}" >&2
         fi
-        local candidate_file
-        for candidate_file in "${CXXET_ROOT_DIR}/docker/"*.Dockerfile; do
-            printf ' - %s\n' "$(basename "${candidate_file}" .Dockerfile)" >&2
-        done
         return 1
     fi
     return 0
