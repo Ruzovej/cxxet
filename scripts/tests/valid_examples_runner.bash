@@ -6,30 +6,48 @@ cxxet_include scripts/commands/compile
 
 function valid_examples_runner() {
     # don't "test" all reasonable presets but only single one:
-    local preset="${1:-release}"
+    local default_preset=release
+    local preset="${1:-${default_preset}}"
+
+    function usage() {
+        {
+            if [[ "$1" != '--short' ]]; then
+                printf 'valid_examples_runner: run example programs with specified preset\n'
+            fi
+            printf 'Usage: tests examples [options...]\n'
+            printf 'Where options are:\n'
+            printf '    --preset, -p PRESET        Run examples with the specified preset (default: %s)\n' "${default_preset}"
+            printf '    --help, -h                 Show this help message\n'
+        } >&2
+    }
+
     while (( $# > 0 )); do
         case "$1" in
             -p|--preset)
                 preset="${2:?No preset specified!}"
                 shift 2
                 ;;
+            --help|-h)
+                usage
+                return 0
+                ;;
             *)
                 printf 'Unknown option: %s\n' "$1" >&2
+                usage --short
                 exit 1
                 ;;
         esac
     done
 
-    printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n' >&2
+    local bin_dir="${CXXET_ROOT_DIR}/bin/${preset}"
+    local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H:%M:%S)"
+    mkdir -p "${target_dir}"
+
     printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for examples:\n' "${preset}" >&2
     compile \
         --preset "${preset}" \
         --target cxxet_examples \
         --ignore-compile_commands >&2
-
-    local bin_dir="${CXXET_ROOT_DIR}/bin/${preset}"
-    local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H:%M:%S)"
-    mkdir -p "${target_dir}"
 
     printf -- '-=-=-=-=-=-=-=- Executing %s examples:\n' "${preset}" >&2
     time (

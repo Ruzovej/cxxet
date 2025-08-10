@@ -8,35 +8,46 @@ cxxet_include scripts/tests/initialize_bats
 function bats_runner() {
     cxxet_require_command \
         jq \
-        strace \
-        nm
+        nm \
+        strace
 
-    local arg_preset
+    local test_presets=(
+        asan
+        asan_d
+        tsan
+        tsan_d
+        release
+    )
+
+    function usage() {
+        {
+            if [[ "$1" != '--short' ]]; then
+                printf 'bats_runner: run bats integration tests with specified preset(s)\n'
+            fi
+            printf 'Usage: tests bats [options...]\n'
+            printf 'Where options are:\n'
+            printf '    --preset, -p PRESET        Run tests only for the specified preset (default is all presets: %s)\n' "${test_presets[*]}"
+            printf '    --help, -h                 Show this help message\n'
+        } >&2
+    }
+
     while (( $# > 0 )); do
         case "$1" in
             -p|--preset)
-                arg_preset="${2:?No preset specified!}"
+                test_presets=("${2:?No preset specified!}")
                 shift 2
+                ;;
+            --help|-h)
+                usage
+                return 0
                 ;;
             *)
                 printf 'Unknown option: %s\n' "$1" >&2
+                usage --short
                 exit 1
                 ;;
         esac
     done
-
-    local test_presets
-    if [[ -z "${arg_preset}" ]]; then
-        test_presets=(
-            asan
-            asan_d
-            tsan
-            tsan_d
-            release
-        )
-    else
-        test_presets=("${arg_preset}")
-    fi
 
     local args=(
         --timing
@@ -52,9 +63,6 @@ function bats_runner() {
 
         local preset
         for preset in "${test_presets[@]}"; do
-            export CXXET_PRESET="${preset}"
-
-            printf -- '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n' >&2
             printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for bats tests:\n' "${preset}" >&2
             compile \
                 --preset "${preset}" \
@@ -64,6 +72,7 @@ function bats_runner() {
                 --ignore-compile_commands >&2
 
             printf -- '-=-=-=-=-=-=-=- Executing %s bats tests:\n' "${preset}" >&2
+            export CXXET_PRESET="${preset}"
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive "${CXXET_ROOT_DIR}/tests/integration/suite"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/01_suite.bats"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/02_cmake_fetch_cxxet_direct_usage.bats"
