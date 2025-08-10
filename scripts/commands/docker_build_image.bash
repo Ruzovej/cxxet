@@ -26,9 +26,8 @@ function docker_build_image() {
     fi
 
     local image_name_base="$1"
-    shift
 
-    docker_validate_image_name_base "${image_name_base}" && reject_further_args "$@" || {
+    docker_validate_image_name_base "${image_name_base}" && shift && reject_further_args "$@" || {
         usage --short
         exit 1
     }
