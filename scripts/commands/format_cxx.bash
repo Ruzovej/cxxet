@@ -15,12 +15,14 @@ function format_cxx() {
     )
 
     function usage() {
-        if [[ "$1" != '--short' ]]; then
-            printf 'format_cxx: format all C/C++ source files in %s\n' >&2 "${format_folders[*]}"
-        fi
-        printf 'Usage: format_cxx [options...]\n' >&2
-        printf 'Where options are:\n' >&2
-        printf '    --help, -h    Show this help message\n' >&2
+        {
+            if [[ "$1" != '--short' ]]; then
+                printf 'format_cxx: format all C/C++ source files in %s\n' "${format_folders[*]}"
+            fi
+            printf 'Usage: format_cxx [options...]\n'
+            printf 'Where options are:\n'
+            printf '    --help, -h    Show this help message\n'
+        } >&2
     }
 
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
