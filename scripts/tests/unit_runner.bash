@@ -42,7 +42,7 @@ function unit_runner() {
             --ignore-compile_commands >&2
 
         printf -- '-=-=-=-=-=-=-=- Executing %s unit tests:\n' "${preset}" >&2
-        "bin/${preset}/cxxet_unit_tests" \
+        "${CXXET_ROOT_DIR}/bin/${preset}/cxxet_unit_tests" \
             --no-intro >&2
 
         printf '\n' >&2
