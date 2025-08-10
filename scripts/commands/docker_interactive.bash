@@ -6,6 +6,7 @@ cxxet_include scripts/common/docker_run
 cxxet_include scripts/common/docker_validate_image_name_base
 cxxet_include scripts/common/ensure_docker_is_allowed
 cxxet_include scripts/common/list_dockerfiles
+cxxet_include scripts/common/reject_further_args
 
 function docker_interactive() {
     ensure_docker_is_allowed
@@ -21,8 +22,9 @@ function docker_interactive() {
     fi
 
     local image_name_base="$1"
+    shift
 
-    docker_validate_image_name_base "${image_name_base}" || {
+    docker_validate_image_name_base "${image_name_base}" && reject_further_args "$@" || {
         usage
         exit 1
     }
