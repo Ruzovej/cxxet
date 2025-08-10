@@ -11,6 +11,18 @@ function debug_executable() {
     local target=cxxet_example_counter_2
     local default_block_size=4
 
+    function usage() {
+        {
+            printf 'Usage: cxxet debug_executable [options...]\n'
+            printf 'Where options are:\n'
+            printf '    --preset, -p PRESET               Set the CMake preset (default: %s)\n' "${preset}"
+            printf '    --target, -t TARGET               Set the target executable (default: %s)\n' "${target}"
+            printf '    --default-block-size, -b SIZE     Set the default block size (default: %s)\n' "${default_block_size}"
+            printf '    --help, -h                        Show this help message\n'
+        } >&2
+    }
+
+
     while (( $# > 0 )); do
         case "$1" in
             --preset|-p)
@@ -25,8 +37,13 @@ function debug_executable() {
                 default_block_size="${2:?No default block size specified!}"
                 shift 2
                 ;;
+            --help|-h)
+                usage
+                exit 0
+                ;;
             *)
-                printf 'Unknown option: %s\n' "$1"
+                printf 'Unknown option: %s\n' "$1" >&2
+                usage
                 exit 1
                 ;;
         esac
