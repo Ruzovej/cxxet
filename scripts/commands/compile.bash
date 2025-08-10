@@ -9,6 +9,7 @@ function compile() {
     local targets=()
     local defines=()
     local force_compile_commands_symlink='true'
+    local quiet='false'
 
     function usage() {
         {
@@ -21,6 +22,7 @@ function compile() {
             printf '    --target, -t TARGET        Add a build target (can be used multiple times, default: all)\n'
             printf '    -DVAR=VALUE                Pass extra define to CMake\n'
             printf '    --ignore-compile_commands  Don'\''t create compile_commands.json symlink (by default creates it)\n'
+            printf '    --quiet, -q                Suppress standard output\n'
             printf '    --help, -h                 Show this help message\n'
         } >&2
     }
@@ -43,6 +45,10 @@ function compile() {
                 force_compile_commands_symlink='false'
                 shift 1
                 ;;
+            --quiet|-q)
+                quiet='true'
+                shift 1
+                ;;
             --help|-h)
                 usage
                 exit 0
@@ -55,6 +61,15 @@ function compile() {
         esac
     done
 
+    function redirect_output() {
+        if [[ "${quiet}" == 'true' ]]; then
+            cat 1>/dev/null
+        else
+            cat >&2
+        fi
+    }
+
+    set -o pipefail
     (
         set -x
         cmake \
@@ -63,7 +78,7 @@ function compile() {
             "${defines[@]}" \
             --preset "${cxxet_preset}" #\
             # --graphviz="graphviz/${cxxet_preset}"
-    )
+    ) | redirect_output
 
     [[ "${force_compile_commands_symlink}" == 'false' && -f "${CXXET_ROOT_DIR}/compile_commands.json" ]] \
     || (
@@ -73,7 +88,7 @@ function compile() {
             --force \
             "${CXXET_ROOT_DIR}/build/${cxxet_preset}/compile_commands.json" \
             "${CXXET_ROOT_DIR}/compile_commands.json"
-    )
+    ) | redirect_output
 
     local num_jobs="$(nproc)"
     (
@@ -82,5 +97,7 @@ function compile() {
             --build "${CXXET_ROOT_DIR}/build/${cxxet_preset}" \
             -j "${num_jobs}" \
             "${targets[@]}"
-    )
+    ) | redirect_output
+
+    set +o pipefail
 }

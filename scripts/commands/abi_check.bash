@@ -54,30 +54,29 @@ function abi_check() {
     done
 
     if [[ -z "${prev_commit}" ]]; then
-        # It can be observed that this is what's needed by running e.g.:
+        # It can be observed that this is what's needed by running e.g.
         # `$ git log --format=oneline -n 1 main` ...
         prev_commit="$(git rev-parse "${prev_branch}")"
     fi
 
-    # TODO new folder everytime (e.g. `mktemp`, ...), or save some space by reusing the same folder in subsequent runs?
-    local abidiff_dir="${CXXET_ROOT_DIR}/tmp/cloned_repo_for_abidiff/preset_${preset}"
-    local baseline_so_name="${abidiff_dir}/bin/${preset}/libcxxet.so"
+    # save (some) space by reusing the same folder in subsequent runs:
+    local abi_check_repo_dir="${CXXET_ROOT_DIR}/tmp/abi_check_repo"
+    local baseline_so_name="${abi_check_repo_dir}/bin/${preset}/libcxxet.so"
     (
-        #rm -rf "${abidiff_dir}" # TODO (https://github.com/Ruzovej/cxxet/issues/113) remove later - now it's here for testing purposes ...
-        if [[ ! -d "${abidiff_dir}" ]]; then
-            mkdir -p "${abidiff_dir}"
+        if [[ ! -d "${abi_check_repo_dir}" ]]; then
+            mkdir -p "${abi_check_repo_dir}"
             (
                 set -x
                 git clone \
                     --branch "${prev_branch}" \
                     --quiet \
                     "file://${CXXET_ROOT_DIR}" \
-                    "${abidiff_dir}"
+                    "${abi_check_repo_dir}"
             )
         else
             (
                 set -x
-                git -C "${abidiff_dir}" fetch \
+                git -C "${abi_check_repo_dir}" fetch \
                     --quiet \
                     origin \
                     "${prev_branch}"
@@ -85,15 +84,16 @@ function abi_check() {
         fi
         (
             set -x
-            git -C "${abidiff_dir}" checkout \
+            git -C "${abi_check_repo_dir}" checkout \
                 --quiet \
                 --detach \
                 "${prev_commit}"
         )
 
-        cd "${abidiff_dir}" # Needed so the `cxxet_manage.bash` properly determines its root directory:
+        cd "${abi_check_repo_dir}" # Needed so the `cxxet_manage.bash` properly determines its root directory:
         ./cxxet_manage.bash compile \
             --preset "${preset}" \
+            --quiet \
             --ignore-compile_commands
         
         [[ -f "${baseline_so_name}" ]] || {
@@ -102,11 +102,11 @@ function abi_check() {
         }
     ) >&2
 
-    # TODO (https://github.com/Ruzovej/cxxet/issues/113) implement `--quiet` option for `compile` subcommand & use it (at least) here
     local current_so_name="${CXXET_ROOT_DIR}/bin/${preset}/libcxxet.so"
     compile \
         --preset "${preset}" \
-        --ignore-compile_commands >&2
+        --quiet \
+        --ignore-compile_commands
 
     [[ -f "${current_so_name}" ]] || {
         printf 'Error: Current shared object file "%s" does not exist!\n' "${current_so_name}" >&2
