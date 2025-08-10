@@ -15,6 +15,16 @@
             }
         },
         {
+            "name": "deploy",
+            "inherits": "default",
+            "cacheVariables": {
+                "CXXET_BUILD_EXAMPLES": "OFF",
+                "CXXET_BUILD_TESTS": "OFF",
+                "CXXET_OUTPUT_DIRECTORY": "${sourceDir}/bin/deploy",
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
             "name": "release",
             "inherits": "default",
             "cacheVariables": {
@@ -76,6 +86,10 @@
             "name": "default",
             "hidden": true,
             "configurePreset": "default"
+        },
+        {
+            "name": "deploy",
+            "configurePreset": "deploy"
         },
         {
             "name": "release",

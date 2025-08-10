@@ -7,24 +7,28 @@ cxxet_include scripts/common/docker_validate_image_name_base
 cxxet_include scripts/common/dockerfile_name
 cxxet_include scripts/common/ensure_docker_is_allowed
 cxxet_include scripts/common/list_dockerfiles
+cxxet_include scripts/common/reject_further_args
 
 function docker_build_image() {
     ensure_docker_is_allowed
 
     function usage() {
+        if [[ "$1" != '--short' ]]; then
+            printf 'docker_build_image: build given docker image\n' >&2
+        fi
         printf 'Usage: docker_build_image <image_name_base>\n' >&2
         list_dockerfiles
     }
 
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         usage
-        return 0
+        exit 0
     fi
 
     local image_name_base="$1"
 
-    docker_validate_image_name_base "${image_name_base}" || {
-        usage
+    docker_validate_image_name_base "${image_name_base}" && shift && reject_further_args "$@" || {
+        usage --short
         exit 1
     }
 

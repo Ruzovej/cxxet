@@ -8,27 +8,7 @@ load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
 
 function setup_file() {
-    # needed tools:
-    run which jq
-    assert_success
-    run which strace
-    assert_success
-    run which nm
-    assert_success
-
-    user_log "# configuring and building cxxet ... "
-    run ./compile.bash \
-        -DCXXET_BUILD_TESTS=ON \
-        -DCXXET_BUILD_EXAMPLES=ON \
-        --preset "${CXXET_PRESET}" \
-        --target infra_sanitizer_check \
-        --target cxxet_examples \
-        --target cxxet_unit_tests \
-        --polite-ln-compile_commands
-    assert_success
-    user_log 'done\n'
-
-    export BIN_DIR="bin/${CXXET_PRESET}"
+    export BIN_DIR="${CXXET_PWD}/bin/${CXXET_PRESET}"
     export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_VERBOSE=1
     export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.01_suite.bats.${CXXET_PRESET}.XXXXXX")"
@@ -57,12 +37,16 @@ function teardown_file() {
     if [[ "${CXXET_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
-        assert_output --partial "runtime error: index 2 out of bounds for type 'int [2]'"
+        # TODO (https://github.com/Ruzovej/cxxet/issues/96) fix this ... there's a difference between what it reports when compiled with `gcc` and `clang` (1st has space `'int [2]'`, 2nd doesn't `'int[2]'`):
+        assert_output --partial "runtime error: index 2 out of bounds for type "
+        #assert_output --partial "runtime error: index 2 out of bounds for type 'int [2]'"
 
         run "${san_check}" lsan
         assert_failure
         assert_output --partial "==ERROR: LeakSanitizer: detected memory leaks"
-        assert_output --partial "SUMMARY: AddressSanitizer: 8 byte(s) leaked in 2 allocation(s)."
+        # TODO (https://github.com/Ruzovej/cxxet/issues/96) fix this ... `gcc` reports the first commented thing, `clang` sometimes the second:
+        #assert_output --partial "SUMMARY: AddressSanitizer: 8 byte(s) leaked in 2 allocation(s)."
+        #assert_output --partial "SUMMARY: AddressSanitizer: 4 byte(s) leaked in 1 allocation(s)."
 
         run "${san_check}" ubsan
         assert_failure
@@ -71,7 +55,10 @@ function teardown_file() {
         run "${san_check}" tsan
         assert_failure
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
-        assert_output --partial 'ThreadSanitizer: reported 1 warnings'
+        # TODO (https://github.com/Ruzovej/cxxet/issues/96) fix this ... `gcc` reports the first commented thing, `clang` the second:
+        #assert_output --partial 'ThreadSanitizer: reported 1 warnings'
+        #assert_output --partial 'ThreadSanitizer: reported 2 warnings'
+        assert_output --partial 'ThreadSanitizer: reported'
     else
         # well, to be precise, each consists of "undefined behavior" so it's just a lucky coincidence that it succeeds:
         run "${san_check}" tsan
@@ -637,7 +624,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_success
     local nm_output="${output}"
 
-    # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
+    # only those symbols should be exported - feel free to update this list when the change is desired; TODO (https://github.com/Ruzovej/cxxet/issues/56) improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
     assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, cxxet::sink_handle&)
 cxxet::file_sink_handle::make(bool)
 cxxet::mark::complete::submit(timespec)
@@ -651,17 +638,24 @@ cxxet::sink_thread_divert_to_sink_global()
 cxxet::sink_thread_flush()
 cxxet::sink_thread_reserve(int)"
 
-    assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
-cxxet::file_sink_handle
-cxxet::sink_handle"
+    # TODO (https://github.com/Ruzovej/cxxet/issues/56) fix those below ...
+    #   - when compiled & linked with gcc & ld (on my system - default for WSL2 Ubuntu 22.04) it reports those 3 symbols
+    #   - clang & lld results are different ...
+    #   - in general, this test is very brittle -> `abbidiff` tool is needed to test this properly ...
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " typeinfo for cxxet::")" 0
+    #assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
+#cxxet::file_sink_handle
+#cxxet::sink_handle"
 
-    assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo name for cxxet::" | cut --delimiter ' ' --fields 1-5 --complement | sort -u)" "cxxet::cascade_sink_handle
-cxxet::file_sink_handle
-cxxet::sink_handle"
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " typeinfo name for cxxet::")" 0
+    #assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo name for cxxet::" | cut --delimiter ' ' --fields 1-5 --complement | sort -u)" "cxxet::cascade_sink_handle
+#cxxet::file_sink_handle
+#cxxet::sink_handle"
 
-    assert_equal "$(printf '%s' "${nm_output}" | grep " V vtable for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
-cxxet::file_sink_handle
-cxxet::sink_handle"
+    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " vtable for cxxet::")" 0
+    #assert_equal "$(printf '%s' "${nm_output}" | grep " V vtable for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
+#cxxet::file_sink_handle
+#cxxet::sink_handle"
 
     # those definitely not:
     assert_equal "$(printf '%s' "${nm_output}" | grep -c "doctest::")" 0
