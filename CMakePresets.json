@@ -25,6 +25,16 @@
             }
         },
         {
+            "name": "abidiff",
+            "inherits": "default",
+            "cacheVariables": {
+                "CXXET_BUILD_EXAMPLES": "OFF",
+                "CXXET_BUILD_TESTS": "OFF",
+                "CXXET_OUTPUT_DIRECTORY": "${sourceDir}/bin/abidiff",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
             "name": "release",
             "inherits": "default",
             "cacheVariables": {
@@ -90,6 +100,10 @@
         {
             "name": "deploy",
             "configurePreset": "deploy"
+        },
+        {
+            "name": "abidiff",
+            "configurePreset": "abidiff"
         },
         {
             "name": "release",

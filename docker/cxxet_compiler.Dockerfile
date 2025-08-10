@@ -72,3 +72,10 @@ RUN groupadd \
         "${USER_NAME:?}"
 
 ENV CXXET_AVOID_DOCKER=1
+
+# TODO (#56) later merge into the first such command ...
+RUN apt update \
+    && apt upgrade -y \
+    && apt install -y --no-install-recommends \
+        abigail-tools \
+    && rm -rf /var/lib/apt/lists/*
