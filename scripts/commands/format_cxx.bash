@@ -25,7 +25,7 @@ function format_cxx() {
 
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         usage
-        return 0
+        exit 0
     fi
 
     reject_further_args "$@" || {
