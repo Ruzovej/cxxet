@@ -40,7 +40,7 @@ function valid_examples_runner() {
     done
 
     local bin_dir="${CXXET_ROOT_DIR}/bin/${preset}"
-    local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H:%M:%S)"
+    local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)"
     mkdir -p "${target_dir}"
 
     printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for examples:\n' "${preset}" >&2
