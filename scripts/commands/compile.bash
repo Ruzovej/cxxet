@@ -15,7 +15,7 @@ function compile() {
             if [[ "$1" != '--short' ]]; then
                 printf 'compile: configures & executes build system for given preset, target(s), etc.'
             fi
-            printf 'Usage: cxxet compile [options...]\n'
+            printf 'Usage: compile [options...]\n'
             printf 'Where options are:\n'
             printf '    --preset, -p PRESET        Set the CMake preset (default: %s)\n' "${cxxet_preset}"
             printf '    --target, -t TARGET        Add a build target (can be used multiple times, default: all)\n'
