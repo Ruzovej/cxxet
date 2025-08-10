@@ -10,6 +10,18 @@ function compile() {
     local defines=()
     local force_compile_commands_symlink='true'
 
+    function usage() {
+        {
+            printf 'Usage: cxxet compile [options...]\n'
+            printf 'Where options are:\n'
+            printf '    --preset, -p PRESET        Set the CMake preset (default: %s)\n' "${cxxet_preset}"
+            printf '    --target, -t TARGET        Add a build target (can be used multiple times, defaults to "all")\n'
+            printf '    -DVAR=VALUE                Pass extra define to CMake\n'
+            printf '    --ignore-compile_commands  Don'\''t create compile_commands.json symlink (by default creates it)\n'
+            printf '    --help, -h                 Show this help message\n'
+        } >&2
+    }
+
     while (( $# > 0 )); do
         case "$1" in
             --preset|-p)
@@ -28,8 +40,13 @@ function compile() {
                 force_compile_commands_symlink='false'
                 shift 1
                 ;;
+            --help|-h)
+                usage
+                exit 0
+                ;;
             *)
-                printf 'Unknown option: %s\n' "$1"
+                printf 'Unknown option: %s\n' "$1" >&2
+                usage
                 exit 1
                 ;;
         esac
