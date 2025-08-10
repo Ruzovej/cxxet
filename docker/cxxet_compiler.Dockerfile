@@ -19,6 +19,7 @@ RUN apt update \
         less \
         libasan8 \
         libclang-rt-${CLANG_VERSION}-dev \
+        libldap-common \
         liblsan0 \
         libtsan2 \
         libubsan1 \
@@ -28,8 +29,11 @@ RUN apt update \
         llvm-${CLANG_VERSION}-linker-tools \
         llvm-${CLANG_VERSION}-tools \
         make \
-        patch \
         ninja-build \
+        netbase \
+        patch \
+        publicsuffix \
+        ssh-client \
         strace \
         vim \
     && rm -rf /var/lib/apt/lists/*
