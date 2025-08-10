@@ -14,7 +14,7 @@ function debug_executable() {
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'debug_executable: executes given target under debugger\n'
+                printf 'debug_executable: execute given target under debugger\n'
             fi
             printf 'Usage: debug_executable [options...]\n'
             printf 'Where options are:\n'

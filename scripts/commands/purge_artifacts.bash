@@ -17,7 +17,7 @@ function purge_artifacts() {
 
     function usage() {
         if [[ "$1" != '--short' ]]; then
-            printf 'purge_artifacts: simply removes all folders/files: %s\n' >&2 "${files_to_remove[*]}"
+            printf 'purge_artifacts: remove all folders/files: %s\n' >&2 "${files_to_remove[*]}"
         fi
         printf 'Usage: purge_artifacts [options...]\n' >&2
         printf 'Where options are:\n' >&2

@@ -13,7 +13,7 @@ function docker_interactive() {
 
     function usage() {
         if [[ "$1" != '--short' ]]; then
-            printf 'docker_interactive: starts container (interactive bash) of given image\n' >&2
+            printf 'docker_interactive: start container (interactive bash) of given image\n' >&2
         fi
         printf 'Usage: docker_interactive <image_name_base>\n' >&2
         list_dockerfiles
