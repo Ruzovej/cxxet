@@ -41,6 +41,6 @@ function debug_executable() {
         set -x
         export CXXET_DEFAULT_BLOCK_SIZE="${default_block_size}" # torture it with some non-default value & force it to allocate more during the run
         gdb --args "${CXXET_ROOT_DIR}/bin/${preset}/${target}"
-        # TODO use `lldb`?! But leave possibility to use `gdb` too ...
+        # TODO (https://github.com/Ruzovej/cxxet/issues/110) use `lldb`?! But leave possibility to use `gdb` too ...
     )
 }

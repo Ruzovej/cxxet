@@ -37,14 +37,14 @@ function teardown_file() {
     if [[ "${CXXET_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
-        # TODO fix this ... there's a difference between what it reports when compiled with `gcc` and `clang` (1st has space `'int [2]'`, 2nd doesn't `'int[2]'`):
+        # TODO (https://github.com/Ruzovej/cxxet/issues/96) fix this ... there's a difference between what it reports when compiled with `gcc` and `clang` (1st has space `'int [2]'`, 2nd doesn't `'int[2]'`):
         assert_output --partial "runtime error: index 2 out of bounds for type "
         #assert_output --partial "runtime error: index 2 out of bounds for type 'int [2]'"
 
         run "${san_check}" lsan
         assert_failure
         assert_output --partial "==ERROR: LeakSanitizer: detected memory leaks"
-        # TODO fix this ... `gcc` reports the first commented thing, `clang` sometimes the second:
+        # TODO (https://github.com/Ruzovej/cxxet/issues/96) fix this ... `gcc` reports the first commented thing, `clang` sometimes the second:
         #assert_output --partial "SUMMARY: AddressSanitizer: 8 byte(s) leaked in 2 allocation(s)."
         #assert_output --partial "SUMMARY: AddressSanitizer: 4 byte(s) leaked in 1 allocation(s)."
 
@@ -55,7 +55,7 @@ function teardown_file() {
         run "${san_check}" tsan
         assert_failure
         assert_output --partial 'WARNING: ThreadSanitizer: data race'
-        # TODO fix this ... `gcc` reports the first commented thing, `clang` the second:
+        # TODO (https://github.com/Ruzovej/cxxet/issues/96) fix this ... `gcc` reports the first commented thing, `clang` the second:
         #assert_output --partial 'ThreadSanitizer: reported 1 warnings'
         #assert_output --partial 'ThreadSanitizer: reported 2 warnings'
         assert_output --partial 'ThreadSanitizer: reported'
@@ -624,7 +624,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_success
     local nm_output="${output}"
 
-    # only those symbols should be exported - feel free to update this list when the change is desired; TODO improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
+    # only those symbols should be exported - feel free to update this list when the change is desired; TODO (https://github.com/Ruzovej/cxxet/issues/56) improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
     assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, cxxet::sink_handle&)
 cxxet::file_sink_handle::make(bool)
 cxxet::mark::complete::submit(timespec)
@@ -638,7 +638,7 @@ cxxet::sink_thread_divert_to_sink_global()
 cxxet::sink_thread_flush()
 cxxet::sink_thread_reserve(int)"
 
-    # TODO fix those below ...
+    # TODO (https://github.com/Ruzovej/cxxet/issues/56) fix those below ...
     #   - when compiled & linked with gcc & ld (on my system - default for WSL2 Ubuntu 22.04) it reports those 3 symbols
     #   - clang & lld results are different ...
     #   - in general, this test is very brittle -> `abbidiff` tool is needed to test this properly ...

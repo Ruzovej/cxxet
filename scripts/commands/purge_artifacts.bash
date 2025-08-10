@@ -10,5 +10,5 @@ function purge_artifacts() {
         "${CXXET_ROOT_DIR}/tests/integration/external" \
         "${CXXET_ROOT_DIR}/graphviz" \
         "${CXXET_ROOT_DIR}/tmp"
-    # TODO is it enough? Or even more ... e.g. everything that is listed in (any) `.gitignore`?!
+    # TODO (https://github.com/Ruzovej/cxxet/issues/111) is it enough? Or even more ... e.g. everything that is listed in (any) `.gitignore`?!
 }
