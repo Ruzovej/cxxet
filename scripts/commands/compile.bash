@@ -65,7 +65,7 @@ function compile() {
             # --graphviz="graphviz/${cxxet_preset}"
     )
 
-    [[ "${force_compile_commands_symlink}" == 'false' && -f compile_commands.json ]] \
+    [[ "${force_compile_commands_symlink}" == 'false' && -f "${CXXET_ROOT_DIR}/compile_commands.json" ]] \
     || (
         set -x
         ln \
