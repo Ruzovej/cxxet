@@ -214,8 +214,8 @@ if (CXXET_BUILD_SHARED)
     set_target_properties( # seems useful -> TODO polish it later
         cxxet
             PROPERTIES
-            VERSION "${CXXET_VERSION}" # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
-            SOVERSION "${CXXET_VERSION_MAJOR}" # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
+            VERSION "${cxxet_VERSION}" # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
+            SOVERSION "${cxxet_VERSION_MAJOR}" # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
     )
 endif()
 target_include_directories(
