@@ -7,6 +7,7 @@ ARG CLANG_VERSION=19
 RUN apt update \
     && apt upgrade -y \
     && apt install -y --no-install-recommends \
+        abigail-tools \
         ca-certificates \
         clang-${CLANG_VERSION} \
 # TODO (https://github.com/Ruzovej/cxxet/issues/11) maybe fix exact version, so reformats doesn't happen "unexpectedly":
@@ -72,10 +73,3 @@ RUN groupadd \
         "${USER_NAME:?}"
 
 ENV CXXET_AVOID_DOCKER=1
-
-# TODO (#56) later merge into the first such command ...
-RUN apt update \
-    && apt upgrade -y \
-    && apt install -y --no-install-recommends \
-        abigail-tools \
-    && rm -rf /var/lib/apt/lists/*
