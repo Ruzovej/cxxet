@@ -17,7 +17,11 @@ function format_cxx() {
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'format_cxx: format all C/C++ source files in %s\n' "${format_folders[*]}"
+                printf 'format_cxx: format all C/C++ source files in those folders:\n'
+                local folder
+                for folder in "${format_folders[@]}"; do
+                    printf '    %s\n' "${folder}"
+                done
             fi
             printf 'Usage: format_cxx [options...]\n'
             printf 'Where options are:\n'

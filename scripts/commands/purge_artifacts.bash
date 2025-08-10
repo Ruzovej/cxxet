@@ -16,12 +16,18 @@ function purge_artifacts() {
     )
 
     function usage() {
-        if [[ "$1" != '--short' ]]; then
-            printf 'purge_artifacts: remove all folders/files: %s\n' >&2 "${files_to_remove[*]}"
-        fi
-        printf 'Usage: purge_artifacts [options...]\n' >&2
-        printf 'Where options are:\n' >&2
-        printf '    --help, -h    Show this help message\n' >&2
+        {
+            if [[ "$1" != '--short' ]]; then
+                printf 'purge_artifacts: remove all folders/files:\n'
+                local file
+                for file in "${files_to_remove[@]}"; do
+                    printf '    %s\n' "${file}"
+                done
+            fi
+            printf 'Usage: purge_artifacts [options...]\n'
+            printf 'Where options are:\n'
+            printf '    --help, -h    Show this help message\n'
+        } >&2
     }
 
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
