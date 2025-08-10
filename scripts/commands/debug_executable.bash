@@ -53,6 +53,7 @@ function debug_executable() {
     done
 
     compile \
+        --quiet \
         --preset "${preset}" \
         --target "${target}" \
         --ignore-compile_commands >&2

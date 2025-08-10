@@ -65,6 +65,7 @@ function bats_runner() {
         for preset in "${test_presets[@]}"; do
             printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for bats tests:\n' "${preset}" >&2
             compile \
+                --quiet \
                 --preset "${preset}" \
                 --target infra_sanitizer_check \
                 --target cxxet_examples \
