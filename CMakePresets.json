@@ -25,6 +25,14 @@
             }
         },
         {
+            "name": "abidiff",
+            "inherits": "deploy",
+            "cacheVariables": {
+                "CXXET_OUTPUT_DIRECTORY": "${sourceDir}/bin/abidiff",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
             "name": "release",
             "inherits": "default",
             "cacheVariables": {
@@ -90,6 +98,10 @@
         {
             "name": "deploy",
             "configurePreset": "deploy"
+        },
+        {
+            "name": "abidiff",
+            "configurePreset": "abidiff"
         },
         {
             "name": "release",

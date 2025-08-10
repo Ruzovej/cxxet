@@ -7,6 +7,7 @@ ARG CLANG_VERSION=19
 RUN apt update \
     && apt upgrade -y \
     && apt install -y --no-install-recommends \
+        abigail-tools \
         ca-certificates \
         clang-${CLANG_VERSION} \
 # TODO (https://github.com/Ruzovej/cxxet/issues/11) maybe fix exact version, so reformats doesn't happen "unexpectedly":

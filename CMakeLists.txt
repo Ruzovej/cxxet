@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
+# https://cmake.org/cmake/help/latest/command/project.html
 project(
     cxxet
+    VERSION 0.1.0
+    HOMEPAGE_URL "https://github.com/Ruzovej/cxxet"
     DESCRIPTION "C++ easy tracing"
     LANGUAGES CXX # TODO later maybe even `C`?!
 )
@@ -211,8 +214,8 @@ if (CXXET_BUILD_SHARED)
     set_target_properties( # seems useful -> TODO polish it later
         cxxet
             PROPERTIES
-            VERSION 0.1.0 # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
-            SOVERSION 0 # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
+            VERSION "${cxxet_VERSION}" # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
+            SOVERSION "${cxxet_VERSION_MAJOR}" # https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
     )
 endif()
 target_include_directories(
