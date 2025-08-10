@@ -9,7 +9,7 @@ function abi_check() {
         abidiff \
         git
 
-    local preset=relwithdebinfo # TODO (https://github.com/Ruzovej/cxxet/issues/113) change to `abidiff`
+    local preset=abidiff
     local prev_commit
     local prev_branch=main
 
