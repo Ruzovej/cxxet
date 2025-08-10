@@ -8,7 +8,7 @@ load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
 
 function setup_file() {
-    export BIN_DIR="bin/${CXXET_PRESET}"
+    export BIN_DIR="${CXXET_PWD}/bin/${CXXET_PRESET}"
     export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_VERBOSE=1
     export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.01_suite.bats.${CXXET_PRESET}.XXXXXX")"
