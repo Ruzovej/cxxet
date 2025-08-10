@@ -26,10 +26,8 @@
         },
         {
             "name": "abidiff",
-            "inherits": "default",
+            "inherits": "deploy",
             "cacheVariables": {
-                "CXXET_BUILD_EXAMPLES": "OFF",
-                "CXXET_BUILD_TESTS": "OFF",
                 "CXXET_OUTPUT_DIRECTORY": "${sourceDir}/bin/abidiff",
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
