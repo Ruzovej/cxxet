@@ -12,20 +12,23 @@ function docker_interactive() {
     ensure_docker_is_allowed
 
     function usage() {
+        if [[ "$1" != '--short' ]]; then
+            printf 'docker_interactive: starts container (interactive bash) of given image\n' >&2
+        fi
         printf 'Usage: docker_interactive <image_name_base>\n' >&2
         list_dockerfiles
     }
 
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         usage
-        return 0
+        exit 0
     fi
 
     local image_name_base="$1"
     shift
 
     docker_validate_image_name_base "${image_name_base}" && reject_further_args "$@" || {
-        usage
+        usage --short
         exit 1
     }
 

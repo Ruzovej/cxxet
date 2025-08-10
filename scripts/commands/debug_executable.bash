@@ -13,11 +13,14 @@ function debug_executable() {
 
     function usage() {
         {
-            printf 'Usage: cxxet debug_executable [options...]\n'
+            if [[ "$1" != '--short' ]]; then
+                printf 'debug_executable: executes given target under debugger\n'
+            fi
+            printf 'Usage: debug_executable [options...]\n'
             printf 'Where options are:\n'
             printf '    --preset, -p PRESET               Set the CMake preset (default: %s)\n' "${preset}"
             printf '    --target, -t TARGET               Set the target executable (default: %s)\n' "${target}"
-            printf '    --default-block-size, -b SIZE     Set the default block size (default: %s)\n' "${default_block_size}"
+            printf '    --default-block-size, -b SIZE     Set "CXXET_DEFAULT_BLOCK_SIZE" - the default block size (default: %s)\n' "${default_block_size}"
             printf '    --help, -h                        Show this help message\n'
         } >&2
     }
@@ -43,7 +46,7 @@ function debug_executable() {
                 ;;
             *)
                 printf 'Unknown option: %s\n' "$1" >&2
-                usage
+                usage --short
                 exit 1
                 ;;
         esac
