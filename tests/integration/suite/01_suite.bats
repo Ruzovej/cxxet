@@ -622,44 +622,11 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run nm -D -C "${shared_lib}"
     assert_success
-    local nm_output="${output}"
-
-    # only those symbols should be exported - feel free to update this list when the change is desired; TODO (https://github.com/Ruzovej/cxxet/issues/56) improve this later - this is very crude, primitive and partial replacement for running `abidiff`:
-    assert_equal "$(printf '%s' "${nm_output}" | grep " T cxxet::" | cut --delimiter ' ' --fields 1,2 --complement | sort -u)" "cxxet::cascade_sink_handle::make(bool, cxxet::sink_handle&)
-cxxet::file_sink_handle::make(bool)
-cxxet::mark::complete::submit(timespec)
-cxxet::mark::submit_counter(char const*, long long, double)
-cxxet::mark::submit_duration_begin(char const*, long long)
-cxxet::mark::submit_duration_end(char const*, long long)
-cxxet::mark::submit_instant(char const*, cxxet::scope_t, long long)
-cxxet::sink_global_flush(cxxet::output::format, char const*, bool)
-cxxet::sink_handle::~sink_handle()
-cxxet::sink_thread_divert_to_sink_global()
-cxxet::sink_thread_flush()
-cxxet::sink_thread_reserve(int)"
-
-    # TODO (https://github.com/Ruzovej/cxxet/issues/56) fix those below ...
-    #   - when compiled & linked with gcc & ld (on my system - default for WSL2 Ubuntu 22.04) it reports those 3 symbols
-    #   - clang & lld results are different ...
-    #   - in general, this test is very brittle -> `abbidiff` tool is needed to test this properly ...
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " typeinfo for cxxet::")" 0
-    #assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
-#cxxet::file_sink_handle
-#cxxet::sink_handle"
-
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " typeinfo name for cxxet::")" 0
-    #assert_equal "$(printf '%s' "${nm_output}" | grep " V typeinfo name for cxxet::" | cut --delimiter ' ' --fields 1-5 --complement | sort -u)" "cxxet::cascade_sink_handle
-#cxxet::file_sink_handle
-#cxxet::sink_handle"
-
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " vtable for cxxet::")" 0
-    #assert_equal "$(printf '%s' "${nm_output}" | grep " V vtable for cxxet::" | cut --delimiter ' ' --fields 1-4 --complement | sort -u)" "cxxet::cascade_sink_handle
-#cxxet::file_sink_handle
-#cxxet::sink_handle"
-
+    # only those symbols should be exported - more detailed checks are done via `abidiff` (see `scripts/commands/abi_check.bash`):
+    assert_output --partial "cxxet::"
     # those definitely not:
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c "doctest::")" 0
-    assert_equal "$(printf '%s' "${nm_output}" | grep -c "cxxet::impl::")" 0
+    refute_output --partial "doctest::"
+    refute_output --partial "cxxet::impl::"
 }
 
 @test "Unit tests runner contains expected symbols" {
@@ -669,11 +636,9 @@ cxxet::sink_thread_reserve(int)"
 
     run nm -C "${BIN_DIR}/cxxet_unit_tests"
     assert_success
-    local nm_output="$output"
-
     # contains internal implementation symbols & `doctest` stuff:
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " cxxet::impl::")" 0
-    assert_not_equal "$(printf '%s' "${nm_output}" | grep -c " doctest::")" 0
+    assert_output --partial "cxxet::impl::"
+    assert_output --partial "doctest::"
 }
 
 @test "Examples & unit test runner properly depend on shared library if built this way" {

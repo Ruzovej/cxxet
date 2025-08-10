@@ -45,6 +45,7 @@ function valid_examples_runner() {
 
     printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for examples:\n' "${preset}" >&2
     compile \
+        --quiet \
         --preset "${preset}" \
         --target cxxet_examples \
         --ignore-compile_commands >&2

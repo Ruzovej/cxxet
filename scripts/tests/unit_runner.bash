@@ -47,6 +47,7 @@ function unit_runner() {
     for preset in "${test_presets[@]}"; do
         printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for unit tests:\n' "${preset}" >&2
         compile \
+            --quiet \
             --preset "${preset}" \
             --target cxxet_unit_tests \
             --ignore-compile_commands >&2
