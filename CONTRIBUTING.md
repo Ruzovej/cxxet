@@ -14,6 +14,8 @@ TODO:
     - filename = function name
   - `bats` tests ...
 
+Please, try to keep it organized - see [open issues on github](https://github.com/Ruzovej/cxxet/issues).
+
 ## Contributors
 
 | Name | GitHub | Email | Notes |

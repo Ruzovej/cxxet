@@ -36,10 +36,7 @@ Your application can be proprietary, commercial, or under any license. You can l
 
 ## Contributing
 
-Contributions are more than welcome! See:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md) for details about contributing to `cxxet`,
-- [open issues on github](https://github.com/Ruzovej/cxxet/issues).
+Contributions are more than welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Development and management in general
 
