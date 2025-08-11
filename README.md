@@ -19,7 +19,7 @@ TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & 
 
 ## Examples
 
-[Examples are here](examples/README.md). They should sufficiently demonstrate how to use `cxxet` in your code. By the way, they are also used for testing `cxxet` itself, so they surely represent its capabilities.
+[Examples are here](examples/README.md). They should sufficiently demonstrate how to use `cxxet` in your code. By the way, they are also used for testing `cxxet` itself, so they assure that it works as ~~intended~~ the tests require!
 
 ## License
 
