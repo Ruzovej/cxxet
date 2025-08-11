@@ -14,7 +14,7 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 
 ## License
 
-[LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) -> [COPYING](COPYING) & [COPYING.lesser](COPYING.lesser)
+[LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) -> [COPYING](COPYING) & [COPYING.lesser](COPYING.LESSER)
 
 ![LGPLv3 image](doc/lgplv3-with-text-154x68.png)
 
