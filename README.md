@@ -4,13 +4,17 @@
 https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
 -->
 
-- [License](#license)
 - [Introduction](#introduction)
+- [License](#license)
 - [Examples](#examples)
 - [Development and management in general](#development-and-management-in-general)
   - [Preparing & using `docker` environment](#preparing--using-docker-environment)
 - [Explorations](#explorations)
 - [TODO](#todo)
+
+## Introduction
+
+TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & visual profiling for Prague `C++` meetup](https://github.com/Ruzovej/visual_and_intrusive_profiling_presentation) here.
 
 ## License
 
@@ -24,10 +28,6 @@ Your application can be proprietary, commercial, or under any license. You can l
 - preserve `cxxet`'s copyright notices,
 - allow users to replace `cxxet` (provide object files or ensure dynamic linking remains possible),
 - if you modify `cxxet` itself, those modifications must be released under `LGPLv3`.
-
-## Introduction
-
-TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & visual profiling for Prague `C++` meetup](https://github.com/Ruzovej/visual_and_intrusive_profiling_presentation) here.
 
 ## Examples
 
