@@ -1,6 +1,6 @@
 # `cxxet` = C++ easy tracing
 
-<!---
+<!--
 https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
 -->
 
@@ -14,7 +14,15 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 
 ## License
 
-![LGPLv3 License](doc/lgplv3-with-text-154x68.png)
+[LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) -> [COPYING](COPYING) & [COPYING.lesser](COPYING.lesser)
+
+![LGPLv3 image](doc/lgplv3-with-text-154x68.png)
+
+Your application can be proprietary, commercial, or under any license. You can link `cxxet` dynamically or statically without releasing your application's source code, as long as You:
+
+- include copy of LGPLv3 license with distribution,
+- preserve `cxxet`'s copyright notices,
+- allow users to replace the library version (provide object files or ensure dynamic linking remains possible).
 
 ## Introduction
 
