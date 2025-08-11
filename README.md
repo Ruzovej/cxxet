@@ -20,7 +20,7 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 
 Your application can be proprietary, commercial, or under any license. You can link `cxxet` dynamically or statically without releasing your application's source code, as long as You:
 
-- include copy of LGPLv3 license with distribution,
+- include copy of `LGPLv3` license with distribution,
 - preserve `cxxet`'s copyright notices,
 - allow users to replace `cxxet` (provide object files or ensure dynamic linking remains possible),
 - if you modify `cxxet` itself, those modifications must be released under `LGPLv3`.
