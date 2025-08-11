@@ -20,4 +20,4 @@ Please, try to keep it organized - see [open issues on github](https://github.co
 
 | Name | GitHub | Email | Notes |
 | ---- | ------ | ----- | ----- |
-| Lukáš Růžička | <https://github.com/Ruzovej> | <ruzovej+cxxet@gmail.com> | author, maintainer, ... |
+| Lukáš Růžička (sometimes with [github copilot](https://github.com/features/copilot)) | <https://github.com/Ruzovej> | [ruzovej@gmail.com](mailto:ruzovej+cxxet@gmail.com) | author, maintainer |
