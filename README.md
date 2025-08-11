@@ -5,8 +5,8 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 -->
 
 - [Introduction](#introduction)
-- [License](#license)
 - [Examples](#examples)
+- [License](#license)
 - [Development and management in general](#development-and-management-in-general)
   - [Preparing & using `docker` environment](#preparing--using-docker-environment)
 - [Explorations](#explorations)
@@ -15,6 +15,10 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 ## Introduction
 
 TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & visual profiling for Prague `C++` meetup](https://github.com/Ruzovej/visual_and_intrusive_profiling_presentation) here.
+
+## Examples
+
+[Examples are here](examples/README.md). They should sufficiently demonstrate how to use `cxxet` in your code. By the way, they are also used for testing `cxxet` itself, so they surely represent its capabilities.
 
 ## License
 
@@ -28,10 +32,6 @@ Your application can be proprietary, commercial, or under any license. You can l
 - preserve `cxxet`'s copyright notices,
 - allow users to replace `cxxet` (provide object files or ensure dynamic linking remains possible),
 - if you modify `cxxet` itself, those modifications must be released under `LGPLv3`.
-
-## Examples
-
-[Examples are here](examples/README.md).
 
 ## Development and management in general
 
