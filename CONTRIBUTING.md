@@ -1,0 +1,21 @@
+# Contributing
+
+TODO:
+
+- are there any deviations from [`llvm` formatting style](.clang-format)?
+  - are silently assumed conventions, or are they part of it? E.g.
+    - include sorting as by `google styleguide`
+    - "east const"
+    - ...
+- `bash` specifics
+  - e.g. use only `printf`, not `echo`
+  - _(almost) all_ should be somewhere in [scripts/](scripts/) directory
+  - one file = one function
+    - filename = function name
+  - `bats` tests ...
+
+## Contributors
+
+| Name | GitHub | Email | Notes |
+| ---- | ------ | ----- | ----- |
+| Lukáš Růžička | <https://github.com/Ruzovej> | <ruzovej+cxxet@gmail.com> | author, maintainer, ... |

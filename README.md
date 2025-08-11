@@ -7,6 +7,7 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 - [Introduction](#introduction)
 - [Examples](#examples)
 - [License](#license)
+- [Contributing](#contributing)
 - [Development and management in general](#development-and-management-in-general)
   - [Preparing & using `docker` environment](#preparing--using-docker-environment)
 - [Explorations](#explorations)
@@ -32,6 +33,13 @@ Your application can be proprietary, commercial, or under any license. You can l
 - preserve `cxxet`'s copyright notices,
 - allow users to replace `cxxet` (provide object files or ensure dynamic linking remains possible),
 - if you modify `cxxet` itself, those modifications must be released under `LGPLv3`.
+
+## Contributing
+
+Contributions are more than welcome! See:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) for details about contributing to `cxxet`,
+- [open issues on github](https://github.com/Ruzovej/cxxet/issues).
 
 ## Development and management in general
 
