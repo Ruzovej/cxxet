@@ -14,7 +14,7 @@ function compile() {
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'compile: configure & execute build system for given preset, target(s), etc.'
+                printf 'compile: configure & execute build system for given preset, target(s), etc.\n'
             fi
             printf 'Usage: compile [options...]\n'
             printf 'Where options are:\n'
