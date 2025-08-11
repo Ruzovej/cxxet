@@ -14,7 +14,7 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 
 ## License
 
-[LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) -> [COPYING](COPYING) & [COPYING.lesser](COPYING.LESSER)
+[`LGPLv3`](https://www.gnu.org/licenses/lgpl-3.0.html) -> [COPYING](COPYING) & [COPYING.lesser](COPYING.LESSER)
 
 ![LGPLv3 image](doc/lgplv3-with-text-154x68.png)
 
@@ -22,7 +22,8 @@ Your application can be proprietary, commercial, or under any license. You can l
 
 - include copy of LGPLv3 license with distribution,
 - preserve `cxxet`'s copyright notices,
-- allow users to replace the library version (provide object files or ensure dynamic linking remains possible).
+- allow users to replace `cxxet` (provide object files or ensure dynamic linking remains possible),
+- if you modify `cxxet` itself, those modifications must be released under `LGPLv3`.
 
 ## Introduction
 
