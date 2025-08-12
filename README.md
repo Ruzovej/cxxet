@@ -17,7 +17,12 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 
 ## Introduction
 
-TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & visual profiling for Prague `C++` meetup](https://github.com/Ruzovej/visual_and_intrusive_profiling_presentation) here.
+TODO:
+
+1. see/mention/interlink (even more ...) presentation about [intrusive & visual profiling for Prague `C++` meetup](https://github.com/Ruzovej/visual_and_intrusive_profiling_presentation) here
+1. how to include it in yor project - short `cmake`'s "fetch content" example
+1. add short example of how to intrusively instrument code (maybe snippet of some example?!)
+1. screenshot of how it looks like when displayed, e.g. via [Perfetto](https://ui.perfetto.dev/)
 
 ### Trace Event Format
 
