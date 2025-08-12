@@ -1,3 +1,3 @@
-# Management scripts
+# Management & convenience scripts
 
-TODO
+TODO (<https://github.com/Ruzovej/cxxet/issues/124>)

@@ -63,6 +63,8 @@ Contributions are more than welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for 
 
 ## Development and management in general
 
+Further details about provided convenience scripts are in [`scripts/README.md`](scripts/README.md).
+
 ### Environments with `bash`
 
 When having `bash` available, use `cxxet_manage.bash` for compilation, testing, preparing `docker` image(s) for development, and so on. Good starting point is to display what is available, e.g.:
@@ -73,8 +75,6 @@ $ ./cxxet_manage.bash --help
 $ ./cxxet_manage.bash compile --help
 ...
 ```
-
-Further details about provided convenience scripts are in respective [`README.md`](scripts/README.md).
 
 #### Preparing & using `docker` environment
 
