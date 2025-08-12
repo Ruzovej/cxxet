@@ -1,6 +1,6 @@
 # Contributing
 
-TODO:
+TODO (<https://github.com/Ruzovej/cxxet/issues/122>):
 
 - are there any deviations from [`llvm` formatting style](.clang-format)?
   - are those silently assumed conventions, or are they part of it? E.g.

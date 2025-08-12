@@ -17,7 +17,7 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 
 ## Introduction
 
-TODO:
+TODO (<https://github.com/Ruzovej/cxxet/issues/118>):
 
 1. see/mention/interlink (even more ...) presentation about [intrusive & visual profiling for Prague `C++` meetup](https://github.com/Ruzovej/visual_and_intrusive_profiling_presentation) here
 1. how to include it in yor project - short `cmake`'s "fetch content" example
@@ -30,7 +30,7 @@ Right now, only the [`Trace Event Format`](https://docs.google.com/document/d/1C
 
 ### Competition
 
-TODO explore more & compare with:
+TODO (<https://github.com/Ruzovej/cxxet/issues/119>) explore more & compare with:
 
 * [`NVIDIA Nsight Systems`](https://developer.nvidia.com/nsight-systems)
 * [`Tracy`](https://github.com/wolfpld/tracy)
@@ -95,6 +95,7 @@ $ ./cxxet_manage.bash compile ...
 
 Maybe create github issues for those?
 
+* clean up this paragraph (<https://github.com/Ruzovej/cxxet/issues/123>)
 * benchmarking
   * try reimplementing the `cxxet::mark::complete` to don't hold all the data, but "save" them immediately and update end time (duration) on `submit`/d-tor (by holding only pointer to this particular record)
 * add more output formats (e.g. implied by this conversation: <https://chatgpt.com/share/681b2833-c728-8003-9e28-a4e1c1c35196>)

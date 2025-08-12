@@ -1,6 +1,6 @@
 # [`Trace Event Format`](https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU)
 
-TODO:
+TODO (<https://github.com/Ruzovej/cxxet/issues/120>):
 
 1. cleanup in this document
     * maybe reorder the subparagraphs? Probably the most important (using `Perfetto` UI) is now last ...
