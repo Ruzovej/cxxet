@@ -1,4 +1,11 @@
-# [`Chrome trace`](https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?usp=sharing) format
+# [`Trace Event Format`](https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU)
+
+TODO (<https://github.com/Ruzovej/cxxet/issues/120>):
+
+1. cleanup in this document
+    * maybe reorder the subparagraphs? Probably the most important (using `Perfetto` UI) is now last ...
+2. explore formats described in <https://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html>
+3. [TODO](#todo) below ...
 
 ## Displaying it
 
