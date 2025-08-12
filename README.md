@@ -21,7 +21,7 @@ TODO ...; see/mention/interlink (even more ...) presentation about [intrusive & 
 
 ### Trace Event Format
 
-Right now, only the [`Trace Event Format`](https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU) format is currently [used & available](doc/UsingTraceEventFormat.md), and seems it suffices.
+Right now, only the [`Trace Event Format`](https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU) format is currently [used & available](doc/UsingTraceEventFormat.md), and seems sufficient.
 
 ### Competition
 
