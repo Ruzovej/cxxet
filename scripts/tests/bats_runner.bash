@@ -57,9 +57,10 @@ function bats_runner() {
     (
         initialize_bats
 
-        export CXXET_PWD="${CXXET_ROOT_DIR}"
-        export CXXET_CURRENT_COMMIT_HASH="$(git -C "${CXXET_PWD}" rev-parse HEAD)"
-        export CXXET_UNCOMMITED_CHANGES="$(git -C "${CXXET_PWD}" status --porcelain)"
+        export TMP_RESULT_DIR_BASE="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_bats"
+
+        export CXXET_CURRENT_COMMIT_HASH="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD)"
+        export CXXET_UNCOMMITED_CHANGES="$(git -C "${CXXET_ROOT_DIR}" status --porcelain)"
 
         local preset
         for preset in "${test_presets[@]}"; do

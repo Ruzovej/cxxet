@@ -11,11 +11,12 @@ function setup_file() {
 
     export CXXET_DEFAULT_BLOCK_SIZE=2 # torture it little bit
     export CXXET_VERBOSE=1
-    export TMP_RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cxxet.03_cmake_fetch_cxxet_indirect_usage.bats.XXXXXX")"
+    export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/03_cmake_fetch_cxxet_indirect_usage"
+    mkdir -p "${TMP_RESULT_DIR}"
 
     user_log "# using tmp dir '%s', repository in '%s' and testing its commit '%s'%s\n" \
         "${TMP_RESULT_DIR}" \
-        "${CXXET_PWD:?}" \
+        "${CXXET_ROOT_DIR}" \
         "${CXXET_CURRENT_COMMIT_HASH:?}" \
         "${CXXET_UNCOMMITED_CHANGES:+", !!! BUT BEWARE, THERE ARE UNCOMMITTED CHANGES THAT WON'T BE 'FETCH_CONTENT-ED' !!!"}"
 
@@ -24,11 +25,11 @@ function setup_file() {
     # When using `Ninja`, `compile_commands.json` contains a bit different paths -> default generator is fixed
     user_log "# configuring and building cxxet cmake fetch_content examples ... "
     run cmake \
-        -S "${CXXET_PWD}/examples/cmake_fetch_content/indirect_usage" \
+        -S "${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage" \
         -B "${CXXET_BUILD_DIR}" \
         -G "Unix Makefiles" \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCXXET_ROOT_DIR="${CXXET_PWD}" \
+        -DCXXET_ROOT_DIR="${CXXET_ROOT_DIR}" \
         -DCXXET_TAG="${CXXET_CURRENT_COMMIT_HASH}"
     user_log 'done\n'
     assert_success
@@ -55,10 +56,7 @@ function teardown() {
 }
 
 function teardown_file() {
-    if [[ -n "${TMP_RESULT_DIR}" ]]; then
-        rm -rf "${TMP_RESULT_DIR}"
-        user_log '# used tmp dir erased\n'
-    fi
+    :
     #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
 }
 
@@ -77,7 +75,7 @@ function teardown_file() {
     # "custom" executables source files:
     assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | length" "${compile_commands}")" "${num_examples_built}"
 
-    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_PWD}/examples/cmake_fetch_content/indirect_usage/indirect_usage.cxx\",\"${CXXET_PWD}/examples/cmake_fetch_content/indirect_usage/shared_lib_foo.cxx\"]"
+    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage/indirect_usage.cxx\",\"${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage/shared_lib_foo.cxx\"]"
 
     # fetched `cxxet` source files:
     assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}/_deps/cxxet-build\") ] | length" "${num_cxxet_lib_source_files}")"
