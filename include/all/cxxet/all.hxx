@@ -59,7 +59,7 @@
 #define CXXET_sink_thread_reserve(minimum_free_capacity)                       \
   cxxet::sink_thread_reserve(minimum_free_capacity)
 
-#define CXXET_sink_thread_flush() cxxet::sink_thread_flush()
+#define CXXET_sink_thread_flush_now() cxxet::sink_thread_flush_now()
 
 #define CXXET_sink_global_flush(...) cxxet::sink_global_flush(__VA_ARGS__)
 
@@ -85,7 +85,7 @@
 
 #define CXXET_sink_thread_reserve(...)
 
-#define CXXET_sink_thread_flush()
+#define CXXET_sink_thread_flush_now()
 
 #define CXXET_sink_global_flush(...)
 

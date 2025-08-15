@@ -29,7 +29,7 @@ namespace cxxet {
 CXXET_IMPL_API void
 sink_thread_reserve(int const minimum_free_capacity = 0) noexcept;
 
-CXXET_IMPL_API void sink_thread_flush() noexcept;
+CXXET_IMPL_API void sink_thread_flush_now() noexcept;
 
 CXXET_IMPL_API void sink_global_flush(
     cxxet::output::format const fmt = cxxet::output::format::chrome_trace,

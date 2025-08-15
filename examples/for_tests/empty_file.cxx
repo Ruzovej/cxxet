@@ -34,7 +34,7 @@ void record_some_events() {
 
   CXXET_mark_counters("lost counter", 42.0);
 
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
 }
 
 } // namespace

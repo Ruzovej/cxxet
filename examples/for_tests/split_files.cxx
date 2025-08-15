@@ -31,7 +31,7 @@ void flush_to_file_now([[maybe_unused]] char const *const filename,
   file_sink_local->divert_thread_sink_to_this();
   file_sink_local->flush(cxxet::output::format::chrome_trace, filename);
 #endif
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
   if (rereserve) {
     CXXET_sink_thread_reserve(1);
   }

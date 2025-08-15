@@ -52,8 +52,8 @@ int main(int argc, char const **argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  CXXET_sink_thread_flush(); // must be done before each sink switch (when not
-                             // empty ...)
+  CXXET_sink_thread_flush_now(); // must be done before each sink switch (when
+                                 // not empty ...)
 
   CXXET_sink_thread_divert_to_sink_global();
 
@@ -68,7 +68,7 @@ int main(int argc, char const **argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
 
 #ifdef CXXET_ENABLE
   file_sink_local->divert_thread_sink_to_this();
@@ -85,7 +85,7 @@ int main(int argc, char const **argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
 
   CXXET_sink_thread_divert_to_sink_global();
 
@@ -100,9 +100,9 @@ int main(int argc, char const **argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  CXXET_sink_thread_flush(); // when the target is the global one, it can be
-                             // omitted. If it was some "local" one, it must be
-                             // done before end of its lifetime
+  CXXET_sink_thread_flush_now(); // when the target is the global one, it can be
+                                 // omitted. If it was some "local" one, it must
+                                 // be done before end of its lifetime
 
   return 0;
 }

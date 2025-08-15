@@ -24,7 +24,7 @@
 static void improper_cxxet_usage() {
   // `CXXET_sink_thread_reserve(...)` should have been called, this would have
   // suboptimal performance in case any markers are used
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
 }
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {

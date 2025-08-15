@@ -71,7 +71,7 @@ int main(int argc, char const **argv) {
     t11.join();
     t12.join();
 
-    CXXET_sink_thread_flush();
+    CXXET_sink_thread_flush_now();
   }};
 
   std::thread t2{[&]() {
@@ -97,7 +97,7 @@ int main(int argc, char const **argv) {
       test_block();
     }}.join();
 
-    CXXET_sink_thread_flush();
+    CXXET_sink_thread_flush_now();
   }};
 
 #ifdef CXXET_ENABLE
@@ -107,7 +107,7 @@ int main(int argc, char const **argv) {
 
   test_block();
 
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
 
   t1.join();
   t2.join();
@@ -118,7 +118,7 @@ int main(int argc, char const **argv) {
 
   test_block();
 
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
 
   return 0;
 }
