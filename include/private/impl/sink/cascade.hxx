@@ -26,10 +26,12 @@
 namespace cxxet::impl::sink {
 
 template <bool thread_safe_v> struct cascade : thread_safe_t<thread_safe_v> {
+  using base_class_t = thread_safe_t<thread_safe_v>;
+
   explicit cascade(sink_base *aParent) noexcept
       : base_class_t{}, parent{aParent} {}
 
-  ~cascade() noexcept override { do_flush<true>(); }
+  ~cascade() noexcept override { do_flush<false>(); }
 
   void set_parent(sink_base *aParent) noexcept {
     assert(aParent != this);
@@ -38,17 +40,17 @@ template <bool thread_safe_v> struct cascade : thread_safe_t<thread_safe_v> {
     base_class_t::unlock();
   }
 
-  void flush() noexcept { do_flush<false>(); }
+  void flush() noexcept { do_flush<true>(); }
 
 private:
-  template <bool inside_dtor> void do_flush() noexcept {
-    if constexpr (!inside_dtor) {
+  template <bool needs_lock> void do_flush() noexcept {
+    if constexpr (needs_lock) {
       base_class_t::lock();
     }
     if (parent && base_class_t::has_events()) {
       parent->drain(*this);
     }
-    if constexpr (!inside_dtor) {
+    if constexpr (needs_lock) {
       base_class_t::unlock();
     }
   }
@@ -57,8 +59,6 @@ private:
   cascade &operator=(cascade const &) = delete;
   cascade(cascade &&) = delete;
   cascade &operator=(cascade &&) = delete;
-
-  using base_class_t = thread_safe_t<thread_safe_v>;
 
   sink_base *parent;
 };

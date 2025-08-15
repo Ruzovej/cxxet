@@ -39,7 +39,7 @@ void record_some_events() {
 
 } // namespace
 
-int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
+int main(int const, char const **) {
   std::thread t{record_some_events};
 
   record_some_events();

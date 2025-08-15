@@ -26,11 +26,6 @@
 namespace cxxet::impl::sink {
 
 template <bool thread_safe_v>
-file_sink<thread_safe_v>::file_sink(
-    long long const aTime_point_zero_ns) noexcept
-    : base_class_t{}, time_point_zero_ns{aTime_point_zero_ns} {}
-
-template <bool thread_safe_v>
 file_sink<thread_safe_v>::file_sink(long long const aTime_point_zero_ns,
                                     output::format const aFmt,
                                     char const *const aTarget_filename) noexcept
@@ -63,12 +58,29 @@ template <bool thread_safe_v>
 void file_sink<thread_safe_v>::do_flush() noexcept {
   if (fmt == output::format::unknown) {
     std::cerr << "Forgot to specify output format (& filename)?!\n";
-  } else if (target_filename) {
+    return;
+  }
+
+  bool const target_filename_valid{
+      (target_filename && target_filename[0] != '\0')};
+  if (target_filename_valid) {
     if (!base_class_t::events.empty()) {
       try {
+        std::array<char, L_tmpnam> tmp_filename_buffer{};
+        auto const gen_tmp_filename = [&tmp_filename_buffer]() {
+          // https://en.cppreference.com/w/cpp/io/c/tmpnam
+          // "... std::tmpnam modifies static state and is not required to be
+          // thread-safe ..." :'-(
+          auto const ret{std::tmpnam(tmp_filename_buffer.data())};
+          if (!ret) {
+            throw std::runtime_error{"Failed to generate temporary filename"};
+          }
+          return ret;
+        };
         // is `time_point_zero_ns` needed?!
         dump_records(base_class_t::events, time_point_zero_ns, fmt,
-                     target_filename);
+                     target_filename_valid ? target_filename
+                                           : gen_tmp_filename());
         base_class_t::events.destroy();
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
