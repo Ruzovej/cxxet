@@ -33,10 +33,10 @@ int main(int argc, char const **argv) {
 
 #ifdef CXXET_ENABLE
   auto file_sink_local1{cxxet::file_sink_handle::make(false)};
-  file_sink_local1->flush(cxxet::output::format::chrome_trace, filename1, true);
+  file_sink_local1->flush(cxxet::output::format::chrome_trace, filename1);
 
   auto file_sink_local2{cxxet::file_sink_handle::make(false)};
-  file_sink_local2->flush(cxxet::output::format::chrome_trace, filename2, true);
+  file_sink_local2->flush(cxxet::output::format::chrome_trace, filename2);
 #endif
 
   std::thread t1{[&]() {

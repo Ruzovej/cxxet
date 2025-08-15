@@ -449,41 +449,12 @@ Deduced CXXET_TARGET_FILENAME: "
     refute [ -f "${result}" ]
 }
 
-@test "Empty or incomplete file - events recorded but incorrectly flushed" {
-    local executable="${BIN_DIR}/cxxet_test_empty_file_1"
-    local result1="${TMP_RESULT_DIR}/example_test_empty_file_1.json"
-    local result2="${TMP_RESULT_DIR}/example_test_empty_file_2.json"
-    local result3="${TMP_RESULT_DIR}/example_test_empty_file_3.json"
-
-    run "${executable}_bare" "${result1}" "${result2}" "${result3}"
-    assert_success
-    assert_output ""
-    refute_sanitizer_output
-
-    refute [ -f "${result1}" ]
-    refute [ -f "${result2}" ]
-    refute [ -f "${result3}" ]
-
-    run "${executable}" "${result1}" "${result2}" "${result3}"
-    assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXET_TARGET_FILENAME: "
-    refute_sanitizer_output
-
-    refute [ -f "${result1}" ]
-    assert [ -f "${result2}" ]
-    assert_not_equal "$(wc -c <"${result2}")" 0
-    assert [ -f "${result3}" ]
-    assert_not_equal "$(wc -c <"${result3}")" 0
-}
-
 @test "Empty file - forgetting to specify it" {
     if [[ "${CXXET_PRESET}" =~ .san* ]]; then
         skip "strace doesn't work with sanitizers"
     fi
 
-    local executable="${BIN_DIR}/cxxet_test_empty_file_2"
+    local executable="${BIN_DIR}/cxxet_test_empty_file"
 
     run strace "${executable}_bare"
     assert_success
@@ -499,7 +470,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_output --partial "write(1, "
     refute_output --regexp "write\([^1]" # `stdout` ... see the asserts above which requires exactly that
 
-    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file_2.json"
+    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.json"
     export CXXET_TARGET_FILENAME="${output_file}"
     run strace "${executable}"
     assert_success

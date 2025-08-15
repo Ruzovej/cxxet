@@ -36,8 +36,8 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
   static std::unique_ptr<file_sink_handle>
   make(bool const thread_safe) noexcept;
 
-  virtual void flush(output::format const fmt, char const *const filename,
-                     bool const defer) noexcept = 0;
+  virtual void flush(output::format const fmt,
+                     char const *const filename) noexcept = 0;
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {

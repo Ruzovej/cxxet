@@ -30,12 +30,12 @@ int main(int argc, char const **argv) {
                                                         : "/dev/stdout"};
 #ifdef CXXET_ENABLE
   auto file_sink_local{cxxet::file_sink_handle::make(true)};
-  file_sink_local->flush(cxxet::output::format::chrome_trace, filename1, true);
+  file_sink_local->flush(cxxet::output::format::chrome_trace, filename1);
 #endif
 
   [[maybe_unused]] char const *const filename2{argc > 2 ? argv[2]
                                                         : "/dev/stdout"};
-  CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename2, true);
+  CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename2);
 
   std::thread t1{[&]() {
 #ifdef CXXET_ENABLE

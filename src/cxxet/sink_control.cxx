@@ -35,9 +35,8 @@ void sink_thread_reserve(int const minimum_free_capacity) noexcept {
 void sink_thread_flush() noexcept { CXXET_IMPL_LOCAL_SINK.flush(); }
 
 void sink_global_flush(cxxet::output::format const fmt,
-                       char const *const filename,
-                       bool const defer_flush) noexcept {
-  CXXET_IMPL_GLOBAL_SINK.flush(fmt, filename, defer_flush);
+                       char const *const filename) noexcept {
+  CXXET_IMPL_GLOBAL_SINK.flush(fmt, filename);
 }
 
 void sink_thread_divert_to_sink_global() noexcept {

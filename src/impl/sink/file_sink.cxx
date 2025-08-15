@@ -43,15 +43,10 @@ template <bool thread_safe_v> file_sink<thread_safe_v>::~file_sink() noexcept {
 
 template <bool thread_safe_v>
 void file_sink<thread_safe_v>::flush(output::format const aFmt,
-                                     char const *const aFilename,
-                                     bool const defer) noexcept {
-  base_class_t::lock();
+                                     char const *const aFilename) noexcept {
+  std::lock_guard lck{*this};
   fmt = aFmt;
   target_filename = aFilename;
-  if (!defer) {
-    do_flush();
-  }
-  base_class_t::unlock();
 }
 
 template <bool thread_safe_v>

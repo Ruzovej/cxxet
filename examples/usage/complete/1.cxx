@@ -37,7 +37,7 @@ int main(int argc, char const **argv) {
 
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
                                                        : "/dev/stdout"};
-  CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename, true);
+  CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename);
 
   std::thread t1{[]() {
     CXXET_sink_thread_reserve();

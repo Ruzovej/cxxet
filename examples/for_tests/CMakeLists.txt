@@ -4,13 +4,8 @@ add_example(
 )
 
 add_example(
-    cxxet_test_empty_file_1
-        "empty_file_1.cxx"
-)
-
-add_example(
-    cxxet_test_empty_file_2
-        "empty_file_2.cxx"
+    cxxet_test_empty_file
+        "empty_file.cxx"
 )
 
 add_example(

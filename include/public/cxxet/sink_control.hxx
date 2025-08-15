@@ -33,9 +33,9 @@ CXXET_IMPL_API void sink_thread_flush() noexcept;
 
 CXXET_IMPL_API void sink_global_flush(
     cxxet::output::format const fmt = cxxet::output::format::chrome_trace,
-    char const *const filename = nullptr, // `== nullptr` => no-op; to be more
-                                          // precise: discard everything
-    bool const defer_flush = false) noexcept;
+    char const *const filename = nullptr // `== nullptr` => no-op; to be more
+                                         // precise: discard everything
+    ) noexcept;
 
 CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
 

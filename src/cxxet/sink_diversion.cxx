@@ -51,9 +51,9 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
     return &sink;
   }
 
-  void flush(output::format const fmt, char const *const filename,
-             bool const defer) noexcept override {
-    sink.flush(fmt, filename, defer);
+  void flush(output::format const fmt,
+             char const *const filename) noexcept override {
+    sink.flush(fmt, filename);
   }
 
 private:
