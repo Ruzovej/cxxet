@@ -25,9 +25,8 @@ static void thread_local_sink_lifecycle() {
   CXXET_sink_thread_reserve(1);
   // do whatever You need between those ...
   CXXET_sink_thread_flush_now(); // not necessary, it will be flushed implicitly
-                                 // too
-                                 // -> unecessary to do it, unless You have some
-                                 // reason.
+                                 // too -> unecessary to do it, unless You have
+                                 // some reason.
 
   // more work, that potentially doesn't submit any `cxxet` events - if it does,
   // it will have to reallocate the buffer for them, and they will get
