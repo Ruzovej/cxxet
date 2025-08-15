@@ -113,6 +113,9 @@ tmp_filename_handle::operator std::string_view() {
 namespace cxxet::impl {
 
 TEST_CASE("tmp_filename_handle") {
+  auto const tmp_base{std::getenv("TMP_RESULT_DIR_BASE")};
+  REQUIRE_NE(tmp_base, nullptr);
+
   SUBCASE("valid base") {
 #if defined(_WIN32)
 #error "Unimplemented platform - TODO ..."
@@ -146,13 +149,12 @@ TEST_CASE("tmp_filename_handle") {
 #if defined(_WIN32)
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
-    auto const tmp_base{std::getenv("TMP_RESULT_DIR_BASE")};
-    REQUIRE_NE(tmp_base, nullptr);
     base = tmp_base + std::string{"/tmp_file.XXXXXX"};
-    REQUIRE(tmp_filename_handle::valid_base(base.c_str()));
 #else
 #error "Unsupported platform"
 #endif
+    REQUIRE(tmp_filename_handle::valid_base(base.c_str()));
+
     tmp_filename_handle handle1{base.c_str()};
     tmp_filename_handle handle2{base.c_str()};
     tmp_filename_handle handle3{base.c_str()};
@@ -197,6 +199,23 @@ TEST_CASE("tmp_filename_handle") {
     REQUIRE_EQ(read_file(handle1), std::string_view{"test1"});
     REQUIRE_EQ(read_file(handle2), std::string_view{"test2.1-append-test2.2"});
     REQUIRE_EQ(read_file(handle3), std::string_view{""});
+  }
+
+  SUBCASE("invalid base - nonexisting directory") {
+    std::string base{};
+#if defined(_WIN32)
+#error "Unimplemented platform - TODO ..."
+#elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+    base = tmp_base + std::string{"non/existing/dirs/tmp_file.XXXXXX"};
+#else
+#error "Unsupported platform"
+#endif
+    REQUIRE(tmp_filename_handle::valid_base(base.c_str()));
+
+    tmp_filename_handle handle{base.c_str()};
+
+    REQUIRE_THROWS_AS((void)static_cast<std::string_view>(handle),
+                      std::runtime_error);
   }
 }
 
