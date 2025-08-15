@@ -19,10 +19,10 @@
 
 #include "impl/sink/file_sink.hxx"
 
-#include <array>
 #include <iostream>
 
 #include "impl/dump_records.hxx"
+#include "impl/tmp_filename_handle.hxx"
 
 namespace cxxet::impl::sink {
 
@@ -57,30 +57,23 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
     return;
   }
 
-  bool const target_filename_valid{
-      (target_filename && target_filename[0] != '\0')};
-  if (target_filename_valid) {
+  if (target_filename && (target_filename[0] != '\0')) {
     if (!base_class_t::events.empty()) {
       try {
-        std::array<char, L_tmpnam> tmp_filename_buffer{};
-        auto const gen_tmp_filename = [&tmp_filename_buffer]() {
-          // https://en.cppreference.com/w/cpp/io/c/tmpnam
-          // "... std::tmpnam modifies static state and is not required to be
-          // thread-safe ..." :'-(
-          auto const ret{std::tmpnam(tmp_filename_buffer.data())};
-          if (!ret) {
-            throw std::runtime_error{"Failed to generate temporary filename"};
-          }
-          return ret;
-        };
+        tmp_filename_handle implicit_file_handle{target_filename};
         // is `time_point_zero_ns` needed?!
         dump_records(base_class_t::events, time_point_zero_ns, fmt,
-                     target_filename_valid ? target_filename
-                                           : gen_tmp_filename());
-        base_class_t::events.destroy();
+                     tmp_filename_handle::valid_base(target_filename)
+                         ? ((std::cerr << "Saving events to file: "
+                                       << static_cast<std::string_view>(
+                                              implicit_file_handle)
+                                       << '\n'),
+                            static_cast<char const *>(implicit_file_handle))
+                         : target_filename);
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
       }
+      base_class_t::events.destroy();
     }
   }
 }
