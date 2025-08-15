@@ -19,6 +19,7 @@
 
 #include "impl/sink/file_sink.hxx"
 
+#include <array>
 #include <iostream>
 
 #include "impl/dump_records.hxx"
