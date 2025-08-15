@@ -53,7 +53,7 @@ void file_sink<thread_safe_v>::set_flush_target(
 template <bool thread_safe_v>
 void file_sink<thread_safe_v>::do_flush() noexcept {
   if (fmt == output::format::unknown) {
-    std::cerr << "Forgot to specify output format (& filename)?!\n";
+    std::cerr << "Forgot to specify output format?!\n";
     return;
   }
 
@@ -82,8 +82,6 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
       }
     }
-    // to avoid flushing again & rewriting the file implicitly ...:
-    target_filename = nullptr;
   }
 }
 

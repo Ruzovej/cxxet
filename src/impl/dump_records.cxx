@@ -29,6 +29,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -220,7 +221,7 @@ void dump_records(impl::event::list const &list,
                   char const *const filename) {
   std::ofstream file;
   if (filename) {
-    if (std::strcmp(filename, "/dev/stdout") == 0) {
+    if (filename == std::string_view{"/dev/stdout"}) {
       std::cout.flush();
       file.open(filename, std::ios::app);
     } else {
