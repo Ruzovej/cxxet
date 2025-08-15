@@ -41,11 +41,9 @@ int main(int argc, char const **argv) {
 
   t.join();
 
-  shared_lib_foo::flush(
-      argc > 1
-          ? argv[1]
-          : "/dev/stdout"); // contains immediate flush via
-                            // `CXXET_sink_global_flush(..., filename, ...);`
+  shared_lib_foo::flush(argc > 1 ? argv[1] : "/dev/stdout");
+  // contains immediate flush via `CXXET_sink_global_set_flush_target(...,
+  // filename, ...);`
 
   return 0;
 }

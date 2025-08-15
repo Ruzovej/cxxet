@@ -34,7 +34,8 @@ template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
   explicit file_sink(properties const &traits) noexcept;
   ~file_sink() noexcept override;
 
-  void flush(output::format const aFmt, char const *const aFilename) noexcept;
+  void set_flush_target(output::format const aFmt,
+                        char const *const aFilename) noexcept;
 
 private:
   file_sink(file_sink const &) = delete;

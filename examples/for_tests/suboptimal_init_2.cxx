@@ -20,8 +20,8 @@
 #include "cxxet/all.hxx"
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
-  CXXET_sink_global_flush(cxxet::output::format::chrome_trace,
-                          argc > 1 ? argv[1] : "/dev/stdout");
+  CXXET_sink_global_set_flush_target(cxxet::output::format::chrome_trace,
+                                     argc > 1 ? argv[1] : "/dev/stdout");
 
   // suboptimal performance - will perform the initialization (reading env.
   // variables for the settings and buffer allocation) as part of the "event
