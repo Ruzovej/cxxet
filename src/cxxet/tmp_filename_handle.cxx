@@ -57,7 +57,6 @@ bool tmp_filename_handle::valid_base(char const *const aBase) noexcept {
 tmp_filename_handle::tmp_filename_handle(char const *const aBase) noexcept
     : base{aBase} {
   buffer[0] = '\0';
-  assert(valid_base(base));
 }
 
 tmp_filename_handle::~tmp_filename_handle() noexcept {
@@ -77,6 +76,7 @@ tmp_filename_handle::operator char const *() {
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
   if (buffer[0] == '\0') {
+    assert(valid_base(base));
     // is there a better & easier way?
     std::copy(base, base + std::strlen(base) + 1, buffer.data());
     int fd;

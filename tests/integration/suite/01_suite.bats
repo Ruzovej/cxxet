@@ -565,17 +565,18 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     local executable="${BIN_DIR}/cxxet_test_suboptimal_init_1"
 
     run "${executable}" 
+    refute_sanitizer_output
     assert_success
     assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
 Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
-
 }
 
 @test "Suboptimal initialization 2" {
     local executable="${BIN_DIR}/cxxet_test_suboptimal_init_2"
 
     run "${executable}" # no output file -> writes to `stdout`
+    refute_sanitizer_output
     assert_success
     assert_output --partial 'Deduced CXXET_DEFAULT_BLOCK_SIZE: 2'
     assert_output --partial '"name":"Suboptimal duration begin","ph":"B"'
