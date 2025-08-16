@@ -9,8 +9,9 @@ load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
 
 function setup_file() {
     export BIN_DIR="${CXXET_ROOT_DIR}/bin/${CXXET_PRESET}"
-    export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_VERBOSE=1
+    export CXXET_DEFAULT_BLOCK_SIZE=2
+    export CXXET_TARGET_FILENAME='' # by default disable dumping events into "implicit" file
     export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
     mkdir -p "${TMP_RESULT_DIR}"
 
@@ -483,6 +484,34 @@ Deduced CXXET_TARGET_FILENAME: ${output_file}"
     refute [ -f "${output_file}" ]       # internally this setting was overwritten ...
 }
 
+@test "Implicit file - default and modified behavior" {
+    local executable="${BIN_DIR}/cxxet_test_empty_file"
+
+    unset CXXET_TARGET_FILENAME # reset to default (empty) value
+
+    run "${executable}_bare"
+    assert_success
+    refute_sanitizer_output
+    assert_output ''
+
+    run "${executable}"
+    assert_success
+    refute_sanitizer_output
+    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: /tmp/cxxet_default.json.XXXXXX"
+
+    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.json.XXXXXX"
+    export CXXET_TARGET_FILENAME="${output_file}"
+    run "${executable}"
+    assert_success
+    refute_sanitizer_output
+    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: ${output_file}"
+    refute [ -f "${output_file}" ]
+}
+
 @test "Split recorded events into multiple files" {
     local executable="${BIN_DIR}/cxxet_test_split_files"
     local result1="${TMP_RESULT_DIR}/example_test_split_1.json"
@@ -559,6 +588,43 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result3}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result3}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
+
+    local result4="${TMP_RESULT_DIR}/example_test_reading_env_4.json.XXXXXX"
+    export CXXET_VERBOSE=1
+    export CXXET_DEFAULT_BLOCK_SIZE=40
+    export CXXET_TARGET_FILENAME="${result4}"
+    run "${executable}"
+    assert_success
+    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
+Deduced CXXET_TARGET_FILENAME: ${result4}"
+    assert_output --partial "Saving events to file: ${result4:0:-6}"
+    refute_sanitizer_output
+
+    result4="$(echo "${output}" | grep -oP '(?<=Saving events to file: ).*')"
+    assert [ -f "${result4}" ]
+    assert_equal "$(jq -e '.traceEvents | length' "${result4}")" 3
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result4}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result4}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result4}")" 1
+
+    unset CXXET_TARGET_FILENAME # reset to default (empty) value
+    local result5='/tmp/cxxet_default.json.XXXXXX'
+    run "${executable}"
+    assert_success
+    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
+Deduced CXXET_TARGET_FILENAME: ${result5}"
+    assert_output --partial "Saving events to file: ${result5:0:-6}"
+    refute_sanitizer_output
+
+    result5="$(echo "${output}" | grep -oP '(?<=Saving events to file: ).*')"
+    assert [ -f "${result5}" ]
+    assert_equal "$(jq -e '.traceEvents | length' "${result5}")" 3
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result5}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result5}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result5}")" 1
+
 }
 
 @test "Suboptimal initialization 1" {

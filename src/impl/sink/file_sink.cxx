@@ -57,8 +57,8 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
     return;
   }
 
-  if (target_filename && (target_filename[0] != '\0')) {
-    if (!base_class_t::events.empty()) {
+  if (!base_class_t::events.empty()) {
+    if (target_filename && (target_filename[0] != '\0')) {
       try {
         tmp_filename_handle implicit_file_handle{target_filename};
         // is `time_point_zero_ns` needed?!
@@ -73,8 +73,8 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
       }
-      base_class_t::events.destroy();
     }
+    base_class_t::events.destroy();
   }
 }
 

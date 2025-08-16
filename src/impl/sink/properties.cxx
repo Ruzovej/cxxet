@@ -39,7 +39,7 @@ value_t parse_env_variable(char const *env_var_name, parse_fn_t const &parse_fn,
                            bool const verbose) {
   auto const value{std::invoke([&]() -> value_t {
     auto const env_var_val{std::getenv(env_var_name)};
-    if (env_var_val && *env_var_val != '\0') {
+    if (env_var_val) {
       try {
         return parse_fn(env_var_val);
       } catch (...) {
@@ -102,8 +102,9 @@ properties::properties() noexcept
                              output::format::chrome_trace, verbose)},
       default_list_node_capacity{parse_env_variable("CXXET_DEFAULT_BLOCK_SIZE",
                                                     parse_int, 64, verbose)},
-      default_target_filename{parse_env_variable(
-          "CXXET_TARGET_FILENAME", parse_string, nullptr, verbose)} {
+      default_target_filename{
+          parse_env_variable("CXXET_TARGET_FILENAME", parse_string,
+                             "/tmp/cxxet_default.json.XXXXXX", verbose)} {
   // ...
 }
 

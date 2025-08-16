@@ -9,8 +9,9 @@ function setup_file() {
         skip "this should test only 'release' build(s), current preset is '${CXXET_PRESET}'"
     fi
 
-    export CXXET_DEFAULT_BLOCK_SIZE=2 # torture it little bit
     export CXXET_VERBOSE=1
+    export CXXET_DEFAULT_BLOCK_SIZE=2 # torture it little bit
+    export CXXET_TARGET_FILENAME='' # by default disable dumping events into "implicit" file
     export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/02_cmake_fetch_cxxet_direct_usage"
     mkdir -p "${TMP_RESULT_DIR}"
 
