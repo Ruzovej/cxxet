@@ -94,7 +94,7 @@ tmp_filename_handle::operator char const *() {
 #error "Unsupported platform"
 #endif
 
-  return buffer.data();
+  return buffer.data(); // #97 TODO make it contain `pid` too?!
 }
 
 tmp_filename_handle::operator std::string_view() {

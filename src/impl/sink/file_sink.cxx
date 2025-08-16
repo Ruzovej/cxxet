@@ -61,15 +61,16 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
     if (target_filename && (target_filename[0] != '\0')) {
       try {
         tmp_filename_handle implicit_file_handle{target_filename};
+        bool const use_tmp_filename{
+            tmp_filename_handle::valid_base(target_filename)};
+        auto const target{use_tmp_filename
+                              ? static_cast<char const *>(implicit_file_handle)
+                              : target_filename};
+        if (use_tmp_filename) { // TODO maybe log everytime?!
+          std::cerr << "Saving events to file: " << target << '\n';
+        }
         // is `time_point_zero_ns` needed?!
-        dump_records(base_class_t::events, time_point_zero_ns, fmt,
-                     tmp_filename_handle::valid_base(target_filename)
-                         ? ((std::cerr << "Saving events to file: "
-                                       << static_cast<std::string_view>(
-                                              implicit_file_handle)
-                                       << '\n'),
-                            static_cast<char const *>(implicit_file_handle))
-                         : target_filename);
+        dump_records(base_class_t::events, time_point_zero_ns, fmt, target);
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
       }

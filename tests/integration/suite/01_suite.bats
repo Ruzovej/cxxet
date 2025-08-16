@@ -601,7 +601,7 @@ Deduced CXXET_TARGET_FILENAME: ${result4}"
     assert_output --partial "Saving events to file: ${result4:0:-6}"
     refute_sanitizer_output
 
-    result4="$(echo "${output}" | grep -oP '(?<=Saving events to file: ).*')"
+    result4="$(printf '%s' "${output}" | grep -oP '(?<=Saving events to file: ).*')"
     assert [ -f "${result4}" ]
     assert_equal "$(jq -e '.traceEvents | length' "${result4}")" 3
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result4}")" 1
@@ -618,7 +618,7 @@ Deduced CXXET_TARGET_FILENAME: ${result5}"
     assert_output --partial "Saving events to file: ${result5:0:-6}"
     refute_sanitizer_output
 
-    result5="$(echo "${output}" | grep -oP '(?<=Saving events to file: ).*')"
+    result5="$(printf '%s' "${output}" | grep -oP '(?<=Saving events to file: ).*')"
     assert [ -f "${result5}" ]
     assert_equal "$(jq -e '.traceEvents | length' "${result5}")" 3
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result5}")" 1
