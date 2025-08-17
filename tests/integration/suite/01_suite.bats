@@ -499,9 +499,9 @@ Deduced CXXET_TARGET_FILENAME: ${output_file}"
     refute_sanitizer_output
     assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
 Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
-Deduced CXXET_TARGET_FILENAME: /tmp/cxxet_default.json.XXXXXX"
+Deduced CXXET_TARGET_FILENAME: /tmp/cxxet_default.pid{pid}.json.XXXXXX"
 
-    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.json.XXXXXX"
+    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.pid{pid}.json.XXXXXX"
     export CXXET_TARGET_FILENAME="${output_file}"
     run "${executable}"
     assert_success
@@ -589,7 +589,7 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result3}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
 
-    local result4="${TMP_RESULT_DIR}/example_test_reading_env_4.json.XXXXXX"
+    local result4="${TMP_RESULT_DIR}/example_test_reading_env_4.pid{pid}.json.XXXXXX"
     export CXXET_VERBOSE=1
     export CXXET_DEFAULT_BLOCK_SIZE=40
     export CXXET_TARGET_FILENAME="${result4}"
@@ -598,7 +598,7 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
 Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
 Deduced CXXET_TARGET_FILENAME: ${result4}"
-    assert_output --partial "Saving events to file: ${result4:0:-6}"
+    assert_output --partial "Saving events to file: ${result4%\{pid\}.json.XXXXXX}"
     refute_sanitizer_output
 
     result4="$(printf '%s' "${output}" | grep -oP '(?<=Saving events to file: ).*')"
@@ -609,13 +609,13 @@ Deduced CXXET_TARGET_FILENAME: ${result4}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result4}")" 1
 
     unset CXXET_TARGET_FILENAME # reset to default (empty) value
-    local result5='/tmp/cxxet_default.json.XXXXXX'
+    local result5='/tmp/cxxet_default.pid{pid}.json.XXXXXX'
     run "${executable}"
     assert_success
     assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
 Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
 Deduced CXXET_TARGET_FILENAME: ${result5}"
-    assert_output --partial "Saving events to file: ${result5:0:-6}"
+    assert_output --partial "Saving events to file: ${result5%\{pid\}.json.XXXXXX}"
     refute_sanitizer_output
 
     result5="$(printf '%s' "${output}" | grep -oP '(?<=Saving events to file: ).*')"
@@ -624,7 +624,6 @@ Deduced CXXET_TARGET_FILENAME: ${result5}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result5}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result5}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result5}")" 1
-
 }
 
 @test "Suboptimal initialization 1" {

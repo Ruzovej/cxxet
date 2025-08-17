@@ -38,7 +38,13 @@ private:
 #if defined(_WIN32)
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+public:
   static constexpr unsigned buffer_size{256};
+  static constexpr int num_required_Xs{6};
+  static constexpr std::string_view pid_placeholder{"{pid}"};
+  static constexpr unsigned digits_for_pid{10};
+
+private:
   std::array<char, buffer_size> buffer;
 #else
 #error "Unsupported platform"

@@ -41,12 +41,16 @@
 namespace cxxet::impl {
 
 bool tmp_filename_handle::valid_base(char const *const aBase) noexcept {
-  std::string_view const base{aBase};
 #if defined(_WIN32)
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
-  static constexpr int num_required_Xs{6};
-  return (base.size() < buffer_size) && (base.size() >= num_required_Xs) &&
+  std::string_view const base{aBase};
+  unsigned size_reduction{0};
+  if (base.find(pid_placeholder) != std::string_view::npos) {
+    size_reduction = digits_for_pid - pid_placeholder.size();
+  }
+  return (base.size() < buffer_size - size_reduction) &&
+         (base.size() >= num_required_Xs) &&
          std::all_of(base.crbegin(), base.crbegin() + num_required_Xs,
                      [](char const c) { return c == 'X'; });
 #else
@@ -75,10 +79,24 @@ tmp_filename_handle::operator char const *() {
 #include <windows.h>
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+  // is there a better & easier way?
   if (buffer[0] == '\0') {
     assert(valid_base(base));
-    // is there a better & easier way?
-    std::copy(base, base + std::strlen(base) + 1, buffer.data());
+    auto const base_len{std::strlen(base)};
+    std::string_view const base_view{base, base_len};
+
+    auto const pos{base_view.find(pid_placeholder)};
+    if (pos != std::string_view::npos) {
+      auto const pid_str{std::to_string(static_cast<long long>(getpid()))};
+      assert(pid_str.size() <= digits_for_pid);
+      std::copy(base, base + pos, buffer.data());
+      std::copy(pid_str.begin(), pid_str.end(), buffer.data() + pos);
+      std::copy(base + pos + pid_placeholder.size(), base + base_len + 1,
+                buffer.data() + pos + pid_str.size());
+    } else {
+      std::copy(base, base + base_len + 1, buffer.data());
+    }
+
     int fd;
     // https://man7.org/linux/man-pages/man3/mkstemp.3.html
     if ((fd = mkstemp(buffer.data())) == -1) {
@@ -89,12 +107,10 @@ tmp_filename_handle::operator char const *() {
     }
     close(fd); // keeping just name of this created file is enough
   }
-
 #else
 #error "Unsupported platform"
 #endif
-
-  return buffer.data(); // #97 TODO make it contain `pid` too?!
+  return buffer.data();
 }
 
 tmp_filename_handle::operator std::string_view() {
@@ -123,7 +139,20 @@ TEST_CASE("tmp_filename_handle") {
     REQUIRE(tmp_filename_handle::valid_base("XXXXXX"));
     REQUIRE(tmp_filename_handle::valid_base("XXXXXXX"));
     REQUIRE(tmp_filename_handle::valid_base("some_local_file.XXXXXX"));
+    REQUIRE(tmp_filename_handle::valid_base("some_local_file.{pid}.XXXXXX"));
     REQUIRE(tmp_filename_handle::valid_base("/tmp/XXXXXX"));
+    REQUIRE(tmp_filename_handle::valid_base("/tmp/{pid}XXXXXX"));
+    auto const long_valid_string_1{
+        R"(/tmp/some/folder/ok/yadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayada/XXXXXX)"};
+    REQUIRE(std::strlen(long_valid_string_1) ==
+            (tmp_filename_handle::buffer_size - 1));
+    REQUIRE(tmp_filename_handle::valid_base(long_valid_string_1));
+    auto const long_valid_string_2{
+        R"(/tmp/some/folder/ok/{pid}yadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadaya/XXXXXX)"};
+    REQUIRE(std::strlen(long_valid_string_2) ==
+            (tmp_filename_handle::buffer_size -
+             tmp_filename_handle::pid_placeholder.size() - 1));
+    REQUIRE(tmp_filename_handle::valid_base(long_valid_string_2));
 #else
 #error "Unsupported platform"
 #endif
@@ -139,6 +168,17 @@ TEST_CASE("tmp_filename_handle") {
     REQUIRE(!tmp_filename_handle::valid_base("XXXX"));
     REQUIRE(!tmp_filename_handle::valid_base("XXXXX"));
     REQUIRE(!tmp_filename_handle::valid_base("/tmp/XXXXXX/"));
+    auto const long_invalid_string_1{
+        R"(/tmp/some/folder/bad/yadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayada/XXXXXX)"};
+    REQUIRE(std::strlen(long_invalid_string_1) ==
+            tmp_filename_handle::buffer_size);
+    REQUIRE(!tmp_filename_handle::valid_base(long_invalid_string_1));
+    auto const long_invalid_string_2{
+        R"(/tmp/some/folder/bad/{pid}yadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadayadaya/XXXXXX)"};
+    REQUIRE(std::strlen(long_invalid_string_2) ==
+            (tmp_filename_handle::buffer_size -
+             tmp_filename_handle::pid_placeholder.size()));
+    REQUIRE(!tmp_filename_handle::valid_base(long_invalid_string_2));
 #else
 #error "Unsupported platform"
 #endif

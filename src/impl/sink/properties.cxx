@@ -104,7 +104,7 @@ properties::properties() noexcept
                                                     parse_int, 64, verbose)},
       default_target_filename{
           parse_env_variable("CXXET_TARGET_FILENAME", parse_string,
-                             "/tmp/cxxet_default.json.XXXXXX", verbose)} {
+                             "/tmp/cxxet_default.pid{pid}.json.XXXXXX", verbose)} {
   // ...
 }
 
