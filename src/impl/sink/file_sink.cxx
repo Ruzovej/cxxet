@@ -66,7 +66,7 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
         auto const target{use_tmp_filename
                               ? static_cast<char const *>(implicit_file_handle)
                               : target_filename};
-        if (use_tmp_filename) { // TODO maybe log everytime?!
+        if (use_tmp_filename) {
           std::cerr << "Saving events to file: " << target << '\n';
         }
         // is `time_point_zero_ns` needed?!
