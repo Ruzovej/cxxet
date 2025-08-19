@@ -19,6 +19,10 @@
 
 #pragma once
 
+#include <cassert>
+
+#include <string>
+
 #include "cxxet/macros/linkage.h"
 #include "cxxet/output_format.hxx"
 
@@ -33,9 +37,22 @@ CXXET_IMPL_API void sink_thread_flush_now() noexcept;
 
 CXXET_IMPL_API void sink_global_set_flush_target(
     cxxet::output::format const fmt = cxxet::output::format::chrome_trace,
-    char const *const filename = nullptr // `== nullptr` => no-op; to be more
-                                         // precise: discard everything
+    std::string filename =
+        "" // empty => no-op; to be more precise: discard everything
     ) noexcept;
+
+[[deprecated("TODO remove this ASAP (#98)")]] inline void
+sink_global_set_flush_target(output::format const fmt,
+                             std::nullptr_t) noexcept {
+  sink_global_set_flush_target(fmt, std::string{});
+}
+
+[[deprecated("TODO remove this ASAP (#98)")]] inline void
+sink_global_set_flush_target(output::format const fmt,
+                             const char *const filename) noexcept {
+  assert(filename != nullptr);
+  sink_global_set_flush_target(fmt, std::string{filename});
+}
 
 CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
 

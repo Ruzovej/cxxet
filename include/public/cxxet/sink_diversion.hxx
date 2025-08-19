@@ -19,7 +19,11 @@
 
 #pragma once
 
+#include <cassert>
+#include <cstddef>
+
 #include <memory>
+#include <string>
 
 #include "cxxet/macros/linkage.h"
 #include "cxxet/output_format.hxx"
@@ -37,7 +41,17 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
   make(bool const thread_safe) noexcept;
 
   virtual void set_flush_target(output::format const fmt,
-                                char const *const filename) noexcept = 0;
+                                std::string filename) noexcept = 0;
+  [[deprecated("TODO remove this ASAP (#98)")]] inline void
+  set_flush_target(output::format const fmt, std::nullptr_t) noexcept {
+    set_flush_target(fmt, std::string{});
+  }
+  [[deprecated("TODO remove this ASAP (#98)")]] inline void
+  set_flush_target(output::format const fmt,
+                   const char *const filename) noexcept {
+    assert(filename != nullptr);
+    set_flush_target(fmt, std::string{filename});
+  }
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {

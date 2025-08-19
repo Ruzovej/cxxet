@@ -52,8 +52,8 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
   }
 
   void set_flush_target(output::format const fmt,
-                        char const *const filename) noexcept override {
-    sink.set_flush_target(fmt, filename);
+                        std::string filename) noexcept override {
+    sink.set_flush_target(fmt, std::move(filename));
   }
 
 private:

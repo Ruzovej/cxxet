@@ -30,12 +30,12 @@ template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
 
   explicit file_sink(long long const aTime_point_zero_ns,
                      output::format const aFmt = output::format::unknown,
-                     char const *const aTarget_filename = nullptr) noexcept;
+                     std::string &&aTarget_filename = "") noexcept;
   explicit file_sink(properties const &traits) noexcept;
   ~file_sink() noexcept override;
 
   void set_flush_target(output::format const aFmt,
-                        char const *const aFilename) noexcept;
+                        std::string &&aFilename) noexcept;
 
 private:
   file_sink(file_sink const &) = delete;
@@ -47,7 +47,7 @@ private:
 
   long long const time_point_zero_ns;
   output::format fmt;
-  char const *target_filename;
+  std::string target_filename;
 };
 
 extern template struct file_sink<true>;

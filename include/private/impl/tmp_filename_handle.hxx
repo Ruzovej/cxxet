@@ -25,16 +25,16 @@
 namespace cxxet::impl {
 
 struct tmp_filename_handle {
-  static bool valid_base(char const *const aBase) noexcept;
+  static bool valid_base(std::string_view const aBase) noexcept;
 
-  explicit tmp_filename_handle(char const *const aBase) noexcept;
+  explicit tmp_filename_handle(std::string_view const aBase) noexcept;
   ~tmp_filename_handle() noexcept;
 
   explicit operator char const *();
   explicit operator std::string_view();
 
 private:
-  char const *base;
+  std::string_view const base;
 #if defined(_WIN32)
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)

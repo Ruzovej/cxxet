@@ -29,9 +29,9 @@ namespace cxxet::impl::sink {
 template <bool thread_safe_v>
 file_sink<thread_safe_v>::file_sink(long long const aTime_point_zero_ns,
                                     output::format const aFmt,
-                                    char const *const aTarget_filename) noexcept
+                                    std::string &&aTarget_filename) noexcept
     : base_class_t{}, time_point_zero_ns{aTime_point_zero_ns}, fmt{aFmt},
-      target_filename{aTarget_filename} {}
+      target_filename{std::move(aTarget_filename)} {}
 
 template <bool thread_safe_v>
 file_sink<thread_safe_v>::file_sink(properties const &traits) noexcept
@@ -44,10 +44,10 @@ template <bool thread_safe_v> file_sink<thread_safe_v>::~file_sink() noexcept {
 
 template <bool thread_safe_v>
 void file_sink<thread_safe_v>::set_flush_target(
-    output::format const aFmt, char const *const aFilename) noexcept {
+    output::format const aFmt, std::string &&aFilename) noexcept {
   std::lock_guard lck{*this};
   fmt = aFmt;
-  target_filename = aFilename;
+  target_filename = std::move(aFilename);
 }
 
 template <bool thread_safe_v>
@@ -58,14 +58,14 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
   }
 
   if (!base_class_t::events.empty()) {
-    if (target_filename && (target_filename[0] != '\0')) {
+    if (!target_filename.empty()) {
       try {
         tmp_filename_handle implicit_file_handle{target_filename};
         bool const use_tmp_filename{
             tmp_filename_handle::valid_base(target_filename)};
         auto const target{use_tmp_filename
                               ? static_cast<char const *>(implicit_file_handle)
-                              : target_filename};
+                              : target_filename.c_str()};
         if (use_tmp_filename) {
           std::cerr << "Saving events to file: " << target << '\n';
         }
