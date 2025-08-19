@@ -96,7 +96,7 @@ output::format parse_output_format(std::string_view const str) {
 int parse_int(char const *const str_value) {
   char *endptr{nullptr};
   auto const ret{static_cast<int>(std::strtol(str_value, &endptr, 10))};
-  if (endptr == str_value) {
+  if ((endptr == str_value) || (*endptr != '\0')) {
     throw std::runtime_error{"Failed to parse integer from string"};
   }
   return ret;
@@ -196,6 +196,10 @@ TEST_CASE("env. var. parsing for sink::properties") {
       REQUIRE_EQ(parse_int("-42"), -42);
 
       REQUIRE_THROWS_AS(parse_int(""), std::runtime_error);
+      REQUIRE_THROWS_AS(parse_int("1.1"), std::runtime_error);
+      REQUIRE_THROWS_AS(parse_int("1."), std::runtime_error);
+      REQUIRE_THROWS_AS(parse_int("1,"), std::runtime_error);
+      REQUIRE_THROWS_AS(parse_int("1a"), std::runtime_error);
     }
 
     SUBCASE("string") {
