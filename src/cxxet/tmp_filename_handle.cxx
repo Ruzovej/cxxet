@@ -98,10 +98,11 @@ tmp_filename_handle::operator char const *() {
     int fd;
     // https://man7.org/linux/man-pages/man3/mkstemp.3.html
     if ((fd = mkstemp(buffer.data())) == -1) {
+      auto const errno_now{errno};
       throw std::runtime_error{
           std::string{"'mkstemp' failed to create temporary file out of '"} +
-          base + "', errno = " + std::to_string(errno) + " -> " +
-          strerror(errno)};
+          base + "', errno = " + std::to_string(errno_now) + " -> " +
+          strerror(errno_now)};
     }
     close(fd); // keeping just name of this created file is enough
   }
