@@ -65,7 +65,6 @@ tmp_filename_handle::tmp_filename_handle(char const *const aBase) noexcept
 
 tmp_filename_handle::~tmp_filename_handle() noexcept {
 #if defined(_WIN32)
-#include <windows.h>
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
 // nothing
@@ -76,7 +75,6 @@ tmp_filename_handle::~tmp_filename_handle() noexcept {
 
 tmp_filename_handle::operator char const *() {
 #if defined(_WIN32)
-#include <windows.h>
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
   // is there a better & easier way?
