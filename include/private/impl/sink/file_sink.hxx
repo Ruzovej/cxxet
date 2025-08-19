@@ -26,15 +26,16 @@
 namespace cxxet::impl::sink {
 
 template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
-  explicit file_sink(long long const aTime_point_zero_ns) noexcept;
+  using base_class_t = thread_safe_t<thread_safe_v>;
+
   explicit file_sink(long long const aTime_point_zero_ns,
-                     output::format const aFmt,
-                     char const *const aTarget_filename) noexcept;
+                     output::format const aFmt = output::format::unknown,
+                     char const *const aTarget_filename = nullptr) noexcept;
   explicit file_sink(properties const &traits) noexcept;
   ~file_sink() noexcept override;
 
-  void flush(output::format const aFmt, char const *const aFilename,
-             bool const defer) noexcept;
+  void set_flush_target(output::format const aFmt,
+                        char const *const aFilename) noexcept;
 
 private:
   file_sink(file_sink const &) = delete;
@@ -42,13 +43,11 @@ private:
   file_sink(file_sink &&) = delete;
   file_sink &operator=(file_sink &&) = delete;
 
-  using base_class_t = thread_safe_t<thread_safe_v>;
-
   void do_flush() noexcept;
 
   long long const time_point_zero_ns;
-  output::format fmt{output::format::unknown};
-  char const *target_filename{nullptr};
+  output::format fmt;
+  char const *target_filename;
 };
 
 extern template struct file_sink<true>;

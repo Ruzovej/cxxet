@@ -43,6 +43,8 @@ function unit_runner() {
         esac
     done
 
+    local TMP_RESULT_DIR_BASE_RAW="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_unit"
+
     local preset
     for preset in "${test_presets[@]}"; do
         printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for unit tests:\n' "${preset}" >&2
@@ -51,6 +53,9 @@ function unit_runner() {
             --preset "${preset}" \
             --target cxxet_unit_tests \
             --ignore-compile_commands >&2
+
+        export TMP_RESULT_DIR_BASE="${TMP_RESULT_DIR_BASE_RAW}/${preset}"
+        mkdir -p "${TMP_RESULT_DIR_BASE}"
 
         printf -- '-=-=-=-=-=-=-=- Executing %s unit tests:\n' "${preset}" >&2
         "${CXXET_ROOT_DIR}/bin/${preset}/cxxet_unit_tests" \

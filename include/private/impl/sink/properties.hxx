@@ -32,13 +32,7 @@ struct properties {
 
   static properties const &instance() noexcept;
 
-#ifdef CXXET_WITH_UNIT_TESTS
-  properties &set_target_filename(char const *const filename) noexcept {
-    default_target_filename = filename;
-    return *this;
-  }
-
-#else
+#ifndef CXXET_WITH_UNIT_TESTS
 private:
 #endif
   properties() noexcept;

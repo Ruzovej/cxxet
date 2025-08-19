@@ -33,10 +33,12 @@ int main(int argc, char const **argv) {
 
 #ifdef CXXET_ENABLE
   auto file_sink_local1{cxxet::file_sink_handle::make(false)};
-  file_sink_local1->flush(cxxet::output::format::chrome_trace, filename1, true);
+  file_sink_local1->set_flush_target(cxxet::output::format::chrome_trace,
+                                     filename1);
 
   auto file_sink_local2{cxxet::file_sink_handle::make(false)};
-  file_sink_local2->flush(cxxet::output::format::chrome_trace, filename2, true);
+  file_sink_local2->set_flush_target(cxxet::output::format::chrome_trace,
+                                     filename2);
 #endif
 
   std::thread t1{[&]() {
@@ -92,7 +94,7 @@ int main(int argc, char const **argv) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    CXXET_sink_thread_flush();
+    CXXET_sink_thread_flush_now();
   }
 
   {
@@ -113,7 +115,7 @@ int main(int argc, char const **argv) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    CXXET_sink_thread_flush();
+    CXXET_sink_thread_flush_now();
   }
 
   return 0;

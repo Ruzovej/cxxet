@@ -75,7 +75,7 @@ bool list::has_free_capacity(int const capacity) const noexcept {
 }
 
 void list::reserve(int const capacity) noexcept {
-  if (get_current_free_capacity() < capacity) {
+  if (!has_free_capacity(capacity)) {
     auto target{first ? &last[0].meta.next : &first};
     *target = allocate_raw_node_elems(capacity);
     last = *target;

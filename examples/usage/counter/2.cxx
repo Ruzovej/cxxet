@@ -40,7 +40,8 @@ double euler_method(fn_t &&fn, double x, double y, double const h,
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]
                                                        : "/dev/stdout"};
-  CXXET_sink_global_flush(cxxet::output::format::chrome_trace, filename, true);
+  CXXET_sink_global_set_flush_target(cxxet::output::format::chrome_trace,
+                                     filename);
 
   CXXET_mark_complete("Counter example 2");
 

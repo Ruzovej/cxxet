@@ -29,13 +29,13 @@ namespace cxxet {
 CXXET_IMPL_API void
 sink_thread_reserve(int const minimum_free_capacity = 0) noexcept;
 
-CXXET_IMPL_API void sink_thread_flush() noexcept;
+CXXET_IMPL_API void sink_thread_flush_now() noexcept;
 
-CXXET_IMPL_API void sink_global_flush(
+CXXET_IMPL_API void sink_global_set_flush_target(
     cxxet::output::format const fmt = cxxet::output::format::chrome_trace,
-    char const *const filename = nullptr, // `== nullptr` => no-op; to be more
-                                          // precise: discard everything
-    bool const defer_flush = false) noexcept;
+    char const *const filename = nullptr // `== nullptr` => no-op; to be more
+                                         // precise: discard everything
+    ) noexcept;
 
 CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
 

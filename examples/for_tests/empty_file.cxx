@@ -34,21 +34,21 @@ void record_some_events() {
 
   CXXET_mark_counters("lost counter", 42.0);
 
-  CXXET_sink_thread_flush();
+  CXXET_sink_thread_flush_now();
 }
 
 } // namespace
 
-int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
+int main(int const, char const **) {
   std::thread t{record_some_events};
 
   record_some_events();
 
-  CXXET_sink_global_flush(
+  CXXET_sink_global_set_flush_target(
       cxxet::output::format::chrome_trace,
-      nullptr, // file won't be created/overwritten - `nullptr` means to discard
-               // all recorded events ...
-      true);
+      nullptr // file won't be created/overwritten - `nullptr` means to discard
+              // all recorded events ...
+  );
 
   t.join();
 

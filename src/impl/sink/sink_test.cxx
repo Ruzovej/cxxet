@@ -62,7 +62,7 @@ TEST_CASE("sink cascade") {
 
   SUBCASE("one 'leaf'") {
     sink::properties traits{};
-    traits.set_target_filename("/dev/null");
+    traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
     test_sink<sink::event_collector> leaf{&root};
     leaf.reserve(2);
@@ -91,7 +91,7 @@ TEST_CASE("sink cascade") {
 
   SUBCASE("two 'leafs', tree") {
     sink::properties traits{};
-    traits.set_target_filename("/dev/null");
+    traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
     test_sink<sink::event_collector> leaf1{&root}, leaf2{&root};
     leaf1.reserve(1);
@@ -128,7 +128,7 @@ TEST_CASE("sink cascade") {
 
   SUBCASE("two 'leafs', linear") {
     sink::properties traits{};
-    traits.set_target_filename("/dev/null");
+    traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
     test_sink<sink::event_collector> leaf1{&root}, leaf2{&leaf1};
     leaf1.reserve(1);
@@ -163,7 +163,7 @@ TEST_CASE("sink cascade") {
 
   SUBCASE("flush upon destruction") {
     sink::properties traits{};
-    traits.set_target_filename("/dev/null");
+    traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
 
     {
@@ -184,7 +184,7 @@ TEST_CASE("sink cascade") {
 
   SUBCASE("intermediate sink::cascade<false> usage (thread UNsafe)") {
     sink::properties traits{};
-    traits.set_target_filename("/dev/null");
+    traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
 
     {
@@ -210,7 +210,7 @@ TEST_CASE("sink cascade") {
 
   SUBCASE("intermediate sink::cascade<true> usage (thread_safe)") {
     sink::properties traits{};
-    traits.set_target_filename("/dev/null");
+    traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
 
     {
@@ -243,7 +243,7 @@ TEST_CASE("sink cascade") {
 
   SUBCASE("sink::file_sink<true> usage (thread safe)") {
     sink::properties traits{};
-    traits.set_target_filename("/dev/null");
+    traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<true>> root{traits};
 
     auto const test_fn = [&root, &traits](event::any const &evt) {

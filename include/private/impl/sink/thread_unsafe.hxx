@@ -29,7 +29,6 @@ struct thread_unsafe : sink_base {
 
   void drain(sink_base &other) noexcept override final;
 
-protected:
   constexpr void lock() noexcept {}
   constexpr void unlock() noexcept {}
 

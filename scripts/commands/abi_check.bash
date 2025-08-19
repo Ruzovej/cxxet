@@ -12,6 +12,7 @@ function abi_check() {
     local preset=abidiff
     local prev_commit
     local prev_branch=main
+    local quiet_flag=('--quiet')
 
     function usage() {
         {
@@ -23,6 +24,7 @@ function abi_check() {
             printf '    --preset, -p PRESET        Set the CMake preset (default: %s)\n' "${preset}"
             printf '    --commit, -c COMMIT        Compare with the specified commit. If not specified, uses last one\n'
             printf '    --branch, -b BRANCH        Compare with given commit on specified branch (default: %s)\n' "${prev_branch}"
+            printf '    --verbose, -v              Increase verbosity (by not suppressing stdout)\n'
             printf '    --help, -h                 Show this help message\n'
         } >&2
     }
@@ -44,6 +46,10 @@ function abi_check() {
             --help|-h)
                 usage
                 exit 0
+                ;;
+            --verbose|-v)
+                quiet_flag=()
+                shift 1
                 ;;
             *)
                 printf 'Unknown option: %s\n' "$1" >&2
@@ -69,7 +75,7 @@ function abi_check() {
                 set -x
                 git clone \
                     --branch "${prev_branch}" \
-                    --quiet \
+                    "${quiet_flag[@]}" \
                     "file://${CXXET_ROOT_DIR}" \
                     "${abi_check_repo_dir}"
             )
@@ -77,7 +83,7 @@ function abi_check() {
             (
                 set -x
                 git -C "${abi_check_repo_dir}" fetch \
-                    --quiet \
+                    "${quiet_flag[@]}" \
                     origin \
                     "${prev_branch}"
             )
@@ -85,7 +91,7 @@ function abi_check() {
         (
             set -x
             git -C "${abi_check_repo_dir}" checkout \
-                --quiet \
+                "${quiet_flag[@]}" \
                 --detach \
                 "${prev_commit}"
         )
@@ -93,7 +99,7 @@ function abi_check() {
         cd "${abi_check_repo_dir}" # Needed so the `cxxet_manage.bash` properly determines its root directory:
         ./cxxet_manage.bash compile \
             --preset "${preset}" \
-            --quiet \
+            "${quiet_flag[@]}" \
             --ignore-compile_commands
         
         [[ -f "${baseline_so_name}" ]] || {
@@ -105,7 +111,7 @@ function abi_check() {
     local current_so_name="${CXXET_ROOT_DIR}/bin/${preset}/libcxxet.so"
     compile \
         --preset "${preset}" \
-        --quiet \
+        "${quiet_flag[@]}" \
         --ignore-compile_commands
 
     [[ -f "${current_so_name}" ]] || {

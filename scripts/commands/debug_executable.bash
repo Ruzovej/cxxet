@@ -8,7 +8,7 @@ function debug_executable() {
     cxxet_require_command gdb
 
     local preset=asan_d
-    local target=cxxet_example_counter_2
+    local target=cxxet_unit_tests
     local default_block_size=4
 
     function usage() {

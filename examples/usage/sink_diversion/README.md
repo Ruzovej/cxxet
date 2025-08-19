@@ -12,7 +12,7 @@ Generated events from any particular thread can be redirected to its own output 
 
 ## Notes
 
-* Always call `CXXET_sink_thread_flush()` before switching sinks to ensure all pending events are written out to the desired sink.
+* Always call `CXXET_sink_thread_flush_now()` before switching sinks to ensure all pending events are written out to the desired sink.
 * Local sinks can be created as thread safe (`true`) or not (`false`).
 * Use `divert_thread_sink_to_this()` to redirect current thread's events to the given instance of a `sink`.
 * Use `CXXET_sink_thread_divert_to_sink_global()` to restore the default `sink` setup.

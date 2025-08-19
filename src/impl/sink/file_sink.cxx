@@ -22,13 +22,9 @@
 #include <iostream>
 
 #include "impl/dump_records.hxx"
+#include "impl/tmp_filename_handle.hxx"
 
 namespace cxxet::impl::sink {
-
-template <bool thread_safe_v>
-file_sink<thread_safe_v>::file_sink(
-    long long const aTime_point_zero_ns) noexcept
-    : base_class_t{}, time_point_zero_ns{aTime_point_zero_ns} {}
 
 template <bool thread_safe_v>
 file_sink<thread_safe_v>::file_sink(long long const aTime_point_zero_ns,
@@ -47,35 +43,39 @@ template <bool thread_safe_v> file_sink<thread_safe_v>::~file_sink() noexcept {
 }
 
 template <bool thread_safe_v>
-void file_sink<thread_safe_v>::flush(output::format const aFmt,
-                                     char const *const aFilename,
-                                     bool const defer) noexcept {
-  base_class_t::lock();
+void file_sink<thread_safe_v>::set_flush_target(
+    output::format const aFmt, char const *const aFilename) noexcept {
+  std::lock_guard lck{*this};
   fmt = aFmt;
   target_filename = aFilename;
-  if (!defer) {
-    do_flush();
-  }
-  base_class_t::unlock();
 }
 
 template <bool thread_safe_v>
 void file_sink<thread_safe_v>::do_flush() noexcept {
   if (fmt == output::format::unknown) {
-    std::cerr << "Forgot to specify output format (& filename)?!\n";
-  } else if (target_filename) {
-    if (!base_class_t::events.empty()) {
+    std::cerr << "Forgot to specify output format?!\n";
+    return;
+  }
+
+  if (!base_class_t::events.empty()) {
+    if (target_filename && (target_filename[0] != '\0')) {
       try {
+        tmp_filename_handle implicit_file_handle{target_filename};
+        bool const use_tmp_filename{
+            tmp_filename_handle::valid_base(target_filename)};
+        auto const target{use_tmp_filename
+                              ? static_cast<char const *>(implicit_file_handle)
+                              : target_filename};
+        if (use_tmp_filename) {
+          std::cerr << "Saving events to file: " << target << '\n';
+        }
         // is `time_point_zero_ns` needed?!
-        dump_records(base_class_t::events, time_point_zero_ns, fmt,
-                     target_filename);
-        base_class_t::events.destroy();
+        dump_records(base_class_t::events, time_point_zero_ns, fmt, target);
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
       }
     }
-    // to avoid flushing again & rewriting the file implicitly ...:
-    target_filename = nullptr;
+    base_class_t::events.destroy();
   }
 }
 

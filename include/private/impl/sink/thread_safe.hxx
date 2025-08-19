@@ -31,11 +31,11 @@ struct thread_safe : sink_base {
 
   void drain(sink_base &other) noexcept override final;
 
-protected:
-  std::mutex mtx;
-
   void lock() noexcept;
   void unlock() noexcept;
+
+protected:
+  std::mutex mtx;
 
 private:
   thread_safe(thread_safe const &) = delete;
