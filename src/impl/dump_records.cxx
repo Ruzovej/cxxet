@@ -88,7 +88,7 @@ double longlong_ns_to_double_us(long long const ns) noexcept {
   return static_cast<double>(ns) / 1'000.0;
 }
 
-void write_chrome_trace(std::ostream &out, impl::event::list const &list,
+void write_chrome_trace(output::writer &out, impl::event::list const &list,
                         long long const time_point_zero_ns) {
   out << "{\"displayTimeUnit\":\"ns\",";
   // TODO put into some "comment" value of `time_point_zero_ns`
@@ -176,7 +176,7 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
   out << '}';
 }
 
-[[deprecated]] void write_naive_v0(std::ostream &out,
+[[deprecated]] void write_naive_v0(output::writer &out,
                                    impl::event::list const &list) {
   list.apply([&out](long long const /*pid*/, long long const thread_id,
                     event::any const &evt) {
@@ -218,29 +218,14 @@ void write_chrome_trace(std::ostream &out, impl::event::list const &list,
 
 void dump_records(impl::event::list const &list,
                   long long const time_point_zero_ns, output::format const fmt,
-                  char const *const filename) {
-  std::ofstream file;
-  if (filename) {
-    if (filename == std::string_view{"/dev/stdout"}) {
-      std::cout.flush();
-      file.open(filename, std::ios::app);
-    } else {
-      file.open(filename, std::ios::out);
-    }
-  }
-  if (!file.is_open()) {
-    throw std::runtime_error("Failed to open file '" +
-                             std::string(filename ? filename : "/dev/stdout") +
-                             "'!");
-  }
-
+                  output::writer &writer) {
   switch (fmt) {
   case output::format::chrome_trace: {
-    write_chrome_trace(file, list, time_point_zero_ns);
+    write_chrome_trace(writer, list, time_point_zero_ns);
     break;
   }
   case output::format::raw_naive_v0: {
-    write_naive_v0(file, list);
+    write_naive_v0(writer, list);
     return;
   }
   default: {
@@ -248,8 +233,7 @@ void dump_records(impl::event::list const &list,
   }
   }
 
-  file.flush();
-  file.close();
+  writer.finalize_and_flush();
 }
 
 } // namespace cxxet::impl

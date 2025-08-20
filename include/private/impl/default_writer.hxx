@@ -19,14 +19,26 @@
 
 #pragma once
 
-#include "cxxet/output/format.hxx"
+#include <fstream>
+#include <string>
+
 #include "cxxet/output/writer.hxx"
-#include "impl/event/list/list.hxx"
 
 namespace cxxet::impl {
 
-void dump_records(impl::event::list const &list,
-                  long long const time_point_zero_ns, output::format const fmt,
-                  output::writer &writer);
+struct default_writer final : output::writer {
+  explicit default_writer(char const *const target_filename);
+  ~default_writer() noexcept override;
 
-}
+  void write(std::string_view const data) override;
+  void write(long long const ll) override;
+  void write(unsigned long long const ull) override;
+  void write(double const dp) override;
+
+  void finalize_and_flush() override;
+
+private:
+  std::ofstream file_stream;
+};
+
+} // namespace cxxet::impl

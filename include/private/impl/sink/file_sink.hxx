@@ -19,7 +19,11 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "cxxet/output/format.hxx"
+#include "cxxet/output/writer.hxx"
 #include "impl/sink/properties.hxx"
 #include "impl/sink/thread_safe_t.hxx"
 
@@ -36,6 +40,9 @@ template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
 
   void set_flush_target(output::format const aFmt,
                         std::string &&aFilename) noexcept;
+  void
+  set_flush_target(output::format const aFmt,
+                   std::unique_ptr<output::writer> &&aCustom_writer) noexcept;
 
 private:
   file_sink(file_sink const &) = delete;
@@ -43,11 +50,15 @@ private:
   file_sink(file_sink &&) = delete;
   file_sink &operator=(file_sink &&) = delete;
 
-  void do_flush() noexcept;
+  void do_flush() noexcept; // TODO rename to e.g. `flush`
 
   long long const time_point_zero_ns;
+  // TODO std::variant (or similar) of
+  //  1. struct { output::format (fmt); std::string (target_filaneme); }
+  //  2. std::unique_ptr<output::writer> (custom_writer)
   output::format fmt;
   std::string target_filename;
+  std::unique_ptr<output::writer> custom_writer{nullptr};
 };
 
 extern template struct file_sink<true>;

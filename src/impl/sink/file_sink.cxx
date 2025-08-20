@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+#include "impl/default_writer.hxx"
 #include "impl/dump_records.hxx"
 #include "impl/tmp_filename_handle.hxx"
 
@@ -51,6 +52,15 @@ void file_sink<thread_safe_v>::set_flush_target(
 }
 
 template <bool thread_safe_v>
+void file_sink<thread_safe_v>::set_flush_target(
+    output::format const aFmt,
+    std::unique_ptr<output::writer> &&aCustom_writer) noexcept {
+  std::lock_guard lck{*this};
+  fmt = aFmt;
+  custom_writer = std::move(aCustom_writer);
+}
+
+template <bool thread_safe_v>
 void file_sink<thread_safe_v>::do_flush() noexcept {
   if (fmt == output::format::unknown) {
     std::cerr << "Forgot to specify output format?!\n";
@@ -70,8 +80,14 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
           std::cerr << "Saving events to file: "
                     << static_cast<std::string_view>(target) << '\n';
         }
+
+        // TODO #98 branch further up to not create this temporary when not
+        // needed ...
+        default_writer def_writer{target};
+
         // is `time_point_zero_ns` needed?!
-        dump_records(base_class_t::events, time_point_zero_ns, fmt, target);
+        dump_records(base_class_t::events, time_point_zero_ns, fmt,
+                     custom_writer ? *custom_writer : def_writer);
       } catch (std::exception const &e) {
         std::cerr << "Failed to dump records: " << e.what() << '\n';
       }

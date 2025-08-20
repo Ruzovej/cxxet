@@ -27,6 +27,7 @@
 
 #include "cxxet/macros/linkage.h"
 #include "cxxet/output/format.hxx"
+#include "cxxet/output/writer.hxx"
 
 namespace cxxet {
 
@@ -42,6 +43,9 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
 
   virtual void set_flush_target(output::format const fmt,
                                 std::string filename) noexcept = 0;
+  virtual void
+  set_flush_target(output::format const fmt,
+                   std::unique_ptr<output::writer> custom_writer) noexcept = 0;
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {

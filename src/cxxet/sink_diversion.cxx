@@ -56,6 +56,12 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
     sink.set_flush_target(fmt, std::move(filename));
   }
 
+  void set_flush_target(
+      output::format const fmt,
+      std::unique_ptr<output::writer> custom_writer) noexcept override {
+    sink.set_flush_target(fmt, std::move(custom_writer));
+  }
+
 private:
   impl::sink::file_sink<thread_safe_v> sink;
 };

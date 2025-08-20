@@ -39,6 +39,12 @@ void sink_global_set_flush_target(cxxet::output::format const fmt,
   CXXET_IMPL_GLOBAL_SINK.set_flush_target(fmt, std::move(filename));
 }
 
+void sink_global_set_flush_target(
+    output::format const fmt,
+    std::unique_ptr<output::writer> custom_writer) noexcept {
+  CXXET_IMPL_GLOBAL_SINK.set_flush_target(fmt, std::move(custom_writer));
+}
+
 void sink_thread_divert_to_sink_global() noexcept {
   CXXET_IMPL_LOCAL_SINK.set_parent(&CXXET_IMPL_GLOBAL_SINK);
 }
