@@ -19,7 +19,7 @@
 
 #include "cxxet/sink_diversion.hxx"
 
-#include "cxxet/output_format.hxx"
+#include "cxxet/output/format.hxx"
 #include "impl/sink/cascade.hxx"
 #include "impl/sink/event_collector.hxx"
 #include "impl/sink/file_sink.hxx"

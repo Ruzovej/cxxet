@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "cxxet/output_format.hxx"
+#include "cxxet/output/format.hxx"
 #include "impl/sink/properties.hxx"
 #include "impl/sink/thread_safe_t.hxx"
 

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "cxxet/output_format.hxx"
+#include "cxxet/output/format.hxx"
 
 namespace cxxet::impl::sink {
 

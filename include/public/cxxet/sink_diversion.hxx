@@ -26,7 +26,7 @@
 #include <string>
 
 #include "cxxet/macros/linkage.h"
-#include "cxxet/output_format.hxx"
+#include "cxxet/output/format.hxx"
 
 namespace cxxet {
 
