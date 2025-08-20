@@ -35,7 +35,9 @@
 
 #define CXXET_mark_complete(description)                                       \
   cxxet::mark::complete CXXET_IMPL_IMPLICIT_MARKER_NAME(                       \
-      CXXET_IMPLICIT_MARKER_, __LINE__)(description)
+      CXXET_IMPLICIT_MARKER_, __LINE__) {                                      \
+    description                                                                \
+  }
 
 #define CXXET_mark_counters(...) cxxet::mark::do_submit_counters(__VA_ARGS__)
 

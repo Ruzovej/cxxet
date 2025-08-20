@@ -67,7 +67,8 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
                               ? static_cast<char const *>(implicit_file_handle)
                               : target_filename.c_str()};
         if (use_tmp_filename) {
-          std::cerr << "Saving events to file: " << target << '\n';
+          std::cerr << "Saving events to file: "
+                    << static_cast<std::string_view>(target) << '\n';
         }
         // is `time_point_zero_ns` needed?!
         dump_records(base_class_t::events, time_point_zero_ns, fmt, target);
