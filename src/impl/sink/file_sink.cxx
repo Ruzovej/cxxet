@@ -68,8 +68,11 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
   }
 
   if (!base_class_t::events.empty()) {
-    if (!target_filename.empty()) {
-      try {
+    try {
+      if (custom_writer) {
+        dump_records(base_class_t::events, time_point_zero_ns, fmt,
+                     *custom_writer);
+      } else if (!target_filename.empty()) {
         tmp_filename_handle implicit_file_handle{target_filename};
         bool const use_tmp_filename{
             tmp_filename_handle::valid_base(target_filename)};
@@ -81,16 +84,12 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
                     << static_cast<std::string_view>(target) << '\n';
         }
 
-        // TODO #98 branch further up to not create this temporary when not
-        // needed ...
-        default_writer def_writer{target};
-
         // is `time_point_zero_ns` needed?!
-        dump_records(base_class_t::events, time_point_zero_ns, fmt,
-                     custom_writer ? *custom_writer : def_writer);
-      } catch (std::exception const &e) {
-        std::cerr << "Failed to dump records: " << e.what() << '\n';
+        default_writer def_writer{target};
+        dump_records(base_class_t::events, time_point_zero_ns, fmt, def_writer);
       }
+    } catch (std::exception const &e) {
+      std::cerr << "Failed to dump records: " << e.what() << '\n';
     }
     base_class_t::events.destroy();
   }

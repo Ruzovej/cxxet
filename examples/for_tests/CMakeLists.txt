@@ -27,3 +27,8 @@ add_example(
     cxxet_test_suboptimal_init_2
         "suboptimal_init_2.cxx"
 )
+
+add_example(
+    cxxet_custom_writer
+        "custom_writer.cxx"
+)

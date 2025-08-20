@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <cassert>
-
 #include <memory>
 #include <string>
 
@@ -48,6 +46,9 @@ CXXET_IMPL_API void sink_global_set_flush_target(
     std::unique_ptr<output::writer> custom_writer =
         nullptr // nullptr -> fallback to the default one
     ) noexcept;
+
+void sink_global_set_flush_target(output::format const fmt,
+                                  std::nullptr_t) noexcept = delete;
 
 CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
 

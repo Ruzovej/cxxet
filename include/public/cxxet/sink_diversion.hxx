@@ -19,9 +19,6 @@
 
 #pragma once
 
-#include <cassert>
-#include <cstddef>
-
 #include <memory>
 #include <string>
 
@@ -43,9 +40,11 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
 
   virtual void set_flush_target(output::format const fmt,
                                 std::string filename) noexcept = 0;
-  virtual void
-  set_flush_target(output::format const fmt,
-                   std::unique_ptr<output::writer> custom_writer) noexcept = 0;
+  virtual void set_flush_target(
+      output::format const fmt,
+      std::unique_ptr<output::writer>
+          custom_writer) noexcept = 0; // TODO example and/or test for this?!
+  void set_flush_target(output::format const, std::nullptr_t) noexcept = delete;
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {

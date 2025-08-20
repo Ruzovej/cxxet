@@ -547,6 +547,33 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
 }
 
+@test "Provide custom writer to global/default file_sink" {
+    local executable="${BIN_DIR}/cxxet_custom_writer"
+
+    run "${executable}_bare"
+    assert_success
+    refute_sanitizer_output
+
+    run "${executable}"
+    assert_success
+    refute_sanitizer_output
+    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
+Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    assert_output --partial "Custom writer initialized; output:"
+    refute_output --partial "Saving events to file: "
+    assert_output --partial "custom writer finished ..."
+
+    local json_output="$(printf '%s' "${output}" | sed -n '/Custom writer initialized; output:/,/<--- custom writer finished .../p' | sed '1d;$d')" # thanks Claude, I don't understand *how* this works, but it does :-)
+    assert [ -n "${json_output}" ]
+
+    assert_equal "$(jq -e '.traceEvents | length' <<< "${json_output}")" 6
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' <<< "${json_output}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' <<< "${json_output}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' <<< "${json_output}")" 2
+    # probably not needed to check it in higher detail ...
+}
+
 @test "Properly read env. variables" {
     local executable="${BIN_DIR}/cxxet_test_reading_env"
 
