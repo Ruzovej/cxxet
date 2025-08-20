@@ -45,22 +45,18 @@ void record_some_events() {
 #ifdef CXXET_ENABLE
 
 struct custom_writer final : cxxet::output::writer {
-  custom_writer() noexcept {
-    std::cout << "Custom writer initialized; output:\n";
-  }
+  custom_writer() { std::cout << "Custom writer initialized; output:\n"; }
   ~custom_writer() noexcept override = default;
 
-  void write(std::string_view data) noexcept override { std::cout << data; }
+  void write(std::string_view data) override { std::cout << data; }
 
-  void write(long long const ll) noexcept override { std::cout << ll; }
+  void write(long long const ll) override { std::cout << ll; }
 
-  void write(unsigned long long const ull) noexcept override {
-    std::cout << ull;
-  }
+  void write(unsigned long long const ull) override { std::cout << ull; }
 
-  void write(double const dp) noexcept override { std::cout << dp; }
+  void write(double const dp) override { std::cout << dp; }
 
-  void finalize_and_flush() noexcept override {
+  void finalize_and_flush() override {
     std::cout << "\ncustom writer finished ..." << std::endl;
   }
 };
