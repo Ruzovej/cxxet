@@ -42,16 +42,6 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
 
   virtual void set_flush_target(output::format const fmt,
                                 std::string filename) noexcept = 0;
-  [[deprecated("TODO remove this ASAP (#98)")]] inline void
-  set_flush_target(output::format const fmt, std::nullptr_t) noexcept {
-    set_flush_target(fmt, std::string{});
-  }
-  [[deprecated("TODO remove this ASAP (#98)")]] inline void
-  set_flush_target(output::format const fmt,
-                   const char *const filename) noexcept {
-    assert(filename != nullptr);
-    set_flush_target(fmt, std::string{filename});
-  }
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {

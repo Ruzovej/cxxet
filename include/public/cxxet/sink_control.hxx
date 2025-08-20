@@ -41,19 +41,6 @@ CXXET_IMPL_API void sink_global_set_flush_target(
         "" // empty => no-op; to be more precise: discard everything
     ) noexcept;
 
-[[deprecated("TODO remove this ASAP (#98)")]] inline void
-sink_global_set_flush_target(output::format const fmt,
-                             std::nullptr_t) noexcept {
-  sink_global_set_flush_target(fmt, std::string{});
-}
-
-[[deprecated("TODO remove this ASAP (#98)")]] inline void
-sink_global_set_flush_target(output::format const fmt,
-                             const char *const filename) noexcept {
-  assert(filename != nullptr);
-  sink_global_set_flush_target(fmt, std::string{filename});
-}
-
 CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
 
 } // namespace cxxet
