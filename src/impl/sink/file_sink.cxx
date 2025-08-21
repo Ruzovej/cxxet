@@ -69,22 +69,21 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
 
   if (!base_class_t::events.empty()) {
     try {
+      // is `time_point_zero_ns` needed?!
       if (custom_writer) {
         dump_records(base_class_t::events, time_point_zero_ns, fmt,
                      *custom_writer);
       } else if (!target_filename.empty()) {
         tmp_filename_handle implicit_file_handle{target_filename};
-        bool const use_tmp_filename{
-            tmp_filename_handle::valid_base(target_filename)};
-        auto const target{use_tmp_filename
-                              ? static_cast<char const *>(implicit_file_handle)
-                              : target_filename.c_str()};
-        if (use_tmp_filename) {
+        char const *target{};
+        if (tmp_filename_handle::valid_base(target_filename)) {
           std::cerr << "Saving events to file: "
-                    << static_cast<std::string_view>(target) << '\n';
+                    << static_cast<std::string_view>(implicit_file_handle)
+                    << '\n';
+          target = static_cast<char const *>(implicit_file_handle);
+        } else {
+          target = target_filename.c_str();
         }
-
-        // is `time_point_zero_ns` needed?!
         default_writer def_writer{target};
         dump_records(base_class_t::events, time_point_zero_ns, fmt, def_writer);
       }
