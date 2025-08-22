@@ -19,7 +19,7 @@
 
 #include <thread>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 
 static void improper_cxxet_usage() {
   // `CXXET_sink_thread_reserve(...)` should have been called, this would have

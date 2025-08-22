@@ -20,7 +20,7 @@
 #include <chrono>
 #include <thread>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 
 int main(int argc, char const **argv) {
   [[maybe_unused]] char const *const filename{argc > 1 ? argv[1]

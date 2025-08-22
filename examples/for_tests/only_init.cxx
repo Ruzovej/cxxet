@@ -19,7 +19,7 @@
 
 #include <thread>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 
 static void thread_local_sink_lifecycle() {
   CXXET_sink_thread_reserve(1);

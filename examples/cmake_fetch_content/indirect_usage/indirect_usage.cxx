@@ -19,7 +19,7 @@
 
 #include <thread>
 
-#include <cxxet/all.hxx>
+#include <cxxet/basic.hxx>
 
 #include "shared_lib_foo.hxx"
 

@@ -17,7 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   CXXET_sink_global_set_flush_target(cxxet::output::format::chrome_trace,

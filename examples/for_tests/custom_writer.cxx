@@ -21,7 +21,7 @@
 #include <memory>
 #include <thread>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 #ifdef CXXET_ENABLE
 #include "cxxet/output/writer.hxx"
 #endif

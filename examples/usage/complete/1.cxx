@@ -20,7 +20,7 @@
 #include <chrono>
 #include <thread>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 
 static void pyramid(int const level) {
   CXXET_mark_complete(__FUNCTION__);

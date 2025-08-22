@@ -17,7 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 #ifdef CXXET_ENABLE
 #include "cxxet/sink_diversion.hxx"
 #endif

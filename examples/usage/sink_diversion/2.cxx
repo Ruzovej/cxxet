@@ -20,7 +20,7 @@
 #include <chrono>
 #include <thread>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 #ifdef CXXET_ENABLE
 #include "cxxet/sink_diversion.hxx"
 #endif
