@@ -46,10 +46,10 @@ private:
   file_sink(file_sink &&) = delete;
   file_sink &operator=(file_sink &&) = delete;
 
-  void
-  do_flush() noexcept; // TODO (https://github.com/Ruzovej/cxxet/issues/132)
-                       // rename to e.g. `flush`
+  void write_out_events() noexcept;
 
+  // TODO (https://github.com/Ruzovej/cxxet/issues/133) is `time_point_zero_ns`
+  // needed?!
   long long const time_point_zero_ns;
   // TODO (https://github.com/Ruzovej/cxxet/issues/132) std::variant (or
   // similar) of

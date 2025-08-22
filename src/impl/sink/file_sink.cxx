@@ -22,8 +22,8 @@
 #include <iostream>
 
 #include "impl/default_writer.hxx"
-#include "impl/dump_records.hxx"
 #include "impl/tmp_filename_handle.hxx"
+#include "impl/write_out/in_trace_event_format.hxx"
 
 namespace cxxet::impl::sink {
 
@@ -38,7 +38,7 @@ file_sink<thread_safe_v>::file_sink(properties const &traits) noexcept
     : file_sink{traits.time_point_zero_ns, traits.default_target_filename} {}
 
 template <bool thread_safe_v> file_sink<thread_safe_v>::~file_sink() noexcept {
-  do_flush();
+  write_out_events();
 }
 
 template <bool thread_safe_v>
@@ -56,18 +56,17 @@ void file_sink<thread_safe_v>::set_flush_target(
 }
 
 template <bool thread_safe_v>
-void file_sink<thread_safe_v>::do_flush() noexcept {
+void file_sink<thread_safe_v>::write_out_events() noexcept {
   if (!base_class_t::events.empty()) {
     try {
-      // TODO (https://github.com/Ruzovej/cxxet/issues/133) is
-      // `time_point_zero_ns` needed?!
       if (custom_writer) {
-        dump_records(base_class_t::events, time_point_zero_ns, *custom_writer);
+        write_out::in_trace_event_format(*custom_writer, time_point_zero_ns,
+                                         base_class_t::events);
       } else if (!target_filename.empty()) {
         tmp_filename_handle implicit_file_handle{target_filename};
         char const *target{};
         if (tmp_filename_handle::valid_base(target_filename)) {
-          std::cerr << "Saving events to file: "
+          std::cerr << "Writing out events to file: "
                     << static_cast<std::string_view>(implicit_file_handle)
                     << '\n';
           target = static_cast<char const *>(implicit_file_handle);
@@ -75,10 +74,11 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
           target = target_filename.c_str();
         }
         default_writer def_writer{target};
-        dump_records(base_class_t::events, time_point_zero_ns, def_writer);
+        write_out::in_trace_event_format(def_writer, time_point_zero_ns,
+                                         base_class_t::events);
       }
     } catch (std::exception const &e) {
-      std::cerr << "Failed to dump records: " << e.what() << '\n';
+      std::cerr << "Failed to write out events: " << e.what() << '\n';
     }
     base_class_t::events.destroy();
   }

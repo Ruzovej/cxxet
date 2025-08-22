@@ -22,9 +22,12 @@
 #include "cxxet/output/writer.hxx"
 #include "impl/event/list/list.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::write_out {
 
-void dump_records(impl::event::list const &list,
-                  long long const time_point_zero_ns, output::writer &writer);
+// Trace Event Format:
+// https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
+void in_trace_event_format(output::writer &out,
+                           long long const time_point_zero_ns,
+                           event::list const &list);
 
-}
+} // namespace cxxet::impl::write_out

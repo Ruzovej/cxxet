@@ -17,7 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/dump_records.hxx"
+#include "impl/write_out/in_trace_event_format.hxx"
 
 #include <cassert>
 #include <cstring>
@@ -35,7 +35,7 @@
 
 #include "impl/event/any.hxx"
 
-namespace cxxet::impl {
+namespace cxxet::impl::write_out {
 
 namespace {
 
@@ -43,7 +43,7 @@ std::string escape_json_string(const char *str) {
   if (!str)
     return "null";
 
-  std::stringstream result;
+  std::ostringstream result;
   result << "\"";
 
   for (const char *c = str; *c; ++c) {
@@ -88,11 +88,16 @@ double longlong_ns_to_double_us(long long const ns) noexcept {
   return static_cast<double>(ns) / 1'000.0;
 }
 
-// TODO #86 rename ...
-void write_chrome_trace(output::writer &out, impl::event::list const &list,
-                        long long const time_point_zero_ns) {
+} // namespace
+
+void in_trace_event_format(output::writer &out,
+                           long long const time_point_zero_ns,
+                           event::list const &list) {
+  out.prepare_for_writing();
+
   out << "{\"displayTimeUnit\":\"ns\",";
-  // TODO put into some "comment" value of `time_point_zero_ns`
+  // TODO (#86, or create sep. issue for that) put into some "comment" value of
+  // `time_point_zero_ns`
   out << "\"traceEvents\":[";
 
   bool first_record{true};
@@ -105,12 +110,10 @@ void write_chrome_trace(output::writer &out, impl::event::list const &list,
       first_record = false;
     }
 
-    // Chrome trace format:
-    // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
     out << '{';
     out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
     out << "\"ph\":\"" << evt.get_ph() << "\",";
-    // TODO - start using this:
+    // TODO (#86, or create sep. issue for that) - start using this:
     // out << "\"cat\":" << escape_json_string(???) << ",";
 
     switch (evt.get_type()) {
@@ -175,18 +178,8 @@ void write_chrome_trace(output::writer &out, impl::event::list const &list,
 
   out << ']'; // traceEvents
   out << '}';
+
+  out.finalize_and_flush();
 }
 
-} // namespace
-
-// TODO #86 unroll, or refactor it in general ...
-void dump_records(impl::event::list const &list,
-                  long long const time_point_zero_ns, output::writer &writer) {
-  writer.prepare_for_writing();
-
-  write_chrome_trace(writer, list, time_point_zero_ns);
-
-  writer.finalize_and_flush();
-}
-
-} // namespace cxxet::impl
+} // namespace cxxet::impl::write_out
