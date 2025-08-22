@@ -19,19 +19,11 @@
 
 #include "impl/write_out/in_trace_event_format.hxx"
 
-#include <cassert>
-#include <cstring>
-
-#include <algorithm>
-#include <fstream>
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <type_traits>
-#include <utility>
 
 #include "impl/event/any.hxx"
 
@@ -95,89 +87,76 @@ void in_trace_event_format(output::writer &out,
                            event::list const &list) {
   out.prepare_for_writing();
 
-  out << "{\"displayTimeUnit\":\"ns\",";
-  // TODO (#86, or create sep. issue for that) put into some "comment" value of
-  // `time_point_zero_ns`
-  out << "\"traceEvents\":[";
+  {
+    out << "{\"displayTimeUnit\":\"ns\",";
+    // TODO (#86, or create sep. issue for that) put into some "comment" value
+    // of `time_point_zero_ns`
+    out << "\"traceEvents\":[";
 
-  bool first_record{true};
-  list.apply([time_point_zero_ns, &first_record,
-              &out](long long const pid, long long const thread_id,
-                    event::any const &evt) {
-    if (!first_record) {
-      out << ',';
-    } else {
-      first_record = false;
-    }
+    bool first_record{true};
+    list.apply([time_point_zero_ns, &first_record,
+                &out](long long const pid, long long const thread_id,
+                      event::any const &evt) {
+      if (!first_record) {
+        out << ',';
+      } else {
+        first_record = false;
+      }
 
-    out << '{';
-    out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
-    out << "\"ph\":\"" << evt.get_ph() << "\",";
-    // TODO (#86, or create sep. issue for that) - start using this:
-    // out << "\"cat\":" << escape_json_string(???) << ",";
+      out << '{';
+      out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
+      out << "\"ph\":\"" << evt.get_ph() << "\",";
+      // TODO (#86, or create sep. issue for that) - start using "category",
+      // e.g.: out << "\"cat\":" << escape_json_string(???) << ",";
 
-    switch (evt.get_type()) {
-    case event::type_t::duration_begin: {
-      auto const &e{evt.evt.dur_begin};
+      auto const write_out_timestamp = [&out](long long const ns) {
+        out << "\"ts\":" << longlong_ns_to_double_us(ns) << ',';
+      };
 
-      auto const timestamp{
-          longlong_ns_to_double_us(e.start_ns - time_point_zero_ns)};
-      out << "\"ts\":" << timestamp << ',';
-      break;
-    }
-    case event::type_t::duration_end: {
-      auto const &e{evt.evt.dur_end};
+      switch (evt.get_type()) {
+      case event::type_t::duration_begin: {
+        auto const &e{evt.evt.dur_begin};
+        write_out_timestamp(e.start_ns - time_point_zero_ns);
+        break;
+      }
+      case event::type_t::duration_end: {
+        auto const &e{evt.evt.dur_end};
+        write_out_timestamp(e.end_ns - time_point_zero_ns);
+        break;
+      }
+      case event::type_t::complete: {
+        auto const &e{evt.evt.cmpl};
+        write_out_timestamp(e.start_ns - time_point_zero_ns);
+        out << "\"dur\":" << longlong_ns_to_double_us(e.duration_ns) << ',';
+        break;
+      }
+      case event::type_t::instant: {
+        auto const &e{evt.evt.inst};
+        write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
+        out << "\"s\":\""
+            << static_cast<std::underlying_type_t<scope_t>>(e.scope) << "\",";
+        break;
+      }
+      case event::type_t::counter: {
+        auto const &e{evt.evt.cntr};
+        write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
+        out << "\"args\":{" << escape_json_string(e.get_quantity_name()) << ":"
+            << e.value << "},";
+        break;
+      }
+      default: {
+        throw std::runtime_error("Unknown event type");
+      }
+      }
 
-      auto const timestamp{
-          longlong_ns_to_double_us(e.end_ns - time_point_zero_ns)};
-      out << "\"ts\":" << timestamp << ',';
-      break;
-    }
-    case event::type_t::complete: {
-      auto const &e{evt.evt.cmpl};
+      out << "\"pid\":" << pid << ',';
+      out << "\"tid\":" << thread_id;
+      out << '}';
+    });
 
-      auto const start{
-          longlong_ns_to_double_us(e.start_ns - time_point_zero_ns)};
-      out << "\"ts\":" << start << ',';
-
-      auto const duration{longlong_ns_to_double_us(e.duration_ns)};
-      out << "\"dur\":" << duration << ',';
-      break;
-    }
-    case event::type_t::instant: {
-      auto const &e{evt.evt.inst};
-
-      auto const timestamp{
-          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero_ns)};
-      out << "\"ts\":" << timestamp << ',';
-
-      auto const scope{static_cast<std::underlying_type_t<scope_t>>(e.scope)};
-      out << "\"s\":\"" << scope << "\",";
-      break;
-    }
-    case event::type_t::counter: {
-      auto const &e{evt.evt.cntr};
-
-      auto const timestamp{
-          longlong_ns_to_double_us(e.timestamp_ns - time_point_zero_ns)};
-      out << "\"ts\":" << timestamp << ',';
-
-      out << "\"args\":{" << escape_json_string(e.get_quantity_name()) << ":"
-          << e.value << "},";
-      break;
-    }
-    default: {
-      throw std::runtime_error("Unknown event type");
-    }
-    }
-
-    out << "\"pid\":" << pid << ',';
-    out << "\"tid\":" << thread_id;
+    out << ']'; // traceEvents
     out << '}';
-  });
-
-  out << ']'; // traceEvents
-  out << '}';
+  }
 
   out.finalize_and_flush();
 }
