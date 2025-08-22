@@ -1,0 +1,53 @@
+/*
+  Copyright 2025 Lukáš Růžička
+
+  This file is part of cxxet.
+
+  cxxet is free software: you can redistribute it and/or modify it under the
+  terms of the GNU Lesser General Public License as published by the Free
+  Software Foundation, either version 3 of the License, or (at your option) any
+  later version.
+
+  cxxet is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+  details.
+
+  You should have received a copy of the GNU Lesser General Public License along
+  with cxxet. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "cxxet/mark/metadata.hxx"
+
+#include "impl/event/kind/metadata.hxx"
+#include "impl/event/metadata_type.hxx"
+#include "impl/thread_local_sink_submit_event.hxx"
+
+namespace cxxet::mark {
+
+void set_process_name(char const *const proc_name) noexcept {
+  impl::thread_local_sink_submit_event(impl::event::metadata{
+      proc_name, impl::event::metadata_type::process_name});
+}
+
+void set_process_label(char const *const proc_label) noexcept {
+  impl::thread_local_sink_submit_event(impl::event::metadata{
+      proc_label, impl::event::metadata_type::process_labels});
+}
+
+void set_process_sort_index(int const proc_sort_index) noexcept {
+  impl::thread_local_sink_submit_event(impl::event::metadata{
+      proc_sort_index, impl::event::metadata_type::process_sort_index});
+}
+
+void set_thread_name(char const *const thread_name) noexcept {
+  impl::thread_local_sink_submit_event(impl::event::metadata{
+      thread_name, impl::event::metadata_type::thread_name});
+}
+
+void set_thread_sort_index(int const thread_sort_index) noexcept {
+  impl::thread_local_sink_submit_event(impl::event::metadata{
+      thread_sort_index, impl::event::metadata_type::thread_sort_index});
+}
+
+} // namespace cxxet::mark

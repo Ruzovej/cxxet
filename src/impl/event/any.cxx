@@ -56,16 +56,17 @@ static_assert(std::is_trivially_destructible_v<duration_end>);
 static_assert(std::is_trivially_destructible_v<complete>);
 static_assert(std::is_trivially_destructible_v<instant>);
 static_assert(std::is_trivially_destructible_v<counter>);
+static_assert(std::is_trivially_destructible_v<metadata>);
 
 static_assert(std::is_trivially_destructible_v<any>);
 
 static constexpr std::size_t max_size{
     std::max({sizeof(duration_begin), sizeof(duration_end), sizeof(complete),
-              sizeof(instant), sizeof(counter)})};
+              sizeof(instant), sizeof(counter), sizeof(metadata)})};
 
 static constexpr std::size_t min_size{
     std::min({sizeof(duration_begin), sizeof(duration_end), sizeof(complete),
-              sizeof(instant), sizeof(counter)})};
+              sizeof(instant), sizeof(counter), sizeof(metadata)})};
 
 static_assert(min_size < max_size); // TODO add explicit padding to every event
 // and change this to equality

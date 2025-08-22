@@ -32,6 +32,7 @@ enum class type_t : char {
   complete = 'X',
   instant = 'i',
   counter = 'C',
+  metadata = 'M',
   // TODO implement or at least consider:
   // (https://github.com/Ruzovej/cxxet/issues/140) async: 'b' nestable begin,
   // 'n' nestable instant, 'e' nestable end
