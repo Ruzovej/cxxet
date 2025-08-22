@@ -19,6 +19,8 @@
 
 #include "cxxet/sink_control.hxx"
 
+#include <cassert>
+
 #include "impl/sink/event_collector.hxx"
 #include "impl/sink/file_sink.hxx"
 
@@ -40,6 +42,7 @@ void sink_global_set_flush_target(std::string filename) noexcept {
 
 void sink_global_set_flush_target(
     std::unique_ptr<output::writer> custom_writer) noexcept {
+  assert(custom_writer != nullptr);
   CXXET_IMPL_GLOBAL_SINK.set_flush_target(std::move(custom_writer));
 }
 
