@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "impl/event/list/list.hxx"
+#include "impl/event/list.hxx"
 
 namespace cxxet::impl::sink {
 

@@ -17,7 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "impl/event/list/list.hxx"
+#include "impl/event/list.hxx"
 
 #include <unistd.h>
 
