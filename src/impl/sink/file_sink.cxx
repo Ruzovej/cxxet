@@ -69,7 +69,7 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
 
   if (!base_class_t::events.empty()) {
     try {
-      // is `time_point_zero_ns` needed?!
+      // TODO (https://github.com/Ruzovej/cxxet/issues/133) is `time_point_zero_ns` needed?!
       if (custom_writer) {
         dump_records(base_class_t::events, time_point_zero_ns, fmt,
                      *custom_writer);
