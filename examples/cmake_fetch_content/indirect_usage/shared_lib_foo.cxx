@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <thread>
 
-#include <cxxet/all.hxx>
+#include <cxxet/basic.hxx>
 
 namespace {
 void pyramid(unsigned const level) {

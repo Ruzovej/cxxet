@@ -28,7 +28,7 @@
 #include <thread>
 #include <vector>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 #ifdef CXXET_ENABLE
 #include "cxxet/output/writer.hxx"
 #include "cxxet/sink_diversion.hxx"

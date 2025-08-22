@@ -19,7 +19,7 @@
 
 #include <cmath>
 
-#include "cxxet/all.hxx"
+#include "cxxet/basic.hxx"
 
 namespace {
 
