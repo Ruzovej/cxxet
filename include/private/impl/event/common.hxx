@@ -33,8 +33,8 @@ enum class type_t : char {
   instant = 'i',
   counter = 'C',
   // TODO implement or at least consider:
-  // async: 'b' nestable begin, 'n' nestable instant, 'e' nestable end
-  // flow: 's' start, 't' step, 'f' end
+  // (https://github.com/Ruzovej/cxxet/issues/140) async: 'b' nestable begin, 'n' nestable instant, 'e' nestable end
+  // (https://github.com/Ruzovej/cxxet/issues/141) flow: 's' start, 't' step, 'f' end
   unknown = '\0',
 };
 
@@ -47,7 +47,7 @@ template <type_t bound_type = type_t::unknown> struct common {
   int flag_4;                    // explicit padding - unspecified meaning
   const char *desc;              // "name"
   // optional (or not?!) fields:
-  // * "cat" -> TODO have it here or not?!
+  // * "cat" -> TODO (https://github.com/Ruzovej/cxxet/issues/139) have it here or not?!
   // other mandatory fields:
   // * "pid", "tid" -> provided by the sink, etc.
   // * "ts", "args", ... -> provided by the specific event type
