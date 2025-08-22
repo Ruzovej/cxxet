@@ -28,8 +28,7 @@ static void improper_cxxet_usage() {
 }
 
 int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
-  CXXET_sink_global_set_flush_target(cxxet::output::format::chrome_trace,
-                                     argc > 1 ? argv[1] : "/dev/stdout");
+  CXXET_sink_global_set_flush_target(argc > 1 ? argv[1] : "/dev/stdout");
 
   std::thread t{improper_cxxet_usage};
 

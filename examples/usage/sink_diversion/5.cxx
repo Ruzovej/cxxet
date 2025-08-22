@@ -102,8 +102,7 @@ private:
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {
 #ifdef CXXET_ENABLE
   auto file_sink_local{cxxet::file_sink_handle::make(false)};
-  file_sink_local->set_flush_target(cxxet::output::format::chrome_trace,
-                                    std::make_unique<custom_writer>(0));
+  file_sink_local->set_flush_target(std::make_unique<custom_writer>(0));
   file_sink_local->divert_thread_sink_to_this();
 #endif
 
@@ -117,8 +116,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {
       log("inside thread no. " + std::to_string(i));
 #ifdef CXXET_ENABLE
       auto file_sink_local{cxxet::file_sink_handle::make(false)};
-      file_sink_local->set_flush_target(cxxet::output::format::chrome_trace,
-                                        std::make_unique<custom_writer>(i));
+      file_sink_local->set_flush_target(std::make_unique<custom_writer>(i));
       file_sink_local->divert_thread_sink_to_this();
 #endif
       test_block();

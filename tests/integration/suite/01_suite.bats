@@ -89,8 +89,7 @@ function teardown_file() {
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -119,8 +118,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -149,8 +147,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -179,8 +176,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -213,8 +209,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -249,8 +244,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -284,8 +278,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result1}" "${result2}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -322,8 +315,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result1}" "${result2}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -360,8 +352,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result1}" "${result2}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -397,8 +388,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -428,7 +418,7 @@ Deduced CXXET_TARGET_FILENAME: "
     run "${executable}"
     assert_success
     refute_sanitizer_output
-    refute_output --partial "Saving events to file: "
+    refute_output --partial "Writing out events to file: "
 
     assert_equal "$(grep -c ": Custom writer initialized; output:" <<< "${output}")" 4
     assert_equal "$(grep -c "custom writer finished ... index " <<< "${output}")" 4
@@ -465,8 +455,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     run "${executable}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -497,8 +486,7 @@ Deduced CXXET_TARGET_FILENAME: "
     run strace "${executable}"
     assert_success
     refute_sanitizer_output
-    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     assert_output --partial "write(1, "
     refute_output --regexp "write\([^1]" # `stdout` ... see the asserts above which requires exactly that
@@ -508,8 +496,7 @@ Deduced CXXET_TARGET_FILENAME: "
     run strace "${executable}"
     assert_success
     refute_sanitizer_output
-    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: ${output_file}"
     assert_output --partial "write(1, "
     refute_output --regexp "write\([^1]" # ditto
@@ -529,8 +516,7 @@ Deduced CXXET_TARGET_FILENAME: ${output_file}"
     run "${executable}"
     assert_success
     refute_sanitizer_output
-    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: /tmp/cxxet_default.pid{pid}.json.XXXXXX"
 
     local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.pid{pid}.json.XXXXXX"
@@ -538,8 +524,7 @@ Deduced CXXET_TARGET_FILENAME: /tmp/cxxet_default.pid{pid}.json.XXXXXX"
     run "${executable}"
     assert_success
     refute_sanitizer_output
-    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: ${output_file}"
     refute [ -f "${output_file}" ]
 }
@@ -561,8 +546,7 @@ Deduced CXXET_TARGET_FILENAME: ${output_file}"
 
     run "${executable}" "${result1}" "${result2}" "${result3}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     refute_sanitizer_output
 
@@ -589,11 +573,10 @@ Deduced CXXET_TARGET_FILENAME: "
     run "${executable}"
     assert_success
     refute_sanitizer_output
-    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     assert_output --partial "Custom writer initialized; output:"
-    refute_output --partial "Saving events to file: "
+    refute_output --partial "Writing out events to file: "
     assert_output --partial "custom writer finished ..."
 
     local json_output="$(printf '%s' "${output}" | sed -n '/Custom writer initialized; output:/,/<--- custom writer finished .../p' | sed '1d;$d')" # thanks Claude, I don't understand *how* this works, but it does :-)
@@ -623,8 +606,7 @@ Deduced CXXET_TARGET_FILENAME: "
     export CXXET_DEFAULT_BLOCK_SIZE=1
     run "${executable}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 1
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 1
 Deduced CXXET_TARGET_FILENAME: ${result2}"
     refute_sanitizer_output
 
@@ -654,13 +636,12 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     export CXXET_TARGET_FILENAME="${result4}"
     run "${executable}"
     assert_success
-    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
+    assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
 Deduced CXXET_TARGET_FILENAME: ${result4}"
-    assert_output --partial "Saving events to file: ${result4%\{pid\}.json.XXXXXX}"
+    assert_output --partial "Writing out events to file: ${result4%\{pid\}.json.XXXXXX}"
     refute_sanitizer_output
 
-    result4="$(printf '%s' "${output}" | grep -oP '(?<=Saving events to file: ).*')"
+    result4="$(printf '%s' "${output}" | grep -oP '(?<=Writing out events to file: ).*')"
     assert [ -f "${result4}" ]
     assert_equal "$(jq -e '.traceEvents | length' "${result4}")" 3
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result4}")" 1
@@ -671,13 +652,12 @@ Deduced CXXET_TARGET_FILENAME: ${result4}"
     local result5='/tmp/cxxet_default.pid{pid}.json.XXXXXX'
     run "${executable}"
     assert_success
-    assert_output --partial "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
+    assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 40
 Deduced CXXET_TARGET_FILENAME: ${result5}"
-    assert_output --partial "Saving events to file: ${result5%\{pid\}.json.XXXXXX}"
+    assert_output --partial "Writing out events to file: ${result5%\{pid\}.json.XXXXXX}"
     refute_sanitizer_output
 
-    result5="$(printf '%s' "${output}" | grep -oP '(?<=Saving events to file: ).*')"
+    result5="$(printf '%s' "${output}" | grep -oP '(?<=Writing out events to file: ).*')"
     assert [ -f "${result5}" ]
     assert_equal "$(jq -e '.traceEvents | length' "${result5}")" 3
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result5}")" 1
@@ -691,8 +671,7 @@ Deduced CXXET_TARGET_FILENAME: ${result5}"
     run "${executable}" 
     refute_sanitizer_output
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
 }
 

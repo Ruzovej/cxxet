@@ -28,7 +28,6 @@
 #include "cxxet/mark/duration_begin.hxx"
 #include "cxxet/mark/duration_end.hxx"
 #include "cxxet/mark/instant.hxx"
-#include "cxxet/output/format.hxx"
 #include "cxxet/scope.hxx"
 #include "cxxet/sink_control.hxx"
 #include "cxxet/timepoint.hxx"

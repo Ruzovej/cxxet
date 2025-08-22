@@ -19,14 +19,11 @@
 
 #pragma once
 
-#include "cxxet/output/format.hxx"
-
 namespace cxxet::impl::sink {
 
 struct properties {
   long long const time_point_zero_ns;
   bool verbose;
-  output::format default_target_format;
   int default_list_node_capacity;
   char const *default_target_filename;
 

@@ -74,8 +74,7 @@ int main(int const, char const **) {
 
   record_some_events();
 
-  CXXET_sink_global_set_flush_target(cxxet::output::format::chrome_trace,
-                                     std::make_unique<custom_writer>());
+  CXXET_sink_global_set_flush_target(std::make_unique<custom_writer>());
 
   t.join();
 

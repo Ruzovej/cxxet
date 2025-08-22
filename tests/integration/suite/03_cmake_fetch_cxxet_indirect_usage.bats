@@ -148,8 +148,7 @@ function teardown_file() {
 
     run "${CXXET_EXAMPLE_EXECUTABLE}" "${result}"
     assert_success
-    assert_output "Deduced CXXET_OUTPUT_FORMAT: 0
-Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
     assert [ -f "${result}" ]
 
