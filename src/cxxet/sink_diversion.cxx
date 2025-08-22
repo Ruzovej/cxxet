@@ -19,6 +19,8 @@
 
 #include "cxxet/sink_diversion.hxx"
 
+#include <cassert>
+
 #include "cxxet/output/format.hxx"
 #include "impl/sink/cascade.hxx"
 #include "impl/sink/event_collector.hxx"
@@ -59,6 +61,7 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
   void set_flush_target(
       output::format const fmt,
       std::unique_ptr<output::writer> custom_writer) noexcept override {
+    assert(custom_writer);
     sink.set_flush_target(fmt, std::move(custom_writer));
   }
 
