@@ -21,11 +21,8 @@
 
 #include <string_view>
 
-// #include "cxxet/macros/linkage.h" // TODO #98 is this needed?!
-
 namespace cxxet::output {
 
-// struct CXXET_IMPL_API writer {
 struct writer {
   writer() = default;
   virtual ~writer() noexcept = default;
