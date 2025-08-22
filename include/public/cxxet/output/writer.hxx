@@ -55,9 +55,7 @@ inline writer &writer::operator<< <const char *>(char const *const &value) {
 }
 
 template <> inline writer &writer::operator<< <char>(char const &value) {
-  if (value != '\0') {
-    write(std::string_view{&value, 1});
-  }
+  write(std::string_view{&value, 1});
   return *this;
 }
 
