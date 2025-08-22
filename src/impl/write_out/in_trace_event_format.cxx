@@ -31,16 +31,16 @@ namespace cxxet::impl::write_out {
 
 namespace {
 
-std::string escape_json_string(const char *str) {
+std::string escape_json_string(char const *const str) {
   if (!str)
     return "null";
 
   std::ostringstream result;
-  result << "\"";
+  result << '"';
 
   for (const char *c = str; *c; ++c) {
     switch (*c) {
-    case '\"':
+    case '"':
       result << "\\\"";
       break;
     case '\\':
@@ -63,7 +63,7 @@ std::string escape_json_string(const char *str) {
       break;
     default:
       // Handle control characters
-      if (*c >= 0 && *c < 32) {
+      if ((0 <= *c) && (*c < 32)) {
         result << "\\u" << std::hex << std::setw(4) << std::setfill('0')
                << static_cast<int>(*c);
       } else {
@@ -72,7 +72,7 @@ std::string escape_json_string(const char *str) {
     }
   }
 
-  result << "\"";
+  result << '"';
   return result.str();
 }
 
