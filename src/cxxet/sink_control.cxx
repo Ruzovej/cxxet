@@ -34,15 +34,13 @@ void sink_thread_reserve(int const minimum_free_capacity) noexcept {
 
 void sink_thread_flush_now() noexcept { CXXET_IMPL_LOCAL_SINK.flush(); }
 
-void sink_global_set_flush_target(cxxet::output::format const fmt,
-                                  std::string filename) noexcept {
-  CXXET_IMPL_GLOBAL_SINK.set_flush_target(fmt, std::move(filename));
+void sink_global_set_flush_target(std::string filename) noexcept {
+  CXXET_IMPL_GLOBAL_SINK.set_flush_target(std::move(filename));
 }
 
 void sink_global_set_flush_target(
-    output::format const fmt,
     std::unique_ptr<output::writer> custom_writer) noexcept {
-  CXXET_IMPL_GLOBAL_SINK.set_flush_target(fmt, std::move(custom_writer));
+  CXXET_IMPL_GLOBAL_SINK.set_flush_target(std::move(custom_writer));
 }
 
 void sink_thread_divert_to_sink_global() noexcept {

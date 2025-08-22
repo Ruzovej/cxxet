@@ -41,8 +41,7 @@ namespace shared_lib_foo {
 void init() noexcept { CXXET_sink_thread_reserve(); }
 
 void flush([[maybe_unused]] char const *const filename) noexcept {
-  CXXET_sink_global_set_flush_target(cxxet::output::format::chrome_trace,
-                                     filename);
+  CXXET_sink_global_set_flush_target(filename);
 }
 
 void perform_work(unsigned const i) noexcept { pyramid(i); }

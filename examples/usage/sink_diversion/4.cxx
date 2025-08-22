@@ -43,8 +43,7 @@ int main(int argc, char const **argv) {
 
 #ifdef CXXET_ENABLE
   auto file_sink_local{cxxet::file_sink_handle::make(true)};
-  file_sink_local->set_flush_target(cxxet::output::format::chrome_trace,
-                                    filename1);
+  file_sink_local->set_flush_target(filename1);
 #endif
 
   std::thread t1{[&]() {

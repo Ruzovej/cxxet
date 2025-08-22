@@ -83,16 +83,6 @@ bool parse_bool(std::string_view const str_value) {
   }
 }
 
-output::format parse_output_format(std::string_view const str) {
-  if (str == "chrome_trace" || str == "0") {
-    return output::format::chrome_trace;
-  } else if (str == "raw_naive" || str == "1") {
-    return output::format::raw_naive_v0;
-  } else {
-    throw std::runtime_error{"Unknown output format"};
-  }
-}
-
 int parse_int(char const *const str_value) {
   char *endptr{nullptr};
   auto const ret{static_cast<int>(std::strtol(str_value, &endptr, 10))};
@@ -116,9 +106,6 @@ properties const &properties::instance() noexcept {
 properties::properties() noexcept
     : time_point_zero_ns{static_time_point_zero_ns},
       verbose{parse_env_variable("CXXET_VERBOSE", parse_bool, false, false)},
-      default_target_format{
-          parse_env_variable("CXXET_OUTPUT_FORMAT", parse_output_format,
-                             output::format::chrome_trace, verbose)},
       default_list_node_capacity{parse_env_variable("CXXET_DEFAULT_BLOCK_SIZE",
                                                     parse_int, 64, verbose)},
       default_target_filename{parse_env_variable(
@@ -170,23 +157,6 @@ TEST_CASE("env. var. parsing for sink::properties") {
                         std::runtime_error);
     }
 
-    SUBCASE("output format") {
-      REQUIRE_EQ(parse_output_format("chrome_trace"),
-                 output::format::chrome_trace);
-      REQUIRE_EQ(parse_output_format("0"), output::format::chrome_trace);
-
-      REQUIRE_EQ(parse_output_format("raw_naive"),
-                 output::format::raw_naive_v0);
-      REQUIRE_EQ(parse_output_format("1"), output::format::raw_naive_v0);
-
-      REQUIRE_THROWS_AS(parse_output_format(""), std::runtime_error);
-      REQUIRE_THROWS_AS(parse_output_format("unknown"), std::runtime_error);
-      REQUIRE_THROWS_AS(parse_output_format("Chrome_trace"),
-                        std::runtime_error);
-      REQUIRE_THROWS_AS(parse_output_format("-1"), std::runtime_error);
-      REQUIRE_THROWS_AS(parse_output_format("2"), std::runtime_error);
-    }
-
     // how to properly test "identities"?!
     SUBCASE("int") {
       REQUIRE_EQ(parse_int("0"), 0);
@@ -224,9 +194,6 @@ TEST_CASE("env. var. parsing for sink::properties") {
       REQUIRE_EQ(parse(parse_bool, false), false);
       REQUIRE_EQ(parse(parse_bool, true), true);
 
-      REQUIRE_EQ(parse(parse_output_format, output::format::chrome_trace),
-                 output::format::chrome_trace);
-
       REQUIRE_EQ(parse(parse_int, 42), 42);
       REQUIRE_EQ(parse(parse_int, 0), 0);
 
@@ -241,9 +208,6 @@ TEST_CASE("env. var. parsing for sink::properties") {
       REQUIRE_EQ(parse(parse_bool, false), false);
       REQUIRE_EQ(parse(parse_bool, true), true);
 
-      REQUIRE_EQ(parse(parse_output_format, output::format::chrome_trace),
-                 output::format::chrome_trace);
-
       REQUIRE_EQ(parse(parse_int, 42), 42);
       REQUIRE_EQ(parse(parse_int, 0), 0);
 
@@ -257,27 +221,9 @@ TEST_CASE("env. var. parsing for sink::properties") {
       REQUIRE_EQ(parse(parse_bool, false), true);
       REQUIRE_EQ(parse(parse_bool, true), true);
 
-      REQUIRE_EQ(parse(parse_output_format, output::format::chrome_trace),
-                 output::format::chrome_trace);
-
       REQUIRE_EQ(parse(parse_int, 42), 42);
 
       REQUIRE_EQ(std::string_view{parse(parse_string, "default")}, "true");
-    }
-
-    SUBCASE("output format (chrome_trace)") {
-      REQUIRE_EQ(setenv(test_env_var_name, "chrome_trace", 1), 0);
-
-      REQUIRE_EQ(parse(parse_bool, false), false);
-      REQUIRE_EQ(parse(parse_bool, true), true);
-
-      REQUIRE_EQ(parse(parse_output_format, output::format::raw_naive_v0),
-                 output::format::chrome_trace);
-
-      REQUIRE_EQ(parse(parse_int, 42), 42);
-
-      REQUIRE_EQ(std::string_view{parse(parse_string, "default")},
-                 "chrome_trace");
     }
 
     SUBCASE("int (123)") {
@@ -285,9 +231,6 @@ TEST_CASE("env. var. parsing for sink::properties") {
 
       REQUIRE_EQ(parse(parse_bool, false), false);
       REQUIRE_EQ(parse(parse_bool, true), true);
-
-      REQUIRE_EQ(parse(parse_output_format, output::format::chrome_trace),
-                 output::format::chrome_trace);
 
       REQUIRE_EQ(parse(parse_int, 42), 123);
 
@@ -299,9 +242,6 @@ TEST_CASE("env. var. parsing for sink::properties") {
 
       REQUIRE_EQ(parse(parse_bool, false), false);
       REQUIRE_EQ(parse(parse_bool, true), true);
-
-      REQUIRE_EQ(parse(parse_output_format, output::format::chrome_trace),
-                 output::format::chrome_trace);
 
       REQUIRE_EQ(parse(parse_int, 42), 42);
 

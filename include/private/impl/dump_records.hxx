@@ -19,14 +19,12 @@
 
 #pragma once
 
-#include "cxxet/output/format.hxx"
 #include "cxxet/output/writer.hxx"
 #include "impl/event/list/list.hxx"
 
 namespace cxxet::impl {
 
 void dump_records(impl::event::list const &list,
-                  long long const time_point_zero_ns, output::format const fmt,
-                  output::writer &writer);
+                  long long const time_point_zero_ns, output::writer &writer);
 
 }

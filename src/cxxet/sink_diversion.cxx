@@ -21,7 +21,6 @@
 
 #include <cassert>
 
-#include "cxxet/output/format.hxx"
 #include "impl/sink/cascade.hxx"
 #include "impl/sink/event_collector.hxx"
 #include "impl/sink/file_sink.hxx"
@@ -53,16 +52,14 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
     return &sink;
   }
 
-  void set_flush_target(output::format const fmt,
-                        std::string filename) noexcept override {
-    sink.set_flush_target(fmt, std::move(filename));
+  void set_flush_target(std::string filename) noexcept override {
+    sink.set_flush_target(std::move(filename));
   }
 
   void set_flush_target(
-      output::format const fmt,
       std::unique_ptr<output::writer> custom_writer) noexcept override {
     assert(custom_writer);
-    sink.set_flush_target(fmt, std::move(custom_writer));
+    sink.set_flush_target(std::move(custom_writer));
   }
 
 private:

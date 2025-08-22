@@ -88,6 +88,7 @@ double longlong_ns_to_double_us(long long const ns) noexcept {
   return static_cast<double>(ns) / 1'000.0;
 }
 
+// TODO #86 rename ...
 void write_chrome_trace(output::writer &out, impl::event::list const &list,
                         long long const time_point_zero_ns) {
   out << "{\"displayTimeUnit\":\"ns\",";
@@ -176,64 +177,14 @@ void write_chrome_trace(output::writer &out, impl::event::list const &list,
   out << '}';
 }
 
-[[deprecated]] void write_naive_v0(output::writer &out,
-                                   impl::event::list const &list) {
-  list.apply([&out](long long const /*pid*/, long long const thread_id,
-                    event::any const &evt) {
-    switch (evt.get_type()) {
-    case event::type_t::duration_begin: {
-      // TODO handle this
-      break;
-    }
-    case event::type_t::duration_end: {
-      // TODO handle this
-      break;
-    }
-    case event::type_t::complete: {
-      auto const &evt_complete{evt.evt.cmpl};
-      out << thread_id << ": '" << evt_complete.evt.desc << "', color "
-          << static_cast<int>(evt_complete.evt.flag_1) << ", tag "
-          << static_cast<int>(evt_complete.evt.flag_2) << ": "
-          << evt_complete.start_ns << " -> "
-          << (evt_complete.start_ns + evt_complete.duration_ns) << " ~ "
-          << evt_complete.duration_ns << " [ns]\n";
-      break;
-    }
-    case event::type_t::instant: {
-      // TODO handle this
-      break;
-    }
-    case event::type_t::counter: {
-      // TODO handle this
-      break;
-    }
-    default: {
-      throw std::runtime_error("Unknown event type");
-    }
-    }
-  });
-}
-
 } // namespace
 
+// TODO #86 unroll, or refactor it in general ...
 void dump_records(impl::event::list const &list,
-                  long long const time_point_zero_ns, output::format const fmt,
-                  output::writer &writer) {
+                  long long const time_point_zero_ns, output::writer &writer) {
   writer.prepare_for_writing();
 
-  switch (fmt) {
-  case output::format::chrome_trace: {
-    write_chrome_trace(writer, list, time_point_zero_ns);
-    break;
-  }
-  case output::format::raw_naive_v0: {
-    write_naive_v0(writer, list);
-    return;
-  }
-  default: {
-    throw std::runtime_error("Unknown output format specified");
-  }
-  }
+  write_chrome_trace(writer, list, time_point_zero_ns);
 
   writer.finalize_and_flush();
 }
