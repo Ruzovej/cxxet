@@ -23,14 +23,14 @@
 
 namespace cxxet::mark {
 
-CXXET_IMPL_API void set_process_name(char const *const proc_name) noexcept;
+CXXET_IMPL_API void process_name(char const *const proc_name) noexcept;
 
-CXXET_IMPL_API void set_process_label(char const *const proc_label) noexcept;
+CXXET_IMPL_API void process_label(char const *const proc_label) noexcept;
 
-CXXET_IMPL_API void set_process_sort_index(int const proc_sort_index) noexcept;
+CXXET_IMPL_API void process_sort_index(int const proc_sort_index) noexcept;
 
-CXXET_IMPL_API void set_thread_name(char const *const thread_name) noexcept;
+CXXET_IMPL_API void thread_name(char const *const thread_name) noexcept;
 
-CXXET_IMPL_API void set_thread_sort_index(int const thread_sort_index) noexcept;
+CXXET_IMPL_API void thread_sort_index(int const thread_sort_index) noexcept;
 
 } // namespace cxxet::mark

@@ -25,27 +25,27 @@
 
 namespace cxxet::mark {
 
-void set_process_name(char const *const proc_name) noexcept {
+void process_name(char const *const proc_name) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       proc_name, impl::event::metadata_type::process_name});
 }
 
-void set_process_label(char const *const proc_label) noexcept {
+void process_label(char const *const proc_label) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       proc_label, impl::event::metadata_type::process_labels});
 }
 
-void set_process_sort_index(int const proc_sort_index) noexcept {
+void process_sort_index(int const proc_sort_index) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       proc_sort_index, impl::event::metadata_type::process_sort_index});
 }
 
-void set_thread_name(char const *const thread_name) noexcept {
+void thread_name(char const *const thread_name) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       thread_name, impl::event::metadata_type::thread_name});
 }
 
-void set_thread_sort_index(int const thread_sort_index) noexcept {
+void thread_sort_index(int const thread_sort_index) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       thread_sort_index, impl::event::metadata_type::thread_sort_index});
 }
