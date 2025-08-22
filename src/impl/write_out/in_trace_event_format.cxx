@@ -31,6 +31,7 @@ namespace cxxet::impl::write_out {
 
 namespace {
 
+// TODO (https://github.com/Ruzovej/cxxet/issues/137) add cache ...
 std::string escape_json_string(char const *const str) {
   if (!str)
     return "null";
@@ -89,8 +90,8 @@ void in_trace_event_format(output::writer &out,
 
   {
     out << "{\"displayTimeUnit\":\"ns\",";
-    // TODO (#86, or create sep. issue for that) put into some "comment" value
-    // of `time_point_zero_ns`
+    // TODO (https://github.com/Ruzovej/cxxet/issues/138) put into some
+    // "comment" value of `time_point_zero_ns`
     out << "\"traceEvents\":[";
 
     bool first_record{true};
@@ -106,8 +107,8 @@ void in_trace_event_format(output::writer &out,
       out << '{';
       out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
       out << "\"ph\":\"" << evt.get_ph() << "\",";
-      // TODO (#86, or create sep. issue for that) - start using "category",
-      // e.g.: out << "\"cat\":" << escape_json_string(???) << ",";
+      // TODO (https://github.com/Ruzovej/cxxet/issues/139) - start using
+      // "category", e.g.: out << "\"cat\":" << escape_json_string(???) << ",";
 
       auto const write_out_timestamp = [&out](long long const ns) {
         out << "\"ts\":" << longlong_ns_to_double_us(ns) << ',';
