@@ -8,6 +8,7 @@ Generated events from any particular thread can be redirected to its own output 
 * [2.cxx](2.cxx) shows how events from different threads can be redirected to a local thread safe `file_sink`.
 * [3.cxx](3.cxx) displays thread unsafe `file_sink` used across multiple threads (in a safe manner!).
 * [4.cxx](4.cxx) presents how to create & use `cascade_sink` - both thread safe and unsafe version.
+* [5.cxx](5.cxx) illustrates how to use "custom writer" in conjunction with local (thread unsafe) `file_sink`s.
 * TODO e.g. tracing of request processing within a server, where each request is independent and processed in its own thread
 
 ## Notes
