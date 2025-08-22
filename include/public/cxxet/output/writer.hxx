@@ -50,12 +50,14 @@ private:
 
 template <>
 inline writer &writer::operator<< <const char *>(char const *const &value) {
-  write(std::string_view{value});
+  write(std::string_view{value != nullptr ? value : ""});
   return *this;
 }
 
 template <> inline writer &writer::operator<< <char>(char const &value) {
-  write(std::string_view{&value, 1});
+  if (value != '\0') {
+    write(std::string_view{&value, 1});
+  }
   return *this;
 }
 
