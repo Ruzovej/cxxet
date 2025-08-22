@@ -50,10 +50,13 @@ private:
   file_sink(file_sink &&) = delete;
   file_sink &operator=(file_sink &&) = delete;
 
-  void do_flush() noexcept; // TODO (https://github.com/Ruzovej/cxxet/issues/132) rename to e.g. `flush`
+  void
+  do_flush() noexcept; // TODO (https://github.com/Ruzovej/cxxet/issues/132)
+                       // rename to e.g. `flush`
 
   long long const time_point_zero_ns;
-  // TODO (https://github.com/Ruzovej/cxxet/issues/132) std::variant (or similar) of
+  // TODO (https://github.com/Ruzovej/cxxet/issues/132) std::variant (or
+  // similar) of
   //  1. struct { output::format (fmt); std::string (target_filaneme); }
   //  2. std::unique_ptr<output::writer> (custom_writer)
   output::format fmt;
