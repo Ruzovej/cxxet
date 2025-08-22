@@ -40,11 +40,10 @@
 
 namespace cxxet::impl {
 
-bool tmp_filename_handle::valid_base(char const *const aBase) noexcept {
+bool tmp_filename_handle::valid_base(std::string_view const base) noexcept {
 #if defined(_WIN32)
 #error "Unimplemented platform - TODO ..."
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
-  std::string_view const base{aBase};
   unsigned size_reduction{0};
   if (base.find(pid_placeholder) != std::string_view::npos) {
     size_reduction = digits_for_pid - pid_placeholder.size();
@@ -58,7 +57,7 @@ bool tmp_filename_handle::valid_base(char const *const aBase) noexcept {
 #endif
 }
 
-tmp_filename_handle::tmp_filename_handle(char const *const aBase) noexcept
+tmp_filename_handle::tmp_filename_handle(std::string_view const aBase) noexcept
     : base{aBase} {
   buffer[0] = '\0';
 }
@@ -80,19 +79,20 @@ tmp_filename_handle::operator char const *() {
   // is there a better & easier way?
   if (buffer[0] == '\0') {
     assert(valid_base(base));
-    auto const base_len{std::strlen(base)};
-    std::string_view const base_view{base, base_len};
+    auto const base_len{base.size()};
 
-    auto const pos{base_view.find(pid_placeholder)};
+    auto const pos{base.find(pid_placeholder)};
     if (pos != std::string_view::npos) {
       auto const pid_str{std::to_string(static_cast<long long>(getpid()))};
       assert(pid_str.size() <= digits_for_pid);
-      std::copy(base, base + pos, buffer.data());
-      std::copy(pid_str.begin(), pid_str.end(), buffer.data() + pos);
-      std::copy(base + pos + pid_placeholder.size(), base + base_len + 1,
-                buffer.data() + pos + pid_str.size());
+      std::copy(base.cbegin(), base.cbegin() + pos, buffer.data());
+      std::copy(pid_str.cbegin(), pid_str.cend(), buffer.data() + pos);
+      std::copy(base.cbegin() + pos + pid_placeholder.size(),
+                base.cbegin() + base_len, buffer.data() + pos + pid_str.size());
+      buffer[base_len - pid_placeholder.size() + pid_str.size()] = '\0';
     } else {
-      std::copy(base, base + base_len + 1, buffer.data());
+      std::copy(base.cbegin(), base.cbegin() + base_len, buffer.data());
+      buffer[base_len] = '\0';
     }
 
     int fd;
@@ -101,8 +101,8 @@ tmp_filename_handle::operator char const *() {
       auto const errno_now{errno};
       throw std::runtime_error{
           std::string{"'mkstemp' failed to create temporary file out of '"} +
-          base + "', errno = " + std::to_string(errno_now) + " -> " +
-          strerror(errno_now)};
+          std::string{base} + "', errno = " + std::to_string(errno_now) +
+          " -> " + strerror(errno_now)};
     }
     close(fd); // keeping just name of this created file is enough
   }

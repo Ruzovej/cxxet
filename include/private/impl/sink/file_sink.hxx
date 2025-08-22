@@ -19,7 +19,11 @@
 
 #pragma once
 
-#include "cxxet/output_format.hxx"
+#include <memory>
+#include <string>
+
+#include "cxxet/output/format.hxx"
+#include "cxxet/output/writer.hxx"
 #include "impl/sink/properties.hxx"
 #include "impl/sink/thread_safe_t.hxx"
 
@@ -30,12 +34,15 @@ template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
 
   explicit file_sink(long long const aTime_point_zero_ns,
                      output::format const aFmt = output::format::unknown,
-                     char const *const aTarget_filename = nullptr) noexcept;
+                     std::string &&aTarget_filename = "") noexcept;
   explicit file_sink(properties const &traits) noexcept;
   ~file_sink() noexcept override;
 
   void set_flush_target(output::format const aFmt,
-                        char const *const aFilename) noexcept;
+                        std::string &&aFilename) noexcept;
+  void
+  set_flush_target(output::format const aFmt,
+                   std::unique_ptr<output::writer> &&aCustom_writer) noexcept;
 
 private:
   file_sink(file_sink const &) = delete;
@@ -43,11 +50,18 @@ private:
   file_sink(file_sink &&) = delete;
   file_sink &operator=(file_sink &&) = delete;
 
-  void do_flush() noexcept;
+  void
+  do_flush() noexcept; // TODO (https://github.com/Ruzovej/cxxet/issues/132)
+                       // rename to e.g. `flush`
 
   long long const time_point_zero_ns;
+  // TODO (https://github.com/Ruzovej/cxxet/issues/132) std::variant (or
+  // similar) of
+  //  1. struct { output::format (fmt); std::string (target_filaneme); }
+  //  2. std::unique_ptr<output::writer> (custom_writer)
   output::format fmt;
-  char const *target_filename;
+  std::string target_filename;
+  std::unique_ptr<output::writer> custom_writer{nullptr};
 };
 
 extern template struct file_sink<true>;

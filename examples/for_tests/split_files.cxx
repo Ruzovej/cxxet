@@ -62,7 +62,7 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
   CXXET_mark_instant("instant");
   flush_to_file_now(argc > 2 ? argv[2] : "/dev/stdout", true);
 
-  CXXET_mark_counters("counter", 42.0);
+  CXXET_mark_counter("counter", 42.0);
   flush_to_file_now(argc > 3 ? argv[3] : "/dev/stdout", false);
 
   return 0;

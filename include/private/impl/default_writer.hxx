@@ -17,16 +17,31 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/all.hxx"
+#pragma once
 
-int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
-  CXXET_sink_thread_reserve();
+#include <fstream>
+#include <string>
 
-  CXXET_mark_complete("main");
+#include "cxxet/output/writer.hxx"
 
-  CXXET_mark_instant("instant");
+namespace cxxet::impl {
 
-  CXXET_mark_counter("counter", 42.0);
+struct default_writer final : output::writer {
+  explicit default_writer(char const *const aTarget_filename);
+  ~default_writer() noexcept override;
 
-  return 0;
-}
+  void prepare_for_writing() override;
+
+  void write(std::string_view const data) override;
+  void write(long long const ll) override;
+  void write(unsigned long long const ull) override;
+  void write(double const dp) override;
+
+  void finalize_and_flush() override;
+
+private:
+  char const *const target_filename;
+  std::ofstream file_stream;
+};
+
+} // namespace cxxet::impl

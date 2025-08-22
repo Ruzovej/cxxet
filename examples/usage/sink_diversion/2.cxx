@@ -55,8 +55,6 @@ int main(int argc, char const **argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }};
 
-  CXXET_sink_thread_divert_to_sink_global();
-
   std::thread t2{[]() {
     CXXET_sink_thread_reserve();
 

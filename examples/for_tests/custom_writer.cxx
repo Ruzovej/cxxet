@@ -17,25 +17,55 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
+#include <memory>
 #include <thread>
 
 #include "cxxet/all.hxx"
+#ifdef CXXET_ENABLE
+#include "cxxet/output/writer.hxx"
+#endif
 
 namespace {
 
 void record_some_events() {
   CXXET_sink_thread_reserve();
 
-  CXXET_mark_complete("a complete event that disappears");
+  CXXET_mark_complete("complete");
 
-  CXXET_mark_instant("event that will never be seen");
+  CXXET_mark_instant("instant");
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-  CXXET_mark_counter("lost counter", 42.0);
+  CXXET_mark_counter("counter", 42.0);
 
   CXXET_sink_thread_flush_now();
 }
+
+#ifdef CXXET_ENABLE
+
+struct custom_writer final : cxxet::output::writer {
+  custom_writer() = default;
+  ~custom_writer() noexcept override = default;
+
+  void prepare_for_writing() override {
+    std::cout << "Custom writer initialized; output:\n";
+  }
+
+  void write(std::string_view data) override { std::cout << data; }
+
+  void write(long long const ll) override { std::cout << ll; }
+
+  void write(unsigned long long const ull) override { std::cout << ull; }
+
+  void write(double const dp) override { std::cout << dp; }
+
+  void finalize_and_flush() override {
+    std::cout << "\ncustom writer finished ..." << std::endl;
+  }
+};
+
+#endif
 
 } // namespace
 
@@ -44,11 +74,8 @@ int main(int const, char const **) {
 
   record_some_events();
 
-  CXXET_sink_global_set_flush_target(
-      cxxet::output::format::chrome_trace,
-      "" // file won't be created/overwritten - empty string means to discard
-         // all recorded events ...
-  );
+  CXXET_sink_global_set_flush_target(cxxet::output::format::chrome_trace,
+                                     std::make_unique<custom_writer>());
 
   t.join();
 

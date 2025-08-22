@@ -28,14 +28,18 @@
 #include "cxxet/mark/duration_begin.hxx"
 #include "cxxet/mark/duration_end.hxx"
 #include "cxxet/mark/instant.hxx"
-#include "cxxet/output_format.hxx"
+#include "cxxet/output/format.hxx"
 #include "cxxet/scope.hxx"
 #include "cxxet/sink_control.hxx"
 #include "cxxet/timepoint.hxx"
 
 #define CXXET_mark_complete(description)                                       \
   cxxet::mark::complete CXXET_IMPL_IMPLICIT_MARKER_NAME(                       \
-      CXXET_IMPLICIT_MARKER_, __LINE__)(description)
+      CXXET_IMPLICIT_MARKER_, __LINE__) {                                      \
+    description                                                                \
+  }
+
+#define CXXET_mark_counter(...) cxxet::mark::do_submit_counter(__VA_ARGS__)
 
 #define CXXET_mark_counters(...) cxxet::mark::do_submit_counters(__VA_ARGS__)
 
@@ -73,6 +77,8 @@
 #else
 
 #define CXXET_mark_complete(...)
+
+#define CXXET_mark_counter(...)
 
 #define CXXET_mark_counters(...)
 

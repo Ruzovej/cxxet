@@ -19,8 +19,12 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "cxxet/macros/linkage.h"
-#include "cxxet/output_format.hxx"
+#include "cxxet/output/format.hxx"
+#include "cxxet/output/writer.hxx"
 
 namespace cxxet {
 
@@ -32,10 +36,19 @@ sink_thread_reserve(int const minimum_free_capacity = 0) noexcept;
 CXXET_IMPL_API void sink_thread_flush_now() noexcept;
 
 CXXET_IMPL_API void sink_global_set_flush_target(
-    cxxet::output::format const fmt = cxxet::output::format::chrome_trace,
-    char const *const filename = nullptr // `== nullptr` => no-op; to be more
-                                         // precise: discard everything
+    output::format const fmt = output::format::chrome_trace,
+    std::string filename =
+        "" // empty => no-op; to be more precise: discard everything
     ) noexcept;
+
+CXXET_IMPL_API void sink_global_set_flush_target(
+    output::format const fmt = output::format::chrome_trace,
+    std::unique_ptr<output::writer> custom_writer =
+        nullptr // nullptr -> fallback to the default one
+    ) noexcept;
+
+void sink_global_set_flush_target(output::format const fmt,
+                                  std::nullptr_t) noexcept = delete;
 
 CXXET_IMPL_API void sink_thread_divert_to_sink_global() noexcept;
 

@@ -20,9 +20,11 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "cxxet/macros/linkage.h"
-#include "cxxet/output_format.hxx"
+#include "cxxet/output/format.hxx"
+#include "cxxet/output/writer.hxx"
 
 namespace cxxet {
 
@@ -37,7 +39,11 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
   make(bool const thread_safe) noexcept;
 
   virtual void set_flush_target(output::format const fmt,
-                                char const *const filename) noexcept = 0;
+                                std::string filename) noexcept = 0;
+  virtual void
+  set_flush_target(output::format const fmt,
+                   std::unique_ptr<output::writer> custom_writer) noexcept = 0;
+  void set_flush_target(output::format const, std::nullptr_t) noexcept = delete;
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {

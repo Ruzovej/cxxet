@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+#include "impl/default_writer.hxx"
 #include "impl/dump_records.hxx"
 #include "impl/tmp_filename_handle.hxx"
 
@@ -29,9 +30,9 @@ namespace cxxet::impl::sink {
 template <bool thread_safe_v>
 file_sink<thread_safe_v>::file_sink(long long const aTime_point_zero_ns,
                                     output::format const aFmt,
-                                    char const *const aTarget_filename) noexcept
+                                    std::string &&aTarget_filename) noexcept
     : base_class_t{}, time_point_zero_ns{aTime_point_zero_ns}, fmt{aFmt},
-      target_filename{aTarget_filename} {}
+      target_filename{std::move(aTarget_filename)} {}
 
 template <bool thread_safe_v>
 file_sink<thread_safe_v>::file_sink(properties const &traits) noexcept
@@ -44,10 +45,19 @@ template <bool thread_safe_v> file_sink<thread_safe_v>::~file_sink() noexcept {
 
 template <bool thread_safe_v>
 void file_sink<thread_safe_v>::set_flush_target(
-    output::format const aFmt, char const *const aFilename) noexcept {
+    output::format const aFmt, std::string &&aFilename) noexcept {
   std::lock_guard lck{*this};
   fmt = aFmt;
-  target_filename = aFilename;
+  target_filename = std::move(aFilename);
+}
+
+template <bool thread_safe_v>
+void file_sink<thread_safe_v>::set_flush_target(
+    output::format const aFmt,
+    std::unique_ptr<output::writer> &&aCustom_writer) noexcept {
+  std::lock_guard lck{*this};
+  fmt = aFmt;
+  custom_writer = std::move(aCustom_writer);
 }
 
 template <bool thread_safe_v>
@@ -58,22 +68,28 @@ void file_sink<thread_safe_v>::do_flush() noexcept {
   }
 
   if (!base_class_t::events.empty()) {
-    if (target_filename && (target_filename[0] != '\0')) {
-      try {
+    try {
+      // TODO (https://github.com/Ruzovej/cxxet/issues/133) is
+      // `time_point_zero_ns` needed?!
+      if (custom_writer) {
+        dump_records(base_class_t::events, time_point_zero_ns, fmt,
+                     *custom_writer);
+      } else if (!target_filename.empty()) {
         tmp_filename_handle implicit_file_handle{target_filename};
-        bool const use_tmp_filename{
-            tmp_filename_handle::valid_base(target_filename)};
-        auto const target{use_tmp_filename
-                              ? static_cast<char const *>(implicit_file_handle)
-                              : target_filename};
-        if (use_tmp_filename) {
-          std::cerr << "Saving events to file: " << target << '\n';
+        char const *target{};
+        if (tmp_filename_handle::valid_base(target_filename)) {
+          std::cerr << "Saving events to file: "
+                    << static_cast<std::string_view>(implicit_file_handle)
+                    << '\n';
+          target = static_cast<char const *>(implicit_file_handle);
+        } else {
+          target = target_filename.c_str();
         }
-        // is `time_point_zero_ns` needed?!
-        dump_records(base_class_t::events, time_point_zero_ns, fmt, target);
-      } catch (std::exception const &e) {
-        std::cerr << "Failed to dump records: " << e.what() << '\n';
+        default_writer def_writer{target};
+        dump_records(base_class_t::events, time_point_zero_ns, fmt, def_writer);
       }
+    } catch (std::exception const &e) {
+      std::cerr << "Failed to dump records: " << e.what() << '\n';
     }
     base_class_t::events.destroy();
   }
