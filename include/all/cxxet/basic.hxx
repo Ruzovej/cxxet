@@ -68,11 +68,10 @@
 #define CXXET_mark_process_sort_index(proc_sort_index)                         \
   cxxet::mark::process_sort_index(proc_sort_index)
 
-#define CXXET_mark_thread_name(thread_name)                                    \
-  cxxet::mark::thread_name(thread_name)
+#define CXXET_mark_thread_name(th_name) cxxet::mark::thread_name(th_name)
 
-#define CXXET_mark_thread_sort_index(thread_sort_index)                        \
-  cxxet::mark::thread_sort_index(thread_sort_index)
+#define CXXET_mark_thread_sort_index(th_sort_index)                            \
+  cxxet::mark::thread_sort_index(th_sort_index)
 
 #define CXXET_sink_thread_reserve(minimum_free_capacity)                       \
   cxxet::sink_thread_reserve(minimum_free_capacity)

@@ -29,8 +29,8 @@ CXXET_IMPL_API void process_label(char const *const proc_label) noexcept;
 
 CXXET_IMPL_API void process_sort_index(int const proc_sort_index) noexcept;
 
-CXXET_IMPL_API void thread_name(char const *const thread_name) noexcept;
+CXXET_IMPL_API void thread_name(char const *const th_name) noexcept;
 
-CXXET_IMPL_API void thread_sort_index(int const thread_sort_index) noexcept;
+CXXET_IMPL_API void thread_sort_index(int const th_sort_index) noexcept;
 
 } // namespace cxxet::mark

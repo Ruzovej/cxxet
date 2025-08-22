@@ -40,14 +40,14 @@ void process_sort_index(int const proc_sort_index) noexcept {
       proc_sort_index, impl::event::metadata_type::process_sort_index});
 }
 
-void thread_name(char const *const thread_name) noexcept {
-  impl::thread_local_sink_submit_event(impl::event::metadata{
-      thread_name, impl::event::metadata_type::thread_name});
+void thread_name(char const *const th_name) noexcept {
+  impl::thread_local_sink_submit_event(
+      impl::event::metadata{th_name, impl::event::metadata_type::thread_name});
 }
 
-void thread_sort_index(int const thread_sort_index) noexcept {
+void thread_sort_index(int const th_sort_index) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
-      thread_sort_index, impl::event::metadata_type::thread_sort_index});
+      th_sort_index, impl::event::metadata_type::thread_sort_index});
 }
 
 } // namespace cxxet::mark

@@ -267,6 +267,45 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | all(has("name") and has("ph") and has("ts") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 }
 
+@test "Metadata markers example" {
+    local executable="${BIN_DIR}/cxxet_example_metadata"
+    local result="${TMP_RESULT_DIR}/example_metadata.json"
+
+    run "${executable}_bare" "${result}"
+    assert_success
+    assert_output ""
+
+    refute [ -f "${result}" ]
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 17
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["B","E","M","X","i"]'
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${result}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${result}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "M")] | length' "${result}")" 8
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 3
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "M")] | all(has("name") and has("ph") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
+
+    # TODO #125 continue ...!!!
+}
+
 @test "Custom file_sink redirection example 1" {
     local executable="${BIN_DIR}/cxxet_example_local_file_sink_1"
     local result1="${TMP_RESULT_DIR}/example_local_file_sink_1_A.json"
