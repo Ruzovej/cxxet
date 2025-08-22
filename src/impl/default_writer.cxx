@@ -23,7 +23,12 @@
 
 namespace cxxet::impl {
 
-default_writer::default_writer(char const *const target_filename) : writer{} {
+default_writer::default_writer(char const *const aTarget_filename)
+    : writer{}, target_filename{aTarget_filename} {}
+
+default_writer::~default_writer() noexcept = default;
+
+void default_writer::prepare_for_writing() {
   if (target_filename != nullptr && target_filename[0] != '\0') {
     if (target_filename == std::string_view{"/dev/stdout"}) {
       std::cout.flush();
@@ -39,8 +44,6 @@ default_writer::default_writer(char const *const target_filename) : writer{} {
     throw std::runtime_error("Failed to open file: nullptr or empty c-string");
   }
 }
-
-default_writer::~default_writer() noexcept = default;
 
 void default_writer::write(std::string_view const data) { file_stream << data; }
 

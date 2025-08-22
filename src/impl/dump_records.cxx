@@ -219,6 +219,8 @@ void write_chrome_trace(output::writer &out, impl::event::list const &list,
 void dump_records(impl::event::list const &list,
                   long long const time_point_zero_ns, output::format const fmt,
                   output::writer &writer) {
+  writer.prepare_for_writing();
+
   switch (fmt) {
   case output::format::chrome_trace: {
     write_chrome_trace(writer, list, time_point_zero_ns);

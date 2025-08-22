@@ -42,14 +42,14 @@ int main(int argc, char const **argv) {
 
   std::thread t1{[]() {
     CXXET_sink_thread_reserve();
-    CXXET_mark_counters("thread 1 operations", 42.0);
+    CXXET_mark_counter("thread 1 operations", 42.0);
     CXXET_mark_counters("RAM [MB]", 3.1, "cpu utilization", 62.0);
   }};
 
   std::thread t2{[]() {
     CXXET_sink_thread_reserve();
     CXXET_mark_counters("RAM [MB]", 3.3, "cpu utilization", 52.0);
-    CXXET_mark_counters("thread 2 operations", 85.3);
+    CXXET_mark_counter("thread 2 operations", 85.3);
   }};
 
   t1.join();

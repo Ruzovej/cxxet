@@ -47,3 +47,8 @@ add_example(
     cxxet_example_local_file_sink_4
         "sink_diversion/4.cxx"
 )
+
+add_example(
+    cxxet_example_local_file_sink_5
+        "sink_diversion/5.cxx"
+)

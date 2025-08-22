@@ -37,7 +37,7 @@ void record_some_events() {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-  CXXET_mark_counters("counter", 42.0);
+  CXXET_mark_counter("counter", 42.0);
 
   CXXET_sink_thread_flush_now();
 }
@@ -45,8 +45,12 @@ void record_some_events() {
 #ifdef CXXET_ENABLE
 
 struct custom_writer final : cxxet::output::writer {
-  custom_writer() { std::cout << "Custom writer initialized; output:\n"; }
+  custom_writer() = default;
   ~custom_writer() noexcept override = default;
+
+  void prepare_for_writing() override {
+    std::cout << "Custom writer initialized; output:\n";
+  }
 
   void write(std::string_view data) override { std::cout << data; }
 

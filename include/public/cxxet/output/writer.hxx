@@ -35,6 +35,8 @@ struct writer {
     return *this;
   }
 
+  virtual void prepare_for_writing() = 0;
+
   virtual void write(std::string_view const data) = 0;
   virtual void write(long long const ll) = 0;
   virtual void write(unsigned long long const ull) = 0;

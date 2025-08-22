@@ -32,7 +32,7 @@ void record_some_events() {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-  CXXET_mark_counters("lost counter", 42.0);
+  CXXET_mark_counter("lost counter", 42.0);
 
   CXXET_sink_thread_flush_now();
 }

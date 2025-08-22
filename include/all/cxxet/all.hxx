@@ -39,6 +39,8 @@
     description                                                                \
   }
 
+#define CXXET_mark_counter(...) cxxet::mark::do_submit_counter(__VA_ARGS__)
+
 #define CXXET_mark_counters(...) cxxet::mark::do_submit_counters(__VA_ARGS__)
 
 #define CXXET_mark_duration(description)                                       \
@@ -75,6 +77,8 @@
 #else
 
 #define CXXET_mark_complete(...)
+
+#define CXXET_mark_counter(...)
 
 #define CXXET_mark_counters(...)
 

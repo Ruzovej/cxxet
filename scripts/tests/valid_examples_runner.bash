@@ -65,6 +65,7 @@ function valid_examples_runner() {
         "${bin_dir}/cxxet_example_local_file_sink_2" "${target_dir}/easy_local_sink_2_a.json" "${target_dir}/easy_local_sink_2_b.json"
         "${bin_dir}/cxxet_example_local_file_sink_3" "${target_dir}/easy_local_sink_3_a.json" "${target_dir}/easy_local_sink_3_b.json"
         "${bin_dir}/cxxet_example_local_file_sink_4" "${target_dir}/easy_local_sink_4.json"
+        "${bin_dir}/cxxet_example_local_file_sink_5" > "${target_dir}/easy_local_sink_5.log"
     )
     printf '\n' >&2
 }

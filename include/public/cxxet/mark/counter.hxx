@@ -30,6 +30,12 @@ CXXET_IMPL_API void submit_counter(char const *const name,
                                    long long const timestamp_ns,
                                    double const value) noexcept;
 
+inline void do_submit_counter(char const *const name,
+                              double const value) noexcept {
+  auto const now_ns{impl::as_int_ns(impl::now())};
+  submit_counter(name, now_ns, value);
+}
+
 template <typename... Args>
 void submit_counters(long long const timestamp_ns, char const *const name,
                      double const value, Args &&...args) noexcept {
@@ -42,6 +48,11 @@ void submit_counters(long long const timestamp_ns, char const *const name,
 template <typename... Args>
 void do_submit_counters(char const *const name, double const value,
                         Args &&...args) noexcept {
+  static_assert(sizeof...(args) % 2 == 0, "Uneven number of arguments");
+  static_assert(
+      sizeof...(args) >= 2,
+      "Submitting only single counter - use `do_submit_counter` instead");
+
   auto const now_ns{impl::as_int_ns(impl::now())};
   submit_counters(now_ns, name, value, std::forward<Args>(args)...);
 }

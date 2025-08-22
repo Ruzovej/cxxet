@@ -27,8 +27,10 @@
 namespace cxxet::impl {
 
 struct default_writer final : output::writer {
-  explicit default_writer(char const *const target_filename);
+  explicit default_writer(char const *const aTarget_filename);
   ~default_writer() noexcept override;
+
+  void prepare_for_writing() override;
 
   void write(std::string_view const data) override;
   void write(long long const ll) override;
@@ -38,6 +40,7 @@ struct default_writer final : output::writer {
   void finalize_and_flush() override;
 
 private:
+  char const *const target_filename;
   std::ofstream file_stream;
 };
 

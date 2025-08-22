@@ -26,7 +26,7 @@ int main([[maybe_unused]] int const argc, [[maybe_unused]] char const **argv) {
 
   CXXET_mark_instant("instant");
 
-  CXXET_mark_counters("counter", 42.0);
+  CXXET_mark_counter("counter", 42.0);
 
   return 0;
 }
