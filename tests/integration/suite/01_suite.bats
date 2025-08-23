@@ -287,23 +287,29 @@ Deduced CXXET_TARGET_FILENAME: "
 
     assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
 
-    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 17
-
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 18
     assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["B","E","M","X","i"]'
-
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${result}")" 2
-
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${result}")" 2
-
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "M")] | length' "${result}")" 8
-
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "M")] | length' "${result}")" 9
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${result}")" 3
-
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result}")" 2
 
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "M")] | all(has("name") and has("ph") and has("args") and has("pid") and has("tid"))' "${result}")" 'true'
 
-    # TODO #125 continue ...!!!
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "process_name")] | length' "${result}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "process_sort_index")] | length' "${result}")" 1
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "process_labels")] | length' "${result}")" 3
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "thread_name")] | length' "${result}")" 2
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "thread_sort_index")] | length' "${result}")" 2
+
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "process_name")] | .[0].args.name' "${result}")" "\"${executable}\""
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "process_sort_index")] | .[0].args.sort_index' "${result}")" 5
+    assert_equal "$(jq -e -c '[.traceEvents[] | select(.name == "process_labels")] | map(.args.labels) | sort' "${result}")" '["test label 3","test_label_1","test_label_2"]'
+
+    assert_equal "$(jq -e -c '[.traceEvents[] | select(.name == "thread_name")] | map(.args.name) | sort' "${result}")" '["main thread in this example :-)","spawned thread"]'
+    assert_equal "$(jq -e -c '[.traceEvents[] | select(.name == "thread_sort_index")] | map(.args.sort_index) | sort' "${result}")" '[10,50]'
 }
 
 @test "Custom file_sink redirection example 1" {
