@@ -55,9 +55,11 @@ struct list {
 
   class const_iterator {
   public:
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = detailed_event const;
     using difference_type = std::ptrdiff_t;
+    using value_type = detailed_event const;
+    using pointer = detailed_event const *;
+    using reference = detailed_event const &;
+    using iterator_category = std::forward_iterator_tag;
 
     constexpr explicit const_iterator(raw_element *aNode) noexcept
         : node{get_first_valid_and_nonempty_or_nullptr(aNode)} {}

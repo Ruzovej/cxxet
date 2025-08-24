@@ -128,6 +128,8 @@ long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
+#include <algorithm>
+
 #include <doctest/doctest.h>
 
 namespace cxxet::impl {
@@ -140,40 +142,37 @@ TEST_CASE("event::list") {
 
   SUBCASE("empty") {
     SUBCASE("default") {
-      n = l.apply([](long long const, long long const, event::any const &) {
-        REQUIRE(false);
-      });
+      // force 2 lines ...
+      n = std::distance(l.cbegin(), l.cend());
     }
 
     SUBCASE("after reserve(1)") {
       l.reserve(1);
 
-      n = l.apply([](long long const, long long const, event::any const &) {
-        REQUIRE(false);
-      });
+      n = std::distance(l.cbegin(), l.cend());
     }
 
     SUBCASE("drain other empty") {
       event::list other;
+      REQUIRE(other.empty());
+
       l.drain_other(other);
 
-      n = l.apply([](long long const, long long const, event::any const &) {
-        REQUIRE(false);
-      });
-
       REQUIRE(other.empty());
+
+      n = std::distance(l.cbegin(), l.cend());
     }
 
     SUBCASE("drain other empty (but with previous reserve)") {
       event::list other;
       other.reserve(3);
+      REQUIRE(other.empty());
+
       l.drain_other(other);
 
-      n = l.apply([](long long const, long long const, event::any const &) {
-        REQUIRE(false);
-      });
-
       REQUIRE(other.empty());
+
+      n = std::distance(l.cbegin(), l.cend());
     }
 
     REQUIRE_EQ(n, 0);
