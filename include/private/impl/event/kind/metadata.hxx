@@ -21,6 +21,8 @@
 
 #include <cassert>
 
+#include <stdexcept>
+
 #include "impl/event/common.hxx"
 #include "impl/event/kind/metadata_type.hxx"
 
@@ -69,7 +71,7 @@ struct metadata {
       CXXET_IMPL_METADATA_CASE(thread_name);
       CXXET_IMPL_METADATA_CASE(thread_sort_index);
     default:
-      throw "Unknown metadata_type";
+      throw std::runtime_error{"Unknown metadata_type"};
     }
 
 #undef CXXET_IMPL_METADATA_CASE
@@ -86,7 +88,7 @@ struct metadata {
     case metadata_type::thread_sort_index:
       return "sort_index";
     default:
-      throw "Unknown metadata_type";
+      throw std::runtime_error{"Unknown metadata_type"};
     }
   }
 

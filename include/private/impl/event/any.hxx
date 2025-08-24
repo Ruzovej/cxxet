@@ -76,17 +76,17 @@ struct any {
                                     std::is_same_v<EventType, metadata>>>
   any(EventType const &e) noexcept : any{} {
     if constexpr (std::is_same_v<EventType, duration_begin>) {
-      new (&evt.dur_begin) duration_begin{e};
+      new (&evt.dur_begin) EventType{e};
     } else if constexpr (std::is_same_v<EventType, duration_end>) {
-      new (&evt.dur_end) duration_end{e};
+      new (&evt.dur_end) EventType{e};
     } else if constexpr (std::is_same_v<EventType, complete>) {
-      new (&evt.cmpl) complete{e};
+      new (&evt.cmpl) EventType{e};
     } else if constexpr (std::is_same_v<EventType, counter>) {
-      new (&evt.cntr) counter{e};
+      new (&evt.cntr) EventType{e};
     } else if constexpr (std::is_same_v<EventType, instant>) {
-      new (&evt.inst) instant{e};
+      new (&evt.inst) EventType{e};
     } else if constexpr (std::is_same_v<EventType, metadata>) {
-      new (&evt.meta) metadata{e};
+      new (&evt.meta) EventType{e};
     }
   }
 
