@@ -268,8 +268,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Metadata markers example" {
-    local executable="${BIN_DIR}/cxxet_example_metadata"
-    local result="${TMP_RESULT_DIR}/example_metadata.json"
+    local executable="${BIN_DIR}/cxxet_example_metadata_1"
+    local result="${TMP_RESULT_DIR}/example_metadata_1.json"
 
     run "${executable}_bare" "${result}"
     assert_success

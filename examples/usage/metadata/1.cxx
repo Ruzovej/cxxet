@@ -35,10 +35,11 @@ int main(int argc, char const **argv) {
     CXXET_mark_complete("setting metadata in main thread");
     // meaningless to set more than once:
     CXXET_mark_process_name(argv[0]);
-    CXXET_mark_process_sort_index(5);
     CXXET_mark_thread_name("main thread in this example :-)");
+    // ditto; those seem ignored by `https://ui.perfetto.dev`:
+    CXXET_mark_process_sort_index(5);
     CXXET_mark_thread_sort_index(10);
-    // set as many as needed (those are probably ignored by `ui.perfetto.dev`):
+    // set as many as needed; those seem ignored by `https://ui.perfetto.dev`:
     CXXET_mark_process_label("test_label_1");
     CXXET_mark_process_label("test_label_2");
     CXXET_mark_process_label("test label 3");

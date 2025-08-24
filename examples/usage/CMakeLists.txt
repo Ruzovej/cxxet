@@ -29,7 +29,7 @@ add_example(
 )
 
 add_example(
-    cxxet_example_metadata
+    cxxet_example_metadata_1
         "metadata/1.cxx"
 )
 

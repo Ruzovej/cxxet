@@ -61,7 +61,7 @@ function valid_examples_runner() {
         "${bin_dir}/cxxet_example_duration_1" "${target_dir}/easy_duration_1.json"
         "${bin_dir}/cxxet_example_instant_1" "${target_dir}/easy_instant_1.json"
         "${bin_dir}/cxxet_example_instant_2" "${target_dir}/easy_instant_2.json"
-        "${bin_dir}/cxxet_example_metadata" "${target_dir}/easy_metadata.json"
+        "${bin_dir}/cxxet_example_metadata_1" "${target_dir}/easy_metadata_1.json"
         "${bin_dir}/cxxet_example_local_file_sink_1" "${target_dir}/easy_local_sink_1_a.json" "${target_dir}/easy_local_sink_1_b.json"
         "${bin_dir}/cxxet_example_local_file_sink_2" "${target_dir}/easy_local_sink_2_a.json" "${target_dir}/easy_local_sink_2_b.json"
         "${bin_dir}/cxxet_example_local_file_sink_3" "${target_dir}/easy_local_sink_3_a.json" "${target_dir}/easy_local_sink_3_b.json"
