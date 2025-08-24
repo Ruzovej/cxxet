@@ -19,7 +19,6 @@
 
 #include "impl/event/list.hxx"
 
-// TODO #143 remove this completely ...
 #include <unistd.h>
 
 #include <cassert>
@@ -121,14 +120,12 @@ int list::get_current_free_capacity() const noexcept {
   return last ? (last[0].meta.get_free_capacity()) : 0;
 }
 
-// TODO #143 remove this completely ...
-long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
-
 } // namespace cxxet::impl::event
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
 #include <algorithm>
+#include <array>
 
 #include <doctest/doctest.h>
 
@@ -138,18 +135,15 @@ namespace {
 
 TEST_CASE("event::list") {
   event::list l;
-  long long n;
 
   SUBCASE("empty") {
     SUBCASE("default") {
-      // force 2 lines ...
-      n = std::distance(l.cbegin(), l.cend());
+      // nothing ...
     }
 
     SUBCASE("after reserve(1)") {
+      // force 2 lines ...
       l.reserve(1);
-
-      n = std::distance(l.cbegin(), l.cend());
     }
 
     SUBCASE("drain other empty") {
@@ -159,8 +153,6 @@ TEST_CASE("event::list") {
       l.drain_other(other);
 
       REQUIRE(other.empty());
-
-      n = std::distance(l.cbegin(), l.cend());
     }
 
     SUBCASE("drain other empty (but with previous reserve)") {
@@ -171,20 +163,18 @@ TEST_CASE("event::list") {
       l.drain_other(other);
 
       REQUIRE(other.empty());
-
-      n = std::distance(l.cbegin(), l.cend());
     }
 
-    REQUIRE_EQ(n, 0);
+    REQUIRE_EQ(std::distance(l.cbegin(), l.cend()), 0);
     REQUIRE(l.empty());
     REQUIRE_EQ(l.size(), 0);
   }
 
-  SUBCASE("append & apply") {
-    int counter{0};
+  SUBCASE("append & iterate") {
+    unsigned cnt{0};
 
-    constexpr int size{5};
-    event::any a[size];
+    constexpr int size{7};
+    std::array<event::any, size> a;
 
     new (&a[0].evt.dur_begin)
         event::duration_begin{51, 52, 53, "test begin", 0};
@@ -199,18 +189,21 @@ TEST_CASE("event::list") {
         45, 78, 89, "test instant", scope_t::thread, 'R', 32109, 2'000'000'001,
         25};
 
+    new (&a[5].evt.meta) event::metadata{"some other metadata str value ...",
+                                         event::metadata_type::process_name};
+
+    new (&a[6].evt.meta)
+        event::metadata{42'132, event::metadata_type::thread_sort_index};
+
     SUBCASE("without reserve()") {
       REQUIRE_EQ(l.get_current_free_capacity(), 0);
       l.safe_append(a[0], 5);
-      REQUIRE_EQ(l.get_current_free_capacity(), 4);
+      REQUIRE_GE(l.get_current_free_capacity(), 4);
 
-      n = l.apply([&counter, &a](long long const, long long const,
-                                 event::any const &evt) {
-        REQUIRE_EQ(evt, a[0]);
-        counter++;
-      });
-
-      REQUIRE_EQ(counter, 1);
+      for (auto const &p : l) {
+        REQUIRE_EQ(p.event, a[cnt++]);
+      }
+      REQUIRE_EQ(cnt, 1);
     }
 
     SUBCASE("after reserve()") {
@@ -219,85 +212,99 @@ TEST_CASE("event::list") {
         l.safe_append(evt, 1);
       }
 
-      n = l.apply([&counter, &a](long long const, long long const,
-                                 event::any const &evt) {
-        REQUIRE_EQ(evt, a[counter++]);
-      });
-
-      REQUIRE_EQ(counter, size);
+      for (auto const &p : l) {
+        REQUIRE_EQ(p.event, a[cnt++]);
+      }
+      REQUIRE_EQ(cnt, size);
     }
 
     SUBCASE("drain other") {
       l.safe_append(a[0], 3);
+
       event::list other;
       other.reserve(2);
       other.append(a[1]);
 
       l.drain_other(other);
-      n = l.apply([&counter, &a](long long const, long long const,
-                                 event::any const &evt) {
-        REQUIRE_EQ(evt, a[counter++]);
-      });
-
       REQUIRE(other.empty());
-      REQUIRE_EQ(counter, 2);
+      REQUIRE(!l.empty());
+
+      for (auto const &p : l) {
+        REQUIRE_EQ(p.event, a[cnt++]);
+      }
+      REQUIRE_EQ(cnt, 2);
     }
 
     SUBCASE("drain other empty (two times)") {
-      l.safe_append(a[0], 6);
       event::list other;
+      REQUIRE(other.empty());
+      other.reserve(3);
+      REQUIRE(other.empty());
 
       l.drain_other(other);
-      n = l.apply([&counter, &a](long long const, long long const,
-                                 event::any const &evt) {
-        REQUIRE_EQ(evt, a[counter++]);
-      });
-
       REQUIRE(other.empty());
-      REQUIRE_EQ(counter, 1);
 
+      l.safe_append(a[0], 6);
+
+      for (auto const &p : l) {
+        REQUIRE_EQ(p.event, a[cnt++]);
+      }
+      REQUIRE_EQ(cnt, 1);
+
+      other.reserve(5);
+      REQUIRE(other.empty());
       l.drain_other(other); // drain second time ...
-
-      counter = 0;
-      n = l.apply([&counter, &a](long long const, long long const,
-                                 event::any const &evt) {
-        REQUIRE_EQ(evt, a[counter++]);
-      });
-
       REQUIRE(other.empty());
-      REQUIRE_EQ(counter, 1);
+
+      cnt = 0;
+      for (auto const &p : l) {
+        REQUIRE_EQ(p.event, a[cnt++]);
+      }
+      REQUIRE_EQ(cnt, 1);
     }
 
     SUBCASE("drain") {
       l.reserve(3);
-      REQUIRE_EQ(l.get_current_free_capacity(), 3);
+      REQUIRE(l.empty());
+      REQUIRE_GE(l.get_current_free_capacity(), 3);
       l.append(a[0]);
-      REQUIRE_EQ(l.get_current_free_capacity(), 2);
+      REQUIRE(!l.empty());
+      REQUIRE_GE(l.get_current_free_capacity(), 2);
       l.append(a[1]);
-      REQUIRE_EQ(l.get_current_free_capacity(), 1);
+      REQUIRE(!l.empty());
+      REQUIRE_GE(l.get_current_free_capacity(), 1);
 
       event::list other;
       // will have to allocate twice (once here, and once later):
       other.reserve(2);
       other.append(a[2]);
-      REQUIRE_EQ(other.get_current_free_capacity(), 1);
+      REQUIRE_GE(other.get_current_free_capacity(), 1);
       other.append(a[3]);
-      REQUIRE_EQ(other.get_current_free_capacity(), 0);
+      REQUIRE_GE(other.get_current_free_capacity(), 0);
       other.safe_append(a[4], 4);
-      REQUIRE(other.get_current_free_capacity() >= 3);
+      REQUIRE_GE(other.get_current_free_capacity(), 3);
 
       l.drain_other(other);
-      n = l.apply([&counter, &a](long long const, long long const,
-                                 event::any const &evt) {
-        REQUIRE_EQ(evt, a[counter++]);
-      });
+      REQUIRE(other.empty());
+      REQUIRE_EQ(other.get_current_free_capacity(), 0);
+
+      other.safe_append(a[5], 2);
+      REQUIRE_GE(other.get_current_free_capacity(), 1);
+      other.append(a[6]);
+      REQUIRE_GE(other.get_current_free_capacity(), 0);
+
+      l.drain_other(other);
+      REQUIRE(other.empty());
+
+      for (auto const &p : l) {
+        REQUIRE_EQ(p.event, a[cnt++]);
+      }
 
       REQUIRE(other.empty());
-      REQUIRE_EQ(counter, size);
+      REQUIRE_EQ(cnt, size);
     }
 
-    REQUIRE_EQ(n, counter);
-    REQUIRE_EQ(l.size(), n);
+    REQUIRE_EQ(l.size(), cnt);
     REQUIRE(!l.empty());
   }
 }

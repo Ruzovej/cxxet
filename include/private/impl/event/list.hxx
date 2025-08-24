@@ -116,25 +116,6 @@ struct list {
 
   void safe_append(any const &event, int const node_capacity) noexcept;
 
-  // TODO #143 remove this completely ...
-  template <typename callable_t> long long apply(callable_t &&callable) const {
-    static_assert(std::is_invocable_r_v<void, // return type
-                                        callable_t,
-                                        // arguments:
-                                        long long const, // process id
-                                        long long const, // thread id
-                                        any const &>);
-    long long cnt{0};
-    auto const pid{get_pid()};
-    for (auto it{first}; it != nullptr; it = it[0].meta.next) {
-      for (int i{0}; i < it[0].meta.size; ++i) {
-        callable(pid, it[0].meta.thread_id, it[i + 1].evt);
-        ++cnt;
-      }
-    }
-    return cnt;
-  }
-
   bool has_free_capacity(int const capacity) const noexcept;
 
   void reserve(int const capacity) noexcept;
@@ -166,9 +147,6 @@ private:
   list &operator=(list const &) = delete;
   list(list &&) = delete;
   list &operator=(list &&) = delete;
-
-  // TODO #143 remove this completely ...
-  static long long get_pid() noexcept;
 
   raw_element *first{nullptr}, *last{nullptr};
 };
