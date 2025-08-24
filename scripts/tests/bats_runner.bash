@@ -12,10 +12,10 @@ function bats_runner() {
         strace
 
     local test_presets=(
-        asan
         asan_d
-        tsan
+        asan
         tsan_d
+        tsan
         release
     )
 

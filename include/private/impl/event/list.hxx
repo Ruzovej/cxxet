@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <cassert>
+
 #include <new>
 #include <type_traits>
 #include <utility>
@@ -46,6 +48,68 @@ struct list {
     constexpr raw_element() noexcept : meta{} {}
   };
 
+  struct detailed_event {
+    long long count;
+    long long thread_id;
+    any event;
+  };
+
+  class const_iterator {
+  public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = detailed_event;
+    using difference_type = std::ptrdiff_t;
+
+    constexpr explicit const_iterator(raw_element *aNode) noexcept
+        : node{get_first_valid_and_nonempty_or_nullptr(aNode)} {}
+
+    value_type operator*() const noexcept {
+      assert(node);
+      assert(index < node[0].meta.size);
+      return value_type{count + 1, node[0].meta.thread_id, node[index + 1].evt};
+    }
+
+    constexpr const_iterator &operator++() noexcept {
+      if (index + 1 < node[0].meta.size) {
+        ++index;
+      } else {
+        node = get_first_valid_and_nonempty_or_nullptr(node[0].meta.next);
+        index = 0;
+      }
+      ++count;
+      return *this;
+    }
+
+    constexpr const_iterator operator++(int) noexcept {
+      auto const ret{*this};
+      ++(*this);
+      return ret;
+    }
+
+    constexpr bool operator==(const_iterator const &other) const noexcept {
+      // TODO #143 should `count` be part of comparison or not?!
+      return (node == other.node) && //(count == other.count) &&
+             (index == other.index);
+    }
+
+    constexpr bool operator!=(const_iterator const &other) const noexcept {
+      return !(*this == other);
+    }
+
+  private:
+    static constexpr raw_element const *
+    get_first_valid_and_nonempty_or_nullptr(raw_element const *node) noexcept {
+      while ((node != nullptr) && (node[0].meta.size == 0)) {
+        node = node[0].meta.next;
+      }
+      return node;
+    }
+
+    raw_element const *node;
+    long long count{0}; // philosophically, does it belong here or not?!
+    int index{0};
+  };
+
   list() noexcept;
   ~list() noexcept;
 
@@ -55,6 +119,7 @@ struct list {
 
   void safe_append(any const &event, int const node_capacity) noexcept;
 
+  // TODO #143 remove this completely ...
   template <typename callable_t> long long apply(callable_t &&callable) const {
     static_assert(std::is_invocable_r_v<void, // return type
                                         callable_t,
@@ -83,7 +148,21 @@ struct list {
 
   [[nodiscard]] long long size() const noexcept;
 
-  int get_current_free_capacity() const noexcept;
+  [[nodiscard]] int get_current_free_capacity() const noexcept;
+
+  [[nodiscard]] constexpr const_iterator begin() const noexcept {
+    return const_iterator{first};
+  }
+
+  [[nodiscard]] constexpr const_iterator end() const noexcept {
+    return const_iterator{nullptr};
+  }
+
+  [[nodiscard]] constexpr const_iterator cbegin() const noexcept {
+    return begin();
+  }
+
+  [[nodiscard]] constexpr const_iterator cend() const noexcept { return end(); }
 
 private:
   list(list const &) = delete;
@@ -91,6 +170,7 @@ private:
   list(list &&) = delete;
   list &operator=(list &&) = delete;
 
+  // TODO #143 remove this completely ...
   static long long get_pid() noexcept;
 
   raw_element *first{nullptr}, *last{nullptr};

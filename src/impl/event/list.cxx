@@ -19,6 +19,7 @@
 
 #include "impl/event/list.hxx"
 
+// TODO #143 remove this completely ...
 #include <unistd.h>
 
 #include <cassert>
@@ -120,6 +121,7 @@ int list::get_current_free_capacity() const noexcept {
   return last ? (last[0].meta.get_free_capacity()) : 0;
 }
 
+// TODO #143 remove this completely ...
 long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
 
 } // namespace cxxet::impl::event
@@ -129,6 +131,8 @@ long long list::get_pid() noexcept { return static_cast<long long>(getpid()); }
 #include <doctest/doctest.h>
 
 namespace cxxet::impl {
+
+namespace {
 
 TEST_CASE("event::list") {
   event::list l;
@@ -298,6 +302,8 @@ TEST_CASE("event::list") {
     REQUIRE(!l.empty());
   }
 }
+
+} // namespace
 
 } // namespace cxxet::impl
 

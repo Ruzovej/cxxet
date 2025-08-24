@@ -6,10 +6,10 @@ cxxet_include scripts/commands/compile
 
 function unit_runner() {
     local test_presets=(
-        asan
         asan_d
-        tsan
+        asan
         tsan_d
+        tsan
         release
     )
 

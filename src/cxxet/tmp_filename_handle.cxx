@@ -127,6 +127,8 @@ tmp_filename_handle::operator std::string_view() {
 
 namespace cxxet::impl {
 
+namespace {
+
 TEST_CASE("tmp_filename_handle") {
   auto const tmp_base{std::getenv("TMP_RESULT_DIR_BASE")};
   REQUIRE_NE(tmp_base, nullptr);
@@ -257,6 +259,8 @@ TEST_CASE("tmp_filename_handle") {
                       std::runtime_error);
   }
 }
+
+} // namespace
 
 } // namespace cxxet::impl
 

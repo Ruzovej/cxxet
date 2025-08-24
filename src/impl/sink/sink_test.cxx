@@ -19,22 +19,25 @@
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
-#include "impl/sink/cascade.hxx"
-#include "impl/sink/event_collector.hxx"
-#include "impl/sink/file_sink.hxx"
-
+#include <array>
 #include <thread>
 
 #include <doctest/doctest.h>
 
+#include "impl/sink/cascade.hxx"
+#include "impl/sink/event_collector.hxx"
+#include "impl/sink/file_sink.hxx"
+
 namespace cxxet::impl {
+
+namespace {
 
 template <typename base_sink> struct test_sink : base_sink {
   using base_sink::base_sink;
 
+  // TODO #143 rework this completely ...
   template <typename callable_t> long long apply(callable_t &&callable) {
-    const auto n{base_sink::events.apply(std::forward<callable_t>(callable))};
-    return n;
+    return base_sink::events.apply(std::forward<callable_t>(callable));
   }
 
   [[nodiscard]] bool empty() const noexcept {
@@ -44,10 +47,10 @@ template <typename base_sink> struct test_sink : base_sink {
 
 TEST_CASE("sink cascade") {
   long long n;
-  int counter{0};
+  std::size_t counter{0};
 
-  constexpr int size{5};
-  event::any a[size];
+  constexpr int size{7};
+  std::array<event::any, size> a;
 
   new (&a[0].evt.dur_begin) event::duration_begin{1, 2, 3, "test begin", 0};
 
@@ -60,6 +63,12 @@ TEST_CASE("sink cascade") {
   new (&a[4].evt.inst) event::instant{
       19, 20, 21, "test instant", scope_t::global, 'c', 321, 1'111'111'111, 25};
 
+  new (&a[5].evt.meta) event::metadata{"some metadata str value ...",
+                                       event::metadata_type::process_name};
+
+  new (&a[6].evt.meta)
+      event::metadata{42'000, event::metadata_type::thread_sort_index};
+
   SUBCASE("one 'leaf'") {
     sink::properties traits{};
     traits.default_target_filename = "/dev/null";
@@ -67,8 +76,9 @@ TEST_CASE("sink cascade") {
     test_sink<sink::event_collector> leaf{&root};
     leaf.reserve(2);
 
-    leaf.append_event(a[0]);
-    leaf.append_event(a[1]);
+    for (auto const &evt : a) {
+      leaf.append_event(evt);
+    }
 
     n = root.apply([](long long const, long long const, event::any const &) {
       REQUIRE(false);
@@ -86,7 +96,7 @@ TEST_CASE("sink cascade") {
 
     REQUIRE(leaf.empty());
     REQUIRE_EQ(n, counter);
-    REQUIRE_EQ(counter, 2);
+    REQUIRE_EQ(counter, size);
   }
 
   SUBCASE("two 'leafs', tree") {
@@ -267,6 +277,8 @@ TEST_CASE("sink cascade") {
     REQUIRE_EQ(counter, 2);
   }
 }
+
+} // namespace
 
 } // namespace cxxet::impl
 
