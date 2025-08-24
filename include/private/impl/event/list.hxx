@@ -33,19 +33,42 @@ struct list {
   union raw_element;
 
   struct meta_info {
+    constexpr explicit meta_info(long long const aThread_id,
+                                 int const aCapacity) noexcept
+        : thread_id{aThread_id}, next{nullptr}, size{0}, capacity{aCapacity} {}
+
+    friend union raw_element;
+
+  private:
     long long thread_id;
     raw_element *next;
     int size;
     int capacity;
-
-    constexpr int get_free_capacity() const noexcept { return capacity - size; }
   };
 
   union raw_element {
     meta_info meta;
     any evt;
 
-    constexpr raw_element() noexcept : meta{} {}
+    constexpr raw_element() noexcept : meta{0, 0} {}
+
+    constexpr long long get_thread_id() const noexcept {
+      return meta.thread_id;
+    }
+
+    constexpr raw_element const *next_node() const noexcept {
+      return meta.next;
+    }
+    constexpr raw_element *&next_node() noexcept { return meta.next; }
+
+    constexpr int get_size() const noexcept { return meta.size; }
+    constexpr int get_capacity() const noexcept { return meta.capacity; }
+
+    constexpr int get_next_free_index() noexcept { return meta.size++; }
+
+    constexpr int get_free_capacity() const noexcept {
+      return meta.capacity - meta.size;
+    }
   };
 
   struct detailed_event {
@@ -66,15 +89,15 @@ struct list {
 
     value_type operator*() const noexcept {
       assert(node);
-      assert(index < node[0].meta.size);
-      return value_type{node[0].meta.thread_id, node[index + 1].evt};
+      assert(index < node->get_size());
+      return value_type{node->get_thread_id(), node[index + 1].evt};
     }
 
     constexpr const_iterator &operator++() noexcept {
-      if (index + 1 < node[0].meta.size) {
+      if (index + 1 < node->get_size()) {
         ++index;
       } else {
-        node = get_first_valid_and_nonempty_or_nullptr(node[0].meta.next);
+        node = get_first_valid_and_nonempty_or_nullptr(node->next_node());
         index = 0;
       }
       return *this;
@@ -97,8 +120,8 @@ struct list {
   private:
     static constexpr raw_element const *
     get_first_valid_and_nonempty_or_nullptr(raw_element const *node) noexcept {
-      while ((node != nullptr) && (node[0].meta.size == 0)) {
-        node = node[0].meta.next;
+      while ((node != nullptr) && (node->get_size() == 0)) {
+        node = node->next_node();
       }
       return node;
     }

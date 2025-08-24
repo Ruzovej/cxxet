@@ -28,12 +28,13 @@ namespace cxxet::impl::event {
 namespace {
 
 list::raw_element *allocate_raw_node_elems(int const capacity) noexcept {
+  assert(capacity > 0);
   // this can throw ... but if it does, it means allocation failed -> how to
   // handle it? Let's just crash ...
   auto *data{new list::raw_element[static_cast<unsigned>(capacity) + 1]};
 
   new (&data[0].meta)
-      list::meta_info{static_cast<long long>(gettid()), nullptr, 0, capacity};
+      list::meta_info{static_cast<long long>(gettid()), capacity};
 
   return data;
 }
@@ -50,7 +51,7 @@ list::~list() noexcept {
 
 void list::destroy() noexcept {
   while (first) {
-    auto *next{first->meta.next};
+    auto *const next{first->next_node()};
     delete[] first;
     first = next;
   }
@@ -58,7 +59,7 @@ void list::destroy() noexcept {
 }
 
 void list::append(any const &event) noexcept {
-  new (&last[1 + last[0].meta.size++].evt) any{event};
+  new (&last[1 + last->get_next_free_index()].evt) any{event};
 }
 
 void list::safe_append(any const &event, int const node_capacity) noexcept {
@@ -76,7 +77,7 @@ bool list::has_free_capacity(int const capacity) const noexcept {
 
 void list::reserve(int const capacity) noexcept {
   if (!has_free_capacity(capacity)) {
-    auto target{first ? &last[0].meta.next : &first};
+    auto target{first ? &last->next_node() : &first};
     *target = allocate_raw_node_elems(capacity);
     last = *target;
   }
@@ -88,7 +89,7 @@ void list::drain_other(list &other) noexcept {
   assert((other.first == nullptr) == (other.last == nullptr));
   if (last) {
     if (other.last) {
-      last[0].meta.next = std::exchange(other.first, nullptr);
+      last->next_node() = std::exchange(other.first, nullptr);
       last = std::exchange(other.last, nullptr);
     }
   } else {
@@ -99,8 +100,8 @@ void list::drain_other(list &other) noexcept {
 
 [[nodiscard]] bool list::empty() const noexcept {
   if (first != nullptr) {
-    for (auto it{first}; it != nullptr; it = it[0].meta.next) {
-      if (it[0].meta.size > 0) {
+    for (auto it{first}; it != nullptr; it = it->next_node()) {
+      if (it->get_size() > 0) {
         return false;
       }
     }
@@ -110,14 +111,14 @@ void list::drain_other(list &other) noexcept {
 
 [[nodiscard]] long long list::size() const noexcept {
   long long sz{0};
-  for (auto it{first}; it != nullptr; it = it[0].meta.next) {
-    sz += it[0].meta.size;
+  for (auto it{first}; it != nullptr; it = it->next_node()) {
+    sz += it->get_size();
   }
   return sz;
 }
 
 int list::get_current_free_capacity() const noexcept {
-  return last ? (last[0].meta.get_free_capacity()) : 0;
+  return last ? (last->get_free_capacity()) : 0;
 }
 
 } // namespace cxxet::impl::event
