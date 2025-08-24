@@ -72,8 +72,8 @@ struct list {
   };
 
   struct detailed_event {
-    long long thread_id;
-    any event;
+    long long const thread_id;
+    any const &event;
   };
 
   class const_iterator {
