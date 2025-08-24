@@ -22,7 +22,7 @@
 #include <cassert>
 
 #include "impl/event/common.hxx"
-#include "impl/event/metadata_type.hxx"
+#include "impl/event/kind/metadata_type.hxx"
 
 namespace cxxet::impl::event {
 

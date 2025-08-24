@@ -20,7 +20,7 @@
 #include "cxxet/mark/metadata.hxx"
 
 #include "impl/event/kind/metadata.hxx"
-#include "impl/event/metadata_type.hxx"
+#include "impl/event/kind/metadata_type.hxx"
 #include "impl/thread_local_sink_submit_event.hxx"
 
 namespace cxxet::mark {
