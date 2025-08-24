@@ -145,6 +145,25 @@ void in_trace_event_format(output::writer &out,
             << e.value << "},";
         break;
       }
+      case event::type_t::metadata: {
+        auto const &e{evt.evt.meta};
+        out << "\"args\":{" << escape_json_string(e.get_arg_name()) << ":";
+        switch (e.get_metadata_type()) {
+        case event::metadata_type::process_name:
+        case event::metadata_type::thread_name:
+        case event::metadata_type::process_labels:
+          out << escape_json_string(e.get_arg_value_str());
+          break;
+        case event::metadata_type::process_sort_index:
+        case event::metadata_type::thread_sort_index:
+          out << e.get_arg_value_int();
+          break;
+        default:
+          throw std::runtime_error("Unknown metadata_type");
+        }
+        out << "},";
+        break;
+      }
       default: {
         throw std::runtime_error("Unknown event type");
       }

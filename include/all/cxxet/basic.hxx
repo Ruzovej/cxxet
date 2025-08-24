@@ -28,6 +28,7 @@
 #include "cxxet/mark/duration_begin.hxx"
 #include "cxxet/mark/duration_end.hxx"
 #include "cxxet/mark/instant.hxx"
+#include "cxxet/mark/metadata.hxx"
 #include "cxxet/scope.hxx"
 #include "cxxet/sink_control.hxx"
 #include "cxxet/timepoint.hxx"
@@ -59,6 +60,19 @@
 
 #define CXXET_mark_instant(...) cxxet::mark::instant(__VA_ARGS__)
 
+#define CXXET_mark_process_name(proc_name) cxxet::mark::process_name(proc_name)
+
+#define CXXET_mark_process_label(proc_label)                                   \
+  cxxet::mark::process_label(proc_label)
+
+#define CXXET_mark_process_sort_index(proc_sort_index)                         \
+  cxxet::mark::process_sort_index(proc_sort_index)
+
+#define CXXET_mark_thread_name(th_name) cxxet::mark::thread_name(th_name)
+
+#define CXXET_mark_thread_sort_index(th_sort_index)                            \
+  cxxet::mark::thread_sort_index(th_sort_index)
+
 #define CXXET_sink_thread_reserve(minimum_free_capacity)                       \
   cxxet::sink_thread_reserve(minimum_free_capacity)
 
@@ -69,9 +83,6 @@
 
 #define CXXET_sink_thread_divert_to_sink_global()                              \
   cxxet::sink_thread_divert_to_sink_global()
-
-// TODO either rename this file (e.g. to `all_markers`) or provide (macro?!)
-// interface to `sink_diversion.hxx`
 
 #else
 
@@ -90,6 +101,16 @@
 #define CXXET_mark_instant(...)
 
 #define CXXET_sink_thread_reserve(...)
+
+#define CXXET_mark_process_name(...)
+
+#define CXXET_mark_process_label(...)
+
+#define CXXET_mark_process_sort_index(...)
+
+#define CXXET_mark_thread_name(...)
+
+#define CXXET_mark_thread_sort_index(...)
 
 #define CXXET_sink_thread_flush_now()
 

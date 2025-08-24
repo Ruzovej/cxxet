@@ -19,28 +19,18 @@
 
 #pragma once
 
-#include "impl/event/list.hxx"
+#include "cxxet/macros/linkage.h"
 
-namespace cxxet::impl::sink {
+namespace cxxet::mark {
 
-struct sink_base {
-  sink_base() noexcept;
-  virtual ~sink_base() noexcept;
+CXXET_IMPL_API void process_name(char const *const proc_name) noexcept;
 
-  virtual void drain(sink_base &other) noexcept = 0;
+CXXET_IMPL_API void process_label(char const *const proc_label) noexcept;
 
-  bool has_events() const noexcept;
+CXXET_IMPL_API void process_sort_index(int const proc_sort_index) noexcept;
 
-protected:
-  event::list events;
+CXXET_IMPL_API void thread_name(char const *const th_name) noexcept;
 
-  void do_drain(sink_base &other) noexcept;
+CXXET_IMPL_API void thread_sort_index(int const th_sort_index) noexcept;
 
-private:
-  sink_base(sink_base const &) = delete;
-  sink_base &operator=(sink_base const &) = delete;
-  sink_base(sink_base &&) = delete;
-  sink_base &operator=(sink_base &&) = delete;
-};
-
-} // namespace cxxet::impl::sink
+} // namespace cxxet::mark

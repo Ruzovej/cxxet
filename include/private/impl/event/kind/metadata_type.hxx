@@ -19,28 +19,14 @@
 
 #pragma once
 
-#include "impl/event/list.hxx"
+namespace cxxet::impl::event {
 
-namespace cxxet::impl::sink {
-
-struct sink_base {
-  sink_base() noexcept;
-  virtual ~sink_base() noexcept;
-
-  virtual void drain(sink_base &other) noexcept = 0;
-
-  bool has_events() const noexcept;
-
-protected:
-  event::list events;
-
-  void do_drain(sink_base &other) noexcept;
-
-private:
-  sink_base(sink_base const &) = delete;
-  sink_base &operator=(sink_base const &) = delete;
-  sink_base(sink_base &&) = delete;
-  sink_base &operator=(sink_base &&) = delete;
+enum class metadata_type : char {
+  process_name,
+  process_labels,
+  process_sort_index,
+  thread_name,
+  thread_sort_index,
 };
 
-} // namespace cxxet::impl::sink
+}

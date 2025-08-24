@@ -29,6 +29,11 @@ add_example(
 )
 
 add_example(
+    cxxet_example_metadata_1
+        "metadata/1.cxx"
+)
+
+add_example(
     cxxet_example_local_file_sink_1
         "sink_diversion/1.cxx"
 )

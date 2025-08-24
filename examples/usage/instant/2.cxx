@@ -30,12 +30,16 @@ int main(int argc, char const **argv) {
   CXXET_sink_thread_reserve();
 
   CXXET_mark_instant("main thread beginning");
+  // equivalent to:
+  // `CXXET_mark_instant("main thread beginning", cxxet::scope_t::thread);`
+  // other options are:
+  // `CXXET_mark_instant("main thread beginning", cxxet::scope_t::process);`
+  // `CXXET_mark_instant("main thread beginning", cxxet::scope_t::global);`
+  // Unfortunately, using non-default scope (== `cxxet::scope_t::thread`),
+  // makes `chrome` & ui.perfetto.dev display it somehow unusably ...
 
   {
     CXXET_mark_complete("main thread, local scope");
-
-    // Unfortunately, using non-default scope (== `cxxet::scope_t::thread`),
-    // makes `chrome` & ui.perfetto.dev display it somehow unusably ...
 
     std::thread t1{[]() {
       CXXET_sink_thread_reserve();

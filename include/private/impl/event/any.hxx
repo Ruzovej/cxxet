@@ -27,6 +27,7 @@
 #include "impl/event/kind/counter.hxx"
 #include "impl/event/kind/duration.hxx"
 #include "impl/event/kind/instant.hxx"
+#include "impl/event/kind/metadata.hxx"
 
 namespace cxxet::impl::event {
 
@@ -40,6 +41,7 @@ struct any {
     complete cmpl;
     counter cntr;
     instant inst;
+    metadata meta;
   } evt;
 
   any() noexcept : evt{} {}
@@ -50,7 +52,8 @@ struct any {
   }
 
   [[nodiscard]] constexpr char const *get_name() const noexcept {
-    return get_type() == event::type_t::counter ? "Counter"
+    return get_type() == event::type_t::metadata  ? evt.meta.get_name()
+           : get_type() == event::type_t::counter ? "Counter"
            : get_type() == event::type_t::duration_end
                // TODO maybe don't return empty string, and rather skip writing
                // out `"name":"",` completely (in `dump_records`)...:
@@ -69,18 +72,21 @@ struct any {
                                     std::is_same_v<EventType, duration_end> ||
                                     std::is_same_v<EventType, complete> ||
                                     std::is_same_v<EventType, counter> ||
-                                    std::is_same_v<EventType, instant>>>
+                                    std::is_same_v<EventType, instant> ||
+                                    std::is_same_v<EventType, metadata>>>
   any(EventType const &e) noexcept : any{} {
     if constexpr (std::is_same_v<EventType, duration_begin>) {
-      new (&evt.dur_begin) duration_begin{e};
+      new (&evt.dur_begin) EventType{e};
     } else if constexpr (std::is_same_v<EventType, duration_end>) {
-      new (&evt.dur_end) duration_end{e};
+      new (&evt.dur_end) EventType{e};
     } else if constexpr (std::is_same_v<EventType, complete>) {
-      new (&evt.cmpl) complete{e};
+      new (&evt.cmpl) EventType{e};
     } else if constexpr (std::is_same_v<EventType, counter>) {
-      new (&evt.cntr) counter{e};
+      new (&evt.cntr) EventType{e};
     } else if constexpr (std::is_same_v<EventType, instant>) {
-      new (&evt.inst) instant{e};
+      new (&evt.inst) EventType{e};
+    } else if constexpr (std::is_same_v<EventType, metadata>) {
+      new (&evt.meta) EventType{e};
     }
   }
 
@@ -93,7 +99,8 @@ struct any {
              evt.dur_end == other.evt.dur_end) ||
             (get_type() == type_t::complete && evt.cmpl == other.evt.cmpl) ||
             (get_type() == type_t::counter && evt.cntr == other.evt.cntr) ||
-            (get_type() == type_t::instant && evt.inst == other.evt.inst));
+            (get_type() == type_t::instant && evt.inst == other.evt.inst) ||
+            (get_type() == type_t::metadata && evt.meta == other.evt.meta));
   }
 };
 

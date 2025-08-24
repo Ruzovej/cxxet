@@ -20,7 +20,7 @@
 #pragma once
 
 #include "cxxet/output/writer.hxx"
-#include "impl/event/list/list.hxx"
+#include "impl/event/list.hxx"
 
 namespace cxxet::impl::write_out {
 
