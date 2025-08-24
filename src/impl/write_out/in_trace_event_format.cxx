@@ -97,8 +97,9 @@ void in_trace_event_format(output::writer &out,
   // "comment" value of `time_point_zero_ns`
   out << "\"traceEvents\":[";
 
-  for (auto const &[count, thread_id, evt] : list) {
-    if (count > 1) {
+  long long count{0};
+  for (auto const &[thread_id, evt] : list) {
+    if (++count > 1) {
       out << ',';
     }
 

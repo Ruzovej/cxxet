@@ -49,7 +49,6 @@ struct list {
   };
 
   struct detailed_event {
-    long long count;
     long long thread_id;
     any event;
   };
@@ -57,7 +56,7 @@ struct list {
   class const_iterator {
   public:
     using iterator_category = std::forward_iterator_tag;
-    using value_type = detailed_event;
+    using value_type = detailed_event const;
     using difference_type = std::ptrdiff_t;
 
     constexpr explicit const_iterator(raw_element *aNode) noexcept
@@ -66,7 +65,7 @@ struct list {
     value_type operator*() const noexcept {
       assert(node);
       assert(index < node[0].meta.size);
-      return value_type{count + 1, node[0].meta.thread_id, node[index + 1].evt};
+      return value_type{node[0].meta.thread_id, node[index + 1].evt};
     }
 
     constexpr const_iterator &operator++() noexcept {
@@ -76,7 +75,6 @@ struct list {
         node = get_first_valid_and_nonempty_or_nullptr(node[0].meta.next);
         index = 0;
       }
-      ++count;
       return *this;
     }
 
@@ -87,9 +85,7 @@ struct list {
     }
 
     constexpr bool operator==(const_iterator const &other) const noexcept {
-      // TODO #143 should `count` be part of comparison or not?!
-      return (node == other.node) && //(count == other.count) &&
-             (index == other.index);
+      return (node == other.node) && (index == other.index);
     }
 
     constexpr bool operator!=(const_iterator const &other) const noexcept {
@@ -106,7 +102,6 @@ struct list {
     }
 
     raw_element const *node;
-    long long count{0}; // philosophically, does it belong here or not?!
     int index{0};
   };
 
