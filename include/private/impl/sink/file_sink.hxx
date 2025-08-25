@@ -25,6 +25,7 @@
 #include "cxxet/output/writer.hxx"
 #include "impl/sink/properties.hxx"
 #include "impl/sink/thread_safe_t.hxx"
+#include "impl/write_out/category_name_map.hxx"
 
 namespace cxxet::impl::sink {
 
@@ -39,6 +40,10 @@ template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
   void set_flush_target(std::string &&aFilename) noexcept;
   void
   set_flush_target(std::unique_ptr<output::writer> &&aCustom_writer) noexcept;
+
+  [[nodiscard]] unsigned register_category_name(unsigned const category,
+                                                std::string &&name,
+                                                bool const allow_rename);
 
 private:
   file_sink(file_sink const &) = delete;
@@ -57,6 +62,8 @@ private:
   //  2. std::unique_ptr<output::writer> (custom_writer)
   std::string target_filename;
   std::unique_ptr<output::writer> custom_writer{nullptr};
+
+  write_out::category_name_map category_names;
 };
 
 extern template struct file_sink<true>;

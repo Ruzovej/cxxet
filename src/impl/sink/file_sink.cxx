@@ -56,6 +56,14 @@ void file_sink<thread_safe_v>::set_flush_target(
 }
 
 template <bool thread_safe_v>
+unsigned file_sink<thread_safe_v>::register_category_name(
+    unsigned const category, std::string &&name, bool const allow_rename) {
+  std::lock_guard lck{*this};
+  return category_names.register_category_name(category, std::move(name),
+                                               allow_rename);
+}
+
+template <bool thread_safe_v>
 void file_sink<thread_safe_v>::write_out_events() noexcept {
   if (!base_class_t::events.empty()) {
     try {
