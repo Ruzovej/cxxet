@@ -314,6 +314,11 @@ Deduced CXXET_TARGET_FILENAME: "
 
 # TODO (https://github.com/Ruzovej/cxxet/issues/146) various examples & corresponding tests for category names, etc.
 
+@test "Markers with nonempty category" {
+    # TODO (https://github.com/Ruzovej/cxxet/issues/146) ...
+    :
+}
+
 @test "Custom file_sink redirection example 1" {
     local executable="${BIN_DIR}/cxxet_example_local_file_sink_1"
     local result1="${TMP_RESULT_DIR}/example_local_file_sink_1_A.json"
