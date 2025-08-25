@@ -21,6 +21,7 @@
 
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 namespace cxxet::impl::write_out {
@@ -45,11 +46,13 @@ struct category_name_map {
   static bool is_name_valid(std::string_view const name) noexcept;
   bool is_name_used(std::string_view const name) const noexcept;
 
-  std::string get_joined_category_names(unsigned const category_bits) const;
+  std::string_view
+  get_joined_category_names(unsigned const category_bits) const;
 
 private:
   // better than `std::array` - to save (stack) space when not used ...
   std::vector<std::string> names{};
+  mutable std::unordered_map<unsigned, std::string> built_names;
 };
 
 } // namespace cxxet::impl::write_out

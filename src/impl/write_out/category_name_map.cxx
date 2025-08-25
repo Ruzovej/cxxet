@@ -113,9 +113,14 @@ bool category_name_map::is_name_used(
                        [name](auto const &n) { return n == name; }) > 0;
 }
 
-std::string category_name_map::get_joined_category_names(
+std::string_view category_name_map::get_joined_category_names(
     unsigned const category_bits) const {
-  std::string res;
+  auto const iter{built_names.find(category_bits)};
+  if (iter != built_names.end()) {
+    return iter->second;
+  }
+
+  std::string &res{built_names[category_bits]};
 
   for (unsigned idx{0u}; idx < num_categories; ++idx) {
     auto const mask{1u << idx};
