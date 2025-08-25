@@ -40,7 +40,7 @@ private:
 
   void submit(impl::timepoint_t const finish) noexcept;
 
-  unsigned int const categories{0};
+  unsigned const categories{0};
   const char *const desc;
   impl::timepoint_t const start;
 };
