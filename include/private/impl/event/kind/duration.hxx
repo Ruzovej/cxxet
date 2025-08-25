@@ -31,14 +31,15 @@ struct duration_begin {
   common<t> evt;
   long long start_ns;
 
-  duration_begin() = default;
-  constexpr duration_begin(char const *const aDesc,
+  constexpr duration_begin(unsigned const aCategories, char const *const aDesc,
                            long long const aStart_ns) noexcept
-      : evt{aDesc}, start_ns{aStart_ns} {}
+      : evt{aCategories, aDesc}, start_ns{aStart_ns} {}
+
+#ifdef CXXET_WITH_UNIT_TESTS
   constexpr duration_begin(char const aFlag1, short const aFlag2,
-                           int const aFlag4, char const *const aDesc,
+                           unsigned const aCategories, char const *const aDesc,
                            long long const aStart_ns) noexcept
-      : evt{aFlag1, aFlag2, aFlag4, aDesc}, start_ns{aStart_ns} {}
+      : evt{aFlag1, aFlag2, aCategories, aDesc}, start_ns{aStart_ns} {}
 
   constexpr bool operator==(duration_begin const &other) const noexcept {
     auto const tie = [](duration_begin const &db) {
@@ -46,6 +47,7 @@ struct duration_begin {
     };
     return tie(*this) == tie(other);
   }
+#endif
 };
 
 struct duration_end {
@@ -54,14 +56,15 @@ struct duration_end {
   common<t> evt;
   long long end_ns;
 
-  duration_end() = default;
-  constexpr duration_end(char const *const aDesc,
+  constexpr duration_end(unsigned const aCategories, char const *const aDesc,
                          long long const aEnd_ns) noexcept
-      : evt{aDesc}, end_ns{aEnd_ns} {}
+      : evt{aCategories, aDesc}, end_ns{aEnd_ns} {}
+
+#ifdef CXXET_WITH_UNIT_TESTS
   constexpr duration_end(char const aFlag1, short const aFlag2,
-                         int const aFlag4, char const *const aDesc,
+                         unsigned const aCategories, char const *const aDesc,
                          long long const aEnd_ns) noexcept
-      : evt{aFlag1, aFlag2, aFlag4, aDesc}, end_ns{aEnd_ns} {}
+      : evt{aFlag1, aFlag2, aCategories, aDesc}, end_ns{aEnd_ns} {}
 
   [[nodiscard]] constexpr bool
   operator==(duration_end const &other) const noexcept {
@@ -70,6 +73,7 @@ struct duration_end {
     };
     return tie(*this) == tie(other);
   }
+#endif
 };
 
 } // namespace cxxet::impl::event

@@ -87,7 +87,8 @@ double longlong_ns_to_double_us(long long const ns) noexcept {
 
 void in_trace_event_format(output::writer &out,
                            long long const time_point_zero_ns,
-                           event::list const &list) {
+                           event::list const &list,
+                           write_out::category_name_map const &cat_names) {
   out.prepare_for_writing();
 
   auto const process_id{static_cast<long long>(getpid())};
@@ -106,8 +107,12 @@ void in_trace_event_format(output::writer &out,
     out << '{';
     out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
     out << "\"ph\":\"" << evt.get_ph() << "\",";
-    // TODO (https://github.com/Ruzovej/cxxet/issues/139) - start using
-    // "category", e.g.: out << "\"cat\":" << escape_json_string(???) << ",";
+    auto const categories_str{
+        cat_names.get_joined_category_names(evt.get_categories())};
+    if (!categories_str.empty()) {
+      // requirements imply no need to escape it
+      out << "\"cat\":" << categories_str << ",";
+    }
 
     auto const write_out_timestamp = [&out](long long const ns) {
       out << "\"ts\":" << longlong_ns_to_double_us(ns) << ',';

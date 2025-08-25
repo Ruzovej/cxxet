@@ -19,11 +19,14 @@
 
 #include "impl/event/any.hxx"
 
+#include <climits>
 #include <cstddef>
 
 #include <algorithm>
 #include <type_traits>
 #include <variant>
+
+static_assert(CHAR_BIT == 8, "mysterious platform");
 
 namespace cxxet::impl::event {
 

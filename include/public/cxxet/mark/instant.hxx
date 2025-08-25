@@ -25,12 +25,18 @@
 
 namespace cxxet::mark {
 
-CXXET_IMPL_API void submit_instant(char const *const desc, scope_t const scope,
+CXXET_IMPL_API void submit_instant(unsigned const categories,
+                                   char const *const desc, scope_t const scope,
                                    long long const timestamp_ns) noexcept;
+
+inline void instant(unsigned const categories, char const *const desc,
+                    scope_t const scope = scope_t::thread) noexcept {
+  submit_instant(categories, desc, scope, impl::as_int_ns(impl::now()));
+}
 
 inline void instant(char const *const desc,
                     scope_t const scope = scope_t::thread) noexcept {
-  submit_instant(desc, scope, impl::as_int_ns(impl::now()));
+  instant(0, desc, scope);
 }
 
 } // namespace cxxet::mark

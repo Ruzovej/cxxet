@@ -25,11 +25,16 @@
 namespace cxxet::mark {
 
 CXXET_IMPL_API void
-submit_duration_begin(char const *const desc,
+submit_duration_begin(unsigned const categories, char const *const desc,
                       long long const timestamp_ns) noexcept;
 
+inline void duration_begin(unsigned const categories,
+                           char const *const desc) noexcept {
+  submit_duration_begin(categories, desc, impl::as_int_ns(impl::now()));
+}
+
 inline void duration_begin(char const *const desc) noexcept {
-  submit_duration_begin(desc, impl::as_int_ns(impl::now()));
+  duration_begin(0, desc);
 }
 
 } // namespace cxxet::mark

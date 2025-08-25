@@ -56,12 +56,20 @@ void file_sink<thread_safe_v>::set_flush_target(
 }
 
 template <bool thread_safe_v>
+unsigned file_sink<thread_safe_v>::register_category_name(
+    unsigned const category, std::string &&name, bool const allow_rename) {
+  std::lock_guard lck{*this};
+  return category_names.register_category_name(category, std::move(name),
+                                               allow_rename);
+}
+
+template <bool thread_safe_v>
 void file_sink<thread_safe_v>::write_out_events() noexcept {
   if (!base_class_t::events.empty()) {
     try {
       if (custom_writer) {
         write_out::in_trace_event_format(*custom_writer, time_point_zero_ns,
-                                         base_class_t::events);
+                                         base_class_t::events, category_names);
       } else if (!target_filename.empty()) {
         tmp_filename_handle implicit_file_handle{target_filename};
         char const *target{};
@@ -75,7 +83,7 @@ void file_sink<thread_safe_v>::write_out_events() noexcept {
         }
         default_writer def_writer{target};
         write_out::in_trace_event_format(def_writer, time_point_zero_ns,
-                                         base_class_t::events);
+                                         base_class_t::events, category_names);
       }
     } catch (std::exception const &e) {
       std::cerr << "Failed to write out events: " << e.what() << '\n';

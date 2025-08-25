@@ -51,6 +51,10 @@ struct any {
     return evt.common_base.c.type;
   }
 
+  [[nodiscard]] constexpr unsigned get_categories() const noexcept {
+    return evt.common_base.c.categories;
+  }
+
   [[nodiscard]] constexpr char const *get_name() const noexcept {
     return get_type() == event::type_t::metadata  ? evt.meta.get_name()
            : get_type() == event::type_t::counter ? "Counter"
@@ -90,7 +94,7 @@ struct any {
     }
   }
 
-  // used only for testing - maybe hide it otherwise (via #if-def, etc.)?
+#ifdef CXXET_WITH_UNIT_TESTS
   [[nodiscard]] constexpr bool operator==(any const &other) const noexcept {
     return get_type() == other.get_type() && get_type() != type_t::unknown &&
            ((get_type() == type_t::duration_begin &&
@@ -102,6 +106,7 @@ struct any {
             (get_type() == type_t::instant && evt.inst == other.evt.inst) ||
             (get_type() == type_t::metadata && evt.meta == other.evt.meta));
   }
+#endif
 };
 
 } // namespace cxxet::impl::event

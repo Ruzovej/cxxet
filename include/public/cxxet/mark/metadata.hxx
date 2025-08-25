@@ -23,14 +23,39 @@
 
 namespace cxxet::mark {
 
-CXXET_IMPL_API void process_name(char const *const proc_name) noexcept;
+CXXET_IMPL_API void process_name(unsigned const categories,
+                                 char const *const proc_name) noexcept;
 
-CXXET_IMPL_API void process_label(char const *const proc_label) noexcept;
+inline void process_name(char const *const proc_name) noexcept {
+  process_name(0, proc_name);
+}
 
-CXXET_IMPL_API void process_sort_index(int const proc_sort_index) noexcept;
+CXXET_IMPL_API void process_label(unsigned const categories,
+                                  char const *const proc_label) noexcept;
 
-CXXET_IMPL_API void thread_name(char const *const th_name) noexcept;
+inline void process_label(char const *const proc_label) noexcept {
+  process_label(0, proc_label);
+}
 
-CXXET_IMPL_API void thread_sort_index(int const th_sort_index) noexcept;
+CXXET_IMPL_API void process_sort_index(unsigned const categories,
+                                       int const proc_sort_index) noexcept;
+
+inline void process_sort_index(int const proc_sort_index) noexcept {
+  process_sort_index(0, proc_sort_index);
+}
+
+CXXET_IMPL_API void thread_name(unsigned const categories,
+                                char const *const th_name) noexcept;
+
+inline void thread_name(char const *const th_name) noexcept {
+  thread_name(0, th_name);
+}
+
+CXXET_IMPL_API void thread_sort_index(unsigned const categories,
+                                      int const th_sort_index) noexcept;
+
+inline void thread_sort_index(int const th_sort_index) noexcept {
+  thread_sort_index(0, th_sort_index);
+}
 
 } // namespace cxxet::mark
