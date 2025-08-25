@@ -54,7 +54,7 @@ template <type_t bound_type = type_t::unknown> struct common {
   // * "ts", "args", ... -> provided by the specific event type
 
   constexpr common() = default;
-  constexpr common(char const *const aDesc) noexcept
+  constexpr explicit common(char const *const aDesc) noexcept
       : flag_1{0}, flag_2{0}, categories{0}, desc{aDesc} {}
   constexpr common(unsigned const aCategories, char const *const aDesc) noexcept
       : flag_1{0}, flag_2{0}, categories{aCategories}, desc{aDesc} {}
