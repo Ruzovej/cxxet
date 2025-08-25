@@ -312,7 +312,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e -c '[.traceEvents[] | select(.name == "thread_sort_index")] | map(.args.sort_index) | sort' "${result}")" '[10,50]'
 }
 
-# TODO #139 various examples & corresponding tests for category names, etc.
+# TODO (https://github.com/Ruzovej/cxxet/issues/146) various examples & corresponding tests for category names, etc.
 
 @test "Custom file_sink redirection example 1" {
     local executable="${BIN_DIR}/cxxet_example_local_file_sink_1"
