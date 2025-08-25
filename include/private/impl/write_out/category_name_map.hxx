@@ -17,17 +17,25 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "cxxet/mark/duration_begin.hxx"
+#pragma once
 
-#include "impl/event/kind/duration.hxx"
-#include "impl/thread_local_sink_submit_event.hxx"
+#include <string>
+#include <vector>
 
-namespace cxxet::mark {
+namespace cxxet::impl::write_out {
 
-void submit_duration_begin(unsigned const categories, char const *const desc,
-                           long long const timestamp_ns) noexcept {
-  impl::thread_local_sink_submit_event(
-      impl::event::duration_begin{categories, desc, timestamp_ns});
-}
+struct category_name_map {
+  static constexpr unsigned max_user_categories{30};
+  static constexpr unsigned num_categories{31};
 
-} // namespace cxxet::mark
+  category_name_map() noexcept;
+
+  [[nodiscard]] unsigned register_category_name(unsigned const category,
+                                                std::string &&name,
+                                                bool const allow_rename);
+
+private:
+  std::vector<std::string> names{}; // to save stack space when not used ...
+};
+
+} // namespace cxxet::impl::write_out

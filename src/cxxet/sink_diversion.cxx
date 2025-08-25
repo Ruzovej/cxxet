@@ -33,7 +33,8 @@ namespace {
 
 struct sink_handle_provider {
   virtual ~sink_handle_provider() noexcept = default;
-  virtual impl::sink::sink_base *get_raw_sink_handle() noexcept = 0;
+  [[nodiscard]] virtual impl::sink::sink_base *
+  get_raw_sink_handle() noexcept = 0;
 };
 
 template <bool thread_safe_v>
@@ -60,6 +61,11 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
       std::unique_ptr<output::writer> custom_writer) noexcept override {
     assert(custom_writer);
     sink.set_flush_target(std::move(custom_writer));
+  }
+
+  unsigned register_category_name(unsigned const category, std::string name,
+                                  bool const allow_rename) noexcept override {
+    return sink.register_category_name(category, std::move(name), allow_rename);
   }
 
 private:

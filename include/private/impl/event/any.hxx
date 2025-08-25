@@ -90,7 +90,7 @@ struct any {
     }
   }
 
-  // used only for testing - maybe hide it otherwise (via #if-def, etc.)?
+#ifdef CXXET_WITH_UNIT_TESTS
   [[nodiscard]] constexpr bool operator==(any const &other) const noexcept {
     return get_type() == other.get_type() && get_type() != type_t::unknown &&
            ((get_type() == type_t::duration_begin &&
@@ -102,6 +102,7 @@ struct any {
             (get_type() == type_t::instant && evt.inst == other.evt.inst) ||
             (get_type() == type_t::metadata && evt.meta == other.evt.meta));
   }
+#endif
 };
 
 } // namespace cxxet::impl::event

@@ -63,11 +63,18 @@ TEST_CASE("sink cascade") {
   new (&a[4].evt.inst) event::instant{
       19, 20, 21, "test instant", scope_t::global, 'c', 321, 1'111'111'111, 25};
 
-  new (&a[5].evt.meta) event::metadata{"some metadata str value ...",
-                                       event::metadata_type::process_name};
+  new (&a[5].evt.meta) event::metadata{'T',
+                                       1234,
+                                       546,
+                                       "some metadata str value ...",
+                                       event::metadata_type::process_name,
+                                       't',
+                                       345,
+                                       678978};
 
-  new (&a[6].evt.meta)
-      event::metadata{42'000, event::metadata_type::thread_sort_index};
+  new (&a[6].evt.meta) event::metadata{
+      'N', 1235, 7898797, 42'000, event::metadata_type::thread_sort_index,
+      'M', 9330};
 
   SUBCASE("one 'leaf'") {
     sink::properties traits{};

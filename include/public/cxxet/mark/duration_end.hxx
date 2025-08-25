@@ -24,11 +24,17 @@
 
 namespace cxxet::mark {
 
-CXXET_IMPL_API void submit_duration_end(char const *const desc,
+CXXET_IMPL_API void submit_duration_end(unsigned const categories,
+                                        char const *const desc,
                                         long long const timestamp_ns) noexcept;
 
-inline void duration_end(char const *desc = nullptr) noexcept {
-  submit_duration_end(desc, impl::as_int_ns(impl::now()));
+inline void duration_end(unsigned const categories = 0,
+                         char const *desc = nullptr) noexcept {
+  submit_duration_end(categories, desc, impl::as_int_ns(impl::now()));
+}
+
+inline void duration_end(char const *const desc) noexcept {
+  duration_end(0, desc);
 }
 
 } // namespace cxxet::mark

@@ -34,17 +34,26 @@ struct CXXET_IMPL_API sink_handle {
 };
 
 struct CXXET_IMPL_API file_sink_handle : sink_handle {
-  static std::unique_ptr<file_sink_handle>
+  [[nodiscard]] static std::unique_ptr<file_sink_handle>
   make(bool const thread_safe) noexcept;
 
   virtual void set_flush_target(std::string filename) noexcept = 0;
   virtual void
   set_flush_target(std::unique_ptr<output::writer> custom_writer) noexcept = 0;
   void set_flush_target(std::nullptr_t) noexcept = delete;
+
+  [[nodiscard]] virtual unsigned
+  register_category_name(unsigned const category, std::string name,
+                         bool const allow_rename = false) noexcept = 0;
+  [[nodiscard]] inline unsigned
+  register_category_name(std::string name,
+                         bool const allow_rename = false) noexcept {
+    return register_category_name(0, std::move(name), allow_rename);
+  }
 };
 
 struct CXXET_IMPL_API cascade_sink_handle : sink_handle {
-  static std::unique_ptr<cascade_sink_handle>
+  [[nodiscard]] static std::unique_ptr<cascade_sink_handle>
   make(bool const thread_safe, sink_handle &parent) noexcept;
 
   virtual void flush_now() noexcept = 0;

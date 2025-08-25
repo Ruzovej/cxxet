@@ -26,35 +26,50 @@
 
 namespace cxxet::mark {
 
-CXXET_IMPL_API void submit_counter(char const *const name,
+CXXET_IMPL_API void submit_counter(unsigned const categories,
+                                   char const *const name,
                                    long long const timestamp_ns,
                                    double const value) noexcept;
 
-inline void do_submit_counter(char const *const name,
+inline void do_submit_counter(unsigned const categories, char const *const name,
                               double const value) noexcept {
   auto const now_ns{impl::as_int_ns(impl::now())};
-  submit_counter(name, now_ns, value);
+  submit_counter(categories, name, now_ns, value);
+}
+
+inline void do_submit_counter(char const *const name,
+                              double const value) noexcept {
+  do_submit_counter(0, name, value);
 }
 
 template <typename... Args>
-void submit_counters(long long const timestamp_ns, char const *const name,
-                     double const value, Args &&...args) noexcept {
-  submit_counter(name, timestamp_ns, value);
+void do_submit_counters_impl(long long const timestamp_ns,
+                             unsigned const categories, char const *const name,
+                             double const value, Args &&...args) noexcept {
+  submit_counter(categories, name, timestamp_ns, value);
   if constexpr (sizeof...(args) > 0) {
-    submit_counters(timestamp_ns, std::forward<Args>(args)...);
+    do_submit_counters_impl(timestamp_ns, categories,
+                            std::forward<Args>(args)...);
   }
 }
 
 template <typename... Args>
-void do_submit_counters(char const *const name, double const value,
-                        Args &&...args) noexcept {
+void do_submit_counters(unsigned const categories, char const *const name,
+                        double const value, Args &&...args) noexcept {
   static_assert(sizeof...(args) % 2 == 0, "Uneven number of arguments");
   static_assert(
       sizeof...(args) >= 2,
       "Submitting only single counter - use `do_submit_counter` instead");
 
   auto const now_ns{impl::as_int_ns(impl::now())};
-  submit_counters(now_ns, name, value, std::forward<Args>(args)...);
+  do_submit_counters_impl(now_ns, categories, name, value,
+                          std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+void do_submit_counters(char const *const name, double const value,
+                        Args &&...args) noexcept {
+  do_submit_counters(0, name, value, std::forward<Args>(args)...);
 }
 
 } // namespace cxxet::mark

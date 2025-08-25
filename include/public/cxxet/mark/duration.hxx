@@ -25,7 +25,11 @@
 namespace cxxet::mark {
 
 struct duration {
-  inline duration(char const *desc) noexcept { duration_begin(desc); }
+  inline duration(unsigned const categories, char const *const desc) noexcept {
+    duration_begin(categories, desc);
+  }
+  inline explicit duration(char const *const desc) noexcept
+      : duration{0, desc} {}
 
   inline ~duration() noexcept { duration_end(); }
 

@@ -272,11 +272,18 @@ TEST_CASE("event::list") {
         45, 78, 89, "test instant", scope_t::thread, 'R', 32109, 2'000'000'001,
         25};
 
-    new (&a[5].evt.meta) event::metadata{"some other metadata str value ...",
-                                         event::metadata_type::process_name};
+    new (&a[5].evt.meta) event::metadata{'c',
+                                         4553,
+                                         145,
+                                         "some other metadata str value ...",
+                                         event::metadata_type::process_name,
+                                         'D',
+                                         9897,
+                                         123155};
 
-    new (&a[6].evt.meta)
-        event::metadata{42'132, event::metadata_type::thread_sort_index};
+    new (&a[6].evt.meta) event::metadata{
+        'r', 134, 13334, 42'132, event::metadata_type::thread_sort_index,
+        'Q', 899};
 
     SUBCASE("without reserve()") {
       REQUIRE_EQ(l.get_current_free_capacity(), 0);
