@@ -23,7 +23,7 @@
 
 namespace cxxet::impl::event {
 
-struct list {
+class list {
   union raw_element;
 
   struct meta_info {
@@ -45,19 +45,25 @@ struct list {
 
     raw_element() noexcept;
 
+    static raw_element *new_elems(int const capacity) noexcept;
+    static void delete_elems(raw_element const *const elems) noexcept;
+
     long long get_thread_id() const noexcept;
 
-    raw_element const *next_node() const noexcept;
-    raw_element *&next_node() noexcept;
+    raw_element const *get_next_node() const noexcept;
+    void set_next_node(raw_element *const next) noexcept;
+
+    any const &operator[](int const idx) const noexcept;
+
+    void push_any(any const &event) noexcept;
 
     int get_size() const noexcept;
     int get_capacity() const noexcept;
 
-    int get_next_free_index() noexcept;
-
     int get_free_capacity() const noexcept;
   };
 
+public:
   struct detailed_event {
     long long const thread_id;
     any const &event;

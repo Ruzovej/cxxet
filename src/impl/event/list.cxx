@@ -28,47 +28,71 @@
 
 namespace cxxet::impl::event {
 
-// raw_element implementations
-list::raw_element::raw_element() noexcept : meta{0, 0} {}
+list::raw_element::raw_element() noexcept : meta{0, 0} {
+  // where else to check this ...:
+  static_assert(std::is_trivially_destructible_v<raw_element>);
+  static_assert(std::is_trivially_destructible_v<meta_info>);
+}
+
+list::raw_element *list::raw_element::new_elems(int const capacity) noexcept {
+  assert(capacity > 0);
+  // this can throw ... but if it does, it means allocation failed -> how to
+  // handle it? Let's just crash ...
+  auto *data{new raw_element[static_cast<unsigned>(capacity) + 1]};
+
+  new (&(data->meta)) meta_info{static_cast<long long>(gettid()), capacity};
+
+  return data;
+}
+
+void list::raw_element::delete_elems(raw_element const *const elems) noexcept {
+  delete[] elems;
+}
 
 long long list::raw_element::get_thread_id() const noexcept {
   return meta.thread_id;
 }
 
-list::raw_element const *list::raw_element::next_node() const noexcept {
+list::raw_element const *list::raw_element::get_next_node() const noexcept {
   return meta.next;
 }
 
-list::raw_element *&list::raw_element::next_node() noexcept {
-  return meta.next;
+void list::raw_element::set_next_node(raw_element *const next) noexcept {
+  meta.next = next;
+}
+
+any const &list::raw_element::operator[](int const idx) const noexcept {
+  assert((0 <= idx) && (idx < get_size()));
+  return this[1 + idx].evt;
+}
+
+void list::raw_element::push_any(any const &event) noexcept {
+  assert(0 < get_free_capacity());
+  new (&this[++meta.size]) any{event};
 }
 
 int list::raw_element::get_size() const noexcept { return meta.size; }
 
 int list::raw_element::get_capacity() const noexcept { return meta.capacity; }
 
-int list::raw_element::get_next_free_index() noexcept { return meta.size++; }
-
 int list::raw_element::get_free_capacity() const noexcept {
   return meta.capacity - meta.size;
 }
 
-// const_iterator implementations
 list::const_iterator::const_iterator(raw_element *aNode) noexcept
     : node{get_first_valid_and_nonempty_or_nullptr(aNode)} {}
 
 list::const_iterator::value_type
 list::const_iterator::operator*() const noexcept {
   assert(node);
-  assert(index < node->get_size());
-  return value_type{node->get_thread_id(), node[index + 1].evt};
+  return value_type{node->get_thread_id(), (*node)[index]};
 }
 
 list::const_iterator &list::const_iterator::operator++() noexcept {
   if (index + 1 < node->get_size()) {
     ++index;
   } else {
-    node = get_first_valid_and_nonempty_or_nullptr(node->next_node());
+    node = get_first_valid_and_nonempty_or_nullptr(node->get_next_node());
     index = 0;
   }
   return *this;
@@ -94,47 +118,26 @@ list::raw_element const *
 list::const_iterator::get_first_valid_and_nonempty_or_nullptr(
     raw_element const *node) noexcept {
   while ((node != nullptr) && (node->get_size() == 0)) {
-    node = node->next_node();
+    node = node->get_next_node();
   }
   return node;
 }
 
-namespace {
-
-list::raw_element *allocate_raw_node_elems(int const capacity) noexcept {
-  assert(capacity > 0);
-  // this can throw ... but if it does, it means allocation failed -> how to
-  // handle it? Let's just crash ...
-  auto *data{new list::raw_element[static_cast<unsigned>(capacity) + 1]};
-
-  new (&data[0].meta)
-      list::meta_info{static_cast<long long>(gettid()), capacity};
-
-  return data;
-}
-
-} // namespace
-
 list::list() noexcept = default;
 
-list::~list() noexcept {
-  static_assert(std::is_trivially_destructible_v<list::meta_info>);
-  static_assert(std::is_trivially_destructible_v<list::raw_element>);
-  destroy();
-}
+list::~list() noexcept { destroy(); }
 
 void list::destroy() noexcept {
-  while (first) {
-    auto *const next{first->next_node()};
-    delete[] first;
-    first = next;
+  auto const *ptr{std::exchange(first, nullptr)};
+  while (ptr) {
+    auto *const next{ptr->get_next_node()};
+    list::raw_element::delete_elems(ptr);
+    ptr = next;
   }
   last = nullptr;
 }
 
-void list::append(any const &event) noexcept {
-  new (&last[1 + last->get_next_free_index()].evt) any{event};
-}
+void list::append(any const &event) noexcept { last->push_any(event); }
 
 void list::safe_append(any const &event, int const node_capacity) noexcept {
   assert(node_capacity > 0 && "node capacity must be positive!");
@@ -151,9 +154,14 @@ bool list::has_free_capacity(int const capacity) const noexcept {
 
 void list::reserve(int const capacity) noexcept {
   if (!has_free_capacity(capacity)) {
-    auto target{first ? &last->next_node() : &first};
-    *target = allocate_raw_node_elems(capacity);
-    last = *target;
+    assert((first == nullptr) == (last == nullptr));
+    auto *const new_elems{raw_element::new_elems(capacity)};
+    if (last != nullptr) {
+      last->set_next_node(new_elems);
+    } else {
+      first = new_elems;
+    }
+    last = new_elems;
   }
 }
 
@@ -163,7 +171,7 @@ void list::drain_other(list &other) noexcept {
   assert((other.first == nullptr) == (other.last == nullptr));
   if (last) {
     if (other.last) {
-      last->next_node() = std::exchange(other.first, nullptr);
+      last->set_next_node(std::exchange(other.first, nullptr));
       last = std::exchange(other.last, nullptr);
     }
   } else {
@@ -174,7 +182,7 @@ void list::drain_other(list &other) noexcept {
 
 [[nodiscard]] bool list::empty() const noexcept {
   if (first != nullptr) {
-    for (auto it{first}; it != nullptr; it = it->next_node()) {
+    for (auto const *it{first}; it != nullptr; it = it->get_next_node()) {
       if (it->get_size() > 0) {
         return false;
       }
@@ -185,7 +193,7 @@ void list::drain_other(list &other) noexcept {
 
 [[nodiscard]] long long list::size() const noexcept {
   long long sz{0};
-  for (auto it{first}; it != nullptr; it = it->next_node()) {
+  for (auto const *it{first}; it != nullptr; it = it->get_next_node()) {
     sz += it->get_size();
   }
   return sz;
