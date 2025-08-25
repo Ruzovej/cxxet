@@ -19,12 +19,6 @@
 
 #pragma once
 
-#include <cassert>
-
-#include <new>
-#include <type_traits>
-#include <utility>
-
 #include "impl/event/any.hxx"
 
 namespace cxxet::impl::event {
@@ -33,8 +27,7 @@ struct list {
   union raw_element;
 
   struct meta_info {
-    constexpr explicit meta_info(long long const aThread_id,
-                                 int const aCapacity) noexcept
+    explicit meta_info(long long const aThread_id, int const aCapacity) noexcept
         : thread_id{aThread_id}, next{nullptr}, size{0}, capacity{aCapacity} {}
 
     friend union raw_element;
@@ -50,25 +43,19 @@ struct list {
     meta_info meta;
     any evt;
 
-    constexpr raw_element() noexcept : meta{0, 0} {}
+    raw_element() noexcept;
 
-    constexpr long long get_thread_id() const noexcept {
-      return meta.thread_id;
-    }
+    long long get_thread_id() const noexcept;
 
-    constexpr raw_element const *next_node() const noexcept {
-      return meta.next;
-    }
-    constexpr raw_element *&next_node() noexcept { return meta.next; }
+    raw_element const *next_node() const noexcept;
+    raw_element *&next_node() noexcept;
 
-    constexpr int get_size() const noexcept { return meta.size; }
-    constexpr int get_capacity() const noexcept { return meta.capacity; }
+    int get_size() const noexcept;
+    int get_capacity() const noexcept;
 
-    constexpr int get_next_free_index() noexcept { return meta.size++; }
+    int get_next_free_index() noexcept;
 
-    constexpr int get_free_capacity() const noexcept {
-      return meta.capacity - meta.size;
-    }
+    int get_free_capacity() const noexcept;
   };
 
   struct detailed_event {
@@ -84,47 +71,21 @@ struct list {
     using reference = detailed_event const &;
     using iterator_category = std::forward_iterator_tag;
 
-    constexpr explicit const_iterator(raw_element *aNode) noexcept
-        : node{get_first_valid_and_nonempty_or_nullptr(aNode)} {}
+    explicit const_iterator(raw_element *aNode) noexcept;
 
-    value_type operator*() const noexcept {
-      assert(node);
-      assert(index < node->get_size());
-      return value_type{node->get_thread_id(), node[index + 1].evt};
-    }
+    value_type operator*() const noexcept;
 
-    constexpr const_iterator &operator++() noexcept {
-      if (index + 1 < node->get_size()) {
-        ++index;
-      } else {
-        node = get_first_valid_and_nonempty_or_nullptr(node->next_node());
-        index = 0;
-      }
-      return *this;
-    }
+    const_iterator &operator++() noexcept;
 
-    constexpr const_iterator operator++(int) noexcept {
-      auto const ret{*this};
-      ++(*this);
-      return ret;
-    }
+    const_iterator operator++(int) noexcept;
 
-    constexpr bool operator==(const_iterator const &other) const noexcept {
-      return (node == other.node) && (index == other.index);
-    }
+    bool operator==(const_iterator const &other) const noexcept;
 
-    constexpr bool operator!=(const_iterator const &other) const noexcept {
-      return !(*this == other);
-    }
+    bool operator!=(const_iterator const &other) const noexcept;
 
   private:
-    static constexpr raw_element const *
-    get_first_valid_and_nonempty_or_nullptr(raw_element const *node) noexcept {
-      while ((node != nullptr) && (node->get_size() == 0)) {
-        node = node->next_node();
-      }
-      return node;
-    }
+    static raw_element const *
+    get_first_valid_and_nonempty_or_nullptr(raw_element const *node) noexcept;
 
     raw_element const *node;
     int index{0};
@@ -151,19 +112,17 @@ struct list {
 
   [[nodiscard]] int get_current_free_capacity() const noexcept;
 
-  [[nodiscard]] constexpr const_iterator begin() const noexcept {
+  [[nodiscard]] const_iterator begin() const noexcept {
     return const_iterator{first};
   }
 
-  [[nodiscard]] constexpr const_iterator end() const noexcept {
+  [[nodiscard]] const_iterator end() const noexcept {
     return const_iterator{nullptr};
   }
 
-  [[nodiscard]] constexpr const_iterator cbegin() const noexcept {
-    return begin();
-  }
+  [[nodiscard]] const_iterator cbegin() const noexcept { return begin(); }
 
-  [[nodiscard]] constexpr const_iterator cend() const noexcept { return end(); }
+  [[nodiscard]] const_iterator cend() const noexcept { return end(); }
 
 private:
   list(list const &) = delete;

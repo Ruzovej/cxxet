@@ -23,7 +23,81 @@
 
 #include <cassert>
 
+#include <new>
+#include <type_traits>
+
 namespace cxxet::impl::event {
+
+// raw_element implementations
+list::raw_element::raw_element() noexcept : meta{0, 0} {}
+
+long long list::raw_element::get_thread_id() const noexcept {
+  return meta.thread_id;
+}
+
+list::raw_element const *list::raw_element::next_node() const noexcept {
+  return meta.next;
+}
+
+list::raw_element *&list::raw_element::next_node() noexcept {
+  return meta.next;
+}
+
+int list::raw_element::get_size() const noexcept { return meta.size; }
+
+int list::raw_element::get_capacity() const noexcept { return meta.capacity; }
+
+int list::raw_element::get_next_free_index() noexcept { return meta.size++; }
+
+int list::raw_element::get_free_capacity() const noexcept {
+  return meta.capacity - meta.size;
+}
+
+// const_iterator implementations
+list::const_iterator::const_iterator(raw_element *aNode) noexcept
+    : node{get_first_valid_and_nonempty_or_nullptr(aNode)} {}
+
+list::const_iterator::value_type
+list::const_iterator::operator*() const noexcept {
+  assert(node);
+  assert(index < node->get_size());
+  return value_type{node->get_thread_id(), node[index + 1].evt};
+}
+
+list::const_iterator &list::const_iterator::operator++() noexcept {
+  if (index + 1 < node->get_size()) {
+    ++index;
+  } else {
+    node = get_first_valid_and_nonempty_or_nullptr(node->next_node());
+    index = 0;
+  }
+  return *this;
+}
+
+list::const_iterator list::const_iterator::operator++(int) noexcept {
+  auto const ret{*this};
+  ++(*this);
+  return ret;
+}
+
+bool list::const_iterator::operator==(
+    const_iterator const &other) const noexcept {
+  return (node == other.node) && (index == other.index);
+}
+
+bool list::const_iterator::operator!=(
+    const_iterator const &other) const noexcept {
+  return !(*this == other);
+}
+
+list::raw_element const *
+list::const_iterator::get_first_valid_and_nonempty_or_nullptr(
+    raw_element const *node) noexcept {
+  while ((node != nullptr) && (node->get_size() == 0)) {
+    node = node->next_node();
+  }
+  return node;
+}
 
 namespace {
 
