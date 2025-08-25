@@ -20,13 +20,20 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace cxxet::impl::write_out {
 
 struct category_name_map {
   static constexpr unsigned max_user_categories{30};
-  static constexpr unsigned num_categories{31};
+  static constexpr unsigned num_categories{32};
+  static_assert(sizeof(unsigned) * 8 == num_categories);
+
+  static constexpr unsigned reserved_1{1u << 30};
+  static constexpr std::string_view reserved_1_name{"cxxet_1"};
+  static constexpr unsigned reserved_2{1u << 31};
+  static constexpr std::string_view reserved_2_name{"cxxet_2"};
 
   category_name_map() noexcept;
 
@@ -34,8 +41,15 @@ struct category_name_map {
                                                 std::string &&name,
                                                 bool const allow_rename);
 
+  // see criteria in `cxxet/output/categories.hxx`:
+  static bool is_name_valid(std::string_view const name) noexcept;
+  bool is_name_used(std::string_view const name) const noexcept;
+
+  std::string get_joined_category_names(unsigned const category_bits) const;
+
 private:
-  std::vector<std::string> names{}; // to save stack space when not used ...
+  // better than `std::array` - to save (stack) space when not used ...
+  std::vector<std::string> names{};
 };
 
 } // namespace cxxet::impl::write_out

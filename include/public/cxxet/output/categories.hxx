@@ -25,11 +25,18 @@
 
 namespace cxxet::output {
 
-// * if the category is invalid (must have exactly one bit set, with 2 highest
+// * if the `category` is invalid (must have exactly one bit set, with 2 highest
 // reserved for internal use), or already registered (if `allow_rename` is
 // false), throws `std::runtime_error`;
 //
-// * if the input is zero, return next free category flag
+// * if the `category` is zero, return next free category flag
+//
+// * `name`:
+//  * shouldn't be empty
+//  * starts with letter
+//  * only alphanumeric characters, `-` and `_` are allowed
+//  * must be unique
+// * if any of those conditions isn't met, throws `std::runtime_error`
 //
 // * returns the category flag itself (either input param. `category` itself, or
 // the "deduced" next one)

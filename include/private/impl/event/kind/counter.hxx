@@ -44,8 +44,8 @@ struct counter {
   constexpr counter(char const aFlag1, short const aFlag2,
                     unsigned const aCategories, char const *const name,
                     long long const aTimestamp_ns, double const aValue) noexcept
-      : evt{aFlag1, aFlag2, aCategories, name},
-        timestamp_ns{aTimestamp_ns}, value{aValue} {}
+      : evt{aFlag1, aFlag2, aCategories, name}, timestamp_ns{aTimestamp_ns},
+        value{aValue} {}
 
   [[nodiscard]] constexpr bool operator==(counter const &other) const noexcept {
     auto const tie = [](counter const &c) {
