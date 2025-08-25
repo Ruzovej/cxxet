@@ -19,35 +19,38 @@
 
 #ifdef CXXET_WITH_UNIT_TESTS
 
-#include "impl/sink/cascade.hxx"
-#include "impl/sink/event_collector.hxx"
-#include "impl/sink/file_sink.hxx"
-
+#include <algorithm>
+#include <array>
 #include <thread>
 
 #include <doctest/doctest.h>
 
+#include "impl/sink/cascade.hxx"
+#include "impl/sink/event_collector.hxx"
+#include "impl/sink/file_sink.hxx"
+
 namespace cxxet::impl {
+
+namespace {
 
 template <typename base_sink> struct test_sink : base_sink {
   using base_sink::base_sink;
 
-  template <typename callable_t> long long apply(callable_t &&callable) {
-    const auto n{base_sink::events.apply(std::forward<callable_t>(callable))};
-    return n;
-  }
-
   [[nodiscard]] bool empty() const noexcept {
     return base_sink::events.empty();
   }
+
+  auto begin() const noexcept { return base_sink::events.cbegin(); }
+  auto end() const noexcept { return base_sink::events.cend(); }
+  auto cbegin() const noexcept { return base_sink::events.cbegin(); }
+  auto cend() const noexcept { return base_sink::events.cend(); }
 };
 
 TEST_CASE("sink cascade") {
-  long long n;
-  int counter{0};
+  std::size_t counter{0};
 
-  constexpr int size{5};
-  event::any a[size];
+  constexpr int size{7};
+  std::array<event::any, size> a;
 
   new (&a[0].evt.dur_begin) event::duration_begin{1, 2, 3, "test begin", 0};
 
@@ -60,6 +63,12 @@ TEST_CASE("sink cascade") {
   new (&a[4].evt.inst) event::instant{
       19, 20, 21, "test instant", scope_t::global, 'c', 321, 1'111'111'111, 25};
 
+  new (&a[5].evt.meta) event::metadata{"some metadata str value ...",
+                                       event::metadata_type::process_name};
+
+  new (&a[6].evt.meta)
+      event::metadata{42'000, event::metadata_type::thread_sort_index};
+
   SUBCASE("one 'leaf'") {
     sink::properties traits{};
     traits.default_target_filename = "/dev/null";
@@ -67,62 +76,58 @@ TEST_CASE("sink cascade") {
     test_sink<sink::event_collector> leaf{&root};
     leaf.reserve(2);
 
-    leaf.append_event(a[0]);
-    leaf.append_event(a[1]);
+    for (auto const &evt : a) {
+      leaf.append_event(evt);
+    }
 
-    n = root.apply([](long long const, long long const, event::any const &) {
-      REQUIRE(false);
-    });
-
+    REQUIRE(!leaf.empty());
     REQUIRE(root.empty());
-    REQUIRE_EQ(n, 0);
-
     leaf.flush();
-
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
     REQUIRE(leaf.empty());
-    REQUIRE_EQ(n, counter);
-    REQUIRE_EQ(counter, 2);
+    REQUIRE(!root.empty());
+
+    for (auto const &p : root) {
+      REQUIRE_EQ(p.event, a[counter++]);
+    }
+
+    REQUIRE_EQ(std::distance(leaf.cbegin(), leaf.cend()), 0);
+    REQUIRE(leaf.empty());
+    REQUIRE_EQ(counter, size);
   }
 
   SUBCASE("two 'leafs', tree") {
     sink::properties traits{};
     traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
-    test_sink<sink::event_collector> leaf1{&root}, leaf2{&root};
-    leaf1.reserve(1);
-    leaf2.reserve(1);
 
+    test_sink<sink::event_collector> leaf1{&root}, leaf2{&root};
+
+    leaf1.reserve(1);
     leaf1.append_event(a[0]);
+
+    leaf2.reserve(1);
     leaf2.append_event(a[1]);
 
-    n = root.apply([](long long const, long long const, event::any const &) {
-      REQUIRE(false);
-    });
-
-    REQUIRE_EQ(n, 0);
-
+    REQUIRE(!leaf1.empty());
+    REQUIRE(root.empty());
     leaf1.flush();
-
-    n = root.apply([&a](long long const, long long const,
-                        event::any const &evt) { REQUIRE_EQ(evt, a[0]); });
-
     REQUIRE(leaf1.empty());
-    REQUIRE_EQ(n, 1);
+    REQUIRE(!root.empty());
 
+    for (auto const &p : root) {
+      REQUIRE_EQ(p.event, a[counter++]);
+    }
+    REQUIRE_EQ(counter, 1);
+
+    REQUIRE(!leaf2.empty());
     leaf2.flush();
-
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
     REQUIRE(leaf2.empty());
-    REQUIRE_EQ(n, counter);
+
+    counter = 0;
+    for (auto const &p : root) {
+      REQUIRE_EQ(p.event, a[counter++]);
+    }
+    REQUIRE_EQ(std::distance(root.cbegin(), root.cend()), counter);
     REQUIRE_EQ(counter, 2);
   }
 
@@ -130,34 +135,35 @@ TEST_CASE("sink cascade") {
     sink::properties traits{};
     traits.default_target_filename = "/dev/null";
     test_sink<sink::file_sink<false>> root{traits};
-    test_sink<sink::event_collector> leaf1{&root}, leaf2{&leaf1};
-    leaf1.reserve(1);
-    leaf2.reserve(1);
 
+    test_sink<sink::event_collector> leaf1{&root}, leaf2{&leaf1};
+
+    leaf1.reserve(1);
     leaf1.append_event(a[0]);
+
+    leaf2.reserve(1);
     leaf2.append_event(a[1]);
 
+    REQUIRE(!leaf2.empty());
     leaf2.flush();
-
-    n = leaf1.apply([&counter, &a](long long const, long long const,
-                                   event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
     REQUIRE(leaf2.empty());
-    REQUIRE_EQ(n, counter);
+    REQUIRE(root.empty());
+
+    for (auto const &p : leaf1) {
+      REQUIRE_EQ(p.event, a[counter++]);
+    }
     REQUIRE_EQ(counter, 2);
 
     leaf1.flush();
+    REQUIRE(leaf1.empty());
+    REQUIRE(leaf2.empty());
+    REQUIRE(!root.empty());
 
     counter = 0;
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
-    REQUIRE(leaf1.empty());
-    REQUIRE_EQ(n, counter);
+    for (auto const &p : root) {
+      REQUIRE_EQ(p.event, a[counter++]);
+    }
+    REQUIRE_EQ(std::distance(root.cbegin(), root.cend()), counter);
     REQUIRE_EQ(counter, 2);
   }
 
@@ -170,15 +176,14 @@ TEST_CASE("sink cascade") {
       sink::event_collector leaf{&root};
       leaf.reserve(traits.default_list_node_capacity);
       leaf.append_event(a[0]);
+      REQUIRE(root.empty());
     }
-
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
     REQUIRE(!root.empty());
-    REQUIRE_EQ(n, counter);
+
+    for (auto const &p : root) {
+      REQUIRE_EQ(p.event, a[counter++]);
+    }
+    REQUIRE_EQ(std::distance(root.cbegin(), root.cend()), counter);
     REQUIRE_EQ(counter, 1);
   }
 
@@ -188,23 +193,24 @@ TEST_CASE("sink cascade") {
     test_sink<sink::file_sink<false>> root{traits};
 
     {
-      sink::cascade<false> intermediate{&root};
+      test_sink<sink::cascade<false>> intermediate{&root};
       auto const test_fn = [&intermediate, &traits](event::any const &evt) {
         test_sink<sink::event_collector> leaf{&intermediate};
         leaf.reserve(traits.default_list_node_capacity);
         leaf.append_event(evt);
       };
+      REQUIRE(intermediate.empty());
       test_fn(a[0]);
+      REQUIRE(!intermediate.empty());
       test_fn(a[1]);
+      REQUIRE(root.empty());
     }
-
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      REQUIRE_EQ(evt, a[counter++]);
-    });
-
     REQUIRE(!root.empty());
-    REQUIRE_EQ(n, counter);
+
+    for (auto const &p : root) {
+      REQUIRE_EQ(p.event, a[counter++]);
+    }
+    REQUIRE_EQ(std::distance(root.cbegin(), root.cend()), counter);
     REQUIRE_EQ(counter, 2);
   }
 
@@ -214,30 +220,31 @@ TEST_CASE("sink cascade") {
     test_sink<sink::file_sink<false>> root{traits};
 
     {
-      sink::cascade<true> intermediate{&root};
+      test_sink<sink::cascade<true>> intermediate{&root};
       auto const test_fn = [&intermediate, &traits](event::any const &evt) {
         test_sink<sink::event_collector> leaf{&intermediate};
         leaf.reserve(traits.default_list_node_capacity);
         leaf.append_event(evt);
       };
-      // same indexes ... because order wouldn't be guaranteed:
-      std::thread t1{test_fn, a[0]};
-      std::thread t2{test_fn, a[0]};
 
-      test_fn(a[0]);
-
-      t1.join();
-      t2.join();
+      REQUIRE(intermediate.empty());
+      { // same indexes ... because order wouldn't be guaranteed:
+        std::thread t1{test_fn, a[0]};
+        std::thread t2{test_fn, a[0]};
+        test_fn(a[0]);
+        t1.join();
+        t2.join();
+      }
+      REQUIRE(!intermediate.empty());
+      REQUIRE(root.empty());
     }
-
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      ++counter;
-      REQUIRE_EQ(evt, a[0]);
-    });
-
     REQUIRE(!root.empty());
-    REQUIRE_EQ(n, counter);
+
+    for (auto const &p : root) {
+      ++counter;
+      REQUIRE_EQ(p.event, a[0]);
+    }
+    REQUIRE_EQ(std::distance(root.cbegin(), root.cend()), counter);
     REQUIRE_EQ(counter, 3);
   }
 
@@ -252,21 +259,24 @@ TEST_CASE("sink cascade") {
       leaf.append_event(evt);
     };
 
-    std::thread t{test_fn, a[0]};
-    test_fn(a[0]);
-    t.join();
-
-    n = root.apply([&counter, &a](long long const, long long const,
-                                  event::any const &evt) {
-      ++counter;
-      REQUIRE_EQ(evt, a[0]);
-    });
-
+    REQUIRE(root.empty());
+    {
+      std::thread t{test_fn, a[0]};
+      test_fn(a[0]);
+      t.join();
+    }
     REQUIRE(!root.empty());
-    REQUIRE_EQ(n, counter);
+
+    for (auto const &p : root) {
+      ++counter;
+      REQUIRE_EQ(p.event, a[0]);
+    }
+    REQUIRE_EQ(std::distance(root.cbegin(), root.cend()), counter);
     REQUIRE_EQ(counter, 2);
   }
 }
+
+} // namespace
 
 } // namespace cxxet::impl
 

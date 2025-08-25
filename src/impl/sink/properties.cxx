@@ -122,6 +122,8 @@ properties::properties() noexcept
 
 namespace cxxet::impl::sink {
 
+namespace {
+
 TEST_CASE("env. var. parsing for sink::properties") {
   SUBCASE("parsing string to ...") {
     SUBCASE("bool") {
@@ -251,6 +253,8 @@ TEST_CASE("env. var. parsing for sink::properties") {
     REQUIRE_EQ(unsetenv(test_env_var_name), 0);
   }
 }
+
+} // namespace
 
 } // namespace cxxet::impl::sink
 

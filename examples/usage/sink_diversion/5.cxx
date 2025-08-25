@@ -115,9 +115,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {
     ths.emplace_back([i]() {
       log("inside thread no. " + std::to_string(i));
 #ifdef CXXET_ENABLE
-      auto file_sink_local{cxxet::file_sink_handle::make(false)};
-      file_sink_local->set_flush_target(std::make_unique<custom_writer>(i));
-      file_sink_local->divert_thread_sink_to_this();
+      auto file_sink_local_th{cxxet::file_sink_handle::make(false)};
+      file_sink_local_th->set_flush_target(std::make_unique<custom_writer>(i));
+      file_sink_local_th->divert_thread_sink_to_this();
 #endif
       test_block();
       log("thread no. " + std::to_string(i) + " finished");

@@ -19,6 +19,8 @@
 
 #include "impl/write_out/in_trace_event_format.hxx"
 
+#include <unistd.h>
+
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
@@ -88,95 +90,91 @@ void in_trace_event_format(output::writer &out,
                            event::list const &list) {
   out.prepare_for_writing();
 
-  {
-    out << "{\"displayTimeUnit\":\"ns\",";
-    // TODO (https://github.com/Ruzovej/cxxet/issues/138) put into some
-    // "comment" value of `time_point_zero_ns`
-    out << "\"traceEvents\":[";
+  auto const process_id{static_cast<long long>(getpid())};
 
-    bool first_record{true};
-    list.apply([time_point_zero_ns, &first_record,
-                &out](long long const pid, long long const thread_id,
-                      event::any const &evt) {
-      if (!first_record) {
-        out << ',';
-      } else {
-        first_record = false;
-      }
+  out << "{\"displayTimeUnit\":\"ns\",";
+  // TODO (https://github.com/Ruzovej/cxxet/issues/138) put into some
+  // "comment" value of `time_point_zero_ns`
+  out << "\"traceEvents\":[";
 
-      out << '{';
-      out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
-      out << "\"ph\":\"" << evt.get_ph() << "\",";
-      // TODO (https://github.com/Ruzovej/cxxet/issues/139) - start using
-      // "category", e.g.: out << "\"cat\":" << escape_json_string(???) << ",";
+  long long count{0};
+  for (auto const &[thread_id, evt] : list) {
+    if (++count > 1) {
+      out << ',';
+    }
 
-      auto const write_out_timestamp = [&out](long long const ns) {
-        out << "\"ts\":" << longlong_ns_to_double_us(ns) << ',';
-      };
+    out << '{';
+    out << "\"name\":" << escape_json_string(evt.get_name()) << ',';
+    out << "\"ph\":\"" << evt.get_ph() << "\",";
+    // TODO (https://github.com/Ruzovej/cxxet/issues/139) - start using
+    // "category", e.g.: out << "\"cat\":" << escape_json_string(???) << ",";
 
-      switch (evt.get_type()) {
-      case event::type_t::duration_begin: {
-        auto const &e{evt.evt.dur_begin};
-        write_out_timestamp(e.start_ns - time_point_zero_ns);
-        break;
-      }
-      case event::type_t::duration_end: {
-        auto const &e{evt.evt.dur_end};
-        write_out_timestamp(e.end_ns - time_point_zero_ns);
-        break;
-      }
-      case event::type_t::complete: {
-        auto const &e{evt.evt.cmpl};
-        write_out_timestamp(e.start_ns - time_point_zero_ns);
-        out << "\"dur\":" << longlong_ns_to_double_us(e.duration_ns) << ',';
-        break;
-      }
-      case event::type_t::instant: {
-        auto const &e{evt.evt.inst};
-        write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
-        out << "\"s\":\""
-            << static_cast<std::underlying_type_t<scope_t>>(e.scope) << "\",";
-        break;
-      }
-      case event::type_t::counter: {
-        auto const &e{evt.evt.cntr};
-        write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
-        out << "\"args\":{" << escape_json_string(e.get_quantity_name()) << ":"
-            << e.value << "},";
-        break;
-      }
-      case event::type_t::metadata: {
-        auto const &e{evt.evt.meta};
-        out << "\"args\":{" << escape_json_string(e.get_arg_name()) << ":";
-        switch (e.get_metadata_type()) {
-        case event::metadata_type::process_name:
-        case event::metadata_type::thread_name:
-        case event::metadata_type::process_labels:
-          out << escape_json_string(e.get_arg_value_str());
-          break;
-        case event::metadata_type::process_sort_index:
-        case event::metadata_type::thread_sort_index:
-          out << e.get_arg_value_int();
-          break;
-        default:
-          throw std::runtime_error("Unknown metadata_type");
-        }
-        out << "},";
-        break;
-      }
-      default: {
-        throw std::runtime_error("Unknown event type");
-      }
-      }
+    auto const write_out_timestamp = [&out](long long const ns) {
+      out << "\"ts\":" << longlong_ns_to_double_us(ns) << ',';
+    };
 
-      out << "\"pid\":" << pid << ',';
-      out << "\"tid\":" << thread_id;
-      out << '}';
-    });
+    switch (evt.get_type()) {
+    case event::type_t::duration_begin: {
+      auto const &e{evt.evt.dur_begin};
+      write_out_timestamp(e.start_ns - time_point_zero_ns);
+      break;
+    }
+    case event::type_t::duration_end: {
+      auto const &e{evt.evt.dur_end};
+      write_out_timestamp(e.end_ns - time_point_zero_ns);
+      break;
+    }
+    case event::type_t::complete: {
+      auto const &e{evt.evt.cmpl};
+      write_out_timestamp(e.start_ns - time_point_zero_ns);
+      out << "\"dur\":" << longlong_ns_to_double_us(e.duration_ns) << ',';
+      break;
+    }
+    case event::type_t::instant: {
+      auto const &e{evt.evt.inst};
+      write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
+      out << "\"s\":\"" << static_cast<std::underlying_type_t<scope_t>>(e.scope)
+          << "\",";
+      break;
+    }
+    case event::type_t::counter: {
+      auto const &e{evt.evt.cntr};
+      write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
+      out << "\"args\":{" << escape_json_string(e.get_quantity_name()) << ":"
+          << e.value << "},";
+      break;
+    }
+    case event::type_t::metadata: {
+      auto const &e{evt.evt.meta};
+      out << "\"args\":{" << escape_json_string(e.get_arg_name()) << ":";
+      switch (e.get_metadata_type()) {
+      case event::metadata_type::process_name:
+      case event::metadata_type::thread_name:
+      case event::metadata_type::process_labels:
+        out << escape_json_string(e.get_arg_value_str());
+        break;
+      case event::metadata_type::process_sort_index:
+      case event::metadata_type::thread_sort_index:
+        out << e.get_arg_value_int();
+        break;
+      default:
+        throw std::runtime_error("Unknown metadata_type");
+      }
+      out << "},";
+      break;
+    }
+    default: {
+      throw std::runtime_error("Unknown event type");
+    }
+    }
 
-    out << ']'; // traceEvents
+    out << "\"pid\":" << process_id << ',';
+    out << "\"tid\":" << thread_id;
     out << '}';
   }
+
+  out << ']'; // traceEvents
+  out << '}';
 
   out.finalize_and_flush();
 }
