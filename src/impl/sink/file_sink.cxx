@@ -69,7 +69,7 @@ void file_sink<thread_safe_v>::write_out_events() noexcept {
     try {
       if (custom_writer) {
         write_out::in_trace_event_format(*custom_writer, time_point_zero_ns,
-                                         base_class_t::events);
+                                         base_class_t::events, category_names);
       } else if (!target_filename.empty()) {
         tmp_filename_handle implicit_file_handle{target_filename};
         char const *target{};
@@ -83,7 +83,7 @@ void file_sink<thread_safe_v>::write_out_events() noexcept {
         }
         default_writer def_writer{target};
         write_out::in_trace_event_format(def_writer, time_point_zero_ns,
-                                         base_class_t::events);
+                                         base_class_t::events, category_names);
       }
     } catch (std::exception const &e) {
       std::cerr << "Failed to write out events: " << e.what() << '\n';

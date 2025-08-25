@@ -21,6 +21,7 @@
 
 #include "cxxet/output/writer.hxx"
 #include "impl/event/list.hxx"
+#include "impl/write_out/category_name_map.hxx"
 
 namespace cxxet::impl::write_out {
 
@@ -28,6 +29,7 @@ namespace cxxet::impl::write_out {
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
 void in_trace_event_format(output::writer &out,
                            long long const time_point_zero_ns,
-                           event::list const &list);
+                           event::list const &list,
+                           write_out::category_name_map const &cat_names);
 
 } // namespace cxxet::impl::write_out

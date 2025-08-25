@@ -51,6 +51,10 @@ struct any {
     return evt.common_base.c.type;
   }
 
+  [[nodiscard]] constexpr unsigned get_categories() const noexcept {
+    return evt.common_base.c.categories;
+  }
+
   [[nodiscard]] constexpr char const *get_name() const noexcept {
     return get_type() == event::type_t::metadata  ? evt.meta.get_name()
            : get_type() == event::type_t::counter ? "Counter"
