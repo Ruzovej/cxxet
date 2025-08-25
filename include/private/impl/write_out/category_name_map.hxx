@@ -37,6 +37,7 @@ struct category_name_map {
   static constexpr std::string_view reserved_2_name{"cxxet_2"};
 
   category_name_map() noexcept;
+  ~category_name_map() noexcept;
 
   [[nodiscard]] unsigned register_category_name(unsigned const category,
                                                 std::string &&name,

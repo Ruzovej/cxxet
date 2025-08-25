@@ -48,6 +48,8 @@ constexpr unsigned bit_to_index(unsigned const x) noexcept {
 
 category_name_map::category_name_map() noexcept = default;
 
+category_name_map::~category_name_map() noexcept = default;
+
 unsigned category_name_map::register_category_name(unsigned const category,
                                                    std::string &&name,
                                                    bool const allow_rename) {
@@ -380,7 +382,6 @@ TEST_CASE("write_out::category_name_map itself") {
     }
 
     SUBCASE("category using reserved bits") {
-      // Test highest 2 bits which should be reserved
       REQUIRE_THROWS_AS(
           (void)cnm.register_category_name(
               1u << category_name_map::max_user_categories, "reserved1", false),
