@@ -56,7 +56,6 @@ struct duration_end {
   common<t> evt;
   long long end_ns;
 
-  // duration_end() = default;
   constexpr duration_end(unsigned const aCategories, char const *const aDesc,
                          long long const aEnd_ns) noexcept
       : evt{aCategories, aDesc}, end_ns{aEnd_ns} {}
