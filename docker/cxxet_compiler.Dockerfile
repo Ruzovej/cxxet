@@ -32,6 +32,7 @@ RUN apt update \
         make \
         ninja-build \
         netbase \
+        parallel \
         patch \
         publicsuffix \
         ssh-client \
