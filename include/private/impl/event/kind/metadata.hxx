@@ -48,8 +48,23 @@ struct metadata {
            type == metadata_type::process_labels ||
            type == metadata_type::thread_name);
   }
+  constexpr metadata(unsigned const aCategories, char const *const aDesc,
+                     metadata_type const aType) noexcept
+      : evt{aCategories, aDesc}, type{aType}, i_flag_1{0}, i_flag_2{0},
+        i_flag_4{0} {
+    assert(type == metadata_type::process_name ||
+           type == metadata_type::process_labels ||
+           type == metadata_type::thread_name);
+  }
   constexpr metadata(int const sort_index, metadata_type const aType) noexcept
       : evt{nullptr}, type{aType}, i_flag_1{0}, i_flag_2{0},
+        i_flag_4{sort_index} {
+    assert(type == metadata_type::process_sort_index ||
+           type == metadata_type::thread_sort_index);
+  }
+  constexpr metadata(unsigned const aCategories, int const sort_index,
+                     metadata_type const aType) noexcept
+      : evt{aCategories, nullptr}, type{aType}, i_flag_1{0}, i_flag_2{0},
         i_flag_4{sort_index} {
     assert(type == metadata_type::process_sort_index ||
            type == metadata_type::thread_sort_index);
@@ -105,6 +120,7 @@ struct metadata {
     return i_flag_4;
   }
 
+#ifdef CXXET_WITH_UNIT_TESTS
   [[nodiscard]] constexpr bool
   operator==(metadata const &other) const noexcept {
     auto const tie = [](metadata const &i) {
@@ -112,6 +128,7 @@ struct metadata {
     };
     return tie(*this) == tie(other);
   }
+#endif
 };
 
 } // namespace cxxet::impl::event

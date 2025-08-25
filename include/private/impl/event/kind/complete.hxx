@@ -36,10 +36,18 @@ struct complete {
   constexpr complete(char const *const aDesc, long long const aStart_ns,
                      long long const aDuration_ns) noexcept
       : evt{aDesc}, start_ns{aStart_ns}, duration_ns{aDuration_ns} {}
-  constexpr complete(char const aFlag1, short const aFlag2, int const aFlag4,
-                     char const *const aDesc, long long const aStart_ns,
+  constexpr complete(unsigned const aCategories, char const *const aDesc,
+                     long long const aStart_ns,
                      long long const aDuration_ns) noexcept
-      : evt{aFlag1, aFlag2, aFlag4, aDesc}, start_ns{aStart_ns},
+      : evt{aCategories, aDesc}, start_ns{aStart_ns},
+        duration_ns{aDuration_ns} {}
+
+#ifdef CXXET_WITH_UNIT_TESTS
+  constexpr complete(char const aFlag1, short const aFlag2,
+                     unsigned const aCategories, char const *const aDesc,
+                     long long const aStart_ns,
+                     long long const aDuration_ns) noexcept
+      : evt{aFlag1, aFlag2, aCategories, aDesc}, start_ns{aStart_ns},
         duration_ns{aDuration_ns} {}
 
   [[nodiscard]] constexpr bool
@@ -49,6 +57,7 @@ struct complete {
     };
     return tie(*this) == tie(other);
   }
+#endif
 };
 
 } // namespace cxxet::impl::event

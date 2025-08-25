@@ -43,28 +43,28 @@ enum class type_t : char {
 
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.uxpopqvbjezh
 template <type_t bound_type = type_t::unknown> struct common {
-  //                        // related to field:
-  type_t const type{bound_type}; // "ph"
+  //                             // related to field:
+  type_t const type{bound_type}; // "ph" (mandatory)
   char flag_1;                   // explicit padding - unspecified meaning
   short flag_2;                  // explicit padding - unspecified meaning
-  int flag_4;                    // explicit padding - unspecified meaning
-  const char *desc;              // "name"
-  // optional (or not?!) fields:
-  // * "cat" -> TODO (https://github.com/Ruzovej/cxxet/issues/139) have it here
-  // or not?! other mandatory fields:
+  unsigned categories;           // "cat" (optional)
+  const char *desc;              // "name" (mandatory)
+  // other mandatory fields:
   // * "pid", "tid" -> provided by the sink, etc.
   // * "ts", "args", ... -> provided by the specific event type
 
   constexpr common() = default;
   constexpr common(char const *const aDesc) noexcept
-      : flag_1{0}, flag_2{0}, flag_4{0}, desc{aDesc} {}
-  constexpr common(char const aFlag1, short const aFlag2, int const aFlag4,
-                   char const *const aDesc) noexcept
-      : flag_1{aFlag1}, flag_2{aFlag2}, flag_4{aFlag4}, desc{aDesc} {}
+      : flag_1{0}, flag_2{0}, categories{0}, desc{aDesc} {}
+  constexpr common(unsigned const aCategories, char const *const aDesc) noexcept
+      : flag_1{0}, flag_2{0}, categories{aCategories}, desc{aDesc} {}
+  constexpr common(char const aFlag1, short const aFlag2,
+                   unsigned const aCategories, char const *const aDesc) noexcept
+      : flag_1{aFlag1}, flag_2{aFlag2}, categories{aCategories}, desc{aDesc} {}
 
   [[nodiscard]] constexpr bool operator==(common const &other) const noexcept {
     auto const tie = [](common const &c) {
-      return std::tie(c.type, c.flag_1, c.flag_2, c.flag_4, c.desc);
+      return std::tie(c.type, c.flag_1, c.flag_2, c.categories, c.desc);
     };
     return tie(*this) == tie(other);
   }

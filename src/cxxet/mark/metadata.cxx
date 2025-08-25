@@ -25,29 +25,36 @@
 
 namespace cxxet::mark {
 
-void process_name(char const *const proc_name) noexcept {
+void process_name(unsigned const categories,
+                  char const *const proc_name) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
-      proc_name, impl::event::metadata_type::process_name});
+      categories, proc_name, impl::event::metadata_type::process_name});
 }
 
-void process_label(char const *const proc_label) noexcept {
+void process_label(unsigned const categories,
+                   char const *const proc_label) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
-      proc_label, impl::event::metadata_type::process_labels});
+      categories, proc_label, impl::event::metadata_type::process_labels});
 }
 
-void process_sort_index(int const proc_sort_index) noexcept {
-  impl::thread_local_sink_submit_event(impl::event::metadata{
-      proc_sort_index, impl::event::metadata_type::process_sort_index});
-}
-
-void thread_name(char const *const th_name) noexcept {
+void process_sort_index(unsigned const categories,
+                        int const proc_sort_index) noexcept {
   impl::thread_local_sink_submit_event(
-      impl::event::metadata{th_name, impl::event::metadata_type::thread_name});
+      impl::event::metadata{categories, proc_sort_index,
+                            impl::event::metadata_type::process_sort_index});
 }
 
-void thread_sort_index(int const th_sort_index) noexcept {
+void thread_name(unsigned const categories,
+                 char const *const th_name) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
-      th_sort_index, impl::event::metadata_type::thread_sort_index});
+      categories, th_name, impl::event::metadata_type::thread_name});
+}
+
+void thread_sort_index(unsigned const categories,
+                       int const th_sort_index) noexcept {
+  impl::thread_local_sink_submit_event(
+      impl::event::metadata{categories, th_sort_index,
+                            impl::event::metadata_type::thread_sort_index});
 }
 
 } // namespace cxxet::mark

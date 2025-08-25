@@ -25,8 +25,10 @@
 namespace cxxet::mark {
 
 struct CXXET_IMPL_API complete {
-  inline complete(char const *aDesc) noexcept
-      : desc{aDesc}, start{impl::now()} {}
+  inline complete(unsigned const aCategories, char const *const aDesc) noexcept
+      : categories{aCategories}, desc{aDesc}, start{impl::now()} {}
+  inline explicit complete(char const *const aDesc) noexcept
+      : complete{0, aDesc} {}
 
   inline ~complete() noexcept { submit(impl::now()); }
 
@@ -38,6 +40,7 @@ private:
 
   void submit(impl::timepoint_t const finish) noexcept;
 
+  unsigned int const categories{0};
   const char *const desc;
   impl::timepoint_t const start;
 };
