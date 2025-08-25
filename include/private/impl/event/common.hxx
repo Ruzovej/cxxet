@@ -43,7 +43,7 @@ enum class type_t : char {
 
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.uxpopqvbjezh
 template <type_t bound_type = type_t::unknown> struct common {
-  //                             // related to field:
+  //                                related to field:
   type_t const type{bound_type}; // "ph" (mandatory)
   char flag_1;                   // explicit padding - unspecified meaning
   short flag_2;                  // explicit padding - unspecified meaning
@@ -54,10 +54,10 @@ template <type_t bound_type = type_t::unknown> struct common {
   // * "ts", "args", ... -> provided by the specific event type
 
   constexpr common() = default;
-  constexpr explicit common(char const *const aDesc) noexcept
-      : flag_1{0}, flag_2{0}, categories{0}, desc{aDesc} {}
   constexpr common(unsigned const aCategories, char const *const aDesc) noexcept
       : flag_1{0}, flag_2{0}, categories{aCategories}, desc{aDesc} {}
+
+#ifdef CXXET_WITH_UNIT_TESTS
   constexpr common(char const aFlag1, short const aFlag2,
                    unsigned const aCategories, char const *const aDesc) noexcept
       : flag_1{aFlag1}, flag_2{aFlag2}, categories{aCategories}, desc{aDesc} {}
@@ -68,6 +68,7 @@ template <type_t bound_type = type_t::unknown> struct common {
     };
     return tie(*this) == tie(other);
   }
+#endif
 };
 
 } // namespace cxxet::impl::event
