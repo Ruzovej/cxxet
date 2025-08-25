@@ -40,14 +40,6 @@ struct metadata {
   int i_flag_4; // explicit padding - "sometimes" used for integer value ("sort
                 // index")
 
-  metadata() = default;
-  constexpr metadata(char const *const aDesc,
-                     metadata_type const aType) noexcept
-      : evt{aDesc}, type{aType}, i_flag_1{0}, i_flag_2{0}, i_flag_4{0} {
-    assert(type == metadata_type::process_name ||
-           type == metadata_type::process_labels ||
-           type == metadata_type::thread_name);
-  }
   constexpr metadata(unsigned const aCategories, char const *const aDesc,
                      metadata_type const aType) noexcept
       : evt{aCategories, aDesc}, type{aType}, i_flag_1{0}, i_flag_2{0},
@@ -55,12 +47,6 @@ struct metadata {
     assert(type == metadata_type::process_name ||
            type == metadata_type::process_labels ||
            type == metadata_type::thread_name);
-  }
-  constexpr metadata(int const sort_index, metadata_type const aType) noexcept
-      : evt{nullptr}, type{aType}, i_flag_1{0}, i_flag_2{0},
-        i_flag_4{sort_index} {
-    assert(type == metadata_type::process_sort_index ||
-           type == metadata_type::thread_sort_index);
   }
   constexpr metadata(unsigned const aCategories, int const sort_index,
                      metadata_type const aType) noexcept
@@ -121,6 +107,26 @@ struct metadata {
   }
 
 #ifdef CXXET_WITH_UNIT_TESTS
+  constexpr metadata(char const aFlag1, short const aFlag2,
+                     unsigned const aCategories, char const *const aDesc,
+                     metadata_type const aType, char const aM_flag1,
+                     short const aM_flag2, int const aM_flag4) noexcept
+      : evt{aFlag1, aFlag2, aCategories, aDesc}, type{aType},
+        i_flag_1{aM_flag1}, i_flag_2{aM_flag2}, i_flag_4{aM_flag4} {
+    assert(type == metadata_type::process_name ||
+           type == metadata_type::process_labels ||
+           type == metadata_type::thread_name);
+  }
+  constexpr metadata(char const aFlag1, short const aFlag2,
+                     unsigned const aCategories, int const sort_index,
+                     metadata_type const aType, char const aM_flag1,
+                     short const aM_flag2) noexcept
+      : evt{aFlag1, aFlag2, aCategories, nullptr}, type{aType},
+        i_flag_1{aM_flag1}, i_flag_2{aM_flag2}, i_flag_4{sort_index} {
+    assert(type == metadata_type::process_sort_index ||
+           type == metadata_type::thread_sort_index);
+  }
+
   [[nodiscard]] constexpr bool
   operator==(metadata const &other) const noexcept {
     auto const tie = [](metadata const &i) {

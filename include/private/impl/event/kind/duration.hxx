@@ -31,10 +31,6 @@ struct duration_begin {
   common<t> evt;
   long long start_ns;
 
-  duration_begin() = default;
-  constexpr duration_begin(char const *const aDesc,
-                           long long const aStart_ns) noexcept
-      : evt{aDesc}, start_ns{aStart_ns} {}
   constexpr duration_begin(unsigned const aCategories, char const *const aDesc,
                            long long const aStart_ns) noexcept
       : evt{aCategories, aDesc}, start_ns{aStart_ns} {}
@@ -60,10 +56,7 @@ struct duration_end {
   common<t> evt;
   long long end_ns;
 
-  duration_end() = default;
-  constexpr duration_end(char const *const aDesc,
-                         long long const aEnd_ns) noexcept
-      : evt{aDesc}, end_ns{aEnd_ns} {}
+  // duration_end() = default;
   constexpr duration_end(unsigned const aCategories, char const *const aDesc,
                          long long const aEnd_ns) noexcept
       : evt{aCategories, aDesc}, end_ns{aEnd_ns} {}

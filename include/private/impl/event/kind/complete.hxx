@@ -32,15 +32,11 @@ struct complete {
   long long start_ns;
   long long duration_ns;
 
-  complete() = default;
-  constexpr complete(char const *const aDesc, long long const aStart_ns,
-                     long long const aDuration_ns) noexcept
-      : evt{aDesc}, start_ns{aStart_ns}, duration_ns{aDuration_ns} {}
   constexpr complete(unsigned const aCategories, char const *const aDesc,
                      long long const aStart_ns,
                      long long const aDuration_ns) noexcept
-      : evt{aCategories, aDesc}, start_ns{aStart_ns},
-        duration_ns{aDuration_ns} {}
+      : evt{aCategories, aDesc}, start_ns{aStart_ns}, duration_ns{
+                                                          aDuration_ns} {}
 
 #ifdef CXXET_WITH_UNIT_TESTS
   constexpr complete(char const aFlag1, short const aFlag2,

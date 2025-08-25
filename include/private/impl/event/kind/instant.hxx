@@ -36,11 +36,6 @@ struct instant {
   int i_flag_4;   // explicit padding - unspecified meaning
   long long timestamp_ns;
 
-  instant() = default;
-  constexpr instant(char const *const aDesc, scope_t const aScope,
-                    long long const aTimestamp_ns) noexcept
-      : evt{aDesc}, scope{aScope}, i_flag_1{0}, i_flag_2{0}, i_flag_4{0},
-        timestamp_ns{aTimestamp_ns} {}
   constexpr instant(unsigned const aCategories, char const *const aDesc,
                     scope_t const aScope,
                     long long const aTimestamp_ns) noexcept
