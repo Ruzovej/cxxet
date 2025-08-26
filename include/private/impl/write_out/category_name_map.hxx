@@ -24,6 +24,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cxxet/output/category_flag.hxx"
+
 namespace cxxet::impl::write_out {
 
 struct category_name_map {
@@ -31,29 +33,29 @@ struct category_name_map {
   static constexpr unsigned num_categories{32};
   static_assert(sizeof(unsigned) * 8 == num_categories);
 
-  static constexpr unsigned reserved_1{1u << 30};
+  static constexpr output::category_flag reserved_1{1u << 30};
   static constexpr std::string_view reserved_1_name{"cxxet_1"};
-  static constexpr unsigned reserved_2{1u << 31};
+  static constexpr output::category_flag reserved_2{1u << 31};
   static constexpr std::string_view reserved_2_name{"cxxet_2"};
 
   category_name_map() noexcept;
   ~category_name_map() noexcept;
 
-  [[nodiscard]] unsigned register_category_name(unsigned const category,
-                                                std::string &&name,
-                                                bool const allow_rename);
+  [[nodiscard]] output::category_flag
+  register_category_name(output::category_flag const category,
+                         std::string &&name, bool const allow_rename);
 
   // see criteria in `cxxet/output/categories.hxx`:
   static bool is_name_valid(std::string_view const name) noexcept;
   bool is_name_used(std::string_view const name) const noexcept;
 
   std::string_view
-  get_joined_category_names(unsigned const category_bits) const;
+  get_joined_category_names(output::category_flag const category_bits) const;
 
 private:
   // better than `std::array` - to save (stack) space when not used ...
   std::vector<std::string> names{};
-  mutable std::unordered_map<unsigned, std::string> built_names;
+  mutable std::unordered_map<output::category_flag, std::string> built_names;
 };
 
 } // namespace cxxet::impl::write_out

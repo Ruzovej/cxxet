@@ -23,8 +23,9 @@
 
 namespace cxxet::output {
 
-unsigned register_category_name(unsigned const category, std::string name,
-                                bool const allow_rename) {
+category_flag register_category_name(category_flag const category,
+                                     std::string name,
+                                     bool const allow_rename) {
   return impl::sink::file_sink_global_instance().register_category_name(
       category, std::move(name), allow_rename);
 }

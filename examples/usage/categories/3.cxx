@@ -24,7 +24,8 @@
 
 #ifdef CXXET_ENABLE
 auto const invalid_category{cxxet::output::register_category_name(
-    0b11, "invalid_flag")}; // Invalid flag: not a power of 2 ~ single bit
+    cxxet::output::category_flag{0b11},
+    "invalid_flag")}; // Invalid flag: not a power of 2 ~ single bit
 #endif
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {

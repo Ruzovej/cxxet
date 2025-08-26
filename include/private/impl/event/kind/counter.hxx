@@ -32,8 +32,9 @@ struct counter {
   long long timestamp_ns;
   double value;
 
-  constexpr counter(unsigned const aCategories, char const *const name,
-                    long long const aTimestamp_ns, double const aValue) noexcept
+  constexpr counter(output::category_flag const aCategories,
+                    char const *const name, long long const aTimestamp_ns,
+                    double const aValue) noexcept
       : evt{aCategories, name}, timestamp_ns{aTimestamp_ns}, value{aValue} {}
 
   [[nodiscard]] constexpr char const *get_quantity_name() const noexcept {
@@ -42,8 +43,9 @@ struct counter {
 
 #ifdef CXXET_WITH_UNIT_TESTS
   constexpr counter(char const aFlag1, short const aFlag2,
-                    unsigned const aCategories, char const *const name,
-                    long long const aTimestamp_ns, double const aValue) noexcept
+                    output::category_flag const aCategories,
+                    char const *const name, long long const aTimestamp_ns,
+                    double const aValue) noexcept
       : evt{aFlag1, aFlag2, aCategories, name}, timestamp_ns{aTimestamp_ns},
         value{aValue} {}
 

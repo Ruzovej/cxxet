@@ -52,29 +52,44 @@ TEST_CASE("sink cascade") {
   constexpr int size{7};
   std::array<event::any, size> a;
 
-  new (&a[0].evt.dur_begin) event::duration_begin{1, 2, 3, "test begin", 0};
+  new (&a[0].evt.dur_begin)
+      event::duration_begin{1, 2, output::category_flag{3}, "test begin", 0};
 
-  new (&a[1].evt.dur_end) event::duration_end{4, 5, 6, "test end", 5};
+  new (&a[1].evt.dur_end)
+      event::duration_end{4, 5, output::category_flag{6}, "test end", 5};
 
-  new (&a[2].evt.cmpl) event::complete{7, 8, 9, "test complete", 10, 15};
+  new (&a[2].evt.cmpl)
+      event::complete{7, 8, output::category_flag{9}, "test complete", 10, 15};
 
-  new (&a[3].evt.cntr) event::counter{16, 17, 18, "test counter", 20, 42.666};
+  new (&a[3].evt.cntr) event::counter{
+      16, 17, output::category_flag{18}, "test counter", 20, 42.666};
 
-  new (&a[4].evt.inst) event::instant{
-      19, 20, 21, "test instant", scope_t::global, 'c', 321, 1'111'111'111, 25};
+  new (&a[4].evt.inst) event::instant{19,
+                                      20,
+                                      output::category_flag{21},
+                                      "test instant",
+                                      scope_t::global,
+                                      'c',
+                                      321,
+                                      1'111'111'111,
+                                      25};
 
   new (&a[5].evt.meta) event::metadata{'T',
                                        1234,
-                                       546,
+                                       output::category_flag{546},
                                        "some metadata str value ...",
                                        event::metadata_type::process_name,
                                        't',
                                        345,
                                        678978};
 
-  new (&a[6].evt.meta) event::metadata{
-      'N', 1235, 7898797, 42'000, event::metadata_type::thread_sort_index,
-      'M', 9330};
+  new (&a[6].evt.meta) event::metadata{'N',
+                                       1235,
+                                       output::category_flag{7898797},
+                                       42'000,
+                                       event::metadata_type::thread_sort_index,
+                                       'M',
+                                       9330};
 
   SUBCASE("one 'leaf'") {
     sink::properties traits{};

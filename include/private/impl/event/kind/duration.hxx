@@ -31,13 +31,15 @@ struct duration_begin {
   common<t> evt;
   long long start_ns;
 
-  constexpr duration_begin(unsigned const aCategories, char const *const aDesc,
+  constexpr duration_begin(output::category_flag const aCategories,
+                           char const *const aDesc,
                            long long const aStart_ns) noexcept
       : evt{aCategories, aDesc}, start_ns{aStart_ns} {}
 
 #ifdef CXXET_WITH_UNIT_TESTS
   constexpr duration_begin(char const aFlag1, short const aFlag2,
-                           unsigned const aCategories, char const *const aDesc,
+                           output::category_flag const aCategories,
+                           char const *const aDesc,
                            long long const aStart_ns) noexcept
       : evt{aFlag1, aFlag2, aCategories, aDesc}, start_ns{aStart_ns} {}
 
@@ -56,13 +58,15 @@ struct duration_end {
   common<t> evt;
   long long end_ns;
 
-  constexpr duration_end(unsigned const aCategories, char const *const aDesc,
+  constexpr duration_end(output::category_flag const aCategories,
+                         char const *const aDesc,
                          long long const aEnd_ns) noexcept
       : evt{aCategories, aDesc}, end_ns{aEnd_ns} {}
 
 #ifdef CXXET_WITH_UNIT_TESTS
   constexpr duration_end(char const aFlag1, short const aFlag2,
-                         unsigned const aCategories, char const *const aDesc,
+                         output::category_flag const aCategories,
+                         char const *const aDesc,
                          long long const aEnd_ns) noexcept
       : evt{aFlag1, aFlag2, aCategories, aDesc}, end_ns{aEnd_ns} {}
 

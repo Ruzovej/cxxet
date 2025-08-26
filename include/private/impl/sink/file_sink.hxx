@@ -41,9 +41,9 @@ template <bool thread_safe_v> struct file_sink : thread_safe_t<thread_safe_v> {
   void
   set_flush_target(std::unique_ptr<output::writer> &&aCustom_writer) noexcept;
 
-  [[nodiscard]] unsigned register_category_name(unsigned const category,
-                                                std::string &&name,
-                                                bool const allow_rename);
+  [[nodiscard]] output::category_flag
+  register_category_name(output::category_flag const category,
+                         std::string &&name, bool const allow_rename);
 
 private:
   file_sink(file_sink const &) = delete;

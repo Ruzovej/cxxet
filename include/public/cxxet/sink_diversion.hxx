@@ -23,6 +23,7 @@
 #include <string>
 
 #include "cxxet/macros/linkage.h"
+#include "cxxet/output/category_flag.hxx"
 #include "cxxet/output/writer.hxx"
 
 namespace cxxet {
@@ -42,13 +43,14 @@ struct CXXET_IMPL_API file_sink_handle : sink_handle {
   set_flush_target(std::unique_ptr<output::writer> custom_writer) noexcept = 0;
   void set_flush_target(std::nullptr_t) noexcept = delete;
 
-  [[nodiscard]] virtual unsigned
-  register_category_name(unsigned const category, std::string name,
+  [[nodiscard]] virtual output::category_flag
+  register_category_name(output::category_flag const category, std::string name,
                          bool const allow_rename = false) noexcept = 0;
-  [[nodiscard]] inline unsigned
+  [[nodiscard]] inline output::category_flag
   register_category_name(std::string name,
                          bool const allow_rename = false) noexcept {
-    return register_category_name(0, std::move(name), allow_rename);
+    return register_category_name(output::category_flag_none, std::move(name),
+                                  allow_rename);
   }
 };
 

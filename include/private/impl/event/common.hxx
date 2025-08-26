@@ -21,6 +21,8 @@
 
 #include <tuple>
 
+#include "cxxet/output/category_flag.hxx"
+
 namespace cxxet::impl::event {
 
 // inspired by
@@ -47,19 +49,21 @@ template <trace_type bound_type = trace_type::unknown> struct common {
   trace_type const type{bound_type}; // "ph" (mandatory)
   char flag_1;                       // explicit padding - unspecified meaning
   short flag_2;                      // explicit padding - unspecified meaning
-  unsigned categories;               // "cat" (optional)
+  output::category_flag categories;  // "cat" (optional)
   const char *desc;                  // "name" (mandatory)
   // other mandatory fields:
   // * "pid", "tid" -> provided by the sink, etc.
   // * "ts", "args", ... -> provided by the specific event type
 
-  constexpr common() = default;
-  constexpr common(unsigned const aCategories, char const *const aDesc) noexcept
+  constexpr common() : categories{output::category_flag_none} {}
+  constexpr common(output::category_flag const aCategories,
+                   char const *const aDesc) noexcept
       : flag_1{0}, flag_2{0}, categories{aCategories}, desc{aDesc} {}
 
 #ifdef CXXET_WITH_UNIT_TESTS
   constexpr common(char const aFlag1, short const aFlag2,
-                   unsigned const aCategories, char const *const aDesc) noexcept
+                   output::category_flag const aCategories,
+                   char const *const aDesc) noexcept
       : flag_1{aFlag1}, flag_2{aFlag2}, categories{aCategories}, desc{aDesc} {}
 
   [[nodiscard]] constexpr bool operator==(common const &other) const noexcept {
