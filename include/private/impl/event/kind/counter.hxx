@@ -26,7 +26,7 @@ namespace cxxet::impl::event {
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.msg3086636uq
 
 struct counter {
-  static constexpr type_t t{type_t::counter};
+  static constexpr trace_type t{trace_type::counter};
 
   common<t> evt;
   long long timestamp_ns;

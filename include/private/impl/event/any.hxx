@@ -47,7 +47,7 @@ struct any {
   any() noexcept : evt{} {}
 
   // valid because of `common initial sequence of members`:
-  [[nodiscard]] constexpr type_t get_type() const noexcept {
+  [[nodiscard]] constexpr trace_type get_type() const noexcept {
     return evt.common_base.c.type;
   }
 
@@ -56,9 +56,9 @@ struct any {
   }
 
   [[nodiscard]] constexpr char const *get_name() const noexcept {
-    return get_type() == event::type_t::metadata  ? evt.meta.get_name()
-           : get_type() == event::type_t::counter ? "Counter"
-           : get_type() == event::type_t::duration_end
+    return get_type() == event::trace_type::metadata  ? evt.meta.get_name()
+           : get_type() == event::trace_type::counter ? "Counter"
+           : get_type() == event::trace_type::duration_end
                // TODO maybe don't return empty string, and rather skip writing
                // out `"name":"",` completely (in `dump_records`)...:
                ? (evt.common_base.c.desc ? evt.common_base.c.desc : "")
@@ -66,7 +66,7 @@ struct any {
   }
 
   [[nodiscard]] constexpr auto get_ph() const noexcept {
-    return static_cast<std::underlying_type_t<event::type_t>>(get_type());
+    return static_cast<std::underlying_type_t<event::trace_type>>(get_type());
   }
 
   // ugh ... TODO refactor those below - they wouldn't scale well & basically
@@ -96,15 +96,17 @@ struct any {
 
 #ifdef CXXET_WITH_UNIT_TESTS
   [[nodiscard]] constexpr bool operator==(any const &other) const noexcept {
-    return get_type() == other.get_type() && get_type() != type_t::unknown &&
-           ((get_type() == type_t::duration_begin &&
+    return get_type() == other.get_type() &&
+           get_type() != trace_type::unknown &&
+           ((get_type() == trace_type::duration_begin &&
              evt.dur_begin == other.evt.dur_begin) ||
-            (get_type() == type_t::duration_end &&
+            (get_type() == trace_type::duration_end &&
              evt.dur_end == other.evt.dur_end) ||
-            (get_type() == type_t::complete && evt.cmpl == other.evt.cmpl) ||
-            (get_type() == type_t::counter && evt.cntr == other.evt.cntr) ||
-            (get_type() == type_t::instant && evt.inst == other.evt.inst) ||
-            (get_type() == type_t::metadata && evt.meta == other.evt.meta));
+            (get_type() == trace_type::complete &&
+             evt.cmpl == other.evt.cmpl) ||
+            (get_type() == trace_type::counter && evt.cntr == other.evt.cntr) ||
+            (get_type() == trace_type::instant && evt.inst == other.evt.inst) ||
+            (get_type() == trace_type::metadata && evt.meta == other.evt.meta));
   }
 #endif
 };

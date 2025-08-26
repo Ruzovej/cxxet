@@ -31,7 +31,7 @@ namespace cxxet::impl::event {
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.lenwiilchoxp
 
 struct metadata {
-  static constexpr type_t t{type_t::metadata};
+  static constexpr trace_type t{trace_type::metadata};
 
   common<t> evt;
   metadata_type type;

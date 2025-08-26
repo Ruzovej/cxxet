@@ -33,45 +33,54 @@
 #include "cxxet/sink_control.hxx"
 #include "cxxet/timepoint.hxx"
 
-#define CXXET_mark_complete(description)                                       \
+// -=-=-=-=-=-=-=-=-=-
+// core markers/events
+// -=-=-=-=-=-=-=-=-=-
+
+#define CXXET_mark_complete(...)                                               \
   cxxet::mark::complete CXXET_IMPL_IMPLICIT_MARKER_NAME(                       \
       CXXET_IMPLICIT_MARKER_, __LINE__) {                                      \
-    description                                                                \
+    __VA_ARGS__                                                                \
   }
 
 #define CXXET_mark_counter(...) cxxet::mark::do_submit_counter(__VA_ARGS__)
 
 #define CXXET_mark_counters(...) cxxet::mark::do_submit_counters(__VA_ARGS__)
 
-#define CXXET_mark_duration(description)                                       \
+#define CXXET_mark_duration(...)                                               \
   cxxet::mark::duration CXXET_IMPL_IMPLICIT_MARKER_NAME(                       \
       CXXET_IMPLICIT_MARKER_, __LINE__) {                                      \
-    description                                                                \
+    __VA_ARGS__                                                                \
   }
 
-#define CXXET_mark_duration_begin(description)                                 \
-  cxxet::mark::duration_begin(description)
+#define CXXET_mark_duration_begin(...) cxxet::mark::duration_begin(__VA_ARGS__)
 
 // Provide either same string as to the corresponding
 // `CXXET_mark_duration_begin` call, `nullptr` or nothing at all. This is so
 // ui.perfetto.dev processes it correctly.
-#define CXXET_mark_duration_end(description)                                   \
-  cxxet::mark::duration_end(description)
+#define CXXET_mark_duration_end(...) cxxet::mark::duration_end(__VA_ARGS__)
 
 #define CXXET_mark_instant(...) cxxet::mark::instant(__VA_ARGS__)
 
-#define CXXET_mark_process_name(proc_name) cxxet::mark::process_name(proc_name)
+// -=-=-=-=-=-=-=-=-=-
+// meta markers/events
+// -=-=-=-=-=-=-=-=-=-
 
-#define CXXET_mark_process_label(proc_label)                                   \
-  cxxet::mark::process_label(proc_label)
+#define CXXET_mark_process_name(...) cxxet::mark::process_name(__VA_ARGS__)
 
-#define CXXET_mark_process_sort_index(proc_sort_index)                         \
-  cxxet::mark::process_sort_index(proc_sort_index)
+#define CXXET_mark_process_label(...) cxxet::mark::process_label(__VA_ARGS__)
 
-#define CXXET_mark_thread_name(th_name) cxxet::mark::thread_name(th_name)
+#define CXXET_mark_process_sort_index(...)                                     \
+  cxxet::mark::process_sort_index(__VA_ARGS__)
 
-#define CXXET_mark_thread_sort_index(th_sort_index)                            \
-  cxxet::mark::thread_sort_index(th_sort_index)
+#define CXXET_mark_thread_name(...) cxxet::mark::thread_name(__VA_ARGS__)
+
+#define CXXET_mark_thread_sort_index(...)                                      \
+  cxxet::mark::thread_sort_index(__VA_ARGS__)
+
+// -=-=-=-=-=-=-=-=-
+// sink manipulation
+// -=-=-=-=-=-=-=-=-
 
 #define CXXET_sink_thread_reserve(minimum_free_capacity)                       \
   cxxet::sink_thread_reserve(minimum_free_capacity)

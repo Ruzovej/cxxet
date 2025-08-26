@@ -35,7 +35,7 @@ namespace {
 // Are those meaningful tests?!
 
 struct common_without_explicit_padding {
-  type_t const t;
+  trace_type const t;
   char const *const desc;
 };
 

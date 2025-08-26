@@ -26,7 +26,7 @@ namespace cxxet::impl::event {
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.nso4gcezn7n1
 
 struct duration_begin {
-  static constexpr type_t t{type_t::duration_begin};
+  static constexpr trace_type t{trace_type::duration_begin};
 
   common<t> evt;
   long long start_ns;
@@ -51,7 +51,7 @@ struct duration_begin {
 };
 
 struct duration_end {
-  static constexpr type_t t{type_t::duration_end};
+  static constexpr trace_type t{trace_type::duration_end};
 
   common<t> evt;
   long long end_ns;

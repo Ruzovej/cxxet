@@ -111,7 +111,9 @@ properties::properties() noexcept
       default_target_filename{parse_env_variable(
           "CXXET_TARGET_FILENAME", parse_string,
           "/tmp/cxxet_default.pid{pid}.json.XXXXXX", verbose)} {
-  // ...
+  if (verbose) {
+    std::cout.flush();
+  }
 }
 
 } // namespace cxxet::impl::sink

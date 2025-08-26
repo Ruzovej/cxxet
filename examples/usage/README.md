@@ -6,6 +6,8 @@ It's lightweight library that generates `chrome trace` format output, which can 
 
 ## Categories
 
+* [categories](categories/README.md)
+  * Organizing and filtering trace events into logical groups for better visualization.
 * [complete](complete/README.md)
   * Marker for measuring time spans, with begin and end merged into single event.
 * [counter](counter/README.md)

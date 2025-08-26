@@ -312,7 +312,105 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e -c '[.traceEvents[] | select(.name == "thread_sort_index")] | map(.args.sort_index) | sort' "${result}")" '[10,50]'
 }
 
-# TODO (https://github.com/Ruzovej/cxxet/issues/146) various examples & corresponding tests for category names, etc.
+@test "Categories example 1 - basic registration and event categorization" {
+    local executable="${BIN_DIR}/cxxet_example_categories_1"
+    local result="${TMP_RESULT_DIR}/example_categories_1.json"
+
+    run "${executable}_bare" "${result}"
+    assert_success
+    assert_output ""
+
+    refute [ -f "${result}" ]
+
+    run "${executable}" "${result}"
+    assert_success
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: "
+    refute_sanitizer_output
+
+    assert [ -f "${result}" ]
+
+    assert_equal "$(jq -e '.displayTimeUnit' "${result}")" '"ns"'
+
+    assert_equal "$(jq -e '.traceEvents | length' "${result}")" 6
+    assert_equal "$(jq -e '[.traceEvents[] | select(has("cat"))] | length' "${result}")" 4
+    assert_equal "$(jq -e -c '.traceEvents | map(.ph) | unique | sort' "${result}")" '["X"]'
+
+    assert_equal "$(jq -e -c '.traceEvents | map(.name) | unique | sort' "${result}")" '["1 HTTP request to API","2 Query user data","3 Sync data to server","4 Cleanup temporary files","5 Uncategorized operation (default)","6 Uncategorized operation (ignoring unknown categories)"]'
+
+    # Check the `cat` content for all categorized events
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "1 HTTP request to API")] | .[0].cat' "${result}")" '"network"'
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "2 Query user data")] | .[0].cat' "${result}")" '"database"'
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "3 Sync data to server")] | .[0].cat' "${result}")" '"network,database"'
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "4 Cleanup temporary files")] | .[0].cat' "${result}")" '"background-tasks"'
+
+    # Check that uncategorized events don't have `cat` field
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "5 Uncategorized operation (default)")] | .[0] | has("cat")' "${result}")" 'false'
+    assert_equal "$(jq -e '[.traceEvents[] | select(.name == "6 Uncategorized operation (ignoring unknown categories)")] | .[0] | has("cat")' "${result}")" 'false'
+}
+
+@test "Categories example 2 - registration fails with invalid name" {
+    local executable="${BIN_DIR}/cxxet_example_fail_categories_2"
+    local result="${TMP_RESULT_DIR}/example_fail_categories_2.json"
+
+    run "${executable}_bare" "${result}"
+    assert_success
+    assert_output ""
+
+    refute [ -f "${result}" ]
+
+    run "${executable}" "${result}"
+    assert_failure
+    refute_sanitizer_output
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: 
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  category name is not valid"
+
+    refute [ -f "${result}" ]
+}
+
+@test "Categories example 3 - registration fails with invalid flag" {
+    local executable="${BIN_DIR}/cxxet_example_fail_categories_3"
+    local result="${TMP_RESULT_DIR}/example_fail_categories_3.json"
+
+    run "${executable}_bare" "${result}"
+    assert_success
+    assert_output ""
+
+    refute [ -f "${result}" ]
+
+    run "${executable}" "${result}"
+    assert_failure
+    refute_sanitizer_output
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: 
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  category flag must have exactly one bit set"
+
+    refute [ -f "${result}" ]
+}
+
+@test "Categories example 4 - registration fails with duplicate flag" {
+    local executable="${BIN_DIR}/cxxet_example_fail_categories_4"
+    local result="${TMP_RESULT_DIR}/example_fail_categories_4.json"
+
+    run "${executable}_bare" "${result}"
+    assert_success
+    assert_output ""
+
+    refute [ -f "${result}" ]
+
+    run "${executable}" "${result}"
+    assert_failure
+    refute_sanitizer_output
+    assert_output "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
+Deduced CXXET_TARGET_FILENAME: 
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  category flag already registered"
+
+    refute [ -f "${result}" ]
+}
 
 @test "Custom file_sink redirection example 1" {
     local executable="${BIN_DIR}/cxxet_example_local_file_sink_1"
@@ -525,29 +623,47 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local executable="${BIN_DIR}/cxxet_test_empty_file"
 
-    run strace "${executable}_bare"
+    # bare
+
+    local strace_output_file1="${TMP_RESULT_DIR}/cxxet_test_empty_file.strace.1"
+    run strace -o "${strace_output_file1}" "${executable}_bare"
     assert_success
     refute_sanitizer_output
-    refute_output --partial "write("
+    refute_output
 
-    run strace "${executable}"
+    assert [ -f "${strace_output_file1}" ]
+    assert_equal "$(grep -c 'write(1,' "${strace_output_file1}")" 0
+
+    # discarding all events
+
+    local strace_output_file2="${TMP_RESULT_DIR}/cxxet_test_empty_file.strace.2"
+    run strace -o "${strace_output_file2}" "${executable}"
     assert_success
     refute_sanitizer_output
     assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: "
-    assert_output --partial "write(1, "
-    refute_output --regexp "write\([^1]" # `stdout` ... see the asserts above which requires exactly that
 
+    assert [ -f "${strace_output_file2}" ]
+    # TODO why writing to `std::cout` (as asserted above) doesn't show up here?
+    #assert_equal "$(grep -c 'write(1,' "${strace_output_file2}")" 1 # writes to `stdout`
+    assert_equal "$(grep -c 'write([^1]' "${strace_output_file2}")" 0 # no other writes
+
+    # specifying file, but no events recorded -> no file created
+
+    local strace_output_file3="${TMP_RESULT_DIR}/cxxet_test_empty_file.strace.3"
     local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.json"
     export CXXET_TARGET_FILENAME="${output_file}"
-    run strace "${executable}"
+    run strace -o "${strace_output_file3}" "${executable}"
     assert_success
     refute_sanitizer_output
     assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: ${output_file}"
-    assert_output --partial "write(1, "
-    refute_output --regexp "write\([^1]" # ditto
-    refute [ -f "${output_file}" ]       # internally this setting was overwritten ...
+    refute [ -f "${output_file}" ]
+
+    assert [ -f "${strace_output_file3}" ]
+    # TODO why writing to `std::cout` (as asserted above) doesn't show up here?
+    #assert_equal "$(grep -c 'write(1,' "${strace_output_file3}")" 1 # ditto
+    assert_equal "$(grep -c 'write([^1]' "${strace_output_file3}")" 0 # ditto
 }
 
 @test "Implicit file - default and modified behavior" {
