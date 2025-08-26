@@ -66,9 +66,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {
   }
 
   {
+#ifdef CXXET_ENABLE
+    auto const unused_categories{(1u << 5) | (1u << 7) | (1u << 13) |
+                                 (1u << 19) | (1u << 23)};
+
+    if ((unused_categories & network_category) ||
+        (unused_categories & database_category) ||
+        (unused_categories & background_category)) {
+      throw std::runtime_error("Test setup error");
+    }
+#endif
+
     // Mark with invalid categories
     CXXET_mark_complete(
-        (1u << 3) | (1u << 11),
+        unused_categories,
         "6 Uncategorized operation (ignoring unknown categories)");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
