@@ -34,6 +34,21 @@ add_example(
 )
 
 add_example(
+    cxxet_example_fail_categories_2
+        "categories/2.cxx"
+)
+
+add_example(
+    cxxet_example_fail_categories_3
+        "categories/3.cxx"
+)
+
+add_example(
+    cxxet_example_fail_categories_4
+        "categories/4.cxx"
+)
+
+add_example(
     cxxet_example_metadata_1
         "metadata/1.cxx"
 )
