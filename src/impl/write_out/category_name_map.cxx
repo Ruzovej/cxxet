@@ -247,9 +247,10 @@ TEST_CASE("write_out::category_name_map itself") {
 
       REQUIRE_EQ(cnm.get_joined_category_names(output::category_flag_none), "");
       REQUIRE_EQ(cnm.get_joined_category_names(cat1), "c1");
-      REQUIRE_EQ(cnm.get_joined_category_names(cat1 | cat1), "c1");
+      REQUIRE_EQ(cnm.get_joined_category_names(cat2 | cat2), "c2");
       REQUIRE_EQ(cnm.get_joined_category_names(cat1 | cat2), "c1,c2");
       REQUIRE_EQ(cnm.get_joined_category_names(cat1 | cat3), "c1,c3");
+      REQUIRE_EQ(cnm.get_joined_category_names(cat3 | cat2), "c2,c3");
       REQUIRE_EQ(cnm.get_joined_category_names(cat2 | cat1 | cat3), "c1,c2,c3");
     }
 
