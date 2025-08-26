@@ -119,37 +119,37 @@ void in_trace_event_format(output::writer &out,
     };
 
     switch (evt.get_type()) {
-    case event::type_t::duration_begin: {
+    case event::trace_type::duration_begin: {
       auto const &e{evt.evt.dur_begin};
       write_out_timestamp(e.start_ns - time_point_zero_ns);
       break;
     }
-    case event::type_t::duration_end: {
+    case event::trace_type::duration_end: {
       auto const &e{evt.evt.dur_end};
       write_out_timestamp(e.end_ns - time_point_zero_ns);
       break;
     }
-    case event::type_t::complete: {
+    case event::trace_type::complete: {
       auto const &e{evt.evt.cmpl};
       write_out_timestamp(e.start_ns - time_point_zero_ns);
       out << "\"dur\":" << longlong_ns_to_double_us(e.duration_ns) << ',';
       break;
     }
-    case event::type_t::instant: {
+    case event::trace_type::instant: {
       auto const &e{evt.evt.inst};
       write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
       out << "\"s\":\"" << static_cast<std::underlying_type_t<scope_t>>(e.scope)
           << "\",";
       break;
     }
-    case event::type_t::counter: {
+    case event::trace_type::counter: {
       auto const &e{evt.evt.cntr};
       write_out_timestamp(e.timestamp_ns - time_point_zero_ns);
       out << "\"args\":{" << escape_json_string(e.get_quantity_name()) << ":"
           << e.value << "},";
       break;
     }
-    case event::type_t::metadata: {
+    case event::trace_type::metadata: {
       auto const &e{evt.evt.meta};
       out << "\"args\":{" << escape_json_string(e.get_arg_name()) << ":";
       switch (e.get_metadata_type()) {

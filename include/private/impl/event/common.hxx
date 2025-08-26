@@ -26,7 +26,7 @@ namespace cxxet::impl::event {
 // inspired by
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU
 
-enum class type_t : char {
+enum class trace_type : char {
   duration_begin = 'B',
   duration_end = 'E',
   complete = 'X',
@@ -42,13 +42,13 @@ enum class type_t : char {
 };
 
 // https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?tab=t.0#heading=h.uxpopqvbjezh
-template <type_t bound_type = type_t::unknown> struct common {
-  //                                related to field:
-  type_t const type{bound_type}; // "ph" (mandatory)
-  char flag_1;                   // explicit padding - unspecified meaning
-  short flag_2;                  // explicit padding - unspecified meaning
-  unsigned categories;           // "cat" (optional)
-  const char *desc;              // "name" (mandatory)
+template <trace_type bound_type = trace_type::unknown> struct common {
+  //                                  related to field:
+  trace_type const type{bound_type}; // "ph" (mandatory)
+  char flag_1;                       // explicit padding - unspecified meaning
+  short flag_2;                      // explicit padding - unspecified meaning
+  unsigned categories;               // "cat" (optional)
+  const char *desc;                  // "name" (mandatory)
   // other mandatory fields:
   // * "pid", "tid" -> provided by the sink, etc.
   // * "ts", "args", ... -> provided by the specific event type
