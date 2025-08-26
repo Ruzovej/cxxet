@@ -21,6 +21,8 @@
 
 #include <unistd.h>
 
+#include <cstring>
+
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
@@ -34,14 +36,19 @@ namespace cxxet::impl::write_out {
 namespace {
 
 // TODO (https://github.com/Ruzovej/cxxet/issues/137) add cache ...
-std::string escape_json_string(char const *const str) {
-  if (!str)
+std::string escape_json_string(char const *const str, std::size_t len = 0) {
+  if (!str) {
     return "null";
+  }
+
+  if (len == 0) {
+    len = std::strlen(str);
+  }
 
   std::ostringstream result;
   result << '"';
 
-  for (const char *c = str; *c; ++c) {
+  for (const char *c = str; c != str + len; ++c) {
     switch (*c) {
     case '"':
       result << "\\\"";
@@ -111,7 +118,9 @@ void in_trace_event_format(output::writer &out,
         cat_names.get_joined_category_names(evt.get_categories())};
     if (!categories_str.empty()) {
       // requirements imply no need to escape it
-      out << "\"cat\":" << categories_str << ",";
+      out << "\"cat\":"
+          << escape_json_string(categories_str.data(), categories_str.size())
+          << ",";
     }
 
     auto const write_out_timestamp = [&out](long long const ns) {

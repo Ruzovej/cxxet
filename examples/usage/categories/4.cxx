@@ -25,9 +25,15 @@
 #ifdef CXXET_ENABLE
 auto const first_category{
     cxxet::output::register_category_name("first_category")};
+
+// It's questionable whether overwriting previously set values is a good
+// practice ...:
+auto const first_category_overwritten{cxxet::output::register_category_name(
+    first_category, "first_category_overwritten", true)};
+
+// Duplicate flag: same as the prev. one, fails:
 auto const duplicate_category{cxxet::output::register_category_name(
-    first_category,
-    "duplicate_category")}; // Duplicate flag: same as the prev. one
+    first_category, "duplicate_category")};
 #endif
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {

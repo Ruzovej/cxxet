@@ -38,37 +38,38 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {
   CXXET_sink_global_set_flush_target(argc > 1 ? argv[1] : "/dev/stdout");
 
   {
-    CXXET_mark_complete(network_category, "HTTP request to API");
+    CXXET_mark_complete(network_category, "1 HTTP request to API");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   {
-    CXXET_mark_complete(database_category, "Query user data");
+    CXXET_mark_complete(database_category, "2 Query user data");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   {
     // Combine multiple categories (bitwise OR)
     CXXET_mark_complete(network_category | database_category,
-                        "Sync data to server");
+                        "3 Sync data to server");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   {
-    CXXET_mark_complete(background_category, "Cleanup temporary files");
+    CXXET_mark_complete(background_category, "4 Cleanup temporary files");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   {
     // Mark without category
-    CXXET_mark_complete("Uncategorized operation (default)");
+    CXXET_mark_complete("5 Uncategorized operation (default)");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   {
     // Mark with invalid categories
-    CXXET_mark_complete((1u << 3) | (1u << 11),
-                        "Uncategorized operation (ignoring unknown categories)");
+    CXXET_mark_complete(
+        (1u << 3) | (1u << 11),
+        "6 Uncategorized operation (ignoring unknown categories)");
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
