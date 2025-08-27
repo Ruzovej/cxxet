@@ -65,9 +65,9 @@ function benchmark_runner() {
     fi
 
     printf -- '-=-=-=-=-=-=-=- Executing %s benchmarks:\n' "${preset}" >&2
-    time (
+    (
         set -x
-        "${bin_dir}/cxxet_benchmarks"
-    ) >&2
+        "${bin_dir}/cxxet_benchmarks" >&2
+    )
     printf '\n' >&2
 }

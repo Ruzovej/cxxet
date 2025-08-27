@@ -51,7 +51,7 @@ function valid_examples_runner() {
         --ignore-compile_commands >&2
 
     printf -- '-=-=-=-=-=-=-=- Executing %s examples:\n' "${preset}" >&2
-    time (
+    (
         set -x
 
         export CXXET_DEFAULT_BLOCK_SIZE=3 # torture it with some non-default value & force it to allocate more during the run
