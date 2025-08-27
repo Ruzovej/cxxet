@@ -16,7 +16,7 @@ function docker_build_image() {
         if [[ "$1" != '--short' ]]; then
             printf 'docker_build_image: build given docker image\n' >&2
         fi
-        printf 'Usage: docker_build_image <image_name_base>\n' >&2
+        printf 'Usage: docker_build_image <image_name_base|-h|--help>\n' >&2
         list_dockerfiles
     }
 

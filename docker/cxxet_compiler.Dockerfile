@@ -69,7 +69,7 @@ RUN groupadd \
     && useradd \
         --uid "${USER_ID:?}" \
         --gid "${GROUP_ID:?}" \
-        --no-create-home \
+        --create-home \
         --shell /bin/bash \
         "${USER_NAME:?}"
 
