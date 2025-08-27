@@ -7,6 +7,8 @@ cxxet_include scripts/common/reject_further_args
 function purge_artifacts() {
     # TODO (https://github.com/Ruzovej/cxxet/issues/111) is it enough? Or even more ... e.g. everything that is listed in (any) `.gitignore`?!
     local files_to_remove=(
+        "${CXXET_ROOT_DIR}/.cache"
+        "${CXXET_ROOT_DIR}/.devcontainer"
         "${CXXET_ROOT_DIR}/bin"
         "${CXXET_ROOT_DIR}/build"
         "${CXXET_ROOT_DIR}/compile_commands.json"

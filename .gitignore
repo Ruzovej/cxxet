@@ -1,4 +1,5 @@
 /.cache
+/.devcontainer
 /.vscode
 /bin
 /build
