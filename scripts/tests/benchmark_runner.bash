@@ -7,8 +7,9 @@ cxxet_include scripts/commands/compile
 function benchmark_runner() {
     # don't "test" all reasonable presets but only single one:
     local default_preset=tsan
-    local preset="${1:-${default_preset}}"
+    local preset="${default_preset}"
     local benchmark_help='false'
+    local benchmark_args=()
 
     function usage() {
         {
@@ -19,6 +20,7 @@ function benchmark_runner() {
             printf 'Where options are:\n'
             printf '    --preset, -p PRESET        Run benchmarks with the specified preset (default: %s)\n' "${default_preset}"
             printf '    --benchmark-help           Show help message of the benchmark runner\n'
+            printf '    --benchmark*, --v=*        Pass any such flag directly to the benchmark runner\n'
             printf '    --help, -h                 Show this help message\n'
         } >&2
     }
@@ -31,6 +33,10 @@ function benchmark_runner() {
                 ;;
             --benchmark-help)
                 benchmark_help='true'
+                shift
+                ;;
+            --benchmark*|--v=*)
+                benchmark_args+=("$1")
                 shift
                 ;;
             --help|-h)
@@ -67,7 +73,7 @@ function benchmark_runner() {
     printf -- '-=-=-=-=-=-=-=- Executing %s benchmarks:\n' "${preset}" >&2
     (
         set -x
-        "${bin_dir}/cxxet_benchmarks" >&2
+        "${bin_dir}/cxxet_benchmarks" "${benchmark_args[@]}" >&2
     )
     printf '\n' >&2
 }

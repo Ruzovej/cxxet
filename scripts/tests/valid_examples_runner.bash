@@ -7,7 +7,7 @@ cxxet_include scripts/commands/compile
 function valid_examples_runner() {
     # don't "test" all reasonable presets but only single one:
     local default_preset=asan_d
-    local preset="${1:-${default_preset}}"
+    local preset="${default_preset}"
 
     function usage() {
         {
