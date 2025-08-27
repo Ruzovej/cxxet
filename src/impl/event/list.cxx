@@ -418,3 +418,181 @@ TEST_CASE("event::list") {
 } // namespace cxxet::impl
 
 #endif
+
+#ifdef CXXET_WITH_BENCHMARKS
+
+#include <benchmark/benchmark.h>
+
+namespace {
+
+namespace helper {
+
+constexpr long long get_internal_array_size(long long const capacity) noexcept {
+  return static_cast<long long>(sizeof(cxxet::impl::event::list::raw_element)) *
+         (capacity + 1);
+}
+
+void placement_new_evt(void *addr) noexcept {
+  new (addr) cxxet::impl::event::complete{cxxet::output::category_flag{123},
+                                          "complete", 1, 2};
+  benchmark::DoNotOptimize(addr);
+}
+
+} // namespace helper
+
+void cxxet_list_raw_element_new_delete(benchmark::State &state) {
+  auto const capacity{static_cast<int>(state.range(0))};
+
+  for (auto _ : state) {
+    auto *elems{cxxet::impl::event::list::raw_element::new_elems(capacity)};
+    benchmark::DoNotOptimize(elems);
+    cxxet::impl::event::list::raw_element::delete_elems(elems);
+  }
+
+  state.SetBytesProcessed(state.iterations() *
+                          helper::get_internal_array_size(capacity));
+}
+BENCHMARK(cxxet_list_raw_element_new_delete)
+    ->Arg(8)
+    ->Arg(64)
+    ->Arg(512)
+    ->Arg(4096)
+    ->Arg(32768);
+
+namespace cxxet_alternative {
+
+char *new_raw_elems(int const capacity) noexcept {
+  assert(capacity > 0);
+  auto *data{new char[static_cast<std::size_t>(
+      helper::get_internal_array_size(capacity))]};
+
+  new (data) cxxet::impl::event::list::meta_info{
+      static_cast<long long>(gettid()), capacity};
+
+  return data;
+}
+
+void delete_raw_elems(char *const elems) noexcept { delete[] elems; }
+
+char *malloc_raw_elems(int const capacity) noexcept {
+  assert(capacity > 0);
+  auto *data{reinterpret_cast<char *>(malloc(
+      static_cast<std::size_t>(helper::get_internal_array_size(capacity))))};
+
+  new (data) cxxet::impl::event::list::meta_info{
+      static_cast<long long>(gettid()), capacity};
+
+  return data;
+}
+
+void free_raw_elems(char *const elems) noexcept { free(elems); }
+
+} // namespace cxxet_alternative
+
+void cxxet_list_raw_element_competing_new_delete(benchmark::State &state) {
+  auto const capacity{static_cast<int>(state.range(0))};
+
+  for (auto _ : state) {
+    auto *elems{cxxet_alternative::new_raw_elems(capacity)};
+    benchmark::DoNotOptimize(elems);
+    cxxet_alternative::delete_raw_elems(elems);
+  }
+
+  state.SetBytesProcessed(state.iterations() *
+                          helper::get_internal_array_size(capacity));
+}
+BENCHMARK(cxxet_list_raw_element_competing_new_delete)
+    ->Arg(8)
+    ->Arg(64)
+    ->Arg(512)
+    ->Arg(4096)
+    ->Arg(32768);
+
+void cxxet_list_raw_element_competing_malloc_free(benchmark::State &state) {
+  auto const capacity{static_cast<int>(state.range(0))};
+
+  for (auto _ : state) {
+    auto *elems{cxxet_alternative::malloc_raw_elems(capacity)};
+    benchmark::DoNotOptimize(elems);
+    cxxet_alternative::free_raw_elems(elems);
+  }
+
+  state.SetBytesProcessed(state.iterations() *
+                          helper::get_internal_array_size(capacity));
+}
+BENCHMARK(cxxet_list_raw_element_competing_malloc_free)
+    ->Arg(8)
+    ->Arg(64)
+    ->Arg(512)
+    ->Arg(4096)
+    ->Arg(32768);
+
+void cxxet_list_raw_element_new_delete_fill_events(benchmark::State &state) {
+  auto const capacity{static_cast<int>(state.range(0))};
+
+  for (auto _ : state) {
+    auto *elems{cxxet::impl::event::list::raw_element::new_elems(capacity)};
+    for (int i = 0; i < capacity; ++i) {
+      helper::placement_new_evt(&(elems[1 + i].evt.evt.cmpl));
+    }
+    cxxet::impl::event::list::raw_element::delete_elems(elems);
+  }
+
+  state.SetItemsProcessed(state.iterations() * capacity);
+}
+BENCHMARK(cxxet_list_raw_element_new_delete_fill_events)
+    ->Arg(8)
+    ->Arg(64)
+    ->Arg(512)
+    ->Arg(4096)
+    ->Arg(32768);
+
+// TODO (#156 ...) this is approximately 33% faster then the current
+// implementation -> rework it later!
+void cxxet_list_raw_element_competing_new_delete_fill_events(
+    benchmark::State &state) {
+  auto const capacity{static_cast<int>(state.range(0))};
+
+  for (auto _ : state) {
+    auto *elems{cxxet_alternative::new_raw_elems(capacity)};
+    for (int i = 0; i < capacity; ++i) {
+      helper::placement_new_evt(elems + static_cast<unsigned>(1 + i) *
+                                            sizeof(cxxet::impl::event::any));
+    }
+    cxxet_alternative::delete_raw_elems(elems);
+  }
+
+  state.SetItemsProcessed(state.iterations() * capacity);
+}
+BENCHMARK(cxxet_list_raw_element_competing_new_delete_fill_events)
+    ->Arg(8)
+    ->Arg(64)
+    ->Arg(512)
+    ->Arg(4096)
+    ->Arg(32768);
+
+void cxxet_list_raw_element_competing_malloc_free_fill_events(
+    benchmark::State &state) {
+  auto const capacity{static_cast<int>(state.range(0))};
+
+  for (auto _ : state) {
+    auto *elems{cxxet_alternative::malloc_raw_elems(capacity)};
+    for (int i = 0; i < capacity; ++i) {
+      helper::placement_new_evt(elems + static_cast<unsigned>(1 + i) *
+                                            sizeof(cxxet::impl::event::any));
+    }
+    cxxet_alternative::free_raw_elems(elems);
+  }
+
+  state.SetItemsProcessed(state.iterations() * capacity);
+}
+BENCHMARK(cxxet_list_raw_element_competing_malloc_free_fill_events)
+    ->Arg(8)
+    ->Arg(64)
+    ->Arg(512)
+    ->Arg(4096)
+    ->Arg(32768);
+
+} // namespace
+
+#endif

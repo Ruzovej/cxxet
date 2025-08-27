@@ -24,6 +24,9 @@
 namespace cxxet::impl::event {
 
 class list {
+#ifdef CXXET_WITH_BENCHMARKS
+public:
+#endif
   union raw_element;
 
   struct meta_info {

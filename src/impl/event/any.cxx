@@ -78,3 +78,125 @@ static_assert(sizeof(any) == max_size,
               "`any` should have same size as the internal union it wraps!");
 
 } // namespace cxxet::impl::event
+
+#ifdef CXXET_WITH_BENCHMARKS
+
+#include <benchmark/benchmark.h>
+
+namespace {
+
+void cxxet_impl_event_any_default_ctor(benchmark::State &state) {
+  for (auto _ : state) {
+    cxxet::impl::event::any any{};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_default_ctor);
+
+namespace cxxet_alternative {
+
+struct alignas(alignof(cxxet::impl::event::any)) competing_any {
+  competing_any() noexcept { type[0] = 42; }
+
+private:
+  char type[sizeof(cxxet::impl::event::any)];
+};
+
+static_assert(sizeof(competing_any) == sizeof(cxxet::impl::event::any));
+
+} // namespace cxxet_alternative
+
+void cxxet_competing_any_default_ctor(benchmark::State &state) {
+  for (auto _ : state) {
+    cxxet_alternative::competing_any any{};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+// TODO (#156 ...) this is faster by ca. 50% compared with current solution ->
+// rework it later!
+BENCHMARK(cxxet_competing_any_default_ctor);
+
+// TODO (#156 ...) those are approximately 33-66 % slower than the default ctor
+// -> rework it later!
+void cxxet_impl_event_any_from_complete(benchmark::State &state) {
+  cxxet::impl::event::complete const e{cxxet::output::category_flag{123},
+                                       "complete", 1, 2};
+
+  for (auto _ : state) {
+    cxxet::impl::event::any any{e};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_from_complete);
+
+void cxxet_impl_event_any_from_counter(benchmark::State &state) {
+  cxxet::impl::event::counter const e{cxxet::output::category_flag{456},
+                                      "counter", 3, 789.654};
+
+  for (auto _ : state) {
+    cxxet::impl::event::any any{e};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_from_counter);
+
+void cxxet_impl_event_any_from_duration_begin(benchmark::State &state) {
+  cxxet::impl::event::duration_begin const e{cxxet::output::category_flag{456},
+                                             "duration_begin", 4};
+
+  for (auto _ : state) {
+    cxxet::impl::event::any any{e};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_from_duration_begin);
+
+void cxxet_impl_event_any_from_duration_end(benchmark::State &state) {
+  cxxet::impl::event::duration_end const e{cxxet::output::category_flag{456},
+                                           "duration_end", 5};
+
+  for (auto _ : state) {
+    cxxet::impl::event::any any{e};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_from_duration_end);
+
+void cxxet_impl_event_any_from_instant(benchmark::State &state) {
+  cxxet::impl::event::instant const e{cxxet::output::category_flag{456},
+                                      "instant", cxxet::scope_t::process, 6};
+
+  for (auto _ : state) {
+    cxxet::impl::event::any any{e};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_from_instant);
+
+void cxxet_impl_event_any_from_metadata_name(benchmark::State &state) {
+  cxxet::impl::event::metadata const e{
+      cxxet::output::category_flag{456}, "metadata name",
+      cxxet::impl::event::metadata_type::thread_name};
+
+  for (auto _ : state) {
+    cxxet::impl::event::any any{e};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_from_metadata_name);
+
+void cxxet_impl_event_any_from_metadata_index(benchmark::State &state) {
+  cxxet::impl::event::metadata const e{
+      cxxet::output::category_flag{456}, 7,
+      cxxet::impl::event::metadata_type::thread_sort_index};
+
+  for (auto _ : state) {
+    cxxet::impl::event::any any{e};
+    benchmark::DoNotOptimize(&any);
+  }
+}
+BENCHMARK(cxxet_impl_event_any_from_metadata_index);
+
+} // namespace
+
+#endif
