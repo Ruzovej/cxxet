@@ -191,7 +191,6 @@ if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
 
     add_executable(
         cxxet_benchmarks
-            "${CMAKE_SOURCE_DIR}/benchmarks/bench_test.cxx" # TODO #156 remove this one ...
             ${CXXET_LIB_SOURCES}
     )
     target_include_directories(
