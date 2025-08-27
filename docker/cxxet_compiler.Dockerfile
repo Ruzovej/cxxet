@@ -58,22 +58,6 @@ RUN install_alternative() { update-alternatives --install "/usr/bin/$1" "$1" "/u
 
 ENV LANG=C.UTF-8
 
-RUN cd /tmp \
-    && git clone \
-        --single-branch \
-        --branch v1.9.4 \
-        https://github.com/google/benchmark.git \
-    && cd benchmark \
-    && cmake \
-        -S . \
-        -B "build" \
-        -G Ninja \
-        -DBENCHMARK_DOWNLOAD_DEPENDENCIES=ON \
-        -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build "build" --config Release --target install \
-    && cd /tmp \
-    && rm -rf benchmark
-
 ARG USER_ID
 ARG GROUP_ID
 ARG USER_NAME

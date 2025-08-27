@@ -170,8 +170,9 @@ if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
 
     FetchContent_Declare(
         doctest
-        GIT_REPOSITORY https://github.com/doctest/doctest.git
-        GIT_TAG        v2.4.11
+        GIT_REPOSITORY  https://github.com/doctest/doctest.git
+        GIT_TAG         v2.4.11
+        GIT_SHALLOW     TRUE
     )
     FetchContent_MakeAvailable(doctest)
 
