@@ -161,17 +161,98 @@ file(
     GLOB_RECURSE
     CXXET_LIB_SOURCES
         CONFIGURE_DEPENDS
-        "src/*.cxx"
+        "${CMAKE_SOURCE_DIR}/src/*.cxx"
 )
 
 # first should be target that is desired to be picked by `clangd` for indexing the source code ... unfortunately, they define various macros to control what is being compiled beside regular source code (e.g. benchmarks, unit tests or nothing more), hence various parts of code will be ignored if not chosen correctly.
 if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
-    add_subdirectory(benchmarks)
+    # TODO #156 refactor this ... see the duplicated code for unit tests below ...
+    FetchContent_Declare(
+        benchmark
+        GIT_REPOSITORY  https://github.com/google/benchmark.git
+        GIT_TAG         v1.9.4
+        GIT_SHALLOW     TRUE
+    )
+    option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." OFF)
+    option(BENCHMARK_ENABLE_EXCEPTIONS "Enable the use of exceptions in the benchmark library." ON)
+    option(BENCHMARK_ENABLE_LTO "Enable link time optimisation of the benchmark library." OFF)
+    option(BENCHMARK_USE_LIBCXX "Build and test using libc++ as the standard library." OFF)
+    option(BENCHMARK_ENABLE_WERROR "Build Release candidates with -Werror." OFF)
+    option(BENCHMARK_FORCE_WERROR "Build Release candidates with -Werror regardless of compiler issues." OFF)
+    option(BENCHMARK_ENABLE_INSTALL "Enable installation of benchmark. (Projects embedding benchmark may want to turn this OFF.)" OFF)
+    option(BENCHMARK_ENABLE_DOXYGEN "Build documentation with Doxygen." OFF)
+    option(BENCHMARK_INSTALL_DOCS "Enable installation of documentation." OFF)
+    option(BENCHMARK_INSTALL_TOOLS "Enable installation of tools." OFF)
+    option(BENCHMARK_ENABLE_GTEST_TESTS "Enable building the unit tests which depend on gtest" OFF)
+    option(BENCHMARK_USE_BUNDLED_GTEST "Use bundled GoogleTest. If disabled, the find_package(GTest) will be used." OFF)
+    option(BENCHMARK_ENABLE_LIBPFM "Enable performance counters provided by libpfm" ON)
+    option(BENCHMARK_ENABLE_ASSEMBLY_TESTS "Enable building and running the assembly tests" OFF)
+    FetchContent_MakeAvailable(benchmark)
+
+    add_executable(
+        cxxet_benchmarks
+            "${CMAKE_SOURCE_DIR}/benchmarks/bench_test.cxx" # TODO #156 remove this one ...
+            ${CXXET_LIB_SOURCES}
+    )
+    target_include_directories(
+        cxxet_benchmarks
+            PRIVATE
+            "${CMAKE_SOURCE_DIR}/include/public"
+            "${CMAKE_SOURCE_DIR}/include/private"
+    )
+    target_link_libraries(
+        cxxet_benchmarks
+            PRIVATE
+                benchmark::benchmark
+                benchmark::benchmark_main
+    )
+    target_compile_definitions(
+        cxxet_benchmarks
+            PRIVATE
+            CXXET_ENABLE
+            CXXET_WITH_BENCHMARKS
+    )
+    add_unix_compiler_flags(cxxet_benchmarks)
+    add_sanitizers(cxxet_benchmarks)
 endif()
 
 if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
-    add_subdirectory(tests/unit)
     add_subdirectory(tests/infra)
+
+    FetchContent_Declare(
+        doctest
+        GIT_REPOSITORY  https://github.com/doctest/doctest.git
+        GIT_TAG         v2.4.11
+        GIT_SHALLOW     TRUE
+    )
+    FetchContent_MakeAvailable(doctest)
+
+    add_executable(
+        cxxet_unit_tests
+            "${CMAKE_SOURCE_DIR}/tests/unit/doctest_main.cxx"
+            ${CXXET_LIB_SOURCES}
+    )
+    target_include_directories(
+        cxxet_unit_tests
+            PRIVATE
+            "${CMAKE_SOURCE_DIR}/include/public"
+            "${CMAKE_SOURCE_DIR}/include/private"
+    )
+    target_link_libraries(
+        cxxet_unit_tests
+            PRIVATE
+            doctest::doctest
+    )
+    target_compile_definitions(
+        cxxet_unit_tests
+            PRIVATE
+            CXXET_ENABLE
+            CXXET_WITH_UNIT_TESTS
+            DOCTEST_CONFIG_SUPER_FAST_ASSERTS
+            DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
+    )
+    add_unix_compiler_flags(cxxet_unit_tests)
+    add_sanitizers(cxxet_unit_tests)
 endif()
 
 add_library(
@@ -193,13 +274,13 @@ endif()
 target_include_directories(
     cxxet
         PUBLIC
-        "include/all"
-        "include/public"
+        "${CMAKE_SOURCE_DIR}/include/all"
+        "${CMAKE_SOURCE_DIR}/include/public"
 )
 target_include_directories(
     cxxet
         PRIVATE
-        "include/private"
+        "${CMAKE_SOURCE_DIR}/include/private"
 )
 target_compile_definitions(
     cxxet
@@ -219,7 +300,7 @@ add_library(
 target_include_directories(
     cxxet_bare
         INTERFACE
-        "include/all"
+        "${CMAKE_SOURCE_DIR}/include/all"
 )
 add_library(
     cxxet::bare
