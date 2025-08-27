@@ -20,7 +20,7 @@
 #pragma once
 
 #include <fstream>
-#include <string>
+#include <string_view>
 
 #include "cxxet/output/writer.hxx"
 
