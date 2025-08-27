@@ -256,7 +256,7 @@ add_library(
         cxxet_bare
 )
 
-if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
+if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(benchmarks)
 endif()
 
