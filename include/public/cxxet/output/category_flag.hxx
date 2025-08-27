@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <functional>
+#include <cstddef>
 
 namespace cxxet::output {
 
@@ -28,7 +28,7 @@ enum category_flag_none_e : unsigned { none = 0 };
 }
 
 struct category_flag {
-  explicit constexpr category_flag(
+  constexpr explicit category_flag(
       detail::category_flag_none_e const =
           detail::category_flag_none_e::none) noexcept
       : value(0) {}
@@ -75,17 +75,31 @@ struct category_flag {
 private:
   unsigned value;
 
-  friend struct std::hash<category_flag>;
+  friend struct category_flag_hasher;
+};
+
+struct category_flag_hasher {
+  constexpr std::size_t operator()(const category_flag &flag) const noexcept {
+    // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
+    enum : std::size_t {
+      FNV_offset_basis = 0xcbf29ce484222325ull,
+      FNV_prime = 0x100000001b3ull,
+    };
+
+    std::size_t res{FNV_offset_basis};
+
+    for (unsigned i{0}; i < 4; ++i) {
+      auto const octet{
+          static_cast<unsigned char>((flag.value >> (i * 8)) & 0xFF)};
+      res ^= octet;
+      res *= FNV_prime;
+    }
+
+    return res;
+  }
 };
 
 static constexpr inline category_flag category_flag_none{
     detail::category_flag_none_e::none};
 
 } // namespace cxxet::output
-
-template <> struct std::hash<cxxet::output::category_flag> {
-  constexpr std::size_t
-  operator()(const cxxet::output::category_flag &flag) const noexcept {
-    return std::hash<unsigned>{}(flag.value);
-  }
-};
