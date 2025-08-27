@@ -3,6 +3,7 @@
 set -e
 
 cxxet_include scripts/tests/bats_runner
+cxxet_include scripts/tests/benchmark_runner
 cxxet_include scripts/tests/unit_runner
 cxxet_include scripts/tests/valid_examples_runner
 
@@ -14,11 +15,12 @@ function tests() {
             fi
             printf 'Usage: tests [options...]\n'
             printf 'Where options are:\n'
-            printf '    -a, --all, all            Run all suites (unit, examples, bats)\n'
-            printf '    -u, --unit, unit          Run unit tests\n'
-            printf '    -e, --examples, examples  Run "valid" examples\n'
-            printf '    -b, --bats, bats          Run bats tests\n'
-            printf '    --help, -h                Show this help message\n'
+            printf '    -a, --all, all              Run all suites (unit, examples, bats)\n'
+            printf '    -u, --unit, unit            Run unit tests\n'
+            printf '    -e, --examples, examples    Run "valid" examples\n'
+            printf '    -b, --bats, bats            Run bats tests\n'
+            printf '    -p, --benchmark, benchmark  Run benchmarks\n'
+            printf '    --help, -h                  Show this help message\n'
             printf 'For suite-specific details/help, pass -h|--help to it\n'
         } >&2
     }
@@ -41,6 +43,10 @@ function tests() {
         -u|--unit|unit)
             shift
             unit_runner "$@"
+            ;;
+        -p|--benchmark|benchmark)
+            shift
+            benchmark_runner "$@"
             ;;
         --help|-h)
             usage

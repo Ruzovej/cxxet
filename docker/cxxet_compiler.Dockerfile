@@ -24,6 +24,7 @@ RUN apt update \
         libclang-rt-${CLANG_VERSION}-dev \
         libldap-common \
         liblsan0 \
+        libpfm4-dev \
         libtsan2 \
         libubsan1 \
         lld-${CLANG_VERSION} \

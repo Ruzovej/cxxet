@@ -16,18 +16,18 @@ option(BENCHMARK_INSTALL_DOCS "Enable installation of documentation." OFF)
 option(BENCHMARK_INSTALL_TOOLS "Enable installation of tools." OFF)
 option(BENCHMARK_ENABLE_GTEST_TESTS "Enable building the unit tests which depend on gtest" OFF)
 option(BENCHMARK_USE_BUNDLED_GTEST "Use bundled GoogleTest. If disabled, the find_package(GTest) will be used." OFF)
-option(BENCHMARK_ENABLE_LIBPFM "Enable performance counters provided by libpfm" OFF)
+option(BENCHMARK_ENABLE_LIBPFM "Enable performance counters provided by libpfm" ON)
 option(BENCHMARK_ENABLE_ASSEMBLY_TESTS "Enable building and running the assembly tests" OFF)
 FetchContent_MakeAvailable(benchmark)
 
-add_executable(basic_benchmark
+add_executable(cxxet_benchmarks
     bench_test.cxx
 )
-target_link_libraries(basic_benchmark
+target_link_libraries(cxxet_benchmarks
     PRIVATE
         benchmark::benchmark
         benchmark::benchmark_main
         cxxet
 )
-add_unix_compiler_flags(basic_benchmark)
-add_sanitizers(basic_benchmark)
+add_unix_compiler_flags(cxxet_benchmarks)
+add_sanitizers(cxxet_benchmarks)
