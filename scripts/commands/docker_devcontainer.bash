@@ -50,7 +50,9 @@ function docker_devcontainer() {
         "$(id -u):$(id -g)"
     ],
     "mounts": [
-        "source=${CXXET_ROOT_DIR},target=${CXXET_ROOT_DIR},type=bind,consistency=cached"
+        "source=${CXXET_ROOT_DIR},target=${CXXET_ROOT_DIR},type=bind,consistency=cached",
+        "source=${HOME}/.gitconfig,target=/home/$(id -un)/.gitconfig,type=bind,consistency=cached,readonly",
+        "source=${HOME}/.ssh,target=/home/$(id -un)/.ssh,type=bind,consistency=cached,readonly"
     ],
     "customizations": {
         "vscode": {
