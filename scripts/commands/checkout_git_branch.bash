@@ -49,6 +49,10 @@ function checkout_git_branch() {
     done
 
     if [[ -n "${desired_branch}" && "${desired_branch}" != 'main' ]]; then
-        git -C "${CXXET_ROOT_DIR}" checkout -b "${desired_branch}"
+        if git -C "${CXXET_ROOT_DIR}" show-ref --verify --quiet "refs/heads/${desired_branch}"; then
+            git -C "${CXXET_ROOT_DIR}" checkout "${desired_branch}"
+        else
+            git -C "${CXXET_ROOT_DIR}" checkout -b "${desired_branch}"
+        fi
     fi
 }
