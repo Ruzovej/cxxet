@@ -11,7 +11,7 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CXXET_LIB_SHARED": "ON"
+                "CXXET_LIB_BUILD_AS_SHARED": "ON"
             }
         },
         {

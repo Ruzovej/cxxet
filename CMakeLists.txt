@@ -27,14 +27,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CXXET_BUILD_BENCHMARKS "ON" CACHE BOOL "Build benchmarks")
 set(CXXET_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
 set(CXXET_BUILD_TESTS "ON" CACHE BOOL "Build tests")
-set(CXXET_LIB_SHARED "OFF" CACHE BOOL "Build as a shared library")
+set(CXXET_LIB_BUILD_AS_SHARED "OFF" CACHE BOOL "Build as a shared library")
 set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
 set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
 set(CXXET_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
 # implied by options:
 set(CXXET_LIB_KIND "STATIC")
-if (CXXET_LIB_SHARED)
+if (CXXET_LIB_BUILD_AS_SHARED)
     set(CXXET_LIB_KIND "SHARED")
 endif()
 
@@ -164,6 +164,16 @@ file(
         "src/*.cxx"
 )
 
+# first should be target that is desired to be picked by `clangd` for indexing the source code ... unfortunately, they define various macros to control what is being compiled beside regular source code (e.g. benchmarks, unit tests or nothing more), hence various parts of code will be ignored if not chosen correctly.
+if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
+    add_subdirectory(benchmarks)
+endif()
+
+if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
+    add_subdirectory(tests/unit)
+    add_subdirectory(tests/infra)
+endif()
+
 add_library(
     cxxet
         ${CXXET_LIB_KIND}
@@ -171,7 +181,7 @@ add_library(
 )
 add_unix_compiler_flags(cxxet)
 add_sanitizers(cxxet)
-if (CXXET_LIB_SHARED)
+if (CXXET_LIB_BUILD_AS_SHARED)
     add_shared_lib_flags(cxxet)
     set_target_properties( # seems useful -> TODO polish it later
         cxxet
@@ -217,15 +227,6 @@ add_library(
         cxxet_bare
 )
 
-if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
-    add_subdirectory(benchmarks)
-endif()
-
 if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(examples)
-endif()
-
-if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
-    add_subdirectory(tests/unit)
-    add_subdirectory(tests/infra)
 endif()
