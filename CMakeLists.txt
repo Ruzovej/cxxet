@@ -164,44 +164,13 @@ file(
         "src/*.cxx"
 )
 
-# tests, etc.:
 if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
+    add_subdirectory(tests/unit)
     add_subdirectory(tests/infra)
+endif()
 
-    FetchContent_Declare(
-        doctest
-        GIT_REPOSITORY  https://github.com/doctest/doctest.git
-        GIT_TAG         v2.4.11
-        GIT_SHALLOW     TRUE
-    )
-    FetchContent_MakeAvailable(doctest)
-
-    add_executable(
-        cxxet_unit_tests
-            tests/unit/doctest_main.cxx
-            ${CXXET_LIB_SOURCES}
-    )
-    target_include_directories(
-        cxxet_unit_tests
-            PRIVATE
-            "include/public"
-            "include/private"
-    )
-    target_link_libraries(
-        cxxet_unit_tests
-            PRIVATE
-            doctest::doctest
-    )
-    target_compile_definitions(
-        cxxet_unit_tests
-            PRIVATE
-            CXXET_ENABLE
-            CXXET_WITH_UNIT_TESTS
-            DOCTEST_CONFIG_SUPER_FAST_ASSERTS
-            DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
-    )
-    add_unix_compiler_flags(cxxet_unit_tests)
-    add_sanitizers(cxxet_unit_tests)
+if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
+    add_subdirectory(benchmarks)
 endif()
 
 add_library(
@@ -256,10 +225,6 @@ add_library(
         ALIAS
         cxxet_bare
 )
-
-if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
-    add_subdirectory(benchmarks)
-endif()
 
 if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(examples)

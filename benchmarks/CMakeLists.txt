@@ -1,3 +1,5 @@
+# TODO #156 refactor this ... see `tests/unit/CMakeLists.txt`
+
 FetchContent_Declare(
     benchmark
     GIT_REPOSITORY  https://github.com/google/benchmark.git
@@ -20,14 +22,28 @@ option(BENCHMARK_ENABLE_LIBPFM "Enable performance counters provided by libpfm" 
 option(BENCHMARK_ENABLE_ASSEMBLY_TESTS "Enable building and running the assembly tests" OFF)
 FetchContent_MakeAvailable(benchmark)
 
-add_executable(cxxet_benchmarks
-    bench_test.cxx
+add_executable(
+    cxxet_benchmarks
+        "${CMAKE_SOURCE_DIR}/benchmarks/bench_test.cxx"
+        ${CXXET_LIB_SOURCES}
 )
-target_link_libraries(cxxet_benchmarks
-    PRIVATE
-        benchmark::benchmark
-        benchmark::benchmark_main
-        cxxet
+target_include_directories(
+    cxxet_benchmarks
+        PRIVATE
+        "${CMAKE_SOURCE_DIR}/include/public"
+        "${CMAKE_SOURCE_DIR}/include/private"
+)
+target_link_libraries(
+    cxxet_benchmarks
+        PRIVATE
+            benchmark::benchmark
+            benchmark::benchmark_main
+)
+target_compile_definitions(
+    cxxet_benchmarks
+        PRIVATE
+        CXXET_ENABLE
+        CXXET_WITH_BENCHMARKS
 )
 add_unix_compiler_flags(cxxet_benchmarks)
 add_sanitizers(cxxet_benchmarks)
