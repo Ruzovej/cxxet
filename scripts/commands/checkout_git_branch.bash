@@ -43,6 +43,8 @@ function checkout_git_branch() {
         git -C "${CXXET_ROOT_DIR}" checkout main
     fi
 
+    git -C "${CXXET_ROOT_DIR}" fetch --prune
+
     local branch
     for branch in $(git -C "${CXXET_ROOT_DIR}" branch -vv | grep ': gone]' | awk '{print $1}'); do
         git -C "${CXXET_ROOT_DIR}" branch -D "${branch}"
