@@ -20,6 +20,7 @@
             "cacheVariables": {
                 "CXXET_BUILD_EXAMPLES": "OFF",
                 "CXXET_BUILD_TESTS": "OFF",
+                "CXXET_BUILD_BENCHMARKS": "OFF",
                 "CXXET_OUTPUT_DIRECTORY": "${sourceDir}/bin/deploy",
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -69,6 +70,7 @@
             "inherits": "default",
             "cacheVariables": {
                 "CXXET_OUTPUT_DIRECTORY": "${sourceDir}/bin/debug",
+                "CXXET_BUILD_BENCHMARKS": "OFF",
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },

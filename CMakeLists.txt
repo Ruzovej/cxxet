@@ -26,6 +26,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # options:
 set(CXXET_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
 set(CXXET_BUILD_TESTS "ON" CACHE BOOL "Build tests")
+set(CXXET_BUILD_BENCHMARKS "ON" CACHE BOOL "Build benchmarks")
 set(CXXET_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
 set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
 set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
@@ -254,6 +255,10 @@ add_library(
         ALIAS
         cxxet_bare
 )
+
+if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
+    add_subdirectory(benchmarks)
+endif()
 
 if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(examples)
