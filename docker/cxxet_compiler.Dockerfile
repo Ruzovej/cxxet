@@ -2,6 +2,8 @@ ARG DEBIAN_CODENAME=bookworm
 
 FROM debian:${DEBIAN_CODENAME}
 
+ENV LANG=C.UTF-8
+
 ARG CLANG_VERSION=19
 
 RUN apt update \
@@ -55,8 +57,6 @@ RUN install_alternative() { update-alternatives --install "/usr/bin/$1" "$1" "/u
     && install_alternative llvm-ranlib ${CLANG_VERSION} \
     && install_alternative llvm-readelf ${CLANG_VERSION} \
     && install_alternative llvm-strip ${CLANG_VERSION}
-
-ENV LANG=C.UTF-8
 
 ARG USER_ID
 ARG GROUP_ID
