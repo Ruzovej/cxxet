@@ -20,23 +20,25 @@
 #pragma once
 
 #include "cxxet/macros/linkage.h"
+#include "cxxet/output/category_flag.hxx"
 #include "cxxet/scope.hxx"
 #include "cxxet/timepoint.hxx"
 
 namespace cxxet::mark {
 
-CXXET_IMPL_API void submit_instant(unsigned const categories,
+CXXET_IMPL_API void submit_instant(output::category_flag const categories,
                                    char const *const desc, scope_t const scope,
                                    long long const timestamp_ns) noexcept;
 
-inline void instant(unsigned const categories, char const *const desc,
+inline void instant(output::category_flag const categories,
+                    char const *const desc,
                     scope_t const scope = scope_t::thread) noexcept {
   submit_instant(categories, desc, scope, impl::as_int_ns(impl::now()));
 }
 
 inline void instant(char const *const desc,
                     scope_t const scope = scope_t::thread) noexcept {
-  instant(0, desc, scope);
+  instant(output::category_flag_none, desc, scope);
 }
 
 } // namespace cxxet::mark

@@ -20,42 +20,43 @@
 #pragma once
 
 #include "cxxet/macros/linkage.h"
+#include "cxxet/output/category_flag.hxx"
 
 namespace cxxet::mark {
 
-CXXET_IMPL_API void process_name(unsigned const categories,
+CXXET_IMPL_API void process_name(output::category_flag const categories,
                                  char const *const proc_name) noexcept;
 
 inline void process_name(char const *const proc_name) noexcept {
-  process_name(0, proc_name);
+  process_name(output::category_flag_none, proc_name);
 }
 
-CXXET_IMPL_API void process_label(unsigned const categories,
+CXXET_IMPL_API void process_label(output::category_flag const categories,
                                   char const *const proc_label) noexcept;
 
 inline void process_label(char const *const proc_label) noexcept {
-  process_label(0, proc_label);
+  process_label(output::category_flag_none, proc_label);
 }
 
-CXXET_IMPL_API void process_sort_index(unsigned const categories,
+CXXET_IMPL_API void process_sort_index(output::category_flag const categories,
                                        int const proc_sort_index) noexcept;
 
 inline void process_sort_index(int const proc_sort_index) noexcept {
-  process_sort_index(0, proc_sort_index);
+  process_sort_index(output::category_flag_none, proc_sort_index);
 }
 
-CXXET_IMPL_API void thread_name(unsigned const categories,
+CXXET_IMPL_API void thread_name(output::category_flag const categories,
                                 char const *const th_name) noexcept;
 
 inline void thread_name(char const *const th_name) noexcept {
-  thread_name(0, th_name);
+  thread_name(output::category_flag_none, th_name);
 }
 
-CXXET_IMPL_API void thread_sort_index(unsigned const categories,
+CXXET_IMPL_API void thread_sort_index(output::category_flag const categories,
                                       int const th_sort_index) noexcept;
 
 inline void thread_sort_index(int const th_sort_index) noexcept {
-  thread_sort_index(0, th_sort_index);
+  thread_sort_index(output::category_flag_none, th_sort_index);
 }
 
 } // namespace cxxet::mark

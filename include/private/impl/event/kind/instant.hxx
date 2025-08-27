@@ -36,18 +36,18 @@ struct instant {
   int i_flag_4;   // explicit padding - unspecified meaning
   long long timestamp_ns;
 
-  constexpr instant(unsigned const aCategories, char const *const aDesc,
-                    scope_t const aScope,
+  constexpr instant(output::category_flag const aCategories,
+                    char const *const aDesc, scope_t const aScope,
                     long long const aTimestamp_ns) noexcept
       : evt{aCategories, aDesc}, scope{aScope}, i_flag_1{0}, i_flag_2{0},
         i_flag_4{0}, timestamp_ns{aTimestamp_ns} {}
 
 #ifdef CXXET_WITH_UNIT_TESTS
   constexpr instant(char const aFlag1, short const aFlag2,
-                    unsigned const aCategories, char const *const aDesc,
-                    scope_t const aScope, char const aI_flag1,
-                    short const aI_flag2, int const aI_flag4,
-                    long long const aTimestamp_ns) noexcept
+                    output::category_flag const aCategories,
+                    char const *const aDesc, scope_t const aScope,
+                    char const aI_flag1, short const aI_flag2,
+                    int const aI_flag4, long long const aTimestamp_ns) noexcept
       : evt{aFlag1, aFlag2, aCategories, aDesc}, scope{aScope},
         i_flag_1{aI_flag1}, i_flag_2{aI_flag2}, i_flag_4{aI_flag4},
         timestamp_ns{aTimestamp_ns} {}

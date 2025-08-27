@@ -25,32 +25,32 @@
 
 namespace cxxet::mark {
 
-void process_name(unsigned const categories,
+void process_name(output::category_flag const categories,
                   char const *const proc_name) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       categories, proc_name, impl::event::metadata_type::process_name});
 }
 
-void process_label(unsigned const categories,
+void process_label(output::category_flag const categories,
                    char const *const proc_label) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       categories, proc_label, impl::event::metadata_type::process_labels});
 }
 
-void process_sort_index(unsigned const categories,
+void process_sort_index(output::category_flag const categories,
                         int const proc_sort_index) noexcept {
   impl::thread_local_sink_submit_event(
       impl::event::metadata{categories, proc_sort_index,
                             impl::event::metadata_type::process_sort_index});
 }
 
-void thread_name(unsigned const categories,
+void thread_name(output::category_flag const categories,
                  char const *const th_name) noexcept {
   impl::thread_local_sink_submit_event(impl::event::metadata{
       categories, th_name, impl::event::metadata_type::thread_name});
 }
 
-void thread_sort_index(unsigned const categories,
+void thread_sort_index(output::category_flag const categories,
                        int const th_sort_index) noexcept {
   impl::thread_local_sink_submit_event(
       impl::event::metadata{categories, th_sort_index,

@@ -51,7 +51,8 @@ struct any {
     return evt.common_base.c.type;
   }
 
-  [[nodiscard]] constexpr unsigned get_categories() const noexcept {
+  [[nodiscard]] constexpr output::category_flag
+  get_categories() const noexcept {
     return evt.common_base.c.categories;
   }
 

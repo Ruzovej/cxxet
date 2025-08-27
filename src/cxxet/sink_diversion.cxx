@@ -63,8 +63,9 @@ struct file_sink_handle_impl final : file_sink_handle, sink_handle_provider {
     sink.set_flush_target(std::move(custom_writer));
   }
 
-  unsigned register_category_name(unsigned const category, std::string name,
-                                  bool const allow_rename) noexcept override {
+  output::category_flag
+  register_category_name(output::category_flag const category, std::string name,
+                         bool const allow_rename) noexcept override {
     return sink.register_category_name(category, std::move(name), allow_rename);
   }
 

@@ -13,6 +13,7 @@ function abi_check() {
     local prev_commit
     local prev_branch=main
     local quiet_flag=('--quiet')
+    local redundant_flag=()
 
     function usage() {
         {
@@ -25,6 +26,7 @@ function abi_check() {
             printf '    --commit, -c COMMIT        Compare with the specified commit. If not specified, uses last one\n'
             printf '    --branch, -b BRANCH        Compare with given commit on specified branch (default: %s)\n' "${prev_branch}"
             printf '    --verbose, -v              Increase verbosity (by not suppressing stdout)\n'
+            printf '    --redundant, -r            Pass --redundant flag to abidiff\n'
             printf '    --help, -h                 Show this help message\n'
         } >&2
     }
@@ -43,13 +45,17 @@ function abi_check() {
                 prev_branch="${2:?No branch specified!}"
                 shift 2
                 ;;
-            --help|-h)
-                usage
-                exit 0
-                ;;
             --verbose|-v)
                 quiet_flag=()
                 shift 1
+                ;;
+            --redundant|-r)
+                redundant_flag+=('--redundant')
+                shift 1
+                ;;
+            --help|-h)
+                usage
+                exit 0
                 ;;
             *)
                 printf 'Unknown option: %s\n' "$1" >&2
@@ -123,7 +129,7 @@ function abi_check() {
         set -x
         abidiff \
             --harmless \
-            --redundant \
+            "${redundant_flag[@]}" \
             "${baseline_so_name}" \
             "${current_so_name}"
     ) >&2

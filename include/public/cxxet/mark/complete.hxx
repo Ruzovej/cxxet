@@ -20,15 +20,17 @@
 #pragma once
 
 #include "cxxet/macros/linkage.h"
+#include "cxxet/output/category_flag.hxx"
 #include "cxxet/timepoint.hxx"
 
 namespace cxxet::mark {
 
 struct CXXET_IMPL_API complete {
-  inline complete(unsigned const aCategories, char const *const aDesc) noexcept
+  inline complete(output::category_flag const aCategories,
+                  char const *const aDesc) noexcept
       : categories{aCategories}, desc{aDesc}, start{impl::now()} {}
   inline explicit complete(char const *const aDesc) noexcept
-      : complete{0, aDesc} {}
+      : complete{output::category_flag_none, aDesc} {}
 
   inline ~complete() noexcept { submit(impl::now()); }
 
@@ -40,7 +42,7 @@ private:
 
   void submit(impl::timepoint_t const finish) noexcept;
 
-  unsigned const categories{0};
+  output::category_flag const categories;
   const char *const desc;
   impl::timepoint_t const start;
 };

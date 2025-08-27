@@ -24,8 +24,9 @@
 
 namespace cxxet::mark {
 
-void submit_counter(unsigned const categories, char const *const name,
-                    long long const timestamp_ns, double const value) noexcept {
+void submit_counter(output::category_flag const categories,
+                    char const *const name, long long const timestamp_ns,
+                    double const value) noexcept {
   impl::thread_local_sink_submit_event(
       impl::event::counter{categories, name, timestamp_ns, value});
 }

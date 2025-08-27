@@ -259,31 +259,45 @@ TEST_CASE("event::list") {
     constexpr int size{7};
     std::array<event::any, size> a;
 
-    new (&a[0].evt.dur_begin)
-        event::duration_begin{51, 52, 53, "test begin", 0};
+    new (&a[0].evt.dur_begin) event::duration_begin{
+        51, 52, output::category_flag{53}, "test begin", 0};
 
-    new (&a[1].evt.dur_end) event::duration_end{1, 2, 3, "test end", 5};
+    new (&a[1].evt.dur_end)
+        event::duration_end{1, 2, output::category_flag{3}, "test end", 5};
 
-    new (&a[2].evt.cmpl) event::complete{4, 5, 6, "test complete", 10, 15};
+    new (&a[2].evt.cmpl) event::complete{
+        4, 5, output::category_flag{6}, "test complete", 10, 15};
 
-    new (&a[3].evt.cntr) event::counter{7, 8, 9, "test counter", 20, 42.666};
+    new (&a[3].evt.cntr) event::counter{
+        7, 8, output::category_flag{9}, "test counter", 20, 42.666};
 
-    new (&a[4].evt.inst) event::instant{
-        45, 78, 89, "test instant", scope_t::thread, 'R', 32109, 2'000'000'001,
-        25};
+    new (&a[4].evt.inst) event::instant{45,
+                                        78,
+                                        output::category_flag{89},
+                                        "test instant",
+                                        scope_t::thread,
+                                        'R',
+                                        32109,
+                                        2'000'000'001,
+                                        25};
 
     new (&a[5].evt.meta) event::metadata{'c',
                                          4553,
-                                         145,
+                                         output::category_flag{145},
                                          "some other metadata str value ...",
                                          event::metadata_type::process_name,
                                          'D',
                                          9897,
                                          123155};
 
-    new (&a[6].evt.meta) event::metadata{
-        'r', 134, 13334, 42'132, event::metadata_type::thread_sort_index,
-        'Q', 899};
+    new (&a[6].evt.meta)
+        event::metadata{'r',
+                        134,
+                        output::category_flag{13334},
+                        42'132,
+                        event::metadata_type::thread_sort_index,
+                        'Q',
+                        899};
 
     SUBCASE("without reserve()") {
       REQUIRE_EQ(l.get_current_free_capacity(), 0);

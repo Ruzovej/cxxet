@@ -29,8 +29,8 @@
 #ifdef CXXET_ENABLE
 auto const network_category{cxxet::output::register_category_name("network")};
 auto const database_category{cxxet::output::register_category_name("database")};
-auto const background_category{
-    cxxet::output::register_category_name(1024, "background-tasks")};
+auto const background_category{cxxet::output::register_category_name(
+    cxxet::output::category_flag{1024}, "background-tasks")};
 #endif
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {
@@ -67,8 +67,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char const **argv) {
 
   {
 #ifdef CXXET_ENABLE
-    auto const unused_categories{(1u << 5) | (1u << 7) | (1u << 13) |
-                                 (1u << 19) | (1u << 23)};
+    cxxet::output::category_flag const unused_categories{
+        (1u << 5) | (1u << 7) | (1u << 13) | (1u << 19) | (1u << 23)};
 
     if ((unused_categories & network_category) ||
         (unused_categories & database_category) ||

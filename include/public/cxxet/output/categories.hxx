@@ -22,6 +22,7 @@
 #include <string>
 
 #include "cxxet/macros/linkage.h"
+#include "cxxet/output/category_flag.hxx"
 
 namespace cxxet::output {
 
@@ -40,12 +41,14 @@ namespace cxxet::output {
 //
 // * returns the category flag itself (either input param. `category` itself, or
 // the "deduced" next one)
-[[nodiscard]] unsigned CXXET_IMPL_API register_category_name(
-    unsigned const category, std::string name, bool const allow_rename = false);
+[[nodiscard]] category_flag CXXET_IMPL_API
+register_category_name(category_flag const category, std::string name,
+                       bool const allow_rename = false);
 
-[[nodiscard]] inline unsigned
+[[nodiscard]] inline category_flag
 register_category_name(std::string name, bool const allow_rename = false) {
-  return register_category_name(0, std::move(name), allow_rename);
+  return register_category_name(category_flag_none, std::move(name),
+                                allow_rename);
 }
 
 } // namespace cxxet::output

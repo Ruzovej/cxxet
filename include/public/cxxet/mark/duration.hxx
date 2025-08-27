@@ -21,15 +21,17 @@
 
 #include "cxxet/mark/duration_begin.hxx"
 #include "cxxet/mark/duration_end.hxx"
+#include "cxxet/output/category_flag.hxx"
 
 namespace cxxet::mark {
 
 struct duration {
-  inline duration(unsigned const categories, char const *const desc) noexcept {
+  inline duration(output::category_flag const categories,
+                  char const *const desc) noexcept {
     duration_begin(categories, desc);
   }
   inline explicit duration(char const *const desc) noexcept
-      : duration{0, desc} {}
+      : duration{output::category_flag_none, desc} {}
 
   inline ~duration() noexcept { duration_end(); }
 

@@ -20,21 +20,23 @@
 #pragma once
 
 #include "cxxet/macros/linkage.h"
+#include "cxxet/output/category_flag.hxx"
 #include "cxxet/timepoint.hxx"
 
 namespace cxxet::mark {
 
 CXXET_IMPL_API void
-submit_duration_begin(unsigned const categories, char const *const desc,
+submit_duration_begin(output::category_flag const categories,
+                      char const *const desc,
                       long long const timestamp_ns) noexcept;
 
-inline void duration_begin(unsigned const categories,
+inline void duration_begin(output::category_flag const categories,
                            char const *const desc) noexcept {
   submit_duration_begin(categories, desc, impl::as_int_ns(impl::now()));
 }
 
 inline void duration_begin(char const *const desc) noexcept {
-  duration_begin(0, desc);
+  duration_begin(output::category_flag_none, desc);
 }
 
 } // namespace cxxet::mark
