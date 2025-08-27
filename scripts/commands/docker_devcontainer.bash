@@ -47,7 +47,9 @@ function docker_devcontainer() {
     "containerUser": "$(id -un)",
     "runArgs": [
         "--user",
-        "$(id -u):$(id -g)"
+        "$(id -u):$(id -g)",
+        "--hostname",
+        "${image_name_base}_devcontainer",
     ],
     "mounts": [
         "source=${CXXET_ROOT_DIR},target=${CXXET_ROOT_DIR},type=bind,consistency=cached",
