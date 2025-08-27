@@ -31,7 +31,7 @@ namespace cxxet::impl::write_out {
 struct category_name_map {
   static constexpr unsigned max_user_categories{30};
   static constexpr unsigned num_categories{32};
-  static_assert(sizeof(unsigned) * 8 == num_categories);
+  static_assert(sizeof(output::category_flag) * 8 == num_categories);
 
   static constexpr output::category_flag reserved_1{1u << 30};
   static constexpr std::string_view reserved_1_name{"cxxet_1"};

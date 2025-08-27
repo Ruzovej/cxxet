@@ -35,8 +35,10 @@ struct category_flag {
 
   constexpr explicit category_flag(unsigned const aValue) : value(aValue) {}
 
-  constexpr bool operator&(const category_flag &other) const noexcept {
-    return (value & other.value) != 0;
+  constexpr explicit operator bool() const noexcept { return value != 0; }
+
+  constexpr category_flag operator&(const category_flag &other) const noexcept {
+    return category_flag{value & other.value};
   }
 
   constexpr category_flag operator|(const category_flag &other) const noexcept {

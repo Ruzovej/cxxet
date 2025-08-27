@@ -108,7 +108,7 @@ std::string_view category_name_map::get_joined_category_names(
 
   for (unsigned idx{0u}; idx < num_categories; ++idx) {
     output::category_flag const mask{1u << idx};
-    if ((category_bits & mask) == 0u) {
+    if (static_cast<bool>(category_bits & mask) == false) {
       continue;
     }
 
