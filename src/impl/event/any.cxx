@@ -90,6 +90,8 @@ void cxxet_impl_event_any_default_ctor(benchmark::State &state) {
     cxxet::impl::event::any any{};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_default_ctor);
 
@@ -111,6 +113,8 @@ void cxxet_competing_any_default_ctor(benchmark::State &state) {
     cxxet_alternative::competing_any any{};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 // TODO (#156 ...) this is faster by ca. 50% compared with current solution ->
 // rework it later!
@@ -126,6 +130,8 @@ void cxxet_impl_event_any_from_complete(benchmark::State &state) {
     cxxet::impl::event::any any{e};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_from_complete);
 
@@ -137,6 +143,8 @@ void cxxet_impl_event_any_from_counter(benchmark::State &state) {
     cxxet::impl::event::any any{e};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_from_counter);
 
@@ -148,6 +156,8 @@ void cxxet_impl_event_any_from_duration_begin(benchmark::State &state) {
     cxxet::impl::event::any any{e};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_from_duration_begin);
 
@@ -159,6 +169,8 @@ void cxxet_impl_event_any_from_duration_end(benchmark::State &state) {
     cxxet::impl::event::any any{e};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_from_duration_end);
 
@@ -170,6 +182,8 @@ void cxxet_impl_event_any_from_instant(benchmark::State &state) {
     cxxet::impl::event::any any{e};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_from_instant);
 
@@ -182,6 +196,8 @@ void cxxet_impl_event_any_from_metadata_name(benchmark::State &state) {
     cxxet::impl::event::any any{e};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_from_metadata_name);
 
@@ -194,6 +210,8 @@ void cxxet_impl_event_any_from_metadata_index(benchmark::State &state) {
     cxxet::impl::event::any any{e};
     benchmark::DoNotOptimize(&any);
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(cxxet_impl_event_any_from_metadata_index);
 

@@ -32,6 +32,8 @@ void timepoint_clock_type_CLOCK_MONOTONIC(benchmark::State &state) {
     benchmark::DoNotOptimize(
         cxxet::impl::now(cxxet::impl::clock_type_t::MONOTONIC));
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(timepoint_clock_type_CLOCK_MONOTONIC);
 
@@ -40,6 +42,8 @@ void timepoint_clock_type_CLOCK_THREAD_CPUTIME_ID(benchmark::State &state) {
     benchmark::DoNotOptimize(
         cxxet::impl::now(cxxet::impl::clock_type_t::THREAD_CPUTIME_ID));
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(timepoint_clock_type_CLOCK_THREAD_CPUTIME_ID);
 
@@ -49,6 +53,8 @@ void timepoint_chosen_implementation_clock_type_CLOCK_MONOTONIC_RAW(
     benchmark::DoNotOptimize(
         cxxet::impl::now(cxxet::impl::clock_type_t::MONOTONIC_RAW));
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(timepoint_chosen_implementation_clock_type_CLOCK_MONOTONIC_RAW);
 
@@ -56,6 +62,8 @@ void used_timepoint_as_int_ns(benchmark::State &state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(cxxet::impl::as_int_ns(cxxet::impl::now()));
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 // TODO (#156 -> create next issue ...) this is reported as faster than the
 // `...::now()` alone! Research it, and potentially remove this "extra" layer
@@ -82,6 +90,8 @@ void timepoint_chrono_implementation(benchmark::State &state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(cxxet_alternative::now());
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(timepoint_chrono_implementation);
 
@@ -90,6 +100,8 @@ void chrono_timepoint_as_int_ns(benchmark::State &state) {
     benchmark::DoNotOptimize(
         cxxet_alternative::as_int_ns(cxxet_alternative::now()));
   }
+
+  state.SetItemsProcessed(state.iterations());
 }
 // TODO (#156 -> create next issue ...) this is reported as fast as
 // `cxxet::impl::now()`! Research it, and potentially remove own implementation
