@@ -13,6 +13,8 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
 * [Development and management in general](#development-and-management-in-general)
   * [Environments with `bash`](#environments-with-bash)
     * [Preparing & using `docker` environment](#preparing--using-docker-environment)
+      * [Command line](#command-line)
+      * [Devcontainer for `VS Code`](#devcontainer-for-vs-code)
 * [TODO](#todo)
 
 ## Introduction
@@ -78,6 +80,8 @@ $ ./cxxet_manage.bash compile --help
 
 #### Preparing & using `docker` environment
 
+##### Command line
+
 If you don't have all tools/compilers/... available, and don't want to install them "directly" (see their list in respective `Dockerfile`s), corresponding `docker` image(s) can be built & used:
 
 ```bash
@@ -90,6 +94,20 @@ $ ./cxxet_manage.bash docker_interactive XYZ # enters interactive (bash) shell i
 $ ./cxxet_manage.bash compile ...
 ...
 ```
+
+##### Devcontainer for `VS Code`
+
+To reopen this project in `VS Code` using [`devcontainer`](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers), first build the image & generate the config. file:
+
+```bash
+# `XYZ` is valid image name
+$ ./cxxet_manage.bash docker_build_image XYZ
+...
+$ ./cxxet_manage.bash docker_devcontainer XYZ
+...
+```
+
+After this, `VS Code` will offer to reopen the project in the container.
 
 ## TODO
 
