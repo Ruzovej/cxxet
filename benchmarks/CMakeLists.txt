@@ -24,7 +24,7 @@ FetchContent_MakeAvailable(benchmark)
 
 add_executable(
     cxxet_benchmarks
-        "${CMAKE_SOURCE_DIR}/benchmarks/bench_test.cxx"
+        "${CMAKE_SOURCE_DIR}/benchmarks/bench_test.cxx" # TODO #156 remove this one ...
         ${CXXET_LIB_SOURCES}
 )
 target_include_directories(
