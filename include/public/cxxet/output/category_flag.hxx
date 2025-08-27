@@ -72,31 +72,31 @@ struct category_flag {
     return value != other.value;
   }
 
+  struct hasher {
+    constexpr std::size_t operator()(const category_flag &flag) const noexcept {
+      // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
+      enum : std::size_t {
+        FNV_offset_basis = 0xcbf29ce484222325ull,
+        FNV_prime = 0x100000001b3ull,
+      };
+
+      std::size_t res{FNV_offset_basis};
+
+      for (unsigned i{0}; i < 4; ++i) {
+        auto const octet{
+            static_cast<unsigned char>((flag.value >> (i * 8)) & 0xFF)};
+        res ^= octet;
+        res *= FNV_prime;
+      }
+
+      return res;
+    }
+  };
+
 private:
   unsigned value;
 
-  friend struct category_flag_hasher;
-};
-
-struct category_flag_hasher {
-  constexpr std::size_t operator()(const category_flag &flag) const noexcept {
-    // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
-    enum : std::size_t {
-      FNV_offset_basis = 0xcbf29ce484222325ull,
-      FNV_prime = 0x100000001b3ull,
-    };
-
-    std::size_t res{FNV_offset_basis};
-
-    for (unsigned i{0}; i < 4; ++i) {
-      auto const octet{
-          static_cast<unsigned char>((flag.value >> (i * 8)) & 0xFF)};
-      res ^= octet;
-      res *= FNV_prime;
-    }
-
-    return res;
-  }
+  friend struct hasher;
 };
 
 static constexpr inline category_flag category_flag_none{

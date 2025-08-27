@@ -56,7 +56,7 @@ private:
   // better than `std::array` - to save (stack) space when not used ...
   std::vector<std::string> names{};
   mutable std::unordered_map<output::category_flag, std::string,
-                             output::category_flag_hasher>
+                             output::category_flag::hasher>
       built_names;
 };
 
