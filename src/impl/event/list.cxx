@@ -539,8 +539,10 @@ void cxxet_list_raw_element_new_delete_fill_events(benchmark::State &state) {
   }
 
   state.SetItemsProcessed(state.iterations() * capacity);
+  state.SetComplexityN(capacity);
 }
 BENCHMARK(cxxet_list_raw_element_new_delete_fill_events)
+    ->Complexity(benchmark::BigO::oN)
     ->Arg(8)
     ->Arg(64)
     ->Arg(512)
@@ -563,8 +565,10 @@ void cxxet_list_raw_element_competing_new_delete_fill_events(
   }
 
   state.SetItemsProcessed(state.iterations() * capacity);
+  state.SetComplexityN(capacity);
 }
 BENCHMARK(cxxet_list_raw_element_competing_new_delete_fill_events)
+    ->Complexity(benchmark::BigO::oN)
     ->Arg(8)
     ->Arg(64)
     ->Arg(512)
@@ -585,8 +589,10 @@ void cxxet_list_raw_element_competing_malloc_free_fill_events(
   }
 
   state.SetItemsProcessed(state.iterations() * capacity);
+  state.SetComplexityN(capacity);
 }
 BENCHMARK(cxxet_list_raw_element_competing_malloc_free_fill_events)
+    ->Complexity(benchmark::BigO::oN)
     ->Arg(8)
     ->Arg(64)
     ->Arg(512)
