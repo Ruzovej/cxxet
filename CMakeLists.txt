@@ -161,7 +161,7 @@ file(
     GLOB_RECURSE
     CXXET_LIB_SOURCES
         CONFIGURE_DEPENDS
-        "${CMAKE_SOURCE_DIR}/src/*.cxx"
+        "${CMAKE_CURRENT_LIST_DIR}/src/*.cxx"
 )
 
 # first should be target that is desired to be picked by `clangd` for indexing the source code ... unfortunately, they define various macros to control what is being compiled beside regular source code (e.g. benchmarks, unit tests or nothing more), hence various parts of code will be ignored if not chosen correctly.
@@ -273,13 +273,13 @@ endif()
 target_include_directories(
     cxxet
         PUBLIC
-        "${CMAKE_SOURCE_DIR}/include/all"
-        "${CMAKE_SOURCE_DIR}/include/public"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/all"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/public"
 )
 target_include_directories(
     cxxet
         PRIVATE
-        "${CMAKE_SOURCE_DIR}/include/private"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/private"
 )
 target_compile_definitions(
     cxxet
@@ -299,7 +299,7 @@ add_library(
 target_include_directories(
     cxxet_bare
         INTERFACE
-        "${CMAKE_SOURCE_DIR}/include/all"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/all"
 )
 add_library(
     cxxet::bare
