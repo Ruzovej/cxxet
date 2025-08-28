@@ -32,19 +32,21 @@ namespace cxxet::impl {
 
 using timepoint_t = struct timespec;
 
-[[nodiscard]] inline timepoint_t now() noexcept {
-  // https://stackoverflow.com/a/42658433
-  // https://www.man7.org/linux/man-pages/man3/clock_gettime.3.html
-  constexpr int clock_type{
-      // choose exactly one of:
-      // CLOCK_MONOTONIC // sometimes higher latency
-      // CLOCK_MONOTONIC_COARSE // dosn't work (on my primary PC)
-      // CLOCK_BOOTTIME // "equivalent" to `CLOCK_MONOTONIC`
-      // CLOCK_THREAD_CPUTIME_ID // very low resolution, seems unusable
-      CLOCK_MONOTONIC_RAW // seems best
-  };
+// https://stackoverflow.com/a/42658433
+// https://www.man7.org/linux/man-pages/man3/clock_gettime.3.html
+enum class clock_type_t : int {
+  MONOTONIC = CLOCK_MONOTONIC,               // sometimes higher latency
+  MONOTONIC_COARSE = CLOCK_MONOTONIC_COARSE, // doesn't work (on my primary PC)
+  BOOTTIME = CLOCK_BOOTTIME, // "equivalent" to `CLOCK_MONOTONIC`
+  THREAD_CPUTIME_ID =
+      CLOCK_THREAD_CPUTIME_ID,        // very low resolution, seems unusable
+  MONOTONIC_RAW = CLOCK_MONOTONIC_RAW // seems best
+};
+
+[[nodiscard]] inline timepoint_t
+now(clock_type_t const clock_type = clock_type_t::MONOTONIC_RAW) noexcept {
   timepoint_t t;
-  clock_gettime(clock_type, &t);
+  clock_gettime(static_cast<int>(clock_type), &t);
   return t;
 }
 

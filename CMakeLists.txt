@@ -6,34 +6,38 @@ project(
     VERSION 0.1.0
     HOMEPAGE_URL "https://github.com/Ruzovej/cxxet"
     DESCRIPTION "C++ easy tracing"
-    LANGUAGES CXX # TODO later maybe even `C`?!
+    LANGUAGES CXX
 )
 
-# Check if this is being used as a subdirectory via FetchContent or add_subdirectory
-if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    set(CXXET_CMAKE_FETCHED "ON")
-endif()
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
-
-#set(CMAKE_C_STANDARD 99)
-#set(CMAKE_C_STANDARD_REQUIRED ON)
-#set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
+
+# Check if this is being used as a subdirectory via FetchContent, add_subdirectory or similar ...
+# Professional CMake 20th edition, 8.5. Recommended Practices:
+#   - `if(PROJECT_IS_TOP_LEVEL)` # Requires CMake 3.21 or later
+#   - prefer using `projectName_SOURCE_DIR` (determined by the last `project(...)` call) or `CMAKE_CURRENT_LIST_DIR`
+if(NOT CMAKE_SOURCE_DIR STREQUAL cxxet_SOURCE_DIR)
+    set(CXXET_CMAKE_FETCHED "ON")
+else()
+    set(CXXET_CMAKE_FETCHED "OFF")
+endif()
+
 # options:
+set(CXXET_BUILD_BENCHMARKS "ON" CACHE BOOL "Build benchmarks")
 set(CXXET_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
 set(CXXET_BUILD_TESTS "ON" CACHE BOOL "Build tests")
-set(CXXET_BUILD_SHARED "OFF" CACHE BOOL "Build as a shared library")
+set(CXXET_LIB_BUILD_AS_SHARED "OFF" CACHE BOOL "Build as a shared library")
 set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
 set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
 set(CXXET_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
 # implied by options:
-set(CXXET_LIB_KIND "STATIC")
-if (CXXET_BUILD_SHARED)
+if (NOT CXXET_LIB_BUILD_AS_SHARED)
+    set(CXXET_LIB_KIND "STATIC")
+else()
     set(CXXET_LIB_KIND "SHARED")
 endif()
 
@@ -47,10 +51,8 @@ if (CXXET_WITH_ASAN AND CXXET_WITH_TSAN)
     message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
 endif()
 
-include(FetchContent)
-
 function(add_unix_compiler_flags target)
-    # TODO
+    # TODO (https://github.com/Ruzovej/cxxet/issues/12)
     # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
     # * refactor:
     set(CXXET_UNIX_COMPILER_FLAGS
@@ -69,7 +71,7 @@ function(add_unix_compiler_flags target)
         -Wformat=2
         -Wnull-dereference
         -Wimplicit-fallthrough
-        -Wno-error=deprecated-declarations # TODO remove this or not?!
+        -Wno-error=deprecated-declarations # TODO (https://github.com/Ruzovej/cxxet/issues/12) remove this or not?!
     )
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         set(
@@ -96,7 +98,7 @@ function(add_unix_compiler_flags target)
 endfunction()
 
 function(add_sanitizers target)
-    # TODO refactor:
+    # TODO (https://github.com/Ruzovej/cxxet/issues/12) refactor:
     function(add_sanitizer target sanitizer)
         target_compile_options(
             ${target}
@@ -160,30 +162,83 @@ file(
     GLOB_RECURSE
     CXXET_LIB_SOURCES
         CONFIGURE_DEPENDS
-        "src/*.cxx"
+        "${CMAKE_CURRENT_LIST_DIR}/src/*.cxx"
 )
 
-# tests, etc.:
+include(FetchContent)
+
+# first should be target that is desired to be picked by `clangd` for indexing the source code ... unfortunately, they define various macros to control what is being compiled beside regular source code (e.g. benchmarks, unit tests or nothing more), hence various parts of code will be ignored if not chosen correctly.
+if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
+    # TODO (https://github.com/Ruzovej/cxxet/issues/12) refactor this ... see the duplicated code for unit tests below ...
+    FetchContent_Declare(
+        benchmark
+        GIT_REPOSITORY  https://github.com/google/benchmark.git
+        GIT_TAG         v1.9.4
+        GIT_SHALLOW     TRUE
+    )
+    option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." OFF)
+    option(BENCHMARK_ENABLE_EXCEPTIONS "Enable the use of exceptions in the benchmark library." ON)
+    option(BENCHMARK_ENABLE_LTO "Enable link time optimisation of the benchmark library." OFF)
+    option(BENCHMARK_USE_LIBCXX "Build and test using libc++ as the standard library." OFF)
+    option(BENCHMARK_ENABLE_WERROR "Build Release candidates with -Werror." OFF)
+    option(BENCHMARK_FORCE_WERROR "Build Release candidates with -Werror regardless of compiler issues." OFF)
+    option(BENCHMARK_ENABLE_INSTALL "Enable installation of benchmark. (Projects embedding benchmark may want to turn this OFF.)" OFF)
+    option(BENCHMARK_ENABLE_DOXYGEN "Build documentation with Doxygen." OFF)
+    option(BENCHMARK_INSTALL_DOCS "Enable installation of documentation." OFF)
+    option(BENCHMARK_INSTALL_TOOLS "Enable installation of tools." OFF)
+    option(BENCHMARK_ENABLE_GTEST_TESTS "Enable building the unit tests which depend on gtest" OFF)
+    option(BENCHMARK_USE_BUNDLED_GTEST "Use bundled GoogleTest. If disabled, the find_package(GTest) will be used." OFF)
+    option(BENCHMARK_ENABLE_LIBPFM "Enable performance counters provided by libpfm" ON)
+    option(BENCHMARK_ENABLE_ASSEMBLY_TESTS "Enable building and running the assembly tests" OFF)
+    FetchContent_MakeAvailable(benchmark)
+
+    add_executable(
+        cxxet_benchmarks
+            ${CXXET_LIB_SOURCES}
+    )
+    target_include_directories(
+        cxxet_benchmarks
+            PRIVATE
+            "${cxxet_SOURCE_DIR}/include/public"
+            "${cxxet_SOURCE_DIR}/include/private"
+    )
+    target_link_libraries(
+        cxxet_benchmarks
+            PRIVATE
+                benchmark::benchmark
+                benchmark::benchmark_main
+    )
+    target_compile_definitions(
+        cxxet_benchmarks
+            PRIVATE
+            CXXET_ENABLE
+            CXXET_WITH_BENCHMARKS
+    )
+    add_unix_compiler_flags(cxxet_benchmarks)
+    add_sanitizers(cxxet_benchmarks)
+endif()
+
 if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(tests/infra)
 
     FetchContent_Declare(
         doctest
-        GIT_REPOSITORY https://github.com/doctest/doctest.git
-        GIT_TAG        v2.4.11
+        GIT_REPOSITORY  https://github.com/doctest/doctest.git
+        GIT_TAG         v2.4.11
+        GIT_SHALLOW     TRUE
     )
     FetchContent_MakeAvailable(doctest)
 
     add_executable(
         cxxet_unit_tests
-            tests/unit/doctest_main.cxx
+            "${cxxet_SOURCE_DIR}/tests/unit/doctest_main.cxx"
             ${CXXET_LIB_SOURCES}
     )
     target_include_directories(
         cxxet_unit_tests
             PRIVATE
-            "include/public"
-            "include/private"
+            "${cxxet_SOURCE_DIR}/include/public"
+            "${cxxet_SOURCE_DIR}/include/private"
     )
     target_link_libraries(
         cxxet_unit_tests
@@ -209,9 +264,9 @@ add_library(
 )
 add_unix_compiler_flags(cxxet)
 add_sanitizers(cxxet)
-if (CXXET_BUILD_SHARED)
+if (CXXET_LIB_BUILD_AS_SHARED)
     add_shared_lib_flags(cxxet)
-    set_target_properties( # seems useful -> TODO polish it later
+    set_target_properties( # seems useful -> TODO (https://github.com/Ruzovej/cxxet/issues/12) polish it later
         cxxet
             PROPERTIES
             VERSION "${cxxet_VERSION}" # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
@@ -221,13 +276,13 @@ endif()
 target_include_directories(
     cxxet
         PUBLIC
-        "include/all"
-        "include/public"
+        "${cxxet_SOURCE_DIR}/include/all"
+        "${cxxet_SOURCE_DIR}/include/public"
 )
 target_include_directories(
     cxxet
         PRIVATE
-        "include/private"
+        "${cxxet_SOURCE_DIR}/include/private"
 )
 target_compile_definitions(
     cxxet
@@ -247,7 +302,7 @@ add_library(
 target_include_directories(
     cxxet_bare
         INTERFACE
-        "include/all"
+        "${cxxet_SOURCE_DIR}/include/all"
 )
 add_library(
     cxxet::bare

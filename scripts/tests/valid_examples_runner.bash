@@ -7,7 +7,7 @@ cxxet_include scripts/commands/compile
 function valid_examples_runner() {
     # don't "test" all reasonable presets but only single one:
     local default_preset=asan_d
-    local preset="${1:-${default_preset}}"
+    local preset="${default_preset}"
 
     function usage() {
         {
@@ -51,7 +51,7 @@ function valid_examples_runner() {
         --ignore-compile_commands >&2
 
     printf -- '-=-=-=-=-=-=-=- Executing %s examples:\n' "${preset}" >&2
-    time (
+    (
         set -x
 
         export CXXET_DEFAULT_BLOCK_SIZE=3 # torture it with some non-default value & force it to allocate more during the run

@@ -30,7 +30,7 @@ endif()
 # ...
 # $ time cmake --build build -j "$(nproc)"
 # ...
-set(CXXET_BUILD_SHARED "ON" CACHE BOOL "Force building the fetched library as an '*.so' so it correctly links with the below defined shared lib." FORCE)
+set(CXXET_LIB_BUILD_AS_SHARED "ON" CACHE BOOL "Force building the fetched library as an '*.so' so it correctly links with the below defined shared lib." FORCE)
 FetchContent_Declare(
     cxxet
     GIT_REPOSITORY "${CXXET_GIT_REPOSITORY}"
@@ -38,7 +38,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cxxet)
 
-# TODO declare only one target instead of two (using `cxxet::trace` vs. `cxxet::bare`), and decide which version to use based on a variable
+# TODO (https://github.com/Ruzovej/cxxet/issues/12) declare only one target instead of two (using `cxxet::trace` vs. `cxxet::bare`), and decide which version to use based on a variable
 
 add_library(
     cxxet_fetch_content_shared_lib_example_foo

@@ -36,10 +36,10 @@ struct any {
     struct {
       common<> c;
     } common_base;
-    duration_begin dur_begin;
-    duration_end dur_end;
     complete cmpl;
     counter cntr;
+    duration_begin dur_begin;
+    duration_end dur_end;
     instant inst;
     metadata meta;
   } evt;
