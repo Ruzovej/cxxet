@@ -22,22 +22,14 @@ else()
     set(CXXET_CMAKE_FETCHED "OFF")
 endif()
 
-set(CXXET_BUILD_BENCHMARKS_DEFAULT "ON")
-set(CXXET_BUILD_EXAMPLES_DEFAULT "ON")
-set(CXXET_BUILD_TESTS_DEFAULT "ON")
-set(CXXET_LIB_BUILD_AS_SHARED_DEFAULT "OFF")
-set(CXXET_OUTPUT_DIRECTORY_DEFAULT "" )
-set(CXXET_WITH_ASAN_DEFAULT "OFF")
-set(CXXET_WITH_TSAN_DEFAULT "OFF")
-
 # options:
-set(CXXET_BUILD_BENCHMARKS "${CXXET_BUILD_BENCHMARKS_DEFAULT}" CACHE BOOL "Build benchmarks")
-set(CXXET_BUILD_EXAMPLES "${CXXET_BUILD_EXAMPLES_DEFAULT}" CACHE BOOL "Build all examples")
-set(CXXET_BUILD_TESTS "${CXXET_BUILD_TESTS_DEFAULT}" CACHE BOOL "Build tests")
-set(CXXET_LIB_BUILD_AS_SHARED "${CXXET_LIB_BUILD_AS_SHARED_DEFAULT}" CACHE BOOL "Build as a shared library")
-set(CXXET_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY_DEFAULT}" CACHE PATH "Folder with compilation results")
-set(CXXET_WITH_ASAN "${CXXET_WITH_ASAN_DEFAULT}" CACHE BOOL "Build with address, leak and undefined sanitizers")
-set(CXXET_WITH_TSAN "${CXXET_WITH_TSAN_DEFAULT}" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
+set(CXXET_BUILD_BENCHMARKS "ON" CACHE BOOL "Build benchmarks")
+set(CXXET_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
+set(CXXET_BUILD_TESTS "ON" CACHE BOOL "Build tests")
+set(CXXET_LIB_BUILD_AS_SHARED "OFF" CACHE BOOL "Build as a shared library")
+set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
+set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
+set(CXXET_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
 # implied by options:
 if (NOT CXXET_LIB_BUILD_AS_SHARED)
