@@ -6,35 +6,43 @@ project(
     VERSION 0.1.0
     HOMEPAGE_URL "https://github.com/Ruzovej/cxxet"
     DESCRIPTION "C++ easy tracing"
-    LANGUAGES CXX # TODO later maybe even `C`?!
+    LANGUAGES CXX
 )
 
-# Check if this is being used as a subdirectory via FetchContent or add_subdirectory
-if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    set(CXXET_CMAKE_FETCHED "ON")
-endif()
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
-
-#set(CMAKE_C_STANDARD 99)
-#set(CMAKE_C_STANDARD_REQUIRED ON)
-#set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
+
+# Check if this is being used as a subdirectory via FetchContent, add_subdirectory or similar ...
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(CXXET_CMAKE_FETCHED "ON")
+else()
+    set(CXXET_CMAKE_FETCHED "OFF")
+endif()
+
+set(CXXET_BUILD_BENCHMARKS_DEFAULT "ON")
+set(CXXET_BUILD_EXAMPLES_DEFAULT "ON")
+set(CXXET_BUILD_TESTS_DEFAULT "ON")
+set(CXXET_LIB_BUILD_AS_SHARED_DEFAULT "OFF")
+set(CXXET_OUTPUT_DIRECTORY_DEFAULT "" )
+set(CXXET_WITH_ASAN_DEFAULT "OFF")
+set(CXXET_WITH_TSAN_DEFAULT "OFF")
+
 # options:
-set(CXXET_BUILD_BENCHMARKS "ON" CACHE BOOL "Build benchmarks")
-set(CXXET_BUILD_EXAMPLES "ON" CACHE BOOL "Build all examples")
-set(CXXET_BUILD_TESTS "ON" CACHE BOOL "Build tests")
-set(CXXET_LIB_BUILD_AS_SHARED "OFF" CACHE BOOL "Build as a shared library")
-set(CXXET_OUTPUT_DIRECTORY "" CACHE PATH "Folder with compilation results")
-set(CXXET_WITH_ASAN "OFF" CACHE BOOL "Build with address, leak and undefined sanitizers")
-set(CXXET_WITH_TSAN "OFF" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
+set(CXXET_BUILD_BENCHMARKS "${CXXET_BUILD_BENCHMARKS_DEFAULT}" CACHE BOOL "Build benchmarks")
+set(CXXET_BUILD_EXAMPLES "${CXXET_BUILD_EXAMPLES_DEFAULT}" CACHE BOOL "Build all examples")
+set(CXXET_BUILD_TESTS "${CXXET_BUILD_TESTS_DEFAULT}" CACHE BOOL "Build tests")
+set(CXXET_LIB_BUILD_AS_SHARED "${CXXET_LIB_BUILD_AS_SHARED_DEFAULT}" CACHE BOOL "Build as a shared library")
+set(CXXET_OUTPUT_DIRECTORY "${CXXET_OUTPUT_DIRECTORY_DEFAULT}" CACHE PATH "Folder with compilation results")
+set(CXXET_WITH_ASAN "${CXXET_WITH_ASAN_DEFAULT}" CACHE BOOL "Build with address, leak and undefined sanitizers")
+set(CXXET_WITH_TSAN "${CXXET_WITH_TSAN_DEFAULT}" CACHE BOOL "Build with thread sanitizer") # not using with `ubsan` ... https://github.com/google/sanitizers/issues/1218#issuecomment-608545162
 
 # implied by options:
-set(CXXET_LIB_KIND "STATIC")
-if (CXXET_LIB_BUILD_AS_SHARED)
+if (NOT CXXET_LIB_BUILD_AS_SHARED)
+    set(CXXET_LIB_KIND "STATIC")
+else()
     set(CXXET_LIB_KIND "SHARED")
 endif()
 
@@ -51,7 +59,7 @@ endif()
 include(FetchContent)
 
 function(add_unix_compiler_flags target)
-    # TODO
+    # TODO (https://github.com/Ruzovej/cxxet/issues/12)
     # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
     # * refactor:
     set(CXXET_UNIX_COMPILER_FLAGS
@@ -70,7 +78,7 @@ function(add_unix_compiler_flags target)
         -Wformat=2
         -Wnull-dereference
         -Wimplicit-fallthrough
-        -Wno-error=deprecated-declarations # TODO remove this or not?!
+        -Wno-error=deprecated-declarations # TODO (https://github.com/Ruzovej/cxxet/issues/12) remove this or not?!
     )
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         set(
@@ -97,7 +105,7 @@ function(add_unix_compiler_flags target)
 endfunction()
 
 function(add_sanitizers target)
-    # TODO refactor:
+    # TODO (https://github.com/Ruzovej/cxxet/issues/12) refactor:
     function(add_sanitizer target sanitizer)
         target_compile_options(
             ${target}
@@ -166,7 +174,7 @@ file(
 
 # first should be target that is desired to be picked by `clangd` for indexing the source code ... unfortunately, they define various macros to control what is being compiled beside regular source code (e.g. benchmarks, unit tests or nothing more), hence various parts of code will be ignored if not chosen correctly.
 if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
-    # TODO #156 refactor this ... see the duplicated code for unit tests below ...
+    # TODO (https://github.com/Ruzovej/cxxet/issues/12) refactor this ... see the duplicated code for unit tests below ...
     FetchContent_Declare(
         benchmark
         GIT_REPOSITORY  https://github.com/google/benchmark.git
@@ -263,7 +271,7 @@ add_unix_compiler_flags(cxxet)
 add_sanitizers(cxxet)
 if (CXXET_LIB_BUILD_AS_SHARED)
     add_shared_lib_flags(cxxet)
-    set_target_properties( # seems useful -> TODO polish it later
+    set_target_properties( # seems useful -> TODO (https://github.com/Ruzovej/cxxet/issues/12) polish it later
         cxxet
             PROPERTIES
             VERSION "${cxxet_VERSION}" # https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html

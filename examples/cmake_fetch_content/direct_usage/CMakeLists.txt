@@ -37,7 +37,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cxxet)
 
-# TODO declare only one target instead of two (using `cxxet::trace` vs. `cxxet::bare`), and decide which version to use based on a variable
+# TODO (https://github.com/Ruzovej/cxxet/issues/12) declare only one target instead of two (using `cxxet::trace` vs. `cxxet::bare`), and decide which version to use based on a variable
 
 add_executable(
     cxxet_fetch_content_direct_usage_example
