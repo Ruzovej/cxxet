@@ -65,7 +65,7 @@ void used_timepoint_as_int_ns(benchmark::State &state) {
 
   state.SetItemsProcessed(state.iterations());
 }
-// TODO (#156 -> create next issue ...) this is reported as faster than the
+// TODO (https://github.com/Ruzovej/cxxet/issues/160) this is reported as faster than the
 // `...::now()` alone! Research it, and potentially remove this "extra" layer
 // and use always this approach.
 BENCHMARK(used_timepoint_as_int_ns);
@@ -103,7 +103,7 @@ void chrono_timepoint_as_int_ns(benchmark::State &state) {
 
   state.SetItemsProcessed(state.iterations());
 }
-// TODO (#156 -> create next issue ...) this is reported as fast as
+// TODO (https://github.com/Ruzovej/cxxet/issues/160) this is reported as fast as
 // `cxxet::impl::now()`! Research it, and potentially remove own implementation
 // and use always this approach.
 BENCHMARK(chrono_timepoint_as_int_ns);
