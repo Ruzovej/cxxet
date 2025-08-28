@@ -15,7 +15,7 @@ function tests() {
             fi
             printf 'Usage: tests [options...]\n'
             printf 'Where options are:\n'
-            printf '    -a, --all, all              Run all suites (unit, examples, bats)\n'
+            printf '    -a, --all, all              Run all test suites (unit, examples, bats)\n'
             printf '    -u, --unit, unit            Run unit tests\n'
             printf '    -e, --examples, examples    Run "valid" examples\n'
             printf '    -b, --bats, bats            Run bats tests\n'
