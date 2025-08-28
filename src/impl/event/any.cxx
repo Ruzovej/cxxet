@@ -116,11 +116,11 @@ void cxxet_competing_any_default_ctor(benchmark::State &state) {
 
   state.SetItemsProcessed(state.iterations());
 }
-// TODO (#156 ...) this is faster by ca. 50% compared with current solution ->
+// TODO (https://github.com/Ruzovej/cxxet/issues/161) this is faster by ca. 50% compared with current solution ->
 // rework it later!
 BENCHMARK(cxxet_competing_any_default_ctor);
 
-// TODO (#156 ...) those are approximately 33-66 % slower than the default ctor
+// TODO (https://github.com/Ruzovej/cxxet/issues/161) those are approximately 33-66 % slower than the default ctor
 // -> rework it later!
 void cxxet_impl_event_any_from_complete(benchmark::State &state) {
   cxxet::impl::event::complete const e{cxxet::output::category_flag{123},
