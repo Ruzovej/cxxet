@@ -16,7 +16,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON" CACHE BOOL "Export compile commands" FORCE)
 
 # Check if this is being used as a subdirectory via FetchContent, add_subdirectory or similar ...
-if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+# Professional CMake 20th edition, 8.5. Recommended Practices:
+#   - `if(PROJECT_IS_TOP_LEVEL)` # Requires CMake 3.21 or later
+#   - prefer using `projectName_SOURCE_DIR` (determined by the last `project(...)` call) or `CMAKE_CURRENT_LIST_DIR`
+if(NOT CMAKE_SOURCE_DIR STREQUAL cxxet_SOURCE_DIR)
     set(CXXET_CMAKE_FETCHED "ON")
 else()
     set(CXXET_CMAKE_FETCHED "OFF")
@@ -196,8 +199,8 @@ if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
     target_include_directories(
         cxxet_benchmarks
             PRIVATE
-            "${CMAKE_SOURCE_DIR}/include/public"
-            "${CMAKE_SOURCE_DIR}/include/private"
+            "${cxxet_SOURCE_DIR}/include/public"
+            "${cxxet_SOURCE_DIR}/include/private"
     )
     target_link_libraries(
         cxxet_benchmarks
@@ -228,14 +231,14 @@ if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
 
     add_executable(
         cxxet_unit_tests
-            "${CMAKE_SOURCE_DIR}/tests/unit/doctest_main.cxx"
+            "${cxxet_SOURCE_DIR}/tests/unit/doctest_main.cxx"
             ${CXXET_LIB_SOURCES}
     )
     target_include_directories(
         cxxet_unit_tests
             PRIVATE
-            "${CMAKE_SOURCE_DIR}/include/public"
-            "${CMAKE_SOURCE_DIR}/include/private"
+            "${cxxet_SOURCE_DIR}/include/public"
+            "${cxxet_SOURCE_DIR}/include/private"
     )
     target_link_libraries(
         cxxet_unit_tests
@@ -273,13 +276,13 @@ endif()
 target_include_directories(
     cxxet
         PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/all"
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/public"
+        "${cxxet_SOURCE_DIR}/include/all"
+        "${cxxet_SOURCE_DIR}/include/public"
 )
 target_include_directories(
     cxxet
         PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/private"
+        "${cxxet_SOURCE_DIR}/include/private"
 )
 target_compile_definitions(
     cxxet
@@ -299,7 +302,7 @@ add_library(
 target_include_directories(
     cxxet_bare
         INTERFACE
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/all"
+        "${cxxet_SOURCE_DIR}/include/all"
 )
 add_library(
     cxxet::bare
