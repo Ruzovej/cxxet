@@ -549,8 +549,8 @@ BENCHMARK(cxxet_list_raw_element_new_delete_fill_events)
     ->Arg(4096)
     ->Arg(32768);
 
-// TODO (#156 ...) this is approximately 33% faster then the current
-// implementation -> rework it later!
+// TODO (https://github.com/Ruzovej/cxxet/issues/162) this is approximately 33%
+// faster then the current implementation -> rework it later!
 void cxxet_list_raw_element_competing_new_delete_fill_events(
     benchmark::State &state) {
   auto const capacity{static_cast<int>(state.range(0))};
