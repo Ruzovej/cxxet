@@ -51,8 +51,6 @@ if (CXXET_WITH_ASAN AND CXXET_WITH_TSAN)
     message(FATAL_ERROR "Cannot build with address and thread sanitizers at the same time")
 endif()
 
-include(FetchContent)
-
 function(add_unix_compiler_flags target)
     # TODO (https://github.com/Ruzovej/cxxet/issues/12)
     # * get inspired by `doctest`: <https://github.com/doctest/doctest/blob/master/scripts/cmake/common.cmake#L84>
@@ -166,6 +164,8 @@ file(
         CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_LIST_DIR}/src/*.cxx"
 )
+
+include(FetchContent)
 
 # first should be target that is desired to be picked by `clangd` for indexing the source code ... unfortunately, they define various macros to control what is being compiled beside regular source code (e.g. benchmarks, unit tests or nothing more), hence various parts of code will be ignored if not chosen correctly.
 if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
