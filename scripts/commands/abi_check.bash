@@ -81,6 +81,7 @@ function abi_check() {
                 set -x
                 git clone \
                     --branch "${prev_branch}" \
+                    --depth 1 \
                     "${quiet_flag[@]}" \
                     "file://${CXXET_ROOT_DIR}" \
                     "${abi_check_repo_dir}"

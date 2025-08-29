@@ -32,8 +32,9 @@ endif()
 # ...
 FetchContent_Declare(
     cxxet
-    GIT_REPOSITORY "${CXXET_GIT_REPOSITORY}"
-    GIT_TAG "${CXXET_GIT_TAG}"
+    GIT_REPOSITORY  "${CXXET_GIT_REPOSITORY}"
+    GIT_TAG         "${CXXET_GIT_TAG}"
+    GIT_SHALLOW     TRUE
 )
 FetchContent_MakeAvailable(cxxet)
 

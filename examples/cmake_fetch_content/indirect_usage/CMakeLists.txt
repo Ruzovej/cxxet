@@ -33,8 +33,9 @@ endif()
 set(CXXET_LIB_BUILD_AS_SHARED "ON" CACHE BOOL "Force building the fetched library as an '*.so' so it correctly links with the below defined shared lib." FORCE)
 FetchContent_Declare(
     cxxet
-    GIT_REPOSITORY "${CXXET_GIT_REPOSITORY}"
-    GIT_TAG "${CXXET_GIT_TAG}"
+    GIT_REPOSITORY  "${CXXET_GIT_REPOSITORY}"
+    GIT_TAG         "${CXXET_GIT_TAG}"
+    GIT_SHALLOW     TRUE
 )
 FetchContent_MakeAvailable(cxxet)
 
