@@ -20,7 +20,10 @@ function benchmark_runner() {
             printf 'Where options are:\n'
             printf '    --preset, -p PRESET        Run benchmarks with the specified preset (default: %s)\n' "${default_preset}"
             printf '    --benchmark-help           Show help message of the benchmark runner\n'
-            printf '    --benchmark*, --v=*        Pass any such flag directly to the benchmark runner\n'
+            printf '    --benchmark_*, --v=*       Pass any such flag directly to the benchmark runner\n'
+            printf '    --interleaving, -i         Equivalent to "--benchmark_enable_random_interleaving=true"\n'
+            printf '    --out-json, -o OUT         Equivalent to "--benchmark_out=OUT --benchmark_out_format=json"\n'
+            printf '    --repetitions, -n N        Equivalent to "--benchmark_repetitions=N"\n'
             printf '    --help, -h                 Show this help message\n'
         } >&2
     }
@@ -35,9 +38,21 @@ function benchmark_runner() {
                 benchmark_help='true'
                 shift
                 ;;
-            --benchmark*|--v=*)
+            --benchmark_*|--v=*)
                 benchmark_args+=("$1")
                 shift
+                ;;
+            --interleaving|-i)
+                benchmark_args+=('--benchmark_enable_random_interleaving=true')
+                shift
+                ;;
+            --out-json|-o)
+                benchmark_args+=("--benchmark_out=${2:?No output file specified!}" '--benchmark_out_format=json')
+                shift 2
+                ;;
+            --repetitions|-n)
+                benchmark_args+=("--benchmark_repetitions=${2:?No repetitions specified!}")
+                shift 2
                 ;;
             --help|-h)
                 usage
