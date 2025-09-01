@@ -13,15 +13,15 @@ function tests() {
             if [[ "$1" != '--short' ]]; then
                 printf 'tests: run various test suites\n'
             fi
-            printf 'Usage: tests [options...]\n'
-            printf 'Where options are:\n'
+            printf 'Usage: tests option [args ...]\n'
+            printf 'Where option is one of:\n'
             printf '    -a, --all, all              Run all test suites (unit, examples, bats)\n'
             printf '    -u, --unit, unit            Run unit tests\n'
             printf '    -e, --examples, examples    Run "valid" examples\n'
             printf '    -b, --bats, bats            Run bats tests\n'
             printf '    -p, --benchmark, benchmark  Run benchmarks\n'
             printf '    --help, -h                  Show this help message\n'
-            printf 'For suite-specific details/help, pass -h|--help to it\n'
+            printf 'Remaining args are passed to the previously parsed "option", e.g. for suite-specific details/help, pass -h|--help to it.\n'
         } >&2
     }
 

@@ -88,7 +88,7 @@ function benchmark_runner() {
     printf -- '-=-=-=-=-=-=-=- Executing %s benchmarks:\n' "${preset}" >&2
     (
         set -x
-        "${bin_dir}/cxxet_benchmarks" "${benchmark_args[@]}" >&2
-    )
+        "${bin_dir}/cxxet_benchmarks" "${benchmark_args[@]}"
+    ) >&2
     printf '\n' >&2
 }
