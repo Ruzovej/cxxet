@@ -10,13 +10,14 @@ function benchmark_runner() {
     local preset="${default_preset}"
     local benchmark_help='false'
     local benchmark_args=()
+    local out_file
 
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
                 printf 'benchmark_runner: run benchmarks with specified preset\n'
             fi
-            printf 'Usage: tests benchmark [options...]\n'
+            printf 'Usage: benchmarks micro [options...]\n'
             printf 'Where options are:\n'
             printf '    --preset, -p PRESET        Run benchmarks with the specified preset (default: %s)\n' "${default_preset}"
             printf '    --benchmark-help           Show help message of the benchmark runner\n'
@@ -47,7 +48,8 @@ function benchmark_runner() {
                 shift
                 ;;
             --out-json|-o)
-                benchmark_args+=("--benchmark_out=${2:?No output file specified!}" '--benchmark_out_format=json')
+                out_file="${2:?No output file specified!}"
+                benchmark_args+=("--benchmark_out=${out_file}" '--benchmark_out_format=json')
                 shift 2
                 ;;
             --repetitions|-n)
@@ -91,4 +93,13 @@ function benchmark_runner() {
         "${bin_dir}/cxxet_benchmarks" "${benchmark_args[@]}"
     ) >&2
     printf '\n' >&2
+
+    if [[ -f "${out_file}" ]]; then
+        local temp_file="$(mktemp "${out_file}.XXXXXX")"
+        local git_hash="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD 2>/dev/null || printf "N/A")"
+        local git_dirty="$(git -C "${CXXET_ROOT_DIR}" diff --shortstat)"
+
+        jq --arg hash "${git_hash}${git_dirty:+ (dirty)}" '.context.cxxet_git_hash = $hash' "${out_file}" > "${temp_file}"
+        mv "${temp_file}" "${out_file}"
+    fi
 }

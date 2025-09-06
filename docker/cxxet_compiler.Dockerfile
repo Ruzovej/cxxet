@@ -38,6 +38,7 @@ RUN apt update \
         parallel \
         patch \
         publicsuffix \
+        python3-venv \
         ssh-client \
         strace \
         vim \
