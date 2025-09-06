@@ -95,14 +95,11 @@ function benchmark_runner() {
     printf '\n' >&2
 
     if [[ -f "${out_file}" ]]; then
+        local temp_file="$(mktemp "${out_file}.XXXXXX")"
         local git_hash="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD 2>/dev/null || printf "N/A")"
         local git_dirty="$(git -C "${CXXET_ROOT_DIR}" diff --shortstat)"
 
-        (
-            set -x
-            local temp_file="$(mktemp "${out_file}.XXXXXX")"
-            jq --arg hash "${git_hash}${git_dirty:+" (dirty)"}" '.context.cxxet_git_hash = $hash' "${out_file}" > "${temp_file}"
-            mv "${temp_file}" "${out_file}"
-        )
+        jq --arg hash "${git_hash}${git_dirty:+ (dirty)}" '.context.cxxet_git_hash = $hash' "${out_file}" > "${temp_file}"
+        mv "${temp_file}" "${out_file}"
     fi
 }
