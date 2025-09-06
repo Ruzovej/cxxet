@@ -13,7 +13,7 @@ function benchmark_compare() {
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'benchmark_compare: compare micro-benchmark results\n'
+                printf 'benchmark_compare: compare micro-benchmark results (using script provided by google/benchmark library; currently supporting only certain features from 1 (benchmarks) out of 3 (filters, benchmarksfiltered) modes available)\n'
             fi
             printf 'Usage: benchmarks compare <[options...] <file1> <file2>|-h|--help|--benchmark-help>\n'
             printf '    --help, -h            Show this help message\n'
@@ -87,7 +87,6 @@ function benchmark_compare() {
         fi
 
         # comparison (https://github.com/google/benchmark/blob/main/docs/tools.md):
-
         if [[ "${benchmark_help}" == 'true' ]]; then
             (
                 set -x
