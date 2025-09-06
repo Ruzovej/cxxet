@@ -2,23 +2,29 @@
 
 set -e
 
+cxxet_include scripts/tests/benchmark_compare
 cxxet_include scripts/tests/benchmark_runner
 
-function tests() {
+function benchmarks() {
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'benchmark: perform or evaluate various benchmark(s)\n'
+                printf 'benchmarks: perform or evaluate various benchmark(s)\n'
             fi
-            printf 'Usage: benchmark option [args ...]\n'
+            printf 'Usage: benchmarks option [args ...]\n'
             printf 'Where option is one of:\n'
-            printf '    -m, --micro, micro  Run C++ implementation micro-benchmarks\n'
-            printf '    --help, -h          Show this help message\n'
+            printf '    -c, --compare, compare  Compare 2 micro-benchmark results (using 3rd party (google benchmark) python3 script)\n'
+            printf '    -m, --micro, micro      Run C++ implementation micro-benchmarks\n'
+            printf '    --help, -h              Show this help message\n'
             printf 'Remaining args are passed to the previously parsed "option", e.g. for suite-specific details/help, pass -h|--help to it.\n'
         } >&2
     }
 
     case "$1" in
+        -c|--compare|compare)
+            shift
+            benchmark_compare "$@"
+            ;;
         -m|--micro|micro)
             shift
             benchmark_runner "$@"
