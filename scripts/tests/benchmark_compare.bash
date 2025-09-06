@@ -7,7 +7,6 @@ function benchmark_compare() {
 
     local benchmark_help='false'
     local benchmark_args=()
-    local out_file
     local file1
     local file2
 
@@ -36,8 +35,7 @@ function benchmark_compare() {
                 shift
                 ;;
             --out-json|-o)
-                benchmark_args+=("--dump_to_json ${2:?No output file specified!}")
-                out_file="${2:?No output file specified!}"
+                benchmark_args+=("--dump_to_json" "${2:?No output file specified!}")
                 shift 2
                 ;;
             --help|-h)
