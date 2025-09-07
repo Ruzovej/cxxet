@@ -10,6 +10,7 @@ function compile() {
     local defines=()
     local force_compile_commands_symlink='true'
     local quiet='false'
+    local last_defines='false'
 
     function usage() {
         {
@@ -21,6 +22,7 @@ function compile() {
             printf '    --preset, -p PRESET        Set the CMake preset (default: %s)\n' "${cxxet_preset}"
             printf '    --target, -t TARGET        Add a build target (can be used multiple times, default: all)\n'
             printf '    -DVAR=VALUE                Pass extra define to CMake\n'
+            printf '    --last-defines, -l         Use extra defines passed during previous run to CMake; mutually exclusive with -D*\n'
             printf '    --ignore-compile_commands  Don'\''t create compile_commands.json symlink (by default creates it)\n'
             printf '    --quiet, -q                Suppress standard output\n'
             printf '    --help, -h                 Show this help message\n'
@@ -39,6 +41,10 @@ function compile() {
                 ;;
             -D*)
                 defines+=("$1")
+                shift 1
+                ;;
+            --last-defines|-l)
+                last_defines='true'
                 shift 1
                 ;;
             --ignore-compile_commands)
@@ -61,6 +67,30 @@ function compile() {
         esac
     done
 
+    if [[ "${last_defines}" == 'true' && -n "${defines[*]}" ]]; then
+        printf 'Error: --last-defines and -D* options are mutually exclusive\n' >&2
+        usage --short
+        exit 1
+    fi
+
+    local build_dir="${CXXET_ROOT_DIR}/build/${cxxet_preset}"
+    mkdir -p "${build_dir}"
+    local last_defines_file="${build_dir}/cxxet_last_defines.txt"
+
+    if [[ "${last_defines}" == 'true' ]]; then
+        if [[ -f "${last_defines_file}" ]]; then
+            readarray -t defines < "${last_defines_file}"
+        fi
+    else
+        if (( "${#defines[@]}" > 0 )); then
+            {
+                printf '%s\n' "${defines[@]}"
+            } > "${last_defines_file}"
+        elif [[ -f "${last_defines_file}" ]]; then
+            rm "${last_defines_file}"
+        fi
+    fi
+
     function redirect_output() {
         if [[ "${quiet}" == 'true' ]]; then
             cat 1>/dev/null
@@ -74,7 +104,7 @@ function compile() {
         set -x
         cmake \
             -S "${CXXET_ROOT_DIR}" \
-            -B "${CXXET_ROOT_DIR}/build/${cxxet_preset}" \
+            -B "${build_dir}" \
             "${defines[@]}" \
             --preset "${cxxet_preset}" #\
             # --graphviz="graphviz/${cxxet_preset}"
@@ -86,7 +116,7 @@ function compile() {
         ln \
             --symbolic \
             --force \
-            "${CXXET_ROOT_DIR}/build/${cxxet_preset}/compile_commands.json" \
+            "${build_dir}/compile_commands.json" \
             "${CXXET_ROOT_DIR}/compile_commands.json"
     ) | redirect_output
 
@@ -94,7 +124,7 @@ function compile() {
     (
         set -x
         cmake \
-            --build "${CXXET_ROOT_DIR}/build/${cxxet_preset}" \
+            --build "${build_dir}" \
             -j "${num_jobs}" \
             "${targets[@]}"
     ) | redirect_output

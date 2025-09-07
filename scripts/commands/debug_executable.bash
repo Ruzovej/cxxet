@@ -55,6 +55,7 @@ function debug_executable() {
         --quiet \
         --preset "${preset}" \
         --target "${target}" \
+        --last-defines \
         --ignore-compile_commands >&2
 
     (
