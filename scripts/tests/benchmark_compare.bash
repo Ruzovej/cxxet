@@ -5,54 +5,42 @@ set -e
 function benchmark_compare() {
     cxxet_require_command python3 # TODO how to check for presence of `venv` module?!
 
-    local benchmark_help='false'
-    local benchmark_args=()
-    local file1
-    local file2
+    local script_args=()
 
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'benchmark_compare: compare micro-benchmark results (using script provided by google/benchmark library; currently supporting only certain features from 1 (benchmarks) out of 3 (filters, benchmarksfiltered) modes available)\n'
+                printf 'benchmark_compare: thin wrapper around script provided by google/benchmark library\n'
             fi
-            printf 'Usage: benchmarks compare <[options...] <file1> <file2>|-h|--help|--benchmark-help>\n'
+            printf 'Usage: benchmarks compare <[options...]|-h|--help>\n'
             printf '    --help, -h            Show this help message\n'
             printf '    --benchmark-help      Show help message of the benchmark comparison script\n'
-            printf 'Where options are:\n'
-            printf '    --benchmark_*, --v=*  Pass any such flag directly to the benchmark runner\n'
-            printf '    --out-json, -o OUT    Equivalent to "--dump_to_json OUT"\n'
+            printf 'Where options are forwarded to the underlying script. For short, useful options are e.g.:\n'
+            printf '    --dump_to_json FILE\n'
+            printf '    --display_aggregates_only\n'
+            printf 'For details, refer to the script documentation (https://github.com/google/benchmark/blob/main/docs/tools.md), or help message.\n'
+            printf 'Examples of usage:\n'
+            printf '  - compare 2 files:\n'
+            printf '    benchmarks compare --display_aggregates_only benchmarks FILE1 FILE2'
+            printf '  - compare different benchmarks from same file:\n'
+            printf '    benchmarks compare --display_aggregates_only filters FILE FILTER1 FILTER2'
+            printf '  - compare different benchmarks from different files:\n'
+            printf '    benchmarks compare --display_aggregates_only benchmarksfiltered FILE1 FILTER1 FILE2 FILTER2'
         } >&2
     }
 
     while (( $# > 0 )); do
         case "$1" in
             --benchmark-help)
-                benchmark_help='true'
+                script_args+=('--help')
                 shift
-                ;;
-            --benchmark_*|--v=*)
-                benchmark_args+=("$1")
-                shift
-                ;;
-            --out-json|-o)
-                benchmark_args+=("--dump_to_json" "${2:?No output file specified!}")
-                shift 2
                 ;;
             --help|-h)
                 usage
                 return 0
                 ;;
             *)
-                # this doesn't prevent parsing further flags in between those 2 files ... ignoring it for now
-                if [[ -z "${file1}" ]]; then
-                    file1="$1"
-                elif [[ -z "${file2}" ]]; then
-                    file2="$1"
-                else
-                    printf 'Unknown option: %s\n' "$1" >&2
-                    usage --short
-                    exit 1
-                fi
+                script_args+=("$1")
                 shift 1
                 ;;
         esac
@@ -86,16 +74,7 @@ function benchmark_compare() {
             pip3 install -r "${script_dir}/requirements.txt"
         fi
 
-        # comparison (https://github.com/google/benchmark/blob/main/docs/tools.md):
-        if [[ "${benchmark_help}" == 'true' ]]; then
-            (
-                set -x
-                "${script_dir}/compare.py" --help
-            )
-            return 0
-        fi
-
         set -x
-        "${script_dir}/compare.py" --display_aggregates_only "${benchmark_args[@]}" benchmarks "${file1}" "${file2}"
+        "${script_dir}/compare.py" "${script_args[@]}"
     ) >&2
 }
