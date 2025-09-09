@@ -52,6 +52,7 @@ function unit_runner() {
             --quiet \
             --preset "${preset}" \
             --target cxxet_unit_tests \
+            --last-defines \
             --ignore-compile_commands >&2
 
         export TMP_RESULT_DIR_BASE="${TMP_RESULT_DIR_BASE_RAW}/${preset}"

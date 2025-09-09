@@ -77,6 +77,7 @@ function benchmark_runner() {
         --quiet \
         --preset "${preset}" \
         --target cxxet_benchmarks \
+        --last-defines \
         --ignore-compile_commands >&2
 
     if [[ "${benchmark_help}" == 'true' ]]; then

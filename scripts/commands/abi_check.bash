@@ -107,6 +107,7 @@ function abi_check() {
         ./cxxet_manage.bash compile \
             --preset "${preset}" \
             "${quiet_flag[@]}" \
+            --last-defines \
             --ignore-compile_commands
         
         [[ -f "${baseline_so_name}" ]] || {
@@ -119,6 +120,7 @@ function abi_check() {
     compile \
         --preset "${preset}" \
         "${quiet_flag[@]}" \
+        --last-defines \
         --ignore-compile_commands
 
     [[ -f "${current_so_name}" ]] || {

@@ -48,6 +48,7 @@ function valid_examples_runner() {
         --quiet \
         --preset "${preset}" \
         --target cxxet_examples \
+        --last-defines \
         --ignore-compile_commands >&2
 
     printf -- '-=-=-=-=-=-=-=- Executing %s examples:\n' "${preset}" >&2
