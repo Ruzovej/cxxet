@@ -26,6 +26,10 @@ function benchmark_compare() {
             printf '    benchmarks compare --display_aggregates_only filters FILE FILTER1 FILTER2\n'
             printf '  - compare different benchmarks from different files:\n'
             printf '    benchmarks compare --display_aggregates_only benchmarksfiltered FILE1 FILTER1 FILE2 FILTER2\n'
+            printf '  - display general help of the wrapped script:\n'
+            printf '    benchmarks compare --benchmark-help\n'
+            printf '  - display help of particular subcommand of the wrapped script:\n'
+            printf '    benchmarks compare filters --help\n'
         } >&2
     }
 
