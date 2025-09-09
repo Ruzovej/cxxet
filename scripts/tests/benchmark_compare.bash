@@ -21,11 +21,11 @@ function benchmark_compare() {
             printf 'For details, refer to the script documentation (https://github.com/google/benchmark/blob/main/docs/tools.md), or help message.\n'
             printf 'Examples of usage:\n'
             printf '  - compare 2 files:\n'
-            printf '    benchmarks compare --display_aggregates_only benchmarks FILE1 FILE2'
+            printf '    benchmarks compare --display_aggregates_only benchmarks FILE1 FILE2\n'
             printf '  - compare different benchmarks from same file:\n'
-            printf '    benchmarks compare --display_aggregates_only filters FILE FILTER1 FILTER2'
+            printf '    benchmarks compare --display_aggregates_only filters FILE FILTER1 FILTER2\n'
             printf '  - compare different benchmarks from different files:\n'
-            printf '    benchmarks compare --display_aggregates_only benchmarksfiltered FILE1 FILTER1 FILE2 FILTER2'
+            printf '    benchmarks compare --display_aggregates_only benchmarksfiltered FILE1 FILTER1 FILE2 FILTER2\n'
         } >&2
     }
 
@@ -36,8 +36,13 @@ function benchmark_compare() {
                 shift
                 ;;
             --help|-h)
-                usage
-                return 0
+                if [[ -z "${script_args[@]}" ]]; then
+                    usage
+                    return 0
+                else
+                    script_args+=("$1")
+                    shift 1
+                fi
                 ;;
             *)
                 script_args+=("$1")
