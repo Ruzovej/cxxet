@@ -243,7 +243,7 @@ if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
     target_link_libraries(
         cxxet_unit_tests
             PRIVATE
-            doctest::doctest
+                doctest::doctest
     )
     target_compile_definitions(
         cxxet_unit_tests
