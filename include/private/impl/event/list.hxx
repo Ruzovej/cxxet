@@ -51,7 +51,7 @@ public:
     static raw_element *new_elems(int const capacity) noexcept;
     static void delete_elems(raw_element const *const elems) noexcept;
 
-    long long get_thread_id() const noexcept;
+    long long associated_thread_id() const noexcept;
 
     raw_element const *get_next_node() const noexcept;
     void set_next_node(raw_element *const next) noexcept;

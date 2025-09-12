@@ -19,12 +19,12 @@
 
 #include "impl/event/list.hxx"
 
-#include <unistd.h>
-
 #include <cassert>
 
 #include <new>
 #include <type_traits>
+
+#include "cxxet/get_thread_id.hxx"
 
 namespace cxxet::impl::event {
 
@@ -40,7 +40,7 @@ list::raw_element *list::raw_element::new_elems(int const capacity) noexcept {
   // handle it? Let's just crash ...
   auto *data{new raw_element[static_cast<unsigned>(capacity) + 1]};
 
-  new (&(data->meta)) meta_info{static_cast<long long>(gettid()), capacity};
+  new (&(data->meta)) meta_info{get_thread_id(), capacity};
 
   return data;
 }
@@ -49,7 +49,7 @@ void list::raw_element::delete_elems(raw_element const *const elems) noexcept {
   delete[] elems;
 }
 
-long long list::raw_element::get_thread_id() const noexcept {
+long long list::raw_element::associated_thread_id() const noexcept {
   return meta.thread_id;
 }
 
@@ -85,7 +85,7 @@ list::const_iterator::const_iterator(raw_element *aNode) noexcept
 list::const_iterator::value_type
 list::const_iterator::operator*() const noexcept {
   assert(node);
-  return value_type{node->get_thread_id(), (*node)[index]};
+  return value_type{node->associated_thread_id(), (*node)[index]};
 }
 
 list::const_iterator &list::const_iterator::operator++() noexcept {
@@ -466,8 +466,8 @@ char *new_raw_elems(int const capacity) noexcept {
   auto *data{new char[static_cast<std::size_t>(
       helper::get_internal_array_size(capacity))]};
 
-  new (data) cxxet::impl::event::list::meta_info{
-      static_cast<long long>(gettid()), capacity};
+  new (data) cxxet::impl::event::list::meta_info{cxxet::impl::get_thread_id(),
+                                                 capacity};
 
   return data;
 }
@@ -479,8 +479,8 @@ char *malloc_raw_elems(int const capacity) noexcept {
   auto *data{reinterpret_cast<char *>(malloc(
       static_cast<std::size_t>(helper::get_internal_array_size(capacity))))};
 
-  new (data) cxxet::impl::event::list::meta_info{
-      static_cast<long long>(gettid()), capacity};
+  new (data) cxxet::impl::event::list::meta_info{cxxet::impl::get_thread_id(),
+                                                 capacity};
 
   return data;
 }
