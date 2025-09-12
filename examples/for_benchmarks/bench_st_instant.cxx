@@ -17,26 +17,17 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <atomic>
-#include <thread>
-#include <vector>
-
 #include "common.hxx"
 
 namespace {
 
-void work(std::atomic<int> &ai, [[maybe_unused]] int const th_index,
-          [[maybe_unused]] int const num_ths,
-          cxxet_bench::driver const &driver) {
+void work(cxxet_bench::driver const &driver) {
   driver.thread_reserve();
 
   for (int i{0}; i < driver.num_iters; ++i) {
-    for (int j{0}; j < driver.marker_after_iter - 1; ++j) {
-      ai.fetch_add(1, std::memory_order::memory_order_relaxed);
-    }
-    auto const val{ai.fetch_add(1, std::memory_order::memory_order_relaxed)};
-
-    driver.submit_counter_marker("some counter ...", val);
+    auto const mc{
+        driver.submit_complete_marker("complete over instant event ")};
+    driver.submit_instant_marker("some instant ...");
   }
 
   driver.thread_flush();
@@ -47,30 +38,7 @@ void work(std::atomic<int> &ai, [[maybe_unused]] int const th_index,
 int main(int const argc, char const **argv) {
   cxxet_bench::driver driver{argc, argv};
 
-  std::vector<std::thread> ths;
-  ths.reserve(static_cast<std::size_t>(driver.num_threads));
-  std::atomic<int> ai{0};
-
-  auto const worker = [&](int const th_index) {
-    work(ai, th_index, driver.num_threads, driver);
-  };
-
-  for (int i = 1; i < driver.num_threads; ++i) {
-    ths.emplace_back(worker, i);
-  }
-
-  worker(0);
-
-  for (auto &th : ths) {
-    th.join();
-  }
-
-#ifndef NDEBUG
-  if (ai.load(std::memory_order::memory_order_acquire) !=
-      (driver.num_iters * driver.num_threads)) {
-    return EXIT_FAILURE;
-  }
-#endif
+  work(driver);
 
   driver.global_flush_target();
   driver.global_flush();

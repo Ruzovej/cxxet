@@ -72,3 +72,8 @@ add_bench_example(
     cxxet_bench_mt_counter
         "bench_mt_counter.cxx"
 )
+
+add_bench_example(
+    cxxet_bench_st_instant
+        "bench_st_instant.cxx"
+)

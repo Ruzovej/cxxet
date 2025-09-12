@@ -29,7 +29,6 @@
 #include <nlohmann/json.hpp>
 
 #include "cxxet/basic.hxx"
-#include "nlohmann/json_fwd.hpp"
 #ifdef CXXET_ENABLE
 #include "cxxet/get_process_id.hxx"
 #include "cxxet/get_thread_id.hxx"
@@ -198,5 +197,33 @@ void driver::submit_counter_marker(char const *const name,
                                    double const value) const {
   CXXET_mark_counter(name, value);
 }
+
+void driver::submit_instant_marker(char const *const name) const {
+  CXXET_mark_instant(name);
+}
+
+driver::complete_marker_alike::~complete_marker_alike() noexcept {
+#ifdef CXXET_ENABLE
+  reinterpret_cast<cxxet::mark::complete *>(&buffer)->~complete();
+#endif
+}
+
+driver::complete_marker_alike::complete_marker_alike(
+    const char *const name) noexcept {
+#ifdef CXXET_ENABLE
+  new (&buffer) cxxet::mark::complete{name};
+#endif
+}
+
+[[nodiscard]] driver::complete_marker_alike
+driver::submit_complete_marker(char const *const name) const {
+  return complete_marker_alike{name};
+}
+
+void driver::submit_begin_marker(char const *const name) const {
+  CXXET_mark_duration_begin(name);
+}
+
+void driver::submit_end_marker() const { CXXET_mark_duration_end(); }
 
 } // namespace cxxet_bench

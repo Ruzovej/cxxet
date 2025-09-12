@@ -36,6 +36,26 @@ struct driver {
   void global_flush() const;
 
   void submit_counter_marker(char const *const name, double const value) const;
+  void submit_instant_marker(char const *const name) const;
+
+  struct complete_marker_alike {
+    ~complete_marker_alike() noexcept;
+
+  private:
+    explicit complete_marker_alike(char const *const aName) noexcept;
+    complete_marker_alike(complete_marker_alike const &) = delete;
+    complete_marker_alike(complete_marker_alike &&) = delete;
+
+    friend struct driver;
+
+    alignas(8) unsigned char buffer[32];
+  };
+
+  [[nodiscard]] complete_marker_alike
+  submit_complete_marker(char const *const name) const;
+
+  void submit_begin_marker(char const *const name) const;
+  void submit_end_marker() const;
 
   int const num_iters;
   int const marker_after_iter;
