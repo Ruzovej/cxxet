@@ -58,6 +58,8 @@ struct driver {
   void submit_end_marker() const;
 
   int const num_iters;
+  // useful only when benchmarking it around doing some nontrivial work (e.g.
+  // incrementing atomic) ...:
   int const marker_after_iter;
   int const cxxet_reserve_buffer;
   int const num_threads;

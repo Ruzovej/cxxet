@@ -25,7 +25,9 @@ int main(int const argc, char const **argv) {
   driver.thread_reserve();
 
   for (int i{0}; i < driver.num_iters; ++i) {
-    driver.submit_instant_marker("some instant ...");
+    driver.submit_begin_marker("begin marker ...");
+
+    driver.submit_end_marker();
   }
 
   driver.thread_flush();

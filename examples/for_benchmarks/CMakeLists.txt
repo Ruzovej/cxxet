@@ -77,3 +77,18 @@ add_bench_example(
     cxxet_bench_st_instant
         "bench_st_instant.cxx"
 )
+
+add_bench_example(
+    cxxet_bench_st_guarded_instant
+        "bench_st_guarded_instant.cxx"
+)
+
+add_bench_example(
+    cxxet_bench_st_complete
+        "bench_st_complete.cxx"
+)
+
+add_bench_example(
+    cxxet_bench_st_duration
+        "bench_st_duration.cxx"
+)
