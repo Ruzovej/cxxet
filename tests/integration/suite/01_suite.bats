@@ -608,12 +608,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert [ -f "${meta_file}" ]
     refute [ -f "${result_base}.json" ]
 
+    assert_equal "$(jq -e 'length' "${meta_file}")" "${num_threads}"
+
     meta_file="${result_base}_traced_meta.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
     assert [ -f "${result_base}_traced.json" ]
+
+    assert_equal "$(jq -e 'length' "${meta_file}")" "${num_threads}"
 }
 
 @test "Large benchmark correctness test 2 (cxxet_bench_st_instant)" {
@@ -639,12 +643,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert [ -f "${meta_file}" ]
     refute [ -f "${result_base}.json" ]
 
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+
     meta_file="${result_base}_traced_meta.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
     assert [ -f "${result_base}_traced.json" ]
+
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
 }
 
 @test "Large benchmark correctness test 3 (cxxet_bench_st_guarded_instant)" {
@@ -670,12 +678,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert [ -f "${meta_file}" ]
     refute [ -f "${result_base}.json" ]
 
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+
     meta_file="${result_base}_traced_meta.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
     assert [ -f "${result_base}_traced.json" ]
+
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
 }
 
 @test "Large benchmark correctness test 4 (cxxet_bench_st_complete)" {
@@ -701,12 +713,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert [ -f "${meta_file}" ]
     refute [ -f "${result_base}.json" ]
 
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+
     meta_file="${result_base}_traced_meta.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
     assert [ -f "${result_base}_traced.json" ]
+
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
 }
 
 @test "Large benchmark correctness test 5 (cxxet_bench_st_duration)" {
@@ -732,12 +748,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert [ -f "${meta_file}" ]
     refute [ -f "${result_base}.json" ]
 
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+
     meta_file="${result_base}_traced_meta.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
     assert [ -f "${result_base}_traced.json" ]
+
+    assert_equal "$(jq -e 'length' "${meta_file}")" 1
 }
 
 # TODO end-user usage:
