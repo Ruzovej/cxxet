@@ -19,34 +19,25 @@
 
 #pragma once
 
-#include <string>
+#if defined(_WIN32)
+#include <windows.h>
+#error "Unimplemented platform - TODO ..."
+#elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+#include <unistd.h>
+#else
+#error "Unsupported platform"
+#endif
 
-namespace cxxet_bench {
+namespace cxxet::impl {
 
-bool tracing_enabled() noexcept;
+inline long long get_thread_id() noexcept {
+#if defined(_WIN32)
+// TODO
+#elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+  return static_cast<long long>(gettid());
+#else
+// TODO
+#endif
+}
 
-struct driver {
-  explicit driver(int const argc, char const **argv);
-  ~driver();
-
-  void thread_reserve(int const capacity = 0) const;
-  void set_thread_name(char const *const th_name) const;
-  void thread_flush() const;
-  void global_flush_target() const;
-  void global_flush() const;
-
-  void submit_counter_marker(char const *const name, double const value) const;
-
-  int const num_iters;
-  int const marker_after_iter;
-  int const cxxet_reserve_buffer;
-  int const num_threads;
-
-private:
-  driver(driver const &) = delete;
-  driver(driver &&) = delete;
-
-  std::string const bench_result_filename_base;
-};
-
-} // namespace cxxet_bench
+} // namespace cxxet::impl
