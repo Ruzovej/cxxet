@@ -131,14 +131,6 @@ metas::~metas() {
 
 namespace cxxet_bench {
 
-bool tracing_enabled() noexcept {
-#ifdef CXXET_ENABLE
-  return true;
-#else
-  return false;
-#endif
-}
-
 driver::driver(int const argc, char const **argv)
     : num_iters(argc > 1 ? std::atoi(argv[1]) : 100'000),
       marker_after_iter(argc > 2 ? std::atoi(argv[2]) : 1),
@@ -154,7 +146,22 @@ driver::driver(int const argc, char const **argv)
 #endif
 }
 
-driver::~driver() { global_flush(); }
+driver::~driver() {
+#ifdef CXXET_ENABLE
+  if (global_file_sink == nullptr) {
+    return;
+  }
+#endif
+  global_flush();
+}
+
+bool driver::tracing_enabled() noexcept {
+#ifdef CXXET_ENABLE
+  return true;
+#else
+  return false;
+#endif
+}
 
 void driver::thread_reserve(int const capacity) const {
   auto const begin{now()};

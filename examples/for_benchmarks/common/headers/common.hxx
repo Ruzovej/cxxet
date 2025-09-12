@@ -23,11 +23,11 @@
 
 namespace cxxet_bench {
 
-bool tracing_enabled() noexcept;
-
 struct driver {
   explicit driver(int const argc, char const **argv);
   ~driver();
+
+  static bool tracing_enabled() noexcept;
 
   void thread_reserve(int const capacity = 0) const;
   void set_thread_name(char const *const th_name) const;
