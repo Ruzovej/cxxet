@@ -584,6 +584,162 @@ Deduced CXXET_TARGET_FILENAME: "
     done
 }
 
+@test "Large benchmark correctness test 1 (cxxet_bench_mt_counter)" {
+    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
+        skip "Large benchmarks aren't supported with debug builds"
+    fi
+
+    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_1"
+    local num_threads=4
+    local executable="${BIN_DIR}/cxxet_bench_mt_counter"
+
+    local args=(
+        50 # num_iters
+        2 # marker_after_iter
+        3 # cxxet_reserve_buffer
+        "${num_threads}" # num_threads
+        "${result_base}" # bench_result_filename_base
+    )
+
+    local meta_file="${result_base}_meta.json"
+    run "${executable}_bare" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    refute [ -f "${result_base}.json" ]
+
+    meta_file="${result_base}_traced_meta.json"
+    run "${executable}" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    assert [ -f "${result_base}_traced.json" ]
+}
+
+@test "Large benchmark correctness test 2 (cxxet_bench_st_instant)" {
+    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
+        skip "Large benchmarks aren't supported with debug builds"
+    fi
+
+    local executable="${BIN_DIR}/cxxet_bench_st_instant"
+    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_2"
+
+    local args=(
+        50 # num_iters
+        2 # marker_after_iter
+        3 # cxxet_reserve_buffer
+        1 # num_threads
+        "${result_base}" # bench_result_filename_base
+    )
+
+    local meta_file="${result_base}_meta.json"
+    run "${executable}_bare" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    refute [ -f "${result_base}.json" ]
+
+    meta_file="${result_base}_traced_meta.json"
+    run "${executable}" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    assert [ -f "${result_base}_traced.json" ]
+}
+
+@test "Large benchmark correctness test 3 (cxxet_bench_st_guarded_instant)" {
+    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
+        skip "Large benchmarks aren't supported with debug builds"
+    fi
+
+    local executable="${BIN_DIR}/cxxet_bench_st_guarded_instant"
+    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_3"
+
+    local args=(
+        50 # num_iters
+        2 # marker_after_iter
+        3 # cxxet_reserve_buffer
+        1 # num_threads
+        "${result_base}" # bench_result_filename_base
+    )
+
+    local meta_file="${result_base}_meta.json"
+    run "${executable}_bare" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    refute [ -f "${result_base}.json" ]
+
+    meta_file="${result_base}_traced_meta.json"
+    run "${executable}" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    assert [ -f "${result_base}_traced.json" ]
+}
+
+@test "Large benchmark correctness test 4 (cxxet_bench_st_complete)" {
+    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
+        skip "Large benchmarks aren't supported with debug builds"
+    fi
+
+    local executable="${BIN_DIR}/cxxet_bench_st_complete"
+    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_4"
+
+    local args=(
+        50 # num_iters
+        2 # marker_after_iter
+        3 # cxxet_reserve_buffer
+        1 # num_threads
+        "${result_base}" # bench_result_filename_base
+    )
+
+    local meta_file="${result_base}_meta.json"
+    run "${executable}_bare" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    refute [ -f "${result_base}.json" ]
+
+    meta_file="${result_base}_traced_meta.json"
+    run "${executable}" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    assert [ -f "${result_base}_traced.json" ]
+}
+
+@test "Large benchmark correctness test 5 (cxxet_bench_st_duration)" {
+    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
+        skip "Large benchmarks aren't supported with debug builds"
+    fi
+
+    local executable="${BIN_DIR}/cxxet_bench_st_duration"
+    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_5"
+
+    local args=(
+        50 # num_iters
+        2 # marker_after_iter
+        3 # cxxet_reserve_buffer
+        1 # num_threads
+        "${result_base}" # bench_result_filename_base
+    )
+
+    local meta_file="${result_base}_meta.json"
+    run "${executable}_bare" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    refute [ -f "${result_base}.json" ]
+
+    meta_file="${result_base}_traced_meta.json"
+    run "${executable}" "${args[@]}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${meta_file}" ]
+    assert [ -f "${result_base}_traced.json" ]
+}
+
 # TODO end-user usage:
 # * All event types in one file.
 
