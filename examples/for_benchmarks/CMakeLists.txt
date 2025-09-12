@@ -69,6 +69,6 @@ function(add_bench_example target_name source_file)
 endfunction()
 
 add_bench_example(
-    cxxet_bench_init
-        "bench_init.cxx"
+    cxxet_bench_mt_counter
+        "bench_mt_counter.cxx"
 )

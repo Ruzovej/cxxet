@@ -67,13 +67,15 @@ int main(int const argc, char const **argv) {
     th.join();
   }
 
+#ifndef NDEBUG
   if (ai.load(std::memory_order::memory_order_acquire) !=
       (driver.num_iters * driver.num_threads)) {
     return EXIT_FAILURE;
   }
+#endif
 
   driver.global_flush_target();
   driver.global_flush();
 
-  return 0;
+  return EXIT_SUCCESS;
 }
