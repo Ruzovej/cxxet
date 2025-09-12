@@ -590,14 +590,15 @@ Deduced CXXET_TARGET_FILENAME: "
     fi
 
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_1"
+    local num_iters=50
     local num_threads=4
     local executable="${BIN_DIR}/cxxet_bench_mt_counter"
 
     local args=(
-        50 # num_iters
+        "${num_iters}"
         2 # marker_after_iter
         3 # cxxet_reserve_buffer
-        "${num_threads}" # num_threads
+        "${num_threads}"
         "${result_base}" # bench_result_filename_base
     )
 
@@ -611,13 +612,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" "${num_threads}"
 
     meta_file="${result_base}_traced_meta.json"
+    local output_file="${result_base}_traced.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
-    assert [ -f "${result_base}_traced.json" ]
+    assert [ -f "${output_file}" ]
 
     assert_equal "$(jq -e 'length' "${meta_file}")" "${num_threads}"
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * num_threads ))"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${output_file}")" "$(( num_iters * num_threads ))"
 }
 
 @test "Large benchmark correctness test 2 (cxxet_bench_st_instant)" {
@@ -625,11 +629,12 @@ Deduced CXXET_TARGET_FILENAME: "
         skip "Large benchmarks aren't supported with debug builds"
     fi
 
-    local executable="${BIN_DIR}/cxxet_bench_st_instant"
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_2"
+    local num_iters=50
+    local executable="${BIN_DIR}/cxxet_bench_st_instant"
 
     local args=(
-        50 # num_iters
+        "${num_iters}"
         2 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
@@ -646,13 +651,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
 
     meta_file="${result_base}_traced_meta.json"
+    local output_file="${result_base}_traced.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
-    assert [ -f "${result_base}_traced.json" ]
+    assert [ -f "${output_file}" ]
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file}")" "${num_iters}"
 }
 
 @test "Large benchmark correctness test 3 (cxxet_bench_st_guarded_instant)" {
@@ -660,11 +668,12 @@ Deduced CXXET_TARGET_FILENAME: "
         skip "Large benchmarks aren't supported with debug builds"
     fi
 
-    local executable="${BIN_DIR}/cxxet_bench_st_guarded_instant"
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_3"
+    local num_iters=50
+    local executable="${BIN_DIR}/cxxet_bench_st_guarded_instant"
 
     local args=(
-        50 # num_iters
+        "${num_iters}"
         2 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
@@ -681,13 +690,17 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
 
     meta_file="${result_base}_traced_meta.json"
+    local output_file="${result_base}_traced.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
-    assert [ -f "${result_base}_traced.json" ]
+    assert [ -f "${output_file}" ]
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * 2 ))"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file}")" "${num_iters}"
 }
 
 @test "Large benchmark correctness test 4 (cxxet_bench_st_complete)" {
@@ -695,11 +708,12 @@ Deduced CXXET_TARGET_FILENAME: "
         skip "Large benchmarks aren't supported with debug builds"
     fi
 
-    local executable="${BIN_DIR}/cxxet_bench_st_complete"
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_4"
+    local num_iters=50
+    local executable="${BIN_DIR}/cxxet_bench_st_complete"
 
     local args=(
-        50 # num_iters
+        "${num_iters}"
         2 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
@@ -716,13 +730,16 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
 
     meta_file="${result_base}_traced_meta.json"
+    local output_file="${result_base}_traced.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
-    assert [ -f "${result_base}_traced.json" ]
+    assert [ -f "${output_file}" ]
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file}")" "${num_iters}"
 }
 
 @test "Large benchmark correctness test 5 (cxxet_bench_st_duration)" {
@@ -730,11 +747,12 @@ Deduced CXXET_TARGET_FILENAME: "
         skip "Large benchmarks aren't supported with debug builds"
     fi
 
-    local executable="${BIN_DIR}/cxxet_bench_st_duration"
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_5"
+    local num_iters=50
+    local executable="${BIN_DIR}/cxxet_bench_st_duration"
 
     local args=(
-        50 # num_iters
+        "${num_iters}"
         2 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
@@ -751,13 +769,17 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
 
     meta_file="${result_base}_traced_meta.json"
+    local output_file="${result_base}_traced.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${meta_file}" ]
-    assert [ -f "${result_base}_traced.json" ]
+    assert [ -f "${output_file}" ]
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * 2 ))"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${output_file}")" "${num_iters}"
 }
 
 # TODO end-user usage:
