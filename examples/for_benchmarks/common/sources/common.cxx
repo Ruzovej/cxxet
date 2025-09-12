@@ -37,8 +37,8 @@
 
 namespace {
 
-std::unique_ptr<cxxet::file_sink_handle>
-    global_file_sink; // so it can be "flushed" manually
+// hack so it can be "flushed" manually:
+std::unique_ptr<cxxet::file_sink_handle> global_file_sink{nullptr};
 
 } // namespace
 
