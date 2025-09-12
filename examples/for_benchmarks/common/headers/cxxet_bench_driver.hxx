@@ -35,6 +35,9 @@ struct driver {
   void global_flush_target() const;
   void global_flush() const;
 
+  void start_marker_submission_measurement() const;
+  void stop_marker_submission_measurement() const;
+
   void submit_counter_marker(char const *const name, double const value) const;
   void submit_instant_marker(char const *const name) const;
 

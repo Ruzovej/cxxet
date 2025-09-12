@@ -30,6 +30,8 @@ void work(std::atomic<int> &ai, [[maybe_unused]] int const th_index,
           cxxet_bench::driver const &driver) {
   driver.thread_reserve();
 
+  driver.start_marker_submission_measurement();
+
   for (int i{0}; i < driver.num_iters; ++i) {
     for (int j{0}; j < driver.marker_after_iter - 1; ++j) {
       ai.fetch_add(1, std::memory_order::memory_order_relaxed);
@@ -38,6 +40,8 @@ void work(std::atomic<int> &ai, [[maybe_unused]] int const th_index,
 
     driver.submit_counter_marker("some counter ...", val);
   }
+
+  driver.stop_marker_submission_measurement();
 
   driver.thread_flush();
 }

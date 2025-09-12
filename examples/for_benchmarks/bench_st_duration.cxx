@@ -24,11 +24,15 @@ int main(int const argc, char const **argv) {
 
   driver.thread_reserve();
 
+  driver.start_marker_submission_measurement();
+
   for (int i{0}; i < driver.num_iters; ++i) {
     driver.submit_begin_marker("begin marker ...");
 
     driver.submit_end_marker();
   }
+
+  driver.stop_marker_submission_measurement();
 
   driver.thread_flush();
 

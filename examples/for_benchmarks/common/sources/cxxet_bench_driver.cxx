@@ -58,6 +58,7 @@ long long now() noexcept { return cxxet::impl::as_int_ns(cxxet::impl::now()); }
 struct meta {
   long long thread_reserve_ns{0};
   long long set_thread_name_ns{0};
+  long long markers_submission_ns{0};
   long long thread_flush_ns{0};
   long long global_flush_target_ns{0};
   long long global_flush_ns{0};
@@ -118,6 +119,7 @@ metas::~metas() {
                  {"tid", m.tid},
                  {"thread_reserve_ns", m.thread_reserve_ns},
                  {"set_thread_name_ns", m.set_thread_name_ns},
+                 {"markers_submission_ns", m.markers_submission_ns},
                  {"thread_flush_ns", m.thread_flush_ns},
                  {"global_flush_target_ns", m.global_flush_target_ns},
                  {"global_flush_ns", m.global_flush_ns}});
@@ -198,6 +200,14 @@ void driver::global_flush() const {
   global_file_sink.reset();
 #endif
   get_meta().global_flush_ns += now() - begin;
+}
+
+void driver::start_marker_submission_measurement() const {
+  get_meta().markers_submission_ns -= now();
+}
+
+void driver::stop_marker_submission_measurement() const {
+  get_meta().markers_submission_ns += now();
 }
 
 void driver::submit_counter_marker(char const *const name,

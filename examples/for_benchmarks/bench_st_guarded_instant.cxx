@@ -24,11 +24,15 @@ int main(int const argc, char const **argv) {
 
   driver.thread_reserve();
 
+  driver.start_marker_submission_measurement();
+
   for (int i{0}; i < driver.num_iters; ++i) {
     auto const mc{
         driver.submit_complete_marker("complete over instant event ")};
     driver.submit_instant_marker("some instant ...");
   }
+
+  driver.stop_marker_submission_measurement();
 
   driver.thread_flush();
 
