@@ -17,7 +17,7 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "common.hxx"
+#include "cxxet_bench_driver.hxx"
 
 #include <cassert>
 

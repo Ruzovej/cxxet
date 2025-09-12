@@ -21,7 +21,7 @@
 #include <thread>
 #include <vector>
 
-#include "common.hxx"
+#include "cxxet_bench_driver.hxx"
 
 namespace {
 
