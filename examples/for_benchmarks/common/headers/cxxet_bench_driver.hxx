@@ -47,7 +47,11 @@ struct driver {
   private:
     explicit complete_marker_alike(char const *const aName) noexcept;
     complete_marker_alike(complete_marker_alike const &) = delete;
+    complete_marker_alike &operator=(complete_marker_alike const &) = delete;
     complete_marker_alike(complete_marker_alike &&) = delete;
+    complete_marker_alike &operator=(complete_marker_alike &&) = delete;
+    void *operator new(std::size_t) = delete;
+    void *operator new[](std::size_t) = delete;
 
     friend struct driver;
 
@@ -69,7 +73,9 @@ struct driver {
 
 private:
   driver(driver const &) = delete;
+  driver &operator=(driver const &) = delete;
   driver(driver &&) = delete;
+  driver &operator=(driver &&) = delete;
 
   std::string const bench_result_filename_base;
 };
