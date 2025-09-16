@@ -188,7 +188,7 @@ function large() {
                     local nths
                     for nths in "${num_threads[@]}"; do # 1 or 3 values
                         # either 9 or 64 combinations ...!!!
-                        # this below is either 1 or 2 runs ...
+                        # this below is either `1 (or 2 if not skipping "bare" version) * reps` runs ...
                         run_large_benchmark \
                             "${bin_dir}" \
                             "${benchmark_name}" \
