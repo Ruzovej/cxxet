@@ -635,7 +635,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local args=(
         "${num_iters}"
-        2 # marker_after_iter
+        1 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
         "${result_base}" # bench_result_filename_base
@@ -674,7 +674,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local args=(
         "${num_iters}"
-        2 # marker_after_iter
+        1 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
         "${result_base}" # bench_result_filename_base
@@ -714,7 +714,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local args=(
         "${num_iters}"
-        2 # marker_after_iter
+        1 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
         "${result_base}" # bench_result_filename_base
@@ -753,7 +753,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local args=(
         "${num_iters}"
-        2 # marker_after_iter
+        1 # marker_after_iter
         3 # cxxet_reserve_buffer
         1 # num_threads
         "${result_base}" # bench_result_filename_base
