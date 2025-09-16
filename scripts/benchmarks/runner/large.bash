@@ -208,13 +208,14 @@ function large() {
 
     printf -- '-=-=-=-=-=-=-=- Executed %s large benchmarks (with out_dir "%s")\n' "${num_executed_benchmarks}" "${out_dir}" >&2
 
-    # TODO #164 remove or refactor (to use "${out_dir}" - create dedicated file there?!)
-    #if [[ -f "${out_file}" ]]; then
-    #    local temp_file="$(mktemp "${out_file}.XXXXXX")"
-    #    local git_hash="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD 2>/dev/null || printf "N/A")"
-    #    local git_dirty="$(git -C "${CXXET_ROOT_DIR}" diff --shortstat)"
-#
-    #    jq --arg hash "${git_hash}${git_dirty:+ (dirty)}" '.context.cxxet_git_hash = $hash' "${out_file}" > "${temp_file}"
-    #    mv "${temp_file}" "${out_file}"
-    #fi
+    if [[ "${dry_run}" == 'false' ]]; then
+        local out_file="${out_dir}/commit_hash.json"
+
+        local git_hash="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD 2>/dev/null || printf "N/A")"
+        local git_dirty="$(git -C "${CXXET_ROOT_DIR}" diff --shortstat)"
+
+        local result="${git_hash}${git_dirty:+ (dirty)}"
+
+        printf '{"context":{"cxxet_git_hash":"%s"}}' "${result}" > "${out_file}"
+    fi
 }
