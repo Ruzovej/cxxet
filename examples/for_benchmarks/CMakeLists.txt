@@ -52,19 +52,39 @@ target_link_libraries(
             nlohmann_json::nlohmann_json
 )
 
-function(add_bench_example target_name source_file)
-    add_example("${target_name}" "${source_file}")
+add_custom_target(
+    cxxet_large_benchmarks
+)
 
+function(add_bench_example target_name source_file)
+    add_executable(
+        "${target_name}"
+            "${source_file}"
+    )
     target_link_libraries(
         "${target_name}"
             PRIVATE
                 cxxet_bench_common
     )
+    add_unix_compiler_flags("${target_name}")
+    add_sanitizers("${target_name}")
 
+    add_executable(
+        "${target_name}_bare"
+            "${source_file}"
+    )
     target_link_libraries(
         "${target_name}_bare"
             PRIVATE
                 cxxet_bench_common_bare
+    )
+    add_unix_compiler_flags("${target_name}_bare")
+    add_sanitizers("${target_name}_bare")
+
+    add_dependencies(
+        cxxet_large_benchmarks
+            "${target_name}"
+            "${target_name}_bare"
     )
 endfunction()
 

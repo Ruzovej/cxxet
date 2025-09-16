@@ -10,7 +10,7 @@ function(add_example target_name source_file)
     target_link_libraries(
         "${target_name}"
             PRIVATE
-            cxxet
+                cxxet
     )
     add_unix_compiler_flags("${target_name}")
     add_sanitizers("${target_name}")
@@ -22,7 +22,7 @@ function(add_example target_name source_file)
     target_link_libraries(
         "${target_name}_bare"
             PRIVATE
-            cxxet_bare
+                cxxet_bare
     )
     add_unix_compiler_flags("${target_name}_bare")
     add_sanitizers("${target_name}_bare")
