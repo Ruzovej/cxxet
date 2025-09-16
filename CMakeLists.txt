@@ -170,11 +170,13 @@ include(FetchContent)
 # first should be target that is desired to be picked by `clangd` for indexing the source code ... unfortunately, they define various macros to control what is being compiled beside regular source code (e.g. benchmarks, unit tests or nothing more), hence various parts of code will be ignored if not chosen correctly.
 if (CXXET_BUILD_BENCHMARKS AND NOT CXXET_CMAKE_FETCHED)
     # TODO (https://github.com/Ruzovej/cxxet/issues/12) refactor this ... see the duplicated code for unit tests below ...
+    cmake_policy(SET CMP0135 NEW) # file timestamps of extracted data are updated to "now"
     FetchContent_Declare(
         benchmark
-        GIT_REPOSITORY  https://github.com/google/benchmark.git
-        GIT_TAG         v1.9.4
-        GIT_SHALLOW     TRUE
+        URL https://github.com/google/benchmark/archive/refs/tags/v1.9.4.tar.gz
+        #GIT_REPOSITORY  https://github.com/google/benchmark.git
+        #GIT_TAG         v1.9.4
+        #GIT_SHALLOW     TRUE
     )
     option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." OFF)
     option(BENCHMARK_ENABLE_EXCEPTIONS "Enable the use of exceptions in the benchmark library." ON)
@@ -221,11 +223,13 @@ endif()
 if (CXXET_BUILD_TESTS AND NOT CXXET_CMAKE_FETCHED)
     add_subdirectory(tests/infra)
 
+    cmake_policy(SET CMP0135 NEW) # file timestamps of extracted data are updated to "now"
     FetchContent_Declare(
         doctest
-        GIT_REPOSITORY  https://github.com/doctest/doctest.git
-        GIT_TAG         v2.4.11
-        GIT_SHALLOW     TRUE
+        URL https://github.com/doctest/doctest/archive/refs/tags/v2.4.11.tar.gz
+        #GIT_REPOSITORY  https://github.com/doctest/doctest.git
+        #GIT_TAG         v2.4.11
+        #GIT_SHALLOW     TRUE
     )
     FetchContent_MakeAvailable(doctest)
 
