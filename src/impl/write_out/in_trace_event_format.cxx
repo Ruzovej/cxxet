@@ -19,8 +19,6 @@
 
 #include "impl/write_out/in_trace_event_format.hxx"
 
-#include <unistd.h>
-
 #include <cstring>
 
 #include <iomanip>
@@ -29,6 +27,7 @@
 #include <string>
 #include <type_traits>
 
+#include "cxxet/get_process_id.hxx"
 #include "impl/event/any.hxx"
 
 namespace cxxet::impl::write_out {
@@ -86,7 +85,7 @@ std::string escape_json_string(char const *const str, std::size_t len = 0) {
   return result.str();
 }
 
-double longlong_ns_to_double_us(long long const ns) noexcept {
+constexpr double longlong_ns_to_double_us(long long const ns) noexcept {
   return static_cast<double>(ns) / 1'000.0;
 }
 
@@ -98,7 +97,7 @@ void in_trace_event_format(output::writer &out,
                            write_out::category_name_map const &cat_names) {
   out.prepare_for_writing();
 
-  auto const process_id{static_cast<long long>(getpid())};
+  auto const process_id{get_process_id()};
 
   out << "{\"displayTimeUnit\":\"ns\",";
   // TODO (https://github.com/Ruzovej/cxxet/issues/138) put into some

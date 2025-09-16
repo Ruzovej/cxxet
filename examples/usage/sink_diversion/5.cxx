@@ -77,7 +77,7 @@ struct custom_writer final : cxxet::output::writer {
     oss << "index " << index << ": Custom writer initialized; output:\n";
   }
 
-  void write(std::string_view data) override { oss << data; }
+  void write(std::string_view const data) override { oss << data; }
 
   void write(long long const ll) override { oss << ll; }
 

@@ -2,8 +2,9 @@
 
 set -e
 
-cxxet_include scripts/tests/benchmark_compare
-cxxet_include scripts/tests/benchmark_runner
+cxxet_include scripts/benchmarks/runner/large
+cxxet_include scripts/benchmarks/runner/micro
+cxxet_include scripts/benchmarks/compare
 
 function benchmarks() {
     function usage() {
@@ -15,6 +16,7 @@ function benchmarks() {
             printf 'Where option is one of:\n'
             printf '    -c, --compare, compare  Compare 2 micro-benchmark results (using 3rd party (google benchmark) python3 script)\n'
             printf '    -m, --micro, micro      Run C++ implementation micro-benchmarks\n'
+            printf '    -l, --large, large      Run C++ implementation large-benchmarks\n'
             printf '    --help, -h              Show this help message\n'
             printf 'Remaining args are passed to the previously parsed "option", e.g. for suite-specific details/help, pass -h|--help to it.\n'
         } >&2
@@ -23,11 +25,15 @@ function benchmarks() {
     case "$1" in
         -c|--compare|compare)
             shift
-            benchmark_compare "$@"
+            compare "$@"
+            ;;
+        -l|--large|large)
+            shift
+            large "$@"
             ;;
         -m|--micro|micro)
             shift
-            benchmark_runner "$@"
+            micro "$@"
             ;;
         --help|-h)
             usage
