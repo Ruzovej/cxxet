@@ -112,3 +112,5 @@ add_bench_example(
     cxxet_bench_st_duration
         "bench_st_duration.cxx"
 )
+
+# TODO custom logger, categories, etc. - in general, "every" feature!!!

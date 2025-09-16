@@ -52,7 +52,7 @@ struct custom_writer final : cxxet::output::writer {
     std::cout << "Custom writer initialized; output:\n";
   }
 
-  void write(std::string_view data) override { std::cout << data; }
+  void write(std::string_view const data) override { std::cout << data; }
 
   void write(long long const ll) override { std::cout << ll; }
 
