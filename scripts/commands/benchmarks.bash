@@ -2,8 +2,8 @@
 
 set -e
 
+cxxet_include scripts/benchmarks/runner/micro
 cxxet_include scripts/tests/benchmark_compare
-cxxet_include scripts/tests/benchmark_runner
 
 function benchmarks() {
     function usage() {
@@ -27,7 +27,7 @@ function benchmarks() {
             ;;
         -m|--micro|micro)
             shift
-            benchmark_runner "$@"
+            micro "$@"
             ;;
         --help|-h)
             usage

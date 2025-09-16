@@ -4,7 +4,7 @@ set -e
 
 cxxet_include scripts/commands/compile
 
-function benchmark_runner() {
+function micro() {
     # don't "test" all reasonable presets but only single one:
     local default_preset=tsan
     local preset="${default_preset}"
@@ -15,7 +15,7 @@ function benchmark_runner() {
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'benchmark_runner: run benchmarks with specified preset\n'
+                printf 'micro: run micro benchmarks with specified preset\n'
             fi
             printf 'Usage: benchmarks micro [options...]\n'
             printf 'Where options are:\n'
