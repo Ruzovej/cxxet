@@ -49,7 +49,6 @@ function benchmark_runner() {
                 ;;
             --out-json|-o)
                 out_file="${2:?No output file specified!}"
-                benchmark_args+=("--benchmark_out=${out_file}" '--benchmark_out_format=json')
                 shift 2
                 ;;
             --repetitions|-n)
@@ -69,10 +68,8 @@ function benchmark_runner() {
     done
 
     local bin_dir="${CXXET_ROOT_DIR}/bin/${preset}"
-    local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_benchmarks/${preset}"
-    mkdir -p "${target_dir}"
 
-    printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for benchmarks:\n' "${preset}" >&2
+    printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for micro benchmarks:\n' "${preset}" >&2
     compile \
         --quiet \
         --preset "${preset}" \
@@ -87,6 +84,13 @@ function benchmark_runner() {
         ) >&2
         return 0
     fi
+
+    if [[ -z "${out_file}" ]]; then
+        local target_dir="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_benchmarks/${preset}"
+        mkdir -p "${target_dir}"
+        out_file="${target_dir}/micro.json"
+    fi
+    benchmark_args+=("--benchmark_out=${out_file}" '--benchmark_out_format=json')
 
     printf -- '-=-=-=-=-=-=-=- Executing %s benchmarks:\n' "${preset}" >&2
     (
