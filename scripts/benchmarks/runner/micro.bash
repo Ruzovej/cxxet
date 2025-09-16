@@ -6,7 +6,7 @@ cxxet_include scripts/commands/compile
 
 function micro() {
     # don't "test" all reasonable presets but only single one:
-    local default_preset=tsan
+    local default_preset=release
     local preset="${default_preset}"
     local benchmark_help='false'
     local benchmark_args=()
