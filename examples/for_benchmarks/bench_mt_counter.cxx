@@ -17,6 +17,8 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
+
 #include <atomic>
 #include <thread>
 #include <vector>

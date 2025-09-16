@@ -17,6 +17,8 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
+
 #include "cxxet_bench_driver.hxx"
 
 int main(int const argc, char const **argv) {
