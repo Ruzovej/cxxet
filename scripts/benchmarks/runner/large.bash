@@ -8,7 +8,8 @@ function large() {
     # don't "test" all reasonable presets but only single one:
     local default_preset=release
     local preset="${default_preset}"
-    local run_bare='true'
+    local inner_loop_executions=2
+    local skip_bare='false'
     local reps=1
     local out_dir_base="${CXXET_ROOT_DIR}/tmp"
     local out_dir
@@ -37,11 +38,13 @@ function large() {
                 shift 2
                 ;;
             --skip-bare|-b)
-                run_bare='false'
+                skip_bare='true'
+                inner_loop_executions="$((inner_loop_executions / 2))"
                 shift
                 ;;
             --repetitions|-n)
                 reps="${2:?No repetitions specified!}"
+                inner_loop_executions="$((inner_loop_executions * reps))"
                 shift 2
                 ;;
             --out-dir|-o)
@@ -95,21 +98,29 @@ function large() {
             "${marker_after_iter}"
             "${cxxet_reserve_buffer}"
             "${num_threads}"
-            "${result_base}"
         )
 
-        if [[ "${dry_run}" == 'false' ]]; then
-            [[ -x "${executable}" ]] || return 1
-            (
-                set -x
-                "${executable}" \
-                    "${args[@]}"
-            ) >&2
-        else
-            printf '%s %s %s %s %s %s\n' \
-                "${executable}" \
-                    "${args[@]}" >&2
-        fi
+        [[ "${dry_run}" == 'true' ]] || [[ -x "${executable}" ]] || return 1
+
+        local rep
+        for rep in $(seq 1 "${reps}"); do
+            local rep_result_base="${result_base}"
+            [[ "${reps}" == 1 ]] || rep_result_base="${rep_result_base}-rep${rep}"
+
+            if [[ "${dry_run}" == 'false' ]]; then
+                (
+                    set -x
+                    "${executable}" \
+                        "${args[@]}" \
+                        "${rep_result_base}"
+                ) >&2
+            else
+                printf '%s %s %s %s %s %s\n' \
+                    "${executable##${CXXET_ROOT_DIR}/}" \
+                        "${args[@]}" \
+                        "${rep_result_base##${CXXET_ROOT_DIR}/}" >&2
+            fi
+        done
     }
 
     function run_large_benchmark() {
@@ -121,86 +132,78 @@ function large() {
         local num_threads="${6:?}"
         local out_dir="${7:?}"
 
-        local executable="${bin_dir}/${bench_name}"
-        local result_base="${out_dir}/${bench_name}-${num_iters}-${marker_after_iter}-${cxxet_reserve_buffer}-${num_threads}"
+        local args=(
+            "${num_iters}"
+            "${marker_after_iter}"
+            "${cxxet_reserve_buffer}"
+            "${num_threads}"
+        )
 
-        if [[ "${run_bare}" == 'true' ]]; then
+        local executable="${bin_dir}/${bench_name}"
+        local result_base="${out_dir}/${bench_name}-iters${num_iters}-markiter${marker_after_iter}-buf${cxxet_reserve_buffer}-ths${num_threads}"
+
+        if [[ "${skip_bare}" == 'false' ]]; then
             do_run_large_benchmark \
                 "${executable}_bare" \
-                "${num_iters}" \
-                "${marker_after_iter}" \
-                "${cxxet_reserve_buffer}" \
-                "${num_threads}" \
+                "${args[@]}" \
                 "${result_base}_bare"
         fi
         do_run_large_benchmark \
             "${executable}" \
-            "${num_iters}" \
-            "${marker_after_iter}" \
-            "${cxxet_reserve_buffer}" \
-            "${num_threads}" \
+            "${args[@]}" \
             "${result_base}"
     }
 
-    printf -- '-=-=-=-=-=-=-=- Executing %s large benchmarks:\n' "${preset}" "${out_dir}" >&2
+    printf -- '-=-=-=-=-=-=-=- Executing %s large benchmarks:\n' "${preset}" >&2
 
     local num_executed_benchmarks=0
-    local inner_loop_executions=1
-    if [[ "${run_bare}" == 'true' ]]; then
-        inner_loop_executions=2
-    fi
 
-    local rep
-    for rep in $(seq 1 "${reps}"); do
-        [[ "${reps}" == 1 ]] || printf -- '-=-=-=-=-=-=-=- round %s/%s\n' "${rep}" "${reps}" >&2
+    local benchmark_name
+    local large_benchmarks=(
+        cxxet_bench_mt_counter
+        cxxet_bench_st_instant
+        cxxet_bench_st_guarded_instant
+        cxxet_bench_st_complete
+        cxxet_bench_st_duration
+    )
 
-        local benchmark_name
-        local large_benchmarks=(
-            cxxet_bench_mt_counter
-            cxxet_bench_st_instant
-            cxxet_bench_st_guarded_instant
-            cxxet_bench_st_complete
-            cxxet_bench_st_duration
-        )
+    for benchmark_name in "${large_benchmarks[@]}"; do
+        local num_threads
+        local marker_after_iters
+        if [[ "${benchmark_name}" =~ ^cxxet_bench_st_ ]]; then
+            # unused by such benchmarks
+            marker_after_iters=(1)
+            num_threads=(1)
+        else
+            marker_after_iters=(1 100)
+            num_threads=(1 4 16)
+        fi
 
-        for benchmark_name in "${large_benchmarks[@]}"; do
-            local num_threads
-            local marker_after_iters
-            if [[ "${benchmark_name}" =~ ^cxxet_bench_st_ ]]; then
-                # unused by such benchmarks
-                marker_after_iters=(1)
-                num_threads=(1)
-            else
-                marker_after_iters=(1 100)
-                num_threads=(1 4 16)
-            fi
+        local num_iters
+        for num_iters in 100 10000 100000; do # 3 values
+            local mai
+            for mai in "${marker_after_iters[@]}"; do # 1 or 2 values
+                local cxxet_reserve_buffer
+                for cxxet_reserve_buffer in "$((num_iters / 8))" "${num_iters}" "$((num_iters * 4))"; do # 3 values
+                    local nths
+                    for nths in "${num_threads[@]}"; do # 1 or 3 values
+                        # either 9 or 64 combinations ...!!!
+                        # this below is either 1 or 2 runs ...
+                        run_large_benchmark \
+                            "${bin_dir}" \
+                            "${benchmark_name}" \
+                            "${num_iters}" \
+                            "${mai}" \
+                            "${cxxet_reserve_buffer}" \
+                            "${nths}" \
+                            "${out_dir}"
 
-            local num_iters
-            for num_iters in 100 10000 100000; do # 3 values
-                local mai
-                for mai in "${marker_after_iters[@]}"; do # 1 or 2 values
-                    local cxxet_reserve_buffer
-                    for cxxet_reserve_buffer in "$((num_iters / 8))" "${num_iters}" "$((num_iters * 4))"; do # 3 values
-                        local nths
-                        for nths in "${num_threads[@]}"; do # 1 or 3 values
-                            # either 9 or 64 combinations ...!!!
-                            # this below is either 1 or 2 runs ...
-                            run_large_benchmark \
-                                "${bin_dir}" \
-                                "${benchmark_name}" \
-                                "${num_iters}" \
-                                "${mai}" \
-                                "${cxxet_reserve_buffer}" \
-                                "${nths}" \
-                                "${out_dir}"
-
-                            num_executed_benchmarks="$((num_executed_benchmarks + inner_loop_executions))"
-                        done
+                        num_executed_benchmarks="$((num_executed_benchmarks + inner_loop_executions))"
                     done
                 done
             done
-            printf '\n' >&2
         done
+        printf '\n' >&2
     done
 
     printf -- '-=-=-=-=-=-=-=- Executed %s large benchmarks (with out_dir "%s")\n' "${num_executed_benchmarks}" "${out_dir}" >&2
