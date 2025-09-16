@@ -3,7 +3,7 @@
 set -e
 
 cxxet_include scripts/benchmarks/runner/micro
-cxxet_include scripts/tests/benchmark_compare
+cxxet_include scripts/benchmarks/compare
 
 function benchmarks() {
     function usage() {
@@ -23,7 +23,7 @@ function benchmarks() {
     case "$1" in
         -c|--compare|compare)
             shift
-            benchmark_compare "$@"
+            compare "$@"
             ;;
         -m|--micro|micro)
             shift

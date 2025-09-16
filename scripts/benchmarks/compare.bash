@@ -2,7 +2,7 @@
 
 set -e
 
-function benchmark_compare() {
+function compare() {
     cxxet_require_command python3 # TODO how to check for presence of `venv` module?!
 
     local script_args=()
@@ -10,7 +10,7 @@ function benchmark_compare() {
     function usage() {
         {
             if [[ "$1" != '--short' ]]; then
-                printf 'benchmark_compare: thin wrapper around script provided by google/benchmark library\n'
+                printf 'compare: thin wrapper around script provided by google/benchmark library\n'
             fi
             printf 'Usage: benchmarks compare <[options...]|-h|--help>\n'
             printf '    --help, -h            Show this help message\n'
