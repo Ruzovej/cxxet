@@ -226,14 +226,26 @@ function large() {
         local result="${git_hash}${git_dirty:+ (dirty)}"
 
         printf '{"context":{"cxxet_git_hash":"%s"}}' "${result}" > "${out_file}"
-    fi
 
-    if [[ "${compression}" == 'true' && "${dry_run}" == 'false' ]]; then
-        printf -- '-=-=-=-=-=-=-=- Compressing results in "%s" with zstd:\n' "${out_dir}" >&2
-        (
-            set -x
-            tar -C "${out_dir}" --zstd -cf "${out_dir}.tar.zst" .
-            rm -rf "${out_dir}"
-        ) >&2
+        if [[ "${compression}" == 'true' ]]; then
+            (
+                set -x
+                tar \
+                    --directory "${out_dir}" \
+                    --use-compress-program='zstd -T0 -5' \
+                    --remove-files \
+                    --create \
+                    --file "${out_dir}.tar.zst" \
+                    . \
+                # TODO #177 provide command for uncompressing it too (to given directory), e.g.:
+                # mkdir /home/lukas/tmp/cxxet/tmp/ahoj2
+                # zstd \
+                #   -d /home/lukas/tmp/cxxet/tmp/2025-09-19T05-59-47_benchmarks/release/large.tar.zst \
+                #   -o /home/lukas/tmp/cxxet/tmp/ahoj2/large.tar
+                # tar \
+                #   --directory /home/lukas/tmp/cxxet/tmp/ahoj2 \
+                #   -xf /home/lukas/tmp/cxxet/tmp/ahoj2/large.tar
+            ) >&2
+        fi
     fi
 }
