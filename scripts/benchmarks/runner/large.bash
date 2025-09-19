@@ -237,14 +237,14 @@ function large() {
                     --create \
                     --file "${out_dir}.tar.zst" \
                     . \
-                # TODO #177 provide command for uncompressing it too (to given directory), e.g.:
-                # mkdir /home/lukas/tmp/cxxet/tmp/ahoj2
+                # (TODO?!) provide command for uncompressing it too (into given directory)? E.g.:
+                # mkdir "${PWD}/tmp/ahoj2"
                 # zstd \
-                #   -d /home/lukas/tmp/cxxet/tmp/2025-09-19T05-59-47_benchmarks/release/large.tar.zst \
-                #   -o /home/lukas/tmp/cxxet/tmp/ahoj2/large.tar
+                #   -d "${PWD}/tmp/2025-09-19T05-59-47_benchmarks/release/large.tar.zst" \
+                #   -o "${PWD}/tmp/ahoj2/large.tar"
                 # tar \
-                #   --directory /home/lukas/tmp/cxxet/tmp/ahoj2 \
-                #   -xf /home/lukas/tmp/cxxet/tmp/ahoj2/large.tar
+                #   --directory "${PWD}/tmp/ahoj2" \
+                #   -xf "${PWD}/tmp/ahoj2/large.tar"
             ) >&2
         fi
     fi
