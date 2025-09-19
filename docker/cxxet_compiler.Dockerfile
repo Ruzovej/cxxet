@@ -42,6 +42,7 @@ RUN apt update \
         ssh-client \
         strace \
         vim \
+        zstd \
     && rm -rf /var/lib/apt/lists/*
 
 RUN install_alternative() { update-alternatives --install "/usr/bin/$1" "$1" "/usr/bin/$1-$2" 100; } \
