@@ -189,7 +189,9 @@ function large() {
         fi
 
         local num_iters
-        for num_iters in 100 10000 100000; do # 3 values
+        # TODO #175 revert this change (useful for development) ...
+        #for num_iters in 100 1000 10000 100000; do # 4 values
+        for num_iters in 100 1000; do # 2 values
             local mai
             for mai in "${marker_after_iters[@]}"; do # 1 or 2 values
                 local cxxet_reserve_buffer
