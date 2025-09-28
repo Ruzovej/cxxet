@@ -24,10 +24,11 @@
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <utility>
+
+#include <nlohmann/json.hpp>
 
 #include "../../../include/public/cxxet/timepoint.hxx"
-#include <nlohmann/json.hpp>
-#include <utility>
 
 namespace {
 
