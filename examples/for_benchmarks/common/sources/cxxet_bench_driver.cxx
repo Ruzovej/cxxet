@@ -71,21 +71,31 @@ private:
   bool flush{true};
 };
 
-meta &get_meta() noexcept {
+[[nodiscard]] meta &get_meta() noexcept {
   thread_local meta m;
   return m;
 }
 
 struct metas {
-  explicit metas(std::string aTarget_filename)
-      : target_filename{std::move(aTarget_filename)} {
-    assert(!target_filename.empty());
-  }
+  metas() = default;
   ~metas();
+
+  void set_traits(std::string aBenchmark_name, int const aNum_iters,
+                  int const aMarker_after_iter, int const aCxxet_reserve_buffer,
+                  int const aNum_threads, std::string aCxxet_results_filename,
+                  std::string aMeta_results_filename) {
+    benchmark_name = std::move(aBenchmark_name);
+    num_iters = aNum_iters;
+    marker_after_iter = aMarker_after_iter;
+    cxxet_reserve_buffer = aCxxet_reserve_buffer;
+    num_threads = aNum_threads;
+    cxxet_results_filename = std::move(aCxxet_results_filename);
+    meta_results_filename = std::move(aMeta_results_filename);
+  }
 
   void submit(meta m) {
     std::lock_guard lck{mtx};
-    ms.push_back(std::move(m));
+    ms.emplace_back(std::move(m));
   }
 
 private:
@@ -94,39 +104,62 @@ private:
 
   std::mutex mtx;
   std::vector<meta> ms;
-  std::string target_filename;
+
+  std::string benchmark_name;
+  int num_iters;
+  int marker_after_iter;
+  int cxxet_reserve_buffer;
+  int num_threads;
+  std::string cxxet_results_filename;
+  std::string meta_results_filename;
 };
 
-metas &get_metas(std::string const &target_filename) {
-  static metas m{target_filename};
+[[nodiscard]] metas &get_metas() {
+  static metas m{};
   return m;
 }
 
 meta::~meta() {
   if (flush) {
     flush = false;
-    get_metas("").submit(*this);
+    get_metas().submit(*this);
   }
 }
 
 metas::~metas() {
-  auto const pid{cxxet::impl::get_process_id()};
+  assert(!meta_results_filename.empty());
 
-  nlohmann::json j = nlohmann::json::array();
+  nlohmann::json meta_info = {
+      {"pid", cxxet::impl::get_process_id()},
+      {"benchmark_executable", benchmark_name},
+      {"benchmark_name",
+       benchmark_name.substr(benchmark_name.find_last_of('/') + 1)},
+      {"num_iters", num_iters},
+      {"marker_after_iter", marker_after_iter},
+      {"cxxet_reserve_buffer", cxxet_reserve_buffer},
+      {"num_threads", num_threads},
+      {"cxxet_results_filename", cxxet_results_filename},
+  };
 
+  nlohmann::json thread_perfs = nlohmann::json::array();
   for (auto const &m : ms) {
-    j.push_back({{"pid", pid},
-                 {"tid", m.tid},
-                 {"thread_reserve_ns", m.thread_reserve_ns},
-                 {"set_thread_name_ns", m.set_thread_name_ns},
-                 {"markers_submission_ns", m.markers_submission_ns},
-                 {"thread_flush_ns", m.thread_flush_ns},
-                 {"global_flush_target_ns", m.global_flush_target_ns},
-                 {"global_flush_ns", m.global_flush_ns}});
+    thread_perfs.push_back(
+        {{"tid", m.tid},
+         {"thread_reserve_ns", m.thread_reserve_ns},
+         {"set_thread_name_ns", m.set_thread_name_ns},
+         {"markers_submission_ns", m.markers_submission_ns},
+         {"thread_flush_ns", m.thread_flush_ns},
+         {"global_flush_target_ns", m.global_flush_target_ns},
+         {"global_flush_ns", m.global_flush_ns}});
   }
 
-  std::ofstream ofs{target_filename};
-  ofs << j.dump(2);
+  nlohmann::json result = {
+      {"meta_info", std::move(meta_info)},
+      {"thread_perfs", std::move(thread_perfs)},
+  };
+
+  std::ofstream ofs{meta_results_filename};
+  ofs << result.dump(2);
 }
 
 } // namespace
@@ -141,8 +174,10 @@ driver::driver(int const argc, char const **argv)
       bench_result_filename_base{
           (argc > 5 ? argv[5] : "/tmp/bench_result") +
           std::string{tracing_enabled() ? "_traced" : ""}} {
-  [[maybe_unused]] auto const &metas{
-      get_metas(bench_result_filename_base + "_meta.json")};
+  get_metas().set_traits(argv[0], num_iters, marker_after_iter,
+                         cxxet_reserve_buffer, num_threads,
+                         bench_result_filename_base + ".json",
+                         bench_result_filename_base + "_meta.json");
 #ifdef CXXET_ENABLE
   global_file_sink = cxxet::file_sink_handle::make(num_threads > 1);
 #endif
