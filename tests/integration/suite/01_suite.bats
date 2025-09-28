@@ -602,8 +602,8 @@ Deduced CXXET_TARGET_FILENAME: "
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
-    local output_file="${result_base}.json"
+    local meta_file="${result_base}_bare_meta.json"
+    local output_file="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -612,12 +612,12 @@ Deduced CXXET_TARGET_FILENAME: "
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
-    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
     assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    output_file="${result_base}_traced.json"
+    meta_file="${result_base}_meta.json"
+    output_file="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -651,8 +651,8 @@ Deduced CXXET_TARGET_FILENAME: "
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
-    local output_file="${result_base}.json"
+    local meta_file="${result_base}_bare_meta.json"
+    local output_file="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -661,12 +661,12 @@ Deduced CXXET_TARGET_FILENAME: "
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
-    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
     assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    output_file="${result_base}_traced.json"
+    meta_file="${result_base}_meta.json"
+    output_file="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -700,8 +700,8 @@ Deduced CXXET_TARGET_FILENAME: "
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
-    local output_file="${result_base}.json"
+    local meta_file="${result_base}_bare_meta.json"
+    local output_file="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -710,12 +710,12 @@ Deduced CXXET_TARGET_FILENAME: "
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
-    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
     assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    output_file="${result_base}_traced.json"
+    meta_file="${result_base}_meta.json"
+    output_file="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -750,8 +750,8 @@ Deduced CXXET_TARGET_FILENAME: "
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
-    local output_file="${result_base}.json"
+    local meta_file="${result_base}_bare_meta.json"
+    local output_file="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -760,12 +760,12 @@ Deduced CXXET_TARGET_FILENAME: "
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
-    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
     assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    output_file="${result_base}_traced.json"
+    meta_file="${result_base}_meta.json"
+    output_file="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -799,8 +799,8 @@ Deduced CXXET_TARGET_FILENAME: "
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
-    local output_file="${result_base}.json"
+    local meta_file="${result_base}_bare_meta.json"
+    local output_file="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
@@ -809,12 +809,12 @@ Deduced CXXET_TARGET_FILENAME: "
 
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
-    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
     assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    output_file="${result_base}_traced.json"
+    meta_file="${result_base}_meta.json"
+    output_file="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output

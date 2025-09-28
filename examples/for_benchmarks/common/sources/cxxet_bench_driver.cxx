@@ -21,6 +21,7 @@
 
 #include <cassert>
 
+#include <algorithm>
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -84,7 +85,7 @@ struct metas {
                   int const aMarker_after_iter, int const aCxxet_reserve_buffer,
                   int const aNum_threads, std::string aCxxet_results_filename,
                   std::string aMeta_results_filename) {
-    benchmark_name = std::move(aBenchmark_name);
+    benchmark_executable = std::move(aBenchmark_name);
     num_iters = aNum_iters;
     marker_after_iter = aMarker_after_iter;
     cxxet_reserve_buffer = aCxxet_reserve_buffer;
@@ -105,7 +106,7 @@ private:
   std::mutex mtx;
   std::vector<meta> ms;
 
-  std::string benchmark_name;
+  std::string benchmark_executable;
   int num_iters;
   int marker_after_iter;
   int cxxet_reserve_buffer;
@@ -129,11 +130,27 @@ meta::~meta() {
 metas::~metas() {
   assert(!meta_results_filename.empty());
 
+  std::string benchmark_name{benchmark_executable};
+  {
+    auto const slash_pos{benchmark_name.find_last_of('/')};
+    if (slash_pos != std::string::npos) {
+      benchmark_name = benchmark_name.substr(slash_pos + 1);
+    }
+    auto const sz{static_cast<long long>(benchmark_name.size())};
+    if (sz < 6) {
+      benchmark_name = "!!!unknown!!!";
+    }
+    if (std::equal(benchmark_name.begin() + (sz - 5), benchmark_name.end(),
+                   "_bare")) {
+      benchmark_name =
+          benchmark_name.substr(0, static_cast<std::size_t>(sz - 5));
+    }
+  }
+
   nlohmann::json meta_info = {
       {"pid", cxxet::impl::get_process_id()},
-      {"benchmark_executable", benchmark_name},
-      {"benchmark_name",
-       benchmark_name.substr(benchmark_name.find_last_of('/') + 1)},
+      {"benchmark_executable", benchmark_executable},
+      {"benchmark_name", std::move(benchmark_name)},
       {"traced", cxxet_bench::driver::tracing_enabled() ? "cxxet" : "bare"},
       {"num_iters", num_iters},
       {"marker_after_iter", marker_after_iter},
@@ -174,7 +191,7 @@ driver::driver(int const argc, char const **argv)
       num_threads(argc > 4 ? std::atoi(argv[4]) : 4),
       bench_result_filename_base{
           (argc > 5 ? argv[5] : "/tmp/bench_result") +
-          std::string{tracing_enabled() ? "_traced" : ""}} {
+          std::string{tracing_enabled() ? "" : "_bare"}} {
   get_metas().set_traits(argv[0], num_iters, marker_after_iter,
                          cxxet_reserve_buffer, num_threads,
                          bench_result_filename_base + ".json",
