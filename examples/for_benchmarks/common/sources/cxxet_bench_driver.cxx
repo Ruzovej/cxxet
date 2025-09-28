@@ -83,13 +83,17 @@ struct metas {
 
   void set_traits(std::string aBenchmark_name, int const aNum_iters,
                   int const aMarker_after_iter, int const aCxxet_reserve_buffer,
-                  int const aNum_threads, std::string aCxxet_results_filename,
+                  int const aNum_threads, int const aRepetition,
+                  int const aNum_repetitions,
+                  std::string aCxxet_results_filename,
                   std::string aMeta_results_filename) {
     benchmark_executable = std::move(aBenchmark_name);
     num_iters = aNum_iters;
     marker_after_iter = aMarker_after_iter;
     cxxet_reserve_buffer = aCxxet_reserve_buffer;
     num_threads = aNum_threads;
+    repetition = aRepetition;
+    num_repetitions = aNum_repetitions;
     cxxet_results_filename = std::move(aCxxet_results_filename);
     meta_results_filename = std::move(aMeta_results_filename);
   }
@@ -111,6 +115,8 @@ private:
   int marker_after_iter;
   int cxxet_reserve_buffer;
   int num_threads;
+  int repetition;
+  int num_repetitions;
   std::string cxxet_results_filename;
   std::string meta_results_filename;
 };
@@ -157,6 +163,8 @@ metas::~metas() {
       {"cxxet_reserve_buffer", cxxet_reserve_buffer},
       {"num_threads", num_threads},
       {"cxxet_results_filename", cxxet_results_filename},
+      {"repetitions", num_repetitions},
+      {"repetition_index", repetition},
   };
 
   nlohmann::json thread_perfs = nlohmann::json::array();
@@ -189,12 +197,14 @@ driver::driver(int const argc, char const **argv)
       marker_after_iter(argc > 2 ? std::atoi(argv[2]) : 1),
       cxxet_reserve_buffer(argc > 3 ? std::atoi(argv[3]) : 10'000),
       num_threads(argc > 4 ? std::atoi(argv[4]) : 4),
+      repetition{argc > 6 ? std::atoi(argv[6]) : 1},
+      num_repetitions{argc > 7 ? std::atoi(argv[7]) : 1},
       bench_result_filename_base{
           (argc > 5 ? argv[5] : "/tmp/bench_result") +
           std::string{tracing_enabled() ? "" : "_bare"}} {
   get_metas().set_traits(argv[0], num_iters, marker_after_iter,
-                         cxxet_reserve_buffer, num_threads,
-                         bench_result_filename_base + ".json",
+                         cxxet_reserve_buffer, num_threads, repetition,
+                         num_repetitions, bench_result_filename_base + ".json",
                          bench_result_filename_base + "_meta.json");
 #ifdef CXXET_ENABLE
   global_file_sink = cxxet::file_sink_handle::make(num_threads > 1);

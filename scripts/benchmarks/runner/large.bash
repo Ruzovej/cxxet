@@ -121,13 +121,17 @@ function large() {
                     set -x
                     "${executable}" \
                         "${args[@]}" \
-                        "${rep_result_base}"
+                        "${rep_result_base}" \
+                        "${rep}" \
+                        "${reps}"
                 ) >&2
             else
                 printf '%s %s %s %s %s %s\n' \
                     "${executable##${CXXET_ROOT_DIR}/}" \
                         "${args[@]}" \
-                        "${rep_result_base##${CXXET_ROOT_DIR}/}" >&2
+                        "${rep_result_base##${CXXET_ROOT_DIR}/}" \
+                        "${rep}" \
+                        "${reps}" >&2
             fi
         done
     }
