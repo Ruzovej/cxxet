@@ -205,6 +205,8 @@ void driver::thread_reserve(int const capacity) const {
   auto const begin{now()};
 #ifdef CXXET_ENABLE
   global_file_sink->divert_thread_sink_to_this();
+#else
+  (void)capacity;
 #endif
   CXXET_sink_thread_reserve(capacity > 0 ? capacity : cxxet_reserve_buffer);
   get_meta().thread_reserve_ns += now() - begin;
@@ -213,6 +215,9 @@ void driver::thread_reserve(int const capacity) const {
 void driver::set_thread_name(char const *const th_name) const {
   auto const begin{now()};
   CXXET_mark_thread_name(th_name);
+#ifndef CXXET_ENABLE
+  (void)th_name;
+#endif
   get_meta().set_thread_name_ns += now() - begin;
 }
 
@@ -249,15 +254,24 @@ void driver::stop_marker_submission_measurement() const {
 void driver::submit_counter_marker(char const *const name,
                                    double const value) const {
   CXXET_mark_counter(name, value);
+#ifndef CXXET_ENABLE
+  (void)name;
+  (void)value;
+#endif
 }
 
 void driver::submit_instant_marker(char const *const name) const {
   CXXET_mark_instant(name);
+#ifndef CXXET_ENABLE
+  (void)name;
+#endif
 }
 
 driver::complete_marker_alike::~complete_marker_alike() noexcept {
 #ifdef CXXET_ENABLE
   reinterpret_cast<cxxet::mark::complete *>(&buffer)->~complete();
+#else
+  (void)buffer;
 #endif
 }
 
@@ -265,6 +279,8 @@ driver::complete_marker_alike::complete_marker_alike(
     const char *const name) noexcept {
 #ifdef CXXET_ENABLE
   new (&buffer) cxxet::mark::complete{name};
+#else
+  (void)name;
 #endif
 }
 
@@ -275,6 +291,9 @@ driver::submit_complete_marker(char const *const name) const {
 
 void driver::submit_begin_marker(char const *const name) const {
   CXXET_mark_duration_begin(name);
+#ifndef CXXET_ENABLE
+  (void)name;
+#endif
 }
 
 void driver::submit_end_marker() const { CXXET_mark_duration_end(); }

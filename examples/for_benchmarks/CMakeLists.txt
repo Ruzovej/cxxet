@@ -17,6 +17,7 @@ file(
         CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_LIST_DIR}/common/sources/*.cxx"
 )
+
 add_library(
     cxxet_bench_common
         STATIC
@@ -34,6 +35,9 @@ target_link_libraries(
         PUBLIC
             nlohmann_json::nlohmann_json
 )
+add_unix_compiler_flags(cxxet_bench_common)
+add_sanitizers(cxxet_bench_common)
+
 add_library(
     cxxet_bench_common_bare
         STATIC
@@ -51,6 +55,8 @@ target_link_libraries(
         PUBLIC
             nlohmann_json::nlohmann_json
 )
+add_unix_compiler_flags(cxxet_bench_common_bare)
+add_sanitizers(cxxet_bench_common_bare)
 
 add_custom_target(
     cxxet_large_benchmarks
