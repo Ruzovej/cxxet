@@ -1085,7 +1085,11 @@ Deduced CXXET_TARGET_FILENAME: "
         # user_log "# checking file '%s'\n" "${file}"
         run ldd "${file}"
         assert_success
-        if [[ "${file}" =~ _bare$ || "${file}" =~ cxxet_unit_tests$ || "${file}" =~ cxxet_benchmarks$ ]]; then
+        if [[ "${file}" =~ _bare$ \
+            || "${file}" =~ cxxet_unit_tests \
+            || "${file}" =~ cxxet_benchmarks \
+            || "${file}" =~ cxxet_large_bench_postprocess \
+        ]]; then
             refute_output --partial "libcxxet.so"
         else
             assert_output --partial "libcxxet.so"

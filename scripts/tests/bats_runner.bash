@@ -90,6 +90,7 @@ function bats_runner() {
                 --target infra_sanitizer_check \
                 --target cxxet_examples \
                 --target cxxet_unit_tests \
+                --target cxxet_large_benchmarks \
                 --last-defines \
                 --ignore-compile_commands >&2
 
