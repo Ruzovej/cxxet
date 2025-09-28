@@ -114,3 +114,5 @@ add_bench_example(
 )
 
 # TODO custom logger, categories, etc. - in general, "every" feature!!!
+
+add_subdirectory(postprocessing)
