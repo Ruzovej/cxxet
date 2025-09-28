@@ -134,6 +134,7 @@ metas::~metas() {
       {"benchmark_executable", benchmark_name},
       {"benchmark_name",
        benchmark_name.substr(benchmark_name.find_last_of('/') + 1)},
+      {"traced", cxxet_bench::driver::tracing_enabled() ? "cxxet" : "bare"},
       {"num_iters", num_iters},
       {"marker_after_iter", marker_after_iter},
       {"cxxet_reserve_buffer", cxxet_reserve_buffer},

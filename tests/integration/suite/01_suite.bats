@@ -613,6 +613,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
     meta_file="${result_base}_traced_meta.json"
@@ -626,6 +627,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"cxxet"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
     assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * num_threads ))"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${output_file}")" "$(( num_iters * num_threads ))"
@@ -660,6 +662,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
     meta_file="${result_base}_traced_meta.json"
@@ -673,6 +676,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"cxxet"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
     assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "${num_iters}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file}")" "${num_iters}"
@@ -707,6 +711,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
     meta_file="${result_base}_traced_meta.json"
@@ -720,6 +725,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"cxxet"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
     assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * 2 ))"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file}")" "${num_iters}"
@@ -755,6 +761,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
     meta_file="${result_base}_traced_meta.json"
@@ -768,6 +775,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"cxxet"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
     assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "${num_iters}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file}")" "${num_iters}"
@@ -802,6 +810,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}_bare\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
 
     meta_file="${result_base}_traced_meta.json"
@@ -815,6 +824,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e 'length' "${meta_file}")" 2
     assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}\""
     assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"cxxet"'
     assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
     assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * 2 ))"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${output_file}")" "${num_iters}"
