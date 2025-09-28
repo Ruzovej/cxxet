@@ -41,8 +41,8 @@ void log_time_diff(std::string_view const msg, long long const begin,
 }
 
 bool ends_with(std::string_view str, std::string_view suffix) {
-  return str.size() >= suffix.size() &&
-         str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+  return (str.size() >= suffix.size()) &&
+         (str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0);
 }
 
 nlohmann::json process_benchmark(std::filesystem::path const &meta_file_path) {
@@ -102,10 +102,11 @@ int main(int const argc, char const **argv) try {
 } catch (std::string const &msg) {
   std::cerr << "Failed to postprocess \"large\" benchmark results: " << msg
             << std::endl;
-  return EXIT_FAILURE;
 
+  return EXIT_FAILURE;
 } catch (char const *const msg) {
   std::cerr << "Failed to postprocess \"large\" benchmark results: " << msg
             << std::endl;
+
   return EXIT_FAILURE;
 }
