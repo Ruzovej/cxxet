@@ -599,6 +599,8 @@ Deduced CXXET_TARGET_FILENAME: "
         2 # marker_after_iter
         3 # cxxet_reserve_buffer
         "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
@@ -648,6 +650,8 @@ Deduced CXXET_TARGET_FILENAME: "
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
         "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
@@ -697,6 +701,8 @@ Deduced CXXET_TARGET_FILENAME: "
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
         "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
@@ -747,6 +753,8 @@ Deduced CXXET_TARGET_FILENAME: "
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
         "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
@@ -796,6 +804,8 @@ Deduced CXXET_TARGET_FILENAME: "
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
         "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
