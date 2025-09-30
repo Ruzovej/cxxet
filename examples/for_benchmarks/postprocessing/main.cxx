@@ -66,8 +66,8 @@ void process_benchmark(nlohmann::json &target_array,
   if (auto const is_regular_file{
           std::filesystem::is_regular_file(cxxet_results_filename)};
       traced != is_regular_file) {
-    throw meta_file_path.string() +
-        " inconsistency (traced == " + std::to_string(traced) +
+    throw '\'' + meta_file_path.string() +
+        "' contains inconsistency (traced == " + std::to_string(traced) +
         ", is_regular_file == " + std::to_string(is_regular_file) + ")";
   }
 

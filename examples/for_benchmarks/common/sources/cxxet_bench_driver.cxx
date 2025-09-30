@@ -197,10 +197,10 @@ driver::driver(int const argc, char const **argv)
       marker_after_iter(argc > 2 ? std::atoi(argv[2]) : 1),
       cxxet_reserve_buffer(argc > 3 ? std::atoi(argv[3]) : 10'000),
       num_threads(argc > 4 ? std::atoi(argv[4]) : 4),
-      repetition{argc > 6 ? std::atoi(argv[6]) : 1},
-      num_repetitions{argc > 7 ? std::atoi(argv[7]) : 1},
+      repetition{argc > 5 ? std::atoi(argv[5]) : 1},
+      num_repetitions{argc > 6 ? std::atoi(argv[6]) : 1},
       bench_result_filename_base{
-          (argc > 5 ? argv[5] : "/tmp/bench_result") +
+          (argc > 7 ? argv[7] : "/tmp/bench_result") +
           std::string{tracing_enabled() ? "" : "_bare"}} {
   get_metas().set_traits(argv[0], num_iters, marker_after_iter,
                          cxxet_reserve_buffer, num_threads, repetition,

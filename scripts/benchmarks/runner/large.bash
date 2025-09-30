@@ -102,17 +102,19 @@ function large() {
         local num_threads="${5:?}"
         local result_base="${6:?}"
 
-        local args=(
-            "${num_iters}"
-            "${marker_after_iter}"
-            "${cxxet_reserve_buffer}"
-            "${num_threads}"
-        )
-
         [[ "${dry_run}" == 'true' ]] || [[ -x "${executable}" ]] || return 1
 
         local rep
         for rep in $(seq 1 "${reps}"); do
+            local args=(
+                "${num_iters}"
+                "${marker_after_iter}"
+                "${cxxet_reserve_buffer}"
+                "${num_threads}"
+                "${rep}"
+                "${reps}"
+            )
+
             local rep_result_base="${result_base}"
             [[ "${reps}" == 1 ]] || rep_result_base="${rep_result_base}-rep${rep}"
 
@@ -121,17 +123,13 @@ function large() {
                     set -x
                     "${executable}" \
                         "${args[@]}" \
-                        "${rep_result_base}" \
-                        "${rep}" \
-                        "${reps}"
+                        "${rep_result_base}"
                 ) >&2
             else
-                printf '%s %s %s %s %s %s\n' \
+                printf '%s %s %s %s %s %s %s %s\n' \
                     "${executable##${CXXET_ROOT_DIR}/}" \
                         "${args[@]}" \
-                        "${rep_result_base##${CXXET_ROOT_DIR}/}" \
-                        "${rep}" \
-                        "${reps}" >&2
+                        "${rep_result_base##${CXXET_ROOT_DIR}/}" >&2
             fi
         done
     }
