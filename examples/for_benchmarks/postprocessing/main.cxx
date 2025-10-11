@@ -37,15 +37,15 @@ bool verbose{false};
 
 long long now() noexcept { return cxxet::impl::as_int_ns(cxxet::impl::now()); }
 
-void log(std::string_view const msg) {
-  if (verbose) {
+void log(std::string_view const msg, bool const force = false) {
+  if (verbose || force) {
     std::cout << msg << '\n';
   }
 }
 
 void log_time_diff(std::string_view const msg, long long const begin,
-                   long long const end) {
-  if (verbose) {
+                   long long const end, bool const force = false) {
+  if (verbose || force) {
     std::cout << msg << ": " << static_cast<double>(end - begin) / 1'000'000
               << " [ms]\n";
   }
@@ -58,7 +58,6 @@ bool ends_with(std::string_view const str, std::string_view const suffix) {
 
 void process_benchmark(nlohmann::json &target_array,
                        std::filesystem::path const &meta_file_path) {
-  log("\tProcessing " + meta_file_path.string());
   auto const meta_json{nlohmann::json::parse(std::ifstream{meta_file_path})};
 
   auto const benchmark_name{
@@ -102,7 +101,7 @@ int main(int argc, char const *const *argv) try {
     throw "input path '" + results_dir.string() + "' is not a directory";
   }
 
-  auto t0{now()};
+  auto const t0{now()};
 
   nlohmann::json meta_info = {
       {"cxxet_git_hash",
@@ -113,6 +112,7 @@ int main(int argc, char const *const *argv) try {
 
   nlohmann::json benchmarks = nlohmann::json::array();
 
+  // TODO parallelize?!
   for (auto const &entry : std::filesystem::directory_iterator{results_dir}) {
     if (!entry.is_regular_file()) {
       continue;
@@ -121,12 +121,15 @@ int main(int argc, char const *const *argv) try {
     static constexpr std::string_view meta_file_suffix{"_meta.json"};
     auto const entry_path{entry.path()};
     if (ends_with(entry_path.string(), meta_file_suffix)) {
+      log("\tProcessing " + entry_path.string() + " ...");
+      auto const t00{now()};
       process_benchmark(benchmarks, entry_path);
+      log_time_diff("\tProcessed " + entry_path.string(), t00, now());
     }
   }
 
-  auto t1{now()};
-  log_time_diff("Postprocessed benchmark results", t0, t1);
+  auto const t1{now()};
+  log_time_diff("Postprocessed benchmark results", t0, t1, true);
 
   nlohmann::json result = {
       {"context", std::move(meta_info)},
@@ -136,7 +139,7 @@ int main(int argc, char const *const *argv) try {
   std::ofstream ofs{results_dir / "large.json"};
   ofs << result.dump(2);
 
-  log_time_diff("Saved results into file", t1, now());
+  log_time_diff("Saved results into file", t1, now(), true);
 
   return EXIT_SUCCESS;
 } catch (std::exception const &e) {
