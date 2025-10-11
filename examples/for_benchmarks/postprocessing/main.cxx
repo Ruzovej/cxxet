@@ -37,22 +37,28 @@ bool verbose{false};
 
 long long now() noexcept { return cxxet::impl::as_int_ns(cxxet::impl::now()); }
 
-void log_time_diff(std::string_view const msg, long long const begin,
-                   long long const end) {
-  std::cout << msg << ": " << static_cast<double>(end - begin) / 1'000'000
-            << " [ms]\n";
+void log(std::string_view const msg) {
+  if (verbose) {
+    std::cout << msg << '\n';
+  }
 }
 
-bool ends_with(std::string_view str, std::string_view suffix) {
+void log_time_diff(std::string_view const msg, long long const begin,
+                   long long const end) {
+  if (verbose) {
+    std::cout << msg << ": " << static_cast<double>(end - begin) / 1'000'000
+              << " [ms]\n";
+  }
+}
+
+bool ends_with(std::string_view const str, std::string_view const suffix) {
   return (str.size() >= suffix.size()) &&
          (str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0);
 }
 
 void process_benchmark(nlohmann::json &target_array,
                        std::filesystem::path const &meta_file_path) {
-  if (verbose) {
-    std::cout << "Processing " << meta_file_path << '\n';
-  }
+  log("\tProcessing " + meta_file_path.string());
   auto const meta_json{nlohmann::json::parse(std::ifstream{meta_file_path})};
 
   auto const benchmark_name{
