@@ -162,7 +162,7 @@ metas::~metas() {
       {"marker_after_iter", marker_after_iter},
       {"cxxet_reserve_buffer", cxxet_reserve_buffer},
       {"num_threads", num_threads},
-      {"cxxet_results_filename", cxxet_results_filename},
+      {"cxxet_results_filename", std::move(cxxet_results_filename)},
       {"repetitions", num_repetitions},
       {"repetition_index", repetition},
   };
