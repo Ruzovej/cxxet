@@ -158,9 +158,37 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
       require(diffs.size() == total_markers, "diffs size");
       std::sort(diffs.begin(), diffs.end());
 
-      write_val_unit_stats(result, cxxet_pp::compute_stats(diffs),
+      write_val_unit_stats(result, cxxet_pp::compute_stats(diffs, false),
                            "TRACE_counter_marker_interval", "ns");
     } else if (benchmark_name == "cxxet_bench_st_instant") {
+      std::vector<double> timestamps;
+
+      timestamps.reserve(results_json["traceEvents"].size());
+      for (auto const &j : results_json["traceEvents"]) {
+        require(j["ph"].get<std::string>() == "i", "phase value");
+        require(j["name"].get<std::string>() == "some instant ...",
+                "marker name");
+
+        auto const ts{j["ts"].get<double>()};
+        timestamps.emplace_back(double_us_to_ns(ts));
+      }
+
+      require(timestamps.size() >= 2, "minimal amount of data");
+      std::sort(timestamps.begin(), timestamps.end());
+
+      std::vector<double> diffs;
+      diffs.reserve(timestamps.size());
+      std::adjacent_difference(timestamps.cbegin(), timestamps.cend(),
+                               std::back_inserter(diffs));
+
+      require(diffs.size() == timestamps.size(), "diffs size");
+
+      // first element is meaningless
+      diffs.erase(diffs.begin());
+      std::sort(diffs.begin(), diffs.end());
+
+      write_val_unit_stats(result, cxxet_pp::compute_stats(diffs, false),
+                           "TRACE_instant_marker_interval", "ns");
     } else if (benchmark_name == "cxxet_bench_st_guarded_instant") {
     } else if (benchmark_name == "cxxet_bench_st_complete") {
     } else if (benchmark_name == "cxxet_bench_st_duration") {

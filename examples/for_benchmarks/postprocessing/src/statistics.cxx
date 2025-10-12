@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <string>
+#include <type_traits>
 
 namespace cxxet_pp {
 
@@ -42,7 +43,7 @@ double percentile(std::vector<double> const &sorted_values, double const p) {
 
 } // namespace
 
-stats compute_stats(std::vector<double> const &values) {
+stats compute_stats(std::vector<double> const &values, bool const sort_values) {
   if (values.empty()) {
     throw "cannot compute stats over empty vector";
   }
@@ -61,21 +62,30 @@ stats compute_stats(std::vector<double> const &values) {
   }
   stddev = std::sqrt(stddev / n);
 
-  auto sorted_values{values};
-  std::sort(sorted_values.begin(), sorted_values.end());
+  using vals_t = std::decay_t<decltype(values)>;
 
-  double const min{sorted_values.front()};
-  double const max{sorted_values.back()};
+  vals_t const *sorted_vals{nullptr};
+  vals_t sorted_values;
+  if (sort_values) {
+    sorted_values = values;
+    std::sort(sorted_values.begin(), sorted_values.end());
+    sorted_vals = &sorted_values;
+  } else {
+    sorted_vals = &values;
+  }
+
+  double const min{sorted_vals->front()};
+  double const max{sorted_vals->back()};
 
   return stats{static_cast<long long>(n),
                mean,
                stddev,
                min,
-               percentile(sorted_values, 2.0),
-               percentile(sorted_values, 25.0),
-               percentile(sorted_values, 50.0),
-               percentile(sorted_values, 75.0),
-               percentile(sorted_values, 98.0),
+               percentile(*sorted_vals, 2.0),
+               percentile(*sorted_vals, 25.0),
+               percentile(*sorted_vals, 50.0),
+               percentile(*sorted_vals, 75.0),
+               percentile(*sorted_vals, 98.0),
                max};
 }
 

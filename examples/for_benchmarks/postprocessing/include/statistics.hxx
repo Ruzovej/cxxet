@@ -41,6 +41,6 @@ struct stats {
 };
 
 // `std::span` would be nicer ...
-stats compute_stats(std::vector<double> const &values);
+stats compute_stats(std::vector<double> const &values, bool const sort_values = true);
 
 } // namespace cxxet_pp
