@@ -26,6 +26,22 @@
 
 namespace cxxet_pp {
 
+namespace {
+
+double percentile(std::vector<double> const &sorted_values, double const p) {
+  if ((p < 0.0) || (p > 100.0)) {
+    throw "invalid percentile " + std::to_string(p);
+  }
+  if (p == 100.0) {
+    return sorted_values.back();
+  }
+  auto const n{static_cast<double>(sorted_values.size())};
+  auto const idx{static_cast<std::size_t>(p / 100.0 * n)};
+  return sorted_values[idx];
+}
+
+} // namespace
+
 stats compute_stats(std::vector<double> const &values) {
   if (values.empty()) {
     throw "cannot compute stats over empty vector";
@@ -51,25 +67,14 @@ stats compute_stats(std::vector<double> const &values) {
   double const min{sorted_values.front()};
   double const max{sorted_values.back()};
 
-  auto percentile = [&](double const p) {
-    if ((p < 0.0) || (p > 100.0)) {
-      throw "invalid percentile " + std::to_string(p);
-    }
-    if (p == 100.0) {
-      return sorted_values.back();
-    }
-    auto const idx{static_cast<std::size_t>(p / 100.0 * n)};
-    return sorted_values[idx];
-  };
-
   return stats{mean,
                stddev,
                min,
                max,
                static_cast<long long>(n),
-               percentile(2.0),
-               percentile(50.0),
-               percentile(98.0)};
+               percentile(sorted_values, 2.0),
+               percentile(sorted_values, 50.0),
+               percentile(sorted_values, 98.0)};
 }
 
 } // namespace cxxet_pp
