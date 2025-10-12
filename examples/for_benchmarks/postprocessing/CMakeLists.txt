@@ -6,6 +6,7 @@ file(
 )
 add_executable(
     cxxet_large_bench_postprocess
+        "${CMAKE_CURRENT_LIST_DIR}/main.cxx"
         ${CXXET_LARGE_BENCH_POSTPROCESS_SOURCES}
 )
 target_include_directories(
