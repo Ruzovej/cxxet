@@ -30,18 +30,9 @@
 
 #include "log.hxx"
 #include "now.hxx"
+#include "str_utils.hxx"
 
 namespace {
-
-bool begins_with(std::string_view const str, std::string_view const prefix) {
-  return (str.size() >= prefix.size()) &&
-         (str.compare(0, prefix.size(), prefix) == 0);
-}
-
-bool ends_with(std::string_view const str, std::string_view const suffix) {
-  return (str.size() >= suffix.size()) &&
-         (str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0);
-}
 
 struct stats {
   double mean;
@@ -131,7 +122,7 @@ process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
 
   for (auto &[name, vals] : sub_results) {
     auto const computed_stats{compute_stats(vals)};
-    if (!begins_with(name, "global_flush") && (n > 1)) {
+    if (!cxxet_pp::begins_with(name, "global_flush") && (n > 1)) {
       results[name + "_mean"] = {computed_stats.mean, "ns"};
       results[name + "_stddev"] = {computed_stats.stddev, "ns"};
       results[name + "_min"] = {computed_stats.min, "ns"};
@@ -256,7 +247,7 @@ int main(int argc, char const *const *argv) {
 
       static constexpr std::string_view meta_file_suffix{"_meta.json"};
       auto const entry_path{entry.path()};
-      if (ends_with(entry_path.string(), meta_file_suffix)) {
+      if (cxxet_pp::ends_with(entry_path.string(), meta_file_suffix)) {
         cxxet_pp::log("\tProcessing " + entry_path.string() + " ...");
         auto const t00{cxxet_pp::now()};
         process_benchmark(benchmarks, entry_path);

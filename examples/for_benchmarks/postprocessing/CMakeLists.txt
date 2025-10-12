@@ -1,7 +1,12 @@
+file(
+    GLOB_RECURSE
+    CXXET_LARGE_BENCH_POSTPROCESS_SOURCES
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_LIST_DIR}/src/*.cxx"
+)
 add_executable(
     cxxet_large_bench_postprocess
-        src/log.cxx
-        src/main.cxx
+        ${CXXET_LARGE_BENCH_POSTPROCESS_SOURCES}
 )
 target_include_directories(
     cxxet_large_bench_postprocess
