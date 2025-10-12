@@ -20,6 +20,7 @@
 #include "result_processor.hxx"
 
 #include <fstream>
+#include <string>
 
 #include <nlohmann/json.hpp>
 
@@ -122,9 +123,9 @@ void process_benchmark(nlohmann::json &target_array,
   auto const rep{meta_json["meta_info"]["repetition_index"].get<long long>()};
 
   auto const benchmark_name_full{
-      benchmark_name + "/ni_" + std::to_string(param_num_iters) + "/ma_" +
-      std::to_string(param_marker_after_iter) + "/rb_" +
-      std::to_string(param_cxxet_reserve_buffer) + "/th_" +
+      benchmark_name + "/nit_" + std::to_string(param_num_iters) + "/mai_" +
+      std::to_string(param_marker_after_iter) + "/crb_" +
+      std::to_string(param_cxxet_reserve_buffer) + "/ths_" +
       std::to_string(param_num_threads)};
 
   auto const write_measurements =
@@ -132,13 +133,23 @@ void process_benchmark(nlohmann::json &target_array,
         for (const auto &[name, vu] : measurements) {
           auto const benchmark_name_full_final{benchmark_name_full + '/' +
                                                name + '/' + traced};
-          target_array.push_back(
-              {{"benchmark_name", benchmark_name},
-               {"benchmark_name_full", benchmark_name_full_final},
-               {"value", vu.value},
-               {"unit", vu.unit},
-               {"rep", rep},
-               {"num_reps", num_reps}});
+          target_array.push_back({
+              {"benchmark_name", benchmark_name},
+              {"benchmark_name_full", benchmark_name_full_final},
+              {"benchmark_params",
+               {
+                   {"cxxet_reserve_buffer", param_cxxet_reserve_buffer},
+                   {"marker_after_iter", param_marker_after_iter},
+                   {"num_iters", param_num_iters},
+                   {"num_threads", param_num_threads},
+                   {"rep_no", rep},
+                   {"reps_max", num_reps},
+                   {"subtype", name},
+                   {"used_lib", traced},
+               }},
+              {"result", vu.value},
+              {"unit", vu.unit},
+          });
         }
       };
 

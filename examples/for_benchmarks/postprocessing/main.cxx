@@ -80,6 +80,17 @@ int main(int argc, char const *const *argv) {
     auto const t1{cxxet_pp::now()};
     cxxet_pp::log_time_diff("Postprocessed benchmark results", t0, t1, true);
 
+    std::sort(benchmarks.begin(), benchmarks.end(),
+              [](nlohmann::json const &a, nlohmann::json const &b) {
+                auto const tpl = [](nlohmann::json const &j) {
+                  return std::tie(j["benchmark_name_full"],
+                                  j["benchmark_params"]["rep_no"]);
+                };
+                return tpl(a) < tpl(b);
+              });
+    cxxet_pp::log_time_diff("Sorted postprocessed benchmark results", t1,
+                            cxxet_pp::now(), true);
+
     nlohmann::json result = {
         {"context", std::move(meta_info)},
         {"benchmarks", std::move(benchmarks)},
