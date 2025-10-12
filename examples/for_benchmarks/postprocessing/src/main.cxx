@@ -29,13 +29,11 @@
 
 #include <nlohmann/json.hpp>
 
-#include "../../../../include/public/cxxet/timepoint.hxx"
+#include "now.hxx"
 
 namespace {
 
 bool verbose{false};
-
-long long now() noexcept { return cxxet::impl::as_int_ns(cxxet::impl::now()); }
 
 void log(std::string_view const msg, bool const force = false) {
   if (verbose || force) {
@@ -254,7 +252,7 @@ int main(int argc, char const *const *argv) try {
     throw "input path '" + results_dir.string() + "' is not a directory";
   }
 
-  auto const t0{now()};
+  auto const t0{cxxet_pp::now()};
 
   nlohmann::json meta_info = {
       {"cxxet_git_hash",
@@ -275,13 +273,13 @@ int main(int argc, char const *const *argv) try {
     auto const entry_path{entry.path()};
     if (ends_with(entry_path.string(), meta_file_suffix)) {
       log("\tProcessing " + entry_path.string() + " ...");
-      auto const t00{now()};
+      auto const t00{cxxet_pp::now()};
       process_benchmark(benchmarks, entry_path);
-      log_time_diff("\tProcessed " + entry_path.string(), t00, now());
+      log_time_diff("\tProcessed " + entry_path.string(), t00, cxxet_pp::now());
     }
   }
 
-  auto const t1{now()};
+  auto const t1{cxxet_pp::now()};
   log_time_diff("Postprocessed benchmark results", t0, t1, true);
 
   nlohmann::json result = {
@@ -294,8 +292,8 @@ int main(int argc, char const *const *argv) try {
   std::ofstream ofs{target_file};
   ofs << result.dump(2);
 
-  log_time_diff("Saved results into file " + target_file.string(), t1, now(),
-                true);
+  log_time_diff("Saved results into file " + target_file.string(), t1,
+                cxxet_pp::now(), true);
 
   return EXIT_SUCCESS;
 } catch (std::exception const &e) {
