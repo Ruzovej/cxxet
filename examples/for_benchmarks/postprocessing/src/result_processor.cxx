@@ -21,6 +21,7 @@
 
 #include <fstream>
 #include <map>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -35,8 +36,27 @@ namespace {
 
 struct val_unit {
   double value{0.0};
-  std::string unit{"ns"};
+  std::string_view unit{"ns"};
 };
+
+void write_val_unit_stats(std::map<std::string, val_unit> &target,
+                          stats const &s, std::string const &name,
+                          std::string_view const unit) {
+  bool const all_percentiles{s.percentiles_near_min_max_meaningful()};
+  target[name + "_mean"] = {s.mean, unit};
+  target[name + "_stddev"] = {s.stddev, unit};
+  target[name + "_min"] = {s.min, unit};
+  if (all_percentiles) {
+    target[name + "_p02"] = {s.p02, unit};
+  }
+  target[name + "_p25"] = {s.p25, unit};
+  target[name + "_p50"] = {s.p50, unit};
+  target[name + "_p75"] = {s.p75, unit};
+  if (all_percentiles) {
+    target[name + "_p98"] = {s.p98, unit};
+  }
+  target[name + "_max"] = {s.max, unit};
+}
 
 std::map<std::string, val_unit>
 process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
@@ -59,42 +79,96 @@ process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
         tp["thread_reserve_ns"].get<double>());
   }
 
-  auto const n{static_cast<long long>(thread_perfs.size())};
   std::map<std::string, val_unit> results;
 
-  for (auto &[name, vals] : sub_results) {
-    auto const computed_stats{cxxet_pp::compute_stats(vals)};
+  for (auto const &[name, vals] : sub_results) {
+    auto const n{static_cast<long long>(vals.size())};
     if (!cxxet_pp::begins_with(name, "global_flush") && (n > 1)) {
-      results[name + "_mean"] = {computed_stats.mean, "ns"};
-      results[name + "_stddev"] = {computed_stats.stddev, "ns"};
-      results[name + "_min"] = {computed_stats.min, "ns"};
-      results[name + "_p02"] = {computed_stats.p02, "ns"};
-      results[name + "_p50"] = {computed_stats.p50, "ns"};
-      results[name + "_p98"] = {computed_stats.p98, "ns"};
-      results[name + "_max"] = {computed_stats.max, "ns"};
+      auto const computed_stats{cxxet_pp::compute_stats(vals)};
+      write_val_unit_stats(results, computed_stats, name, "ns");
+    } else if (n <= 0) {
+      throw "missing `thread_perfs` data";
     } else {
-      results[name] = {computed_stats.max, "ns"};
+      results[name] = {vals.front(), "ns"};
     }
   }
 
   return results;
 }
 
-std::map<std::string, val_unit> process_benchmark_raw_results(
-    std::string_view const benchmark_name,
-    std::filesystem::path const & /*results_file_path*/,
-    std::string_view const /*traced*/) {
+// all `ts` & `dur` fields are in [us]
+constexpr double double_us_to_ns(double const us) noexcept {
+  return us * 1'000.0;
+}
+
+std::map<std::string, val_unit>
+process_benchmark_raw_results(std::string_view const benchmark_name,
+                              std::filesystem::path const &results_file_path,
+                              std::string_view const traced) {
   std::map<std::string, val_unit> result;
-  // should exhaust all "options"/targets in
-  // `examples/for_benchmarks/CMakeLists.txt`:
-  if (benchmark_name == "cxxet_bench_mt_counter") {
-  } else if (benchmark_name == "cxxet_bench_st_instant") {
-  } else if (benchmark_name == "cxxet_bench_st_guarded_instant") {
-  } else if (benchmark_name == "cxxet_bench_st_complete") {
-  } else if (benchmark_name == "cxxet_bench_st_duration") {
-  } else {
-    throw "unknown benchmark name '" + std::string(benchmark_name) + "'";
+
+  auto const require = [&](bool const cond, std::string const msg = "") {
+    if (!cond) {
+      throw "mandatory condition (" + msg + ") unsatisfied; benchmark '" +
+          std::string{benchmark_name} + "', results file '" +
+          results_file_path.string() + '\'';
+    }
+  };
+
+  if (traced == "cxxet") {
+    auto const results_json{
+        nlohmann::json::parse(std::ifstream{results_file_path})};
+
+    // should exhaust all "options"/targets in
+    // `examples/for_benchmarks/CMakeLists.txt`:
+    if (benchmark_name == "cxxet_bench_mt_counter") {
+      std::map<long long, std::vector<double>> thread_timestamps;
+
+      for (auto const &j : results_json["traceEvents"]) {
+        require(j["ph"].get<std::string>() == "C", "phase value");
+        require(j["name"].get<std::string>() == "Counter", "marker name");
+
+        auto const tid{j["tid"].get<long long>()};
+        auto const ts{j["ts"].get<double>()};
+
+        thread_timestamps[tid].emplace_back(double_us_to_ns(ts));
+      }
+
+      std::size_t total_markers{0};
+      for (auto &[tid, tss] : thread_timestamps) {
+        require(tss.size() >= 2, "minimal amount of data");
+        std::sort(tss.begin(), tss.end()); // just to be sure ...
+        total_markers += tss.size() - 1;
+      }
+
+      std::vector<double> diffs, tmp;
+      diffs.reserve(total_markers);
+      for (auto const &[tid, tss] : thread_timestamps) {
+        tmp.clear();
+        tmp.reserve(tss.size());
+
+        std::adjacent_difference(tss.cbegin(), tss.cend(),
+                                 std::back_inserter(tmp));
+
+        require(tmp.size() == tss.size(), "tmp diffs size");
+
+        // first element is meaningless
+        diffs.insert(diffs.end(), tmp.cbegin() + 1, tmp.cend());
+      }
+      require(diffs.size() == total_markers, "diffs size");
+      std::sort(diffs.begin(), diffs.end());
+
+      write_val_unit_stats(result, cxxet_pp::compute_stats(diffs),
+                           "TRACE_counter_marker_interval", "ns");
+    } else if (benchmark_name == "cxxet_bench_st_instant") {
+    } else if (benchmark_name == "cxxet_bench_st_guarded_instant") {
+    } else if (benchmark_name == "cxxet_bench_st_complete") {
+    } else if (benchmark_name == "cxxet_bench_st_duration") {
+    } else {
+      throw "unknown benchmark name '" + std::string{benchmark_name} + "'";
+    }
   }
+
   return result;
 }
 

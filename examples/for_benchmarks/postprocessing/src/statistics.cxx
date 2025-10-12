@@ -67,14 +67,16 @@ stats compute_stats(std::vector<double> const &values) {
   double const min{sorted_values.front()};
   double const max{sorted_values.back()};
 
-  return stats{mean,
+  return stats{static_cast<long long>(n),
+               mean,
                stddev,
                min,
-               max,
-               static_cast<long long>(n),
                percentile(sorted_values, 2.0),
+               percentile(sorted_values, 25.0),
                percentile(sorted_values, 50.0),
-               percentile(sorted_values, 98.0)};
+               percentile(sorted_values, 75.0),
+               percentile(sorted_values, 98.0),
+               max};
 }
 
 } // namespace cxxet_pp
