@@ -29,7 +29,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "../../../include/public/cxxet/timepoint.hxx"
+#include "../../../../include/public/cxxet/timepoint.hxx"
 
 namespace {
 

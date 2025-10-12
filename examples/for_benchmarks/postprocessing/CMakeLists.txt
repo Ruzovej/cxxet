@@ -1,6 +1,11 @@
 add_executable(
     cxxet_large_bench_postprocess
-        main.cxx
+        src/main.cxx
+)
+target_include_directories(
+    cxxet_large_bench_postprocess
+        PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}/include"
 )
 target_link_libraries(
     cxxet_large_bench_postprocess
