@@ -122,11 +122,17 @@ void process_benchmark(nlohmann::json &target_array,
   auto const num_reps{meta_json["meta_info"]["repetitions"].get<long long>()};
   auto const rep{meta_json["meta_info"]["repetition_index"].get<long long>()};
 
+  auto num_ths_str{std::to_string(param_num_threads)};
+  if (num_ths_str.size() == 1) {
+    num_ths_str = "00" + num_ths_str;
+  } else if (num_ths_str.size() == 2) {
+    num_ths_str = '0' + num_ths_str;
+  }
+
   auto const benchmark_name_full{
       benchmark_name + "/nit_" + std::to_string(param_num_iters) + "/mai_" +
       std::to_string(param_marker_after_iter) + "/crb_" +
-      std::to_string(param_cxxet_reserve_buffer) + "/ths_" +
-      std::to_string(param_num_threads)};
+      std::to_string(param_cxxet_reserve_buffer) + "/ths_" + num_ths_str};
 
   auto const write_measurements =
       [&](std::map<std::string, val_unit> const &measurements) {
