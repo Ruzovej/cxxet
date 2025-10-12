@@ -34,6 +34,7 @@ struct stats {
   double p98;
 };
 
+// `std::span` would be nicer ...
 stats compute_stats(std::vector<double> const &values);
 
 } // namespace cxxet_pp

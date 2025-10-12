@@ -20,7 +20,9 @@
 #include "result_processor.hxx"
 
 #include <fstream>
+#include <map>
 #include <string>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
@@ -79,11 +81,20 @@ process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
 }
 
 std::map<std::string, val_unit> process_benchmark_raw_results(
-    std::string_view const /*benchmark_name*/,
+    std::string_view const benchmark_name,
     std::filesystem::path const & /*results_file_path*/,
     std::string_view const /*traced*/) {
   std::map<std::string, val_unit> result;
-
+  // should exhaust all "options"/targets in
+  // `examples/for_benchmarks/CMakeLists.txt`:
+  if (benchmark_name == "cxxet_bench_mt_counter") {
+  } else if (benchmark_name == "cxxet_bench_st_instant") {
+  } else if (benchmark_name == "cxxet_bench_st_guarded_instant") {
+  } else if (benchmark_name == "cxxet_bench_st_complete") {
+  } else if (benchmark_name == "cxxet_bench_st_duration") {
+  } else {
+    throw "unknown benchmark name '" + std::string(benchmark_name) + "'";
+  }
   return result;
 }
 
@@ -135,7 +146,8 @@ void process_benchmark(nlohmann::json &target_array,
       std::to_string(param_cxxet_reserve_buffer) + "/ths_" + num_ths_str};
 
   auto const write_measurements =
-      [&](std::map<std::string, val_unit> const &measurements) {
+      [&](std::map<std::string, val_unit> const &measurements,
+          std::filesystem::path const &source_file) {
         for (const auto &[name, vu] : measurements) {
           auto const benchmark_name_full_final{benchmark_name_full + '/' +
                                                name + '/' + traced};
@@ -153,16 +165,19 @@ void process_benchmark(nlohmann::json &target_array,
                    {"subtype", name},
                    {"used_lib", traced},
                }},
+              {"file_path_source", source_file},
               {"result", vu.value},
               {"unit", vu.unit},
           });
         }
       };
 
-  write_measurements(process_benchmark_thread_perfs(meta_json["thread_perfs"]));
+  write_measurements(process_benchmark_thread_perfs(meta_json["thread_perfs"]),
+                     meta_file_path);
   if (traced != "bare") {
     write_measurements(process_benchmark_raw_results(
-        benchmark_name, cxxet_results_filename, traced));
+                           benchmark_name, cxxet_results_filename, traced),
+                       cxxet_results_filename);
   }
 }
 
