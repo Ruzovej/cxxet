@@ -1,5 +1,6 @@
 add_executable(
     cxxet_large_bench_postprocess
+        src/log.cxx
         src/main.cxx
 )
 target_include_directories(

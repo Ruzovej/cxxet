@@ -22,32 +22,16 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include <nlohmann/json.hpp>
 
+#include "log.hxx"
 #include "now.hxx"
 
 namespace {
-
-bool verbose{false};
-
-void log(std::string_view const msg, bool const force = false) {
-  if (verbose || force) {
-    std::cout << msg << '\n';
-  }
-}
-
-void log_time_diff(std::string_view const msg, long long const begin,
-                   long long const end, bool const force = false) {
-  if (verbose || force) {
-    std::cout << msg << ": " << static_cast<double>(end - begin) / 1'000'000
-              << " [ms]\n";
-  }
-}
 
 bool begins_with(std::string_view const str, std::string_view const prefix) {
   return (str.size() >= prefix.size()) &&
@@ -235,83 +219,83 @@ void process_benchmark(nlohmann::json &target_array,
 
 } // namespace
 
-int main(int argc, char const *const *argv) try {
-  if ((argc > 1) && ((std::string_view{argv[1]} == "--verbose") ||
-                     (std::string_view{argv[1]} == "-v"))) {
-    --argc;
-    ++argv;
-    verbose = true;
-  }
-  std::filesystem::path results_dir;
-  if (argc > 1) {
-    results_dir = argv[1];
-  } else {
-    throw "missing input directory argument";
-  }
-  if (!std::filesystem::is_directory(results_dir)) {
-    throw "input path '" + results_dir.string() + "' is not a directory";
-  }
-
-  auto const t0{cxxet_pp::now()};
-
-  nlohmann::json meta_info = {
-      {"cxxet_git_hash",
-       nlohmann::json::parse(std::ifstream{
-           results_dir / "commit_hash.json"})["context"]["cxxet_git_hash"]
-           .get<std::string>()},
-  };
-
-  nlohmann::json benchmarks = nlohmann::json::array();
-
-  // TODO parallelize?!
-  for (auto const &entry : std::filesystem::directory_iterator{results_dir}) {
-    if (!entry.is_regular_file()) {
-      continue;
+int main(int argc, char const *const *argv) {
+  try {
+    if ((argc > 1) && ((std::string_view{argv[1]} == "--verbose") ||
+                       (std::string_view{argv[1]} == "-v"))) {
+      --argc;
+      ++argv;
+      cxxet_pp::set_verbose(true);
+    }
+    std::filesystem::path results_dir;
+    if (argc > 1) {
+      results_dir = argv[1];
+    } else {
+      throw "missing input directory argument";
+    }
+    if (!std::filesystem::is_directory(results_dir)) {
+      throw "input path '" + results_dir.string() + "' is not a directory";
     }
 
-    static constexpr std::string_view meta_file_suffix{"_meta.json"};
-    auto const entry_path{entry.path()};
-    if (ends_with(entry_path.string(), meta_file_suffix)) {
-      log("\tProcessing " + entry_path.string() + " ...");
-      auto const t00{cxxet_pp::now()};
-      process_benchmark(benchmarks, entry_path);
-      log_time_diff("\tProcessed " + entry_path.string(), t00, cxxet_pp::now());
+    auto const t0{cxxet_pp::now()};
+
+    nlohmann::json meta_info = {
+        {"cxxet_git_hash",
+         nlohmann::json::parse(std::ifstream{
+             results_dir / "commit_hash.json"})["context"]["cxxet_git_hash"]
+             .get<std::string>()},
+    };
+
+    nlohmann::json benchmarks = nlohmann::json::array();
+
+    // TODO parallelize?!
+    for (auto const &entry : std::filesystem::directory_iterator{results_dir}) {
+      if (!entry.is_regular_file()) {
+        continue;
+      }
+
+      static constexpr std::string_view meta_file_suffix{"_meta.json"};
+      auto const entry_path{entry.path()};
+      if (ends_with(entry_path.string(), meta_file_suffix)) {
+        cxxet_pp::log("\tProcessing " + entry_path.string() + " ...");
+        auto const t00{cxxet_pp::now()};
+        process_benchmark(benchmarks, entry_path);
+        cxxet_pp::log_time_diff("\tProcessed " + entry_path.string(), t00,
+                                cxxet_pp::now());
+      }
     }
+
+    auto const t1{cxxet_pp::now()};
+    cxxet_pp::log_time_diff("Postprocessed benchmark results", t0, t1, true);
+
+    nlohmann::json result = {
+        {"context", std::move(meta_info)},
+        {"benchmarks", std::move(benchmarks)},
+    };
+
+    auto const target_file{results_dir / "large.json"};
+
+    std::ofstream ofs{target_file};
+    ofs << result.dump(2);
+
+    cxxet_pp::log_time_diff("Saved results into file " + target_file.string(),
+                            t1, cxxet_pp::now(), true);
+
+    return EXIT_SUCCESS;
+  } catch (std::exception const &e) {
+    cxxet_pp::log_error(
+        "Failed (3) to postprocess \"large\" benchmark results: " +
+        std::string{e.what()});
+  } catch (std::string const &msg) {
+    cxxet_pp::log_error(
+        "Failed (2) to postprocess \"large\" benchmark results: " + msg);
+  } catch (char const *const msg) {
+    cxxet_pp::log_error(
+        "Failed (1) to postprocess \"large\" benchmark results: " +
+        std::string{msg});
+  } catch (...) {
+    cxxet_pp::log_error("Failed (0) to postprocess \"large\" benchmark "
+                        "results: unknown exception");
   }
-
-  auto const t1{cxxet_pp::now()};
-  log_time_diff("Postprocessed benchmark results", t0, t1, true);
-
-  nlohmann::json result = {
-      {"context", std::move(meta_info)},
-      {"benchmarks", std::move(benchmarks)},
-  };
-
-  auto const target_file{results_dir / "large.json"};
-
-  std::ofstream ofs{target_file};
-  ofs << result.dump(2);
-
-  log_time_diff("Saved results into file " + target_file.string(), t1,
-                cxxet_pp::now(), true);
-
-  return EXIT_SUCCESS;
-} catch (std::exception const &e) {
-  std::cout.flush();
-  std::cerr << "Failed (3) to postprocess \"large\" benchmark results: "
-            << e.what() << std::endl;
-
-  return EXIT_FAILURE;
-} catch (std::string const &msg) {
-  std::cout.flush();
-  std::cerr << "Failed (2) to postprocess \"large\" benchmark results: " << msg
-            << std::endl;
-
-  return EXIT_FAILURE;
-} catch (char const *const msg) {
-  std::cout.flush();
-  std::cerr << "Failed (1) to postprocess \"large\" benchmark results: " << msg
-            << std::endl;
-
   return EXIT_FAILURE;
 }
