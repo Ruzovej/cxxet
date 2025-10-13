@@ -190,6 +190,84 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
       write_val_unit_stats(result, cxxet_pp::compute_stats(diffs, false),
                            "TRACE_instant_marker_interval", "ns");
     } else if (benchmark_name == "cxxet_bench_st_guarded_instant") {
+      auto const num_events{results_json["traceEvents"].size()};
+      require(num_events % 2 == 0, "even number of events");
+      require(num_events > 0, "some data");
+      auto const num_event_pairs{num_events / 2};
+
+      std::vector<double> marker_complete_lengths;
+      marker_complete_lengths.reserve(num_event_pairs);
+      std::vector<double> marker_complete_gaps;
+      marker_complete_gaps.reserve(num_event_pairs - 1);
+      std::vector<double> marker_instant_dist_from_complete_center;
+      marker_instant_dist_from_complete_center.reserve(num_event_pairs);
+
+      auto const &js{results_json["traceEvents"]};
+      std::optional<double> prev_complete_end{};
+      for (auto it{js.cbegin()}; it != js.cend(); it += 2) {
+        auto const &j_inst{*it};
+        require(j_inst["ph"].get<std::string>() == "i", "phase value");
+        require(j_inst["name"].get<std::string>() == "some instant ...",
+                "instant marker name");
+
+        auto const mark_inst_ts{double_us_to_ns(j_inst["ts"].get<double>())};
+
+        auto const &j_comp{*(it + 1)};
+        require(j_comp["ph"].get<std::string>() == "X", "phase value");
+        require(
+            (j_comp["name"].get<std::string>() ==
+             "complete over instant event ") // TODO delete this later ...
+                                             // after adjusting/fixing the
+                                             // benchmark itself
+                ||
+                (j_comp["name"].get<std::string>() ==
+                 "complete over instant event") // NOTE: desired condition ...
+            ,
+            "complete marker name");
+
+        auto const mark_comp_beg{double_us_to_ns(j_comp["ts"].get<double>())};
+        auto const mark_comp_dur{double_us_to_ns(j_comp["dur"].get<double>())};
+        auto const mark_comp_end{mark_comp_beg + mark_comp_dur};
+
+        require(mark_comp_beg <= mark_inst_ts, "instant after complete begin");
+        require(mark_inst_ts <= mark_comp_end, "instant before complete end");
+
+        marker_complete_lengths.emplace_back(mark_comp_dur);
+        if (prev_complete_end.has_value()) {
+          marker_complete_gaps.emplace_back(mark_comp_beg -
+                                            prev_complete_end.value());
+        }
+        prev_complete_end.emplace(mark_comp_end);
+
+        auto const mark_comp_center{mark_comp_beg + 0.5 * mark_comp_dur};
+        marker_instant_dist_from_complete_center.emplace_back(mark_inst_ts -
+                                                              mark_comp_center);
+      }
+
+      require(marker_complete_lengths.size() == num_event_pairs,
+              "marker_complete_lengths size");
+      require(marker_complete_gaps.size() == num_event_pairs - 1,
+              "marker_complete_gaps size");
+      require(marker_instant_dist_from_complete_center.size() ==
+                  num_event_pairs,
+              "marker_instant_dist_from_complete_center size");
+
+      std::sort(marker_complete_lengths.begin(), marker_complete_lengths.end());
+      std::sort(marker_complete_gaps.begin(), marker_complete_gaps.end());
+      std::sort(marker_instant_dist_from_complete_center.begin(),
+                marker_instant_dist_from_complete_center.end());
+
+      write_val_unit_stats(
+          result, cxxet_pp::compute_stats(marker_complete_lengths, false),
+          "TRACE_guarding_complete_marker_duration", "ns");
+      write_val_unit_stats(result,
+                           cxxet_pp::compute_stats(marker_complete_gaps, false),
+                           "TRACE_guarding_complete_marker_gap", "ns");
+      write_val_unit_stats(result,
+                           cxxet_pp::compute_stats(
+                               marker_instant_dist_from_complete_center, false),
+                           "TRACE_guarded_instant_dist_from_complete_center",
+                           "ns");
     } else if (benchmark_name == "cxxet_bench_st_complete") {
     } else if (benchmark_name == "cxxet_bench_st_duration") {
     } else {
