@@ -313,6 +313,57 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
                            cxxet_pp::compute_stats(marker_complete_gaps, false),
                            "TRACE_complete_marker_gap", "ns");
     } else if (benchmark_name == "cxxet_bench_st_duration") {
+      auto const num_events{results_json["traceEvents"].size()};
+      require(num_events % 2 == 0, "even number of events");
+      require(num_events > 0, "some data");
+      auto const num_event_pairs{num_events / 2};
+
+      std::vector<double> marker_duration_lengths;
+      marker_duration_lengths.reserve(num_event_pairs);
+      std::vector<double> marker_duration_gaps;
+      marker_duration_gaps.reserve(num_event_pairs - 1);
+
+      auto const &js{results_json["traceEvents"]};
+      std::optional<double> prev_end_ts{};
+      for (auto it{js.cbegin()}; it != js.cend(); it += 2) {
+        auto const &j_begin{*it};
+        require(j_begin["ph"].get<std::string>() == "B", "phase value");
+        require(j_begin["name"].get<std::string>() == "begin marker ...",
+                "begin marker name");
+
+        auto const mark_begin_ts{double_us_to_ns(j_begin["ts"].get<double>())};
+
+        auto const &j_end{*(it + 1)};
+        require(j_end["ph"].get<std::string>() == "E", "phase value");
+
+        auto const mark_end_ts{double_us_to_ns(j_end["ts"].get<double>())};
+
+        require(mark_begin_ts <= mark_end_ts, "begin before end");
+
+        auto const duration{mark_end_ts - mark_begin_ts};
+        marker_duration_lengths.emplace_back(duration);
+
+        if (prev_end_ts.has_value()) {
+          marker_duration_gaps.emplace_back(mark_begin_ts -
+                                            prev_end_ts.value());
+        }
+        prev_end_ts.emplace(mark_end_ts);
+      }
+
+      require(marker_duration_lengths.size() == num_event_pairs,
+              "marker_duration_lengths size");
+      require(marker_duration_gaps.size() == num_event_pairs - 1,
+              "marker_duration_gaps size");
+
+      std::sort(marker_duration_lengths.begin(), marker_duration_lengths.end());
+      std::sort(marker_duration_gaps.begin(), marker_duration_gaps.end());
+
+      write_val_unit_stats(
+          result, cxxet_pp::compute_stats(marker_duration_lengths, false),
+          "TRACE_duration_marker_duration", "ns");
+      write_val_unit_stats(result,
+                           cxxet_pp::compute_stats(marker_duration_gaps, false),
+                           "TRACE_duration_marker_gap", "ns");
     } else {
       throw "unknown benchmark name '" + std::string{benchmark_name} + "'";
     }
