@@ -83,8 +83,17 @@ int main(int argc, char const *const *argv) {
     std::sort(benchmarks.begin(), benchmarks.end(),
               [](nlohmann::json const &a, nlohmann::json const &b) {
                 auto const tpl = [](nlohmann::json const &j) {
-                  return std::tie(j["benchmark_name_full"],
-                                  j["benchmark_params"]["rep_no"]);
+                  auto const &jbp{j["benchmark_params"]};
+                  return std::tuple(
+                      j["benchmark_name"].get<std::string_view>(),
+                      jbp["num_iters"].get<long long>(),
+                      jbp["marker_after_iter"].get<long long>(),
+                      jbp["cxxet_reserve_buffer"].get<long long>(),
+                      jbp["num_threads"].get<long long>(),
+                      jbp["subtype"].get<std::string_view>(),
+                      jbp["used_lib"].get<std::string_view>(),
+                      jbp["reps_max"].get<long long>(),
+                      jbp["rep_no"].get<long long>());
                 };
                 return tpl(a) < tpl(b);
               });
