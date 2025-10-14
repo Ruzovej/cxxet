@@ -809,36 +809,43 @@ Deduced CXXET_TARGET_FILENAME: "
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_bare_meta.json"
-    local output_file="${result_base}_bare.json"
+    local meta_file1="${result_base}_bare_meta.json"
+    local output_file1="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    refute [ -f "${output_file}" ]
+    assert [ -f "${meta_file1}" ]
+    refute [ -f "${output_file1}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 2
-    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}_bare\""
-    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
-    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"bare"'
-    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
+    assert_equal "$(jq -e 'length' "${meta_file1}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file1}")" "\"${executable}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file1}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file1}")" '"bare"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file1}")" "${num_threads}"
 
-    meta_file="${result_base}_meta.json"
-    output_file="${result_base}.json"
+    local meta_file2="${result_base}_meta.json"
+    local output_file2="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    assert [ -f "${output_file}" ]
+    assert [ -f "${meta_file2}" ]
+    assert [ -f "${output_file2}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 2
-    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file}")" "\"${executable}\""
-    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file}")" "\"${executable##*/}\""
-    assert_equal "$(jq -e '.meta_info.traced' "${meta_file}")" '"cxxet"'
-    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file}")" "${num_threads}"
-    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * 2 ))"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${output_file}")" "${num_iters}"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e 'length' "${meta_file2}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file2}")" "\"${executable}\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file2}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file2}")" '"cxxet"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file2}")" "${num_threads}"
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file2}")" "$(( num_iters * 2 ))"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${output_file2}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${output_file2}")" "${num_iters}"
+
+    local pp_file="${result_base}_pp.json"
+    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${pp_file}" ]
+    # TODO rest + for the test cases above too!
 }
 
 # TODO end-user usage:

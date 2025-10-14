@@ -17,6 +17,8 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
+
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -31,46 +33,94 @@
 #include "result_processor.hxx"
 #include "str_utils.hxx"
 
-int main(int argc, char const *const *argv) {
+int main(int const argc, char const *const *const argv) {
   try {
-    if ((argc > 1) && ((std::string_view{argv[1]} == "--verbose") ||
-                       (std::string_view{argv[1]} == "-v"))) {
-      --argc;
-      ++argv;
-      cxxet_pp::set_verbose(true);
-    }
-
-    std::filesystem::path results_dir;
-    if (argc > 1) {
-      results_dir = argv[1];
-      if (!std::filesystem::is_directory(results_dir)) {
-        throw "input path '" + results_dir.string() + "' is not a directory";
-      }
-      --argc;
-      ++argv;
-    } else {
-      throw "missing input directory argument";
-    }
-
-    auto const t0{cxxet_pp::now()};
-
-    nlohmann::json meta_info = {
-        {"cxxet_git_hash",
-         nlohmann::json::parse(std::ifstream{
-             results_dir / "commit_hash.json"})["context"]["cxxet_git_hash"]
-             .get<std::string>()},
+    auto const usage = [&]() {
+      cxxet_pp::log("usage: " + std::string{argv[0]} +
+                        " [-v|--verbose] [-h|--help] <-o|--out|--out-json "
+                        "<output_file> <input_file_1> [<input_file_2>] "
+                        "...|<input_dir>>",
+                    true);
     };
+    auto consume_arg = [&usage, argc = argc - 1,
+                        argv{argv + 1}](bool const require =
+                                            false) mutable -> std::string_view {
+      if (argc <= 0) {
+        if (require) {
+          usage();
+          throw "missing argument";
+        }
+        return "";
+      }
+      auto const arg{*argv};
+      --argc;
+      ++argv;
+      return arg;
+    };
+
+    std::string_view output;
+    std::vector<std::string_view> rest;
+    rest.reserve(static_cast<std::size_t>(std::max(argc - 3, 1)));
+
+    while (true) { // why are there no init-statements for `while` loops?!
+      auto const arg{consume_arg()};
+      if (arg.empty()) {
+        break;
+      }
+
+      if (arg == "-v" || arg == "--verbose") {
+        cxxet_pp::set_verbose(true); // ignore repetitions - use the latest value
+      } else if (arg == "-h" || arg == "--help") {
+        usage();
+        return EXIT_SUCCESS;
+      } else if (arg == "-o" || arg == "--out" || arg == "--out-json") {
+        output = consume_arg(true); // ignore repetitions - use the latest value
+      } else {
+        rest.emplace_back(arg);
+      }
+    }
+
+    if (rest.empty()) {
+      throw "missing input file(s) or directory";
+    } else if (output.empty() && rest.size() != 1) {
+      throw "missing output file (when multiple input files are given)";
+    }
+
+    std::filesystem::path output_file;
+    std::optional<std::filesystem::path> file_with_hash;
+    std::vector<std::filesystem::path> input_files;
+
+    if (output.empty()) {
+      assert(rest.size() == 1);
+
+      output_file = rest.front();
+      output_file /= "large.json";
+
+      file_with_hash.emplace(rest.front());
+      *file_with_hash /= "commit_hash.json";
+      if (!std::filesystem::exists(*file_with_hash)) {
+        file_with_hash.reset();
+      }
+
+      for (auto const &entry :
+           std::filesystem::directory_iterator{rest.front()}) {
+        input_files.emplace_back(entry.path());
+      }
+    } else {
+      output_file = output;
+
+      for (auto const &strv : rest) {
+        input_files.emplace_back(strv);
+      }
+    }
 
     nlohmann::json benchmarks = nlohmann::json::array();
 
-    // TODO parallelize?!
-    for (auto const &entry : std::filesystem::directory_iterator{results_dir}) {
-      if (!entry.is_regular_file()) {
-        continue;
-      }
+    auto const t0{cxxet_pp::now()};
 
+    // TODO parallelize?!
+    for (auto const &entry_path : input_files) {
       static constexpr std::string_view meta_file_suffix{"_meta.json"};
-      auto const entry_path{entry.path()};
       if (cxxet_pp::ends_with(entry_path.string(), meta_file_suffix)) {
         cxxet_pp::log("\tProcessing " + entry_path.string() + " ...");
         auto const t00{cxxet_pp::now()};
@@ -104,16 +154,19 @@ int main(int argc, char const *const *argv) {
                             cxxet_pp::now(), true);
 
     nlohmann::json result = {
-        {"context", std::move(meta_info)},
         {"benchmarks", std::move(benchmarks)},
     };
 
-    auto const target_file{results_dir / "large.json"};
+    if (file_with_hash.has_value()) {
+      result["context"]["cxxet_git_hash"] = nlohmann::json::parse(std::ifstream{
+          *file_with_hash})["context"]["cxxet_git_hash"]
+                                                .get<std::string>();
+    }
 
-    std::ofstream ofs{target_file};
+    std::ofstream ofs{output_file};
     ofs << result.dump(2);
 
-    cxxet_pp::log_time_diff("Saved results into file " + target_file.string(),
+    cxxet_pp::log_time_diff("Saved results into file " + output_file.string(),
                             t1, cxxet_pp::now(), true);
 
     return EXIT_SUCCESS;
