@@ -191,16 +191,14 @@ function large() {
         fi
 
         local num_iters
-        # TODO #175 revert this change (useful for development) ...
-        #for num_iters in 100 1000 10000 100000; do # 4 values
-        for num_iters in 100 1000; do # 2 values
+        for num_iters in 100 1000 10000 100000; do # 4 values
             local mai
             for mai in "${marker_after_iters[@]}"; do # 1 or 2 values
                 local cxxet_reserve_buffer
                 for cxxet_reserve_buffer in "$((num_iters / 8))" "${num_iters}" "$((num_iters * 4))"; do # 3 values
                     local nths
                     for nths in "${num_threads[@]}"; do # 1 or 3 values
-                        # either 9 or 64 combinations ...!!!
+                        # either 12 (`st`) or 72 (`mt`) combinations ...!!!
                         # this below is either `1 (or 2 if not skipping "bare" version) * reps` runs ...
                         run_large_benchmark \
                             "${bin_dir}" \
@@ -231,7 +229,11 @@ function large() {
 
         printf '{"context":{"cxxet_git_hash":"%s"}}' "${result}" > "${out_file}"
 
+        "${CXXET_ROOT_DIR}/bin/${preset}/cxxet_large_bench_postprocess" --verbose "${out_dir}" >&2
+
         if [[ "${compression}" == 'true' ]]; then
+            cp "${out_dir}/large.json" "${out_dir}/../large.json"
+
             (
                 set -x
                 tar \
@@ -240,7 +242,7 @@ function large() {
                     --remove-files \
                     --create \
                     --file "${out_dir}.tar.zst" \
-                    . \
+                    .
                 # (TODO?!) provide command for uncompressing it too (into given directory)? E.g.:
                 # mkdir "${PWD}/tmp/ahoj2"
                 # zstd \

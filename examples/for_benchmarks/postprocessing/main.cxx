@@ -39,14 +39,17 @@ int main(int argc, char const *const *argv) {
       ++argv;
       cxxet_pp::set_verbose(true);
     }
+
     std::filesystem::path results_dir;
     if (argc > 1) {
       results_dir = argv[1];
+      if (!std::filesystem::is_directory(results_dir)) {
+        throw "input path '" + results_dir.string() + "' is not a directory";
+      }
+      --argc;
+      ++argv;
     } else {
       throw "missing input directory argument";
-    }
-    if (!std::filesystem::is_directory(results_dir)) {
-      throw "input path '" + results_dir.string() + "' is not a directory";
     }
 
     auto const t0{cxxet_pp::now()};
@@ -90,8 +93,8 @@ int main(int argc, char const *const *argv) {
                       jbp["marker_after_iter"].get<long long>(),
                       jbp["cxxet_reserve_buffer"].get<long long>(),
                       jbp["num_threads"].get<long long>(),
-                      jbp["subtype"].get<std::string_view>(),
                       jbp["used_lib"].get<std::string_view>(),
+                      jbp["subtype"].get<std::string_view>(),
                       jbp["reps_max"].get<long long>(),
                       jbp["rep_no"].get<long long>());
                 };

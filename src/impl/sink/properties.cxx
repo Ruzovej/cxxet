@@ -94,7 +94,9 @@ int parse_int(char const *const str_value) {
 
 char const *parse_string(char const *const str_value) { return str_value; }
 
+#ifndef CXXET_WITH_UNIT_TESTS
 long long const static_time_point_zero_ns{as_int_ns(now())};
+#endif
 
 } // namespace
 
@@ -104,7 +106,12 @@ properties const &properties::instance() noexcept {
 }
 
 properties::properties() noexcept
-    : time_point_zero_ns{static_time_point_zero_ns},
+    :
+#ifndef CXXET_WITH_UNIT_TESTS
+      time_point_zero_ns{static_time_point_zero_ns},
+#else
+      time_point_zero_ns{0},
+#endif
       verbose{parse_env_variable("CXXET_VERBOSE", parse_bool, false, false)},
       default_list_node_capacity{parse_env_variable("CXXET_DEFAULT_BLOCK_SIZE",
                                                     parse_int, 64, verbose)},

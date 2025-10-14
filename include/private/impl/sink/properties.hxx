@@ -27,7 +27,7 @@ struct properties {
   int default_list_node_capacity;
   char const *default_target_filename;
 
-  static properties const &instance() noexcept;
+  [[nodiscard]] static properties const &instance() noexcept;
 
 #ifndef CXXET_WITH_UNIT_TESTS
 private:
