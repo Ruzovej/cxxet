@@ -12,8 +12,6 @@ function setup_file() {
     export CXXET_VERBOSE=1
     export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_TARGET_FILENAME='' # by default disable dumping events into "implicit" file
-    export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
-    mkdir -p "${TMP_RESULT_DIR}"
 
     user_log "# using tmp dir '%s'\n" "${TMP_RESULT_DIR}"
 }
@@ -845,7 +843,22 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
-    # TODO rest + for the test cases above too!
+    # TODO for the test cases above too!
+
+    assert_equal "$(jq -e 'length' "${pp_file}")" 2
+
+    local num_driver_statistics=6 # see `examples/for_benchmarks/common/sources/cxxet_bench_driver.cxx` -> `struct meta`
+    local num_extracted_statistic_from_real_file_low=7 # `examples/for_benchmarks/postprocessing/include/statistics.hxx` -> method `percentiles_near_min_max_meaningful`
+    local num_extracted_statistic_from_real_file_high=9
+    assert_equal "$(jq -e '.benchmarks | length' "${pp_file}")" "$(( num_driver_statistics * 2 + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high ))"
+    # first `*2`: `cxxet` + `bare`
+    # observing two things - durations and gaps - in the results:
+    # there are 49 gaps and 50 durations ... -> detailed statistics for one will consist of 7 entries, for the other of 9 entries
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "bare")] | length' "${pp_file}")" "${num_driver_statistics}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "cxxet")] | length' "${pp_file}")" "$(( num_driver_statistics + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high ))"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_duration_marker_gap"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_low}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_duration_marker_duration"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_high}"
+    # IMHO unnecessary to test it in more detail ...
 }
 
 # TODO end-user usage:

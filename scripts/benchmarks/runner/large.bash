@@ -3,6 +3,7 @@
 set -e
 
 cxxet_include scripts/commands/compile
+cxxet_include scripts/common/commit_hash_json_file
 
 function large() {
     cxxet_require_command \
@@ -220,14 +221,7 @@ function large() {
     printf -- '-=-=-=-=-=-=-=- Executed %s large benchmarks (with out_dir "%s")\n' "${num_executed_benchmarks}" "${out_dir}" >&2
 
     if [[ "${dry_run}" == 'false' ]]; then
-        local out_file="${out_dir}/commit_hash.json"
-
-        local git_hash="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD 2>/dev/null || printf "N/A")"
-        local git_dirty="$(git -C "${CXXET_ROOT_DIR}" diff --shortstat)"
-
-        local result="${git_hash}${git_dirty:+ (dirty)}"
-
-        printf '{"context":{"cxxet_git_hash":"%s"}}' "${result}" > "${out_file}"
+        commit_hash_json_file "${out_dir}"
 
         "${CXXET_ROOT_DIR}/bin/${preset}/cxxet_large_bench_postprocess" --verbose "${out_dir}" >&2
 

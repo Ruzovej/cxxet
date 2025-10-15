@@ -35,12 +35,13 @@ struct stats {
   double p98;
   double max;
 
-  bool percentiles_near_min_max_meaningful() const noexcept {
+  constexpr bool percentiles_near_min_max_meaningful() const noexcept {
     return cnt >= 50;
   }
 };
 
 // `std::span` would be nicer ...
-stats compute_stats(std::vector<double> const &values, bool const sort_values = true);
+stats compute_stats(std::vector<double> const &values,
+                    bool const sort_values = true);
 
 } // namespace cxxet_pp

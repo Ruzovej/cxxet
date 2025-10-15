@@ -69,7 +69,8 @@ int main(int const argc, char const *const *const argv) {
       }
 
       if (arg == "-v" || arg == "--verbose") {
-        cxxet_pp::set_verbose(true); // ignore repetitions - use the latest value
+        cxxet_pp::set_verbose(
+            true); // ignore repetitions - use the latest value
       } else if (arg == "-h" || arg == "--help") {
         usage();
         return EXIT_SUCCESS;
@@ -96,11 +97,8 @@ int main(int const argc, char const *const *const argv) {
       output_file = rest.front();
       output_file /= "large.json";
 
-      file_with_hash.emplace(rest.front());
-      *file_with_hash /= "commit_hash.json";
-      if (!std::filesystem::exists(*file_with_hash)) {
-        file_with_hash.reset();
-      }
+      file_with_hash.emplace(std::filesystem::path{rest.front()} /
+                             "commit_hash.json");
 
       for (auto const &entry :
            std::filesystem::directory_iterator{rest.front()}) {
@@ -109,9 +107,15 @@ int main(int const argc, char const *const *const argv) {
     } else {
       output_file = output;
 
+      file_with_hash.emplace(output_file.parent_path() / "commit_hash.json");
+
       for (auto const &strv : rest) {
         input_files.emplace_back(strv);
       }
+    }
+
+    if (!std::filesystem::exists(*file_with_hash)) {
+      file_with_hash.reset();
     }
 
     nlohmann::json benchmarks = nlohmann::json::array();
