@@ -154,8 +154,10 @@ int main(int const argc, char const *const *const argv) {
                 };
                 return tpl(a) < tpl(b);
               });
-    cxxet_pp::log_time_diff("Sorted postprocessed benchmark results", t1,
-                            cxxet_pp::now(), true);
+
+    auto const t2{cxxet_pp::now()};
+    cxxet_pp::log_time_diff("Sorted postprocessed benchmark results", t1, t2,
+                            true);
 
     nlohmann::json result = {
         {"benchmarks", std::move(benchmarks)},
@@ -171,7 +173,7 @@ int main(int const argc, char const *const *const argv) {
     ofs << result.dump(2);
 
     cxxet_pp::log_time_diff("Saved results into file " + output_file.string(),
-                            t1, cxxet_pp::now(), true);
+                            t2, cxxet_pp::now(), true);
 
     return EXIT_SUCCESS;
   } catch (std::exception const &e) {
