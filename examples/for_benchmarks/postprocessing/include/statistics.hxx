@@ -24,20 +24,26 @@
 namespace cxxet_pp {
 
 struct stats {
+  static constexpr int cnt_for_all_percentiles{50};
+  constexpr bool percentiles_near_min_max_meaningful() const noexcept {
+    return cnt_for_all_percentiles <= cnt;
+  }
+
   long long cnt;
+
+  // 2 values:
   double mean;
   double stddev;
+
+  // 7 percentiles; only 5 - excluding the "fragile" ones - should be written
+  // out if `percentiles_near_min_max_meaningful() == false`
   double min;
-  double p02;
+  double p02; // fragile
   double p25;
   double p50; // median
   double p75;
-  double p98;
+  double p98; // fragile
   double max;
-
-  constexpr bool percentiles_near_min_max_meaningful() const noexcept {
-    return cnt >= 50;
-  }
 };
 
 // `std::span` would be nicer ...
