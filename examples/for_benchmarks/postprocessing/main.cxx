@@ -154,9 +154,12 @@ int main(int const argc, char const *const *const argv) {
         }
       }
     } else {
+      struct alignas(std::hardware_destructive_interference_size) json_helper {
+        nlohmann::json j{nlohmann::json::array()};
+      };
+
       auto const num_input_files{input_files.size()};
-      std::vector<nlohmann::json> sub_results(num_input_files,
-                                              nlohmann::json::array());
+      std::vector<json_helper> sub_results(num_input_files, json_helper{});
 
       std::atomic<unsigned> next_file_index{0};
       std::mutex log_mtx;
@@ -176,7 +179,8 @@ int main(int const argc, char const *const *const argv) {
 
           if (cxxet_pp::ends_with(entry_path.string(), meta_file_suffix)) {
             auto const t00{cxxet_pp::now()};
-            cxxet_pp::process_benchmark(sub_results[my_file_index], entry_path);
+            cxxet_pp::process_benchmark(sub_results[my_file_index].j,
+                                        entry_path);
 
             if (cxxet_pp::get_verbose()) {
               msg = "\tThread " + std::to_string(th_ind) + "/" +
@@ -207,8 +211,8 @@ int main(int const argc, char const *const *const argv) {
       }
 
       for (auto &sub_result : sub_results) {
-        for (auto &j : sub_result) {
-          benchmarks.emplace_back(std::move(j));
+        for (auto &jj : sub_result.j) {
+          benchmarks.emplace_back(std::move(jj));
         }
       }
     }
