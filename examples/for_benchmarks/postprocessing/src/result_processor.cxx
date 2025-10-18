@@ -20,8 +20,8 @@
 #include "result_processor.hxx"
 
 #include <fstream>
-#include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -41,32 +41,34 @@ constexpr double double_us_to_ns(double const us) noexcept {
 }
 
 struct val_unit {
+  std::string name{};
   double value{0.0};
   std::string_view unit{};
 };
 
-void write_val_unit_stats(std::map<std::string, val_unit> &target,
+void write_val_unit_stats(std::vector<val_unit> &target,
                           stats const &computed_stats,
                           std::string const &name_base,
                           std::string_view const unit = default_time_units) {
   bool const all_percentiles{
       computed_stats.percentiles_near_min_max_meaningful()};
-  target[name_base + "_mean"] = {computed_stats.mean, unit};
-  target[name_base + "_stddev"] = {computed_stats.stddev, unit};
-  target[name_base + "_min"] = {computed_stats.min, unit};
+  target.emplace_back(val_unit{name_base + "_mean", computed_stats.mean, unit});
+  target.emplace_back(
+      val_unit{name_base + "_stddev", computed_stats.stddev, unit});
+  target.emplace_back(val_unit{name_base + "_min", computed_stats.min, unit});
   if (all_percentiles) {
-    target[name_base + "_p02"] = {computed_stats.p02, unit};
+    target.emplace_back(val_unit{name_base + "_p02", computed_stats.p02, unit});
   }
-  target[name_base + "_p25"] = {computed_stats.p25, unit};
-  target[name_base + "_p50"] = {computed_stats.p50, unit};
-  target[name_base + "_p75"] = {computed_stats.p75, unit};
+  target.emplace_back(val_unit{name_base + "_p25", computed_stats.p25, unit});
+  target.emplace_back(val_unit{name_base + "_p50", computed_stats.p50, unit});
+  target.emplace_back(val_unit{name_base + "_p75", computed_stats.p75, unit});
   if (all_percentiles) {
-    target[name_base + "_p98"] = {computed_stats.p98, unit};
+    target.emplace_back(val_unit{name_base + "_p98", computed_stats.p98, unit});
   }
-  target[name_base + "_max"] = {computed_stats.max, unit};
+  target.emplace_back(val_unit{name_base + "_max", computed_stats.max, unit});
 }
 
-void write_val_unit_stats(std::map<std::string, val_unit> &target,
+void write_val_unit_stats(std::vector<val_unit> &target,
                           std::vector<double> &&data,
                           std::string_view const val_name_base,
                           std::string_view const unit = default_time_units) {
@@ -74,7 +76,7 @@ void write_val_unit_stats(std::map<std::string, val_unit> &target,
                        std::string{val_name_base}, unit);
 }
 
-std::map<std::string, val_unit>
+std::vector<val_unit>
 process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
   std::map<std::string, std::vector<double>> sub_results;
 
@@ -95,7 +97,7 @@ process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
         tp["thread_reserve_ns"].get<double>());
   }
 
-  std::map<std::string, val_unit> results;
+  std::vector<val_unit> results;
 
   for (auto &&[name, vals] : sub_results) {
     auto const n{static_cast<long long>(vals.size())};
@@ -104,7 +106,7 @@ process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
     } else if (n <= 0) {
       throw "missing `thread_perfs` data";
     } else {
-      results[name] = {vals.front(), default_time_units};
+      results.emplace_back(val_unit{name, vals.front(), default_time_units});
     }
   }
 
@@ -136,11 +138,11 @@ private:
   std::vector<double> diffs;
 };
 
-std::map<std::string, val_unit>
+std::vector<val_unit>
 process_benchmark_raw_results(std::string_view const benchmark_name,
                               std::filesystem::path const &results_file_path,
                               std::string_view const traced) {
-  std::map<std::string, val_unit> result;
+  std::vector<val_unit> result;
 
   auto const require = [&](bool const cond, std::string_view const msg = "") {
     if (!cond) {
@@ -387,9 +389,9 @@ void process_benchmark(nlohmann::json &target_array,
   auto const rep{meta_json["meta_info"]["repetition_index"].get<long long>()};
 
   auto const write_measurements =
-      [&](std::map<std::string, val_unit> const &measurements,
+      [&](std::vector<val_unit> const &measurements,
           std::filesystem::path const &source_file) {
-        for (const auto &[name, vu] : measurements) {
+        for (const auto &vu : measurements) {
           target_array.push_back({
               {"benchmark_name", benchmark_name},
               {"benchmark_params",
@@ -400,7 +402,7 @@ void process_benchmark(nlohmann::json &target_array,
                    {"num_threads", param_num_threads},
                    {"rep_no", rep},
                    {"reps_max", num_reps},
-                   {"subtype", name},
+                   {"subtype", vu.name},
                    {"used_lib", traced},
                }},
               {"file_path_source", source_file},
