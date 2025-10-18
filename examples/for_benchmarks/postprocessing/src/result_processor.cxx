@@ -134,15 +134,15 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
         thread_timestamps[tid].emplace_back(double_us_to_ns(ts));
       }
 
-      std::size_t total_markers{0};
+      std::size_t total_marker_gaps{0};
       for (auto &[tid, tss] : thread_timestamps) {
         require(tss.size() >= 2, "minimal amount of data");
         std::sort(tss.begin(), tss.end()); // just to be sure ...
-        total_markers += tss.size() - 1;
+        total_marker_gaps += tss.size() - 1;
       }
 
       std::vector<double> diffs, tmp;
-      diffs.reserve(total_markers);
+      diffs.reserve(total_marker_gaps);
       for (auto const &[tid, tss] : thread_timestamps) {
         tmp.clear();
         tmp.reserve(tss.size());
@@ -155,7 +155,7 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
         // first element is meaningless
         diffs.insert(diffs.end(), tmp.cbegin() + 1, tmp.cend());
       }
-      require(diffs.size() == total_markers, "diffs size");
+      require(diffs.size() == total_marker_gaps, "diffs size");
       std::sort(diffs.begin(), diffs.end());
 
       write_val_unit_stats(result, cxxet_pp::compute_stats(diffs, false),
@@ -214,15 +214,8 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
 
         auto const &j_comp{*(it + 1)};
         require(j_comp["ph"].get<std::string>() == "X", "phase value");
-        require(
-            (j_comp["name"].get<std::string>() ==
-             "complete over instant event ") // TODO delete this later ...
-                                             // after adjusting/fixing the
-                                             // benchmark itself
-                ||
-                (j_comp["name"].get<std::string>() ==
-                 "complete over instant event") // NOTE: desired condition ...
-            ,
+        require(j_comp["name"].get<std::string>() ==
+                    "complete over instant event",
             "complete marker name");
 
         auto const mark_comp_beg{double_us_to_ns(j_comp["ts"].get<double>())};
