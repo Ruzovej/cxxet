@@ -583,10 +583,6 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 1 (cxxet_bench_mt_counter)" {
-    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
-        skip "Large benchmarks aren't supported with debug builds"
-    fi
-
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_1"
     local num_iters=50
     local num_threads=4
@@ -654,10 +650,6 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 2 (cxxet_bench_st_instant)" {
-    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
-        skip "Large benchmarks aren't supported with debug builds"
-    fi
-
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_2"
     local num_iters=50
     local num_threads=1
@@ -724,10 +716,6 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 3 (cxxet_bench_st_guarded_instant)" {
-    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
-        skip "Large benchmarks aren't supported with debug builds"
-    fi
-
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_3"
     local num_iters=50
     local num_threads=1
@@ -797,10 +785,6 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 4 (cxxet_bench_st_complete)" {
-    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
-        skip "Large benchmarks aren't supported with debug builds"
-    fi
-
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_4"
     local num_iters=50
     local num_threads=1
@@ -869,10 +853,6 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 5 (cxxet_bench_st_duration)" {
-    if [[ "${CXXET_PRESET}" =~ .san_d ]]; then
-        skip "Large benchmarks aren't supported with debug builds"
-    fi
-
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_5"
     local num_iters=50
     local num_threads=1
