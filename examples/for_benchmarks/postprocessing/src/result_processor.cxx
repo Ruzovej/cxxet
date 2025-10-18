@@ -186,7 +186,7 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
       }
       require(diffs.size() == total_marker_gaps, "all diffs size");
 
-      thread_timestamps.clear(); // sligthly dangerous (during later
+      thread_timestamps.clear(); // slightly dangerous (during later
                                  // development, if overlooked & needed), but
                                  // speculatively save some memory here
 
