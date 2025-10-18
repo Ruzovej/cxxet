@@ -17,8 +17,6 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
-
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -92,9 +90,12 @@ int main(int const argc, char const *const *const argv) {
     std::vector<std::filesystem::path> input_files;
 
     if (output.empty()) {
-      assert(rest.size() == 1);
-
       output_file = rest.front();
+      if (!std::filesystem::is_directory(output_file)) {
+        throw "when output file is not specified, the single input must be a "
+              "directory";
+      }
+
       output_file /= "large.json";
 
       file_with_hash.emplace(std::filesystem::path{rest.front()} /
