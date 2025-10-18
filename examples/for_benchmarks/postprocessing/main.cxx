@@ -137,30 +137,43 @@ int main(int const argc, char const *const *const argv) {
     auto const t1{cxxet_pp::now()};
     cxxet_pp::log_time_diff("Postprocessed benchmark results", t0, t1, true);
 
-    std::sort(benchmarks.begin(), benchmarks.end(),
-              [](nlohmann::json const &a, nlohmann::json const &b) {
-                auto const tpl = [](nlohmann::json const &j) {
-                  auto const &jbp{j["benchmark_params"]};
-                  return std::tuple(
-                      j["benchmark_name"].get<std::string_view>(),
-                      jbp["num_iters"].get<long long>(),
-                      jbp["marker_after_iter"].get<long long>(),
-                      jbp["cxxet_reserve_buffer"].get<long long>(),
-                      jbp["num_threads"].get<long long>(),
-                      jbp["used_lib"].get<std::string_view>(),
-                      jbp["subtype"].get<std::string_view>(),
-                      jbp["reps_max"].get<long long>(),
-                      jbp["rep_no"].get<long long>());
-                };
-                return tpl(a) < tpl(b);
-              });
+    auto const json_elem_cmp_tuple = [](nlohmann::json const &j) {
+      auto const &jbp{j["benchmark_params"]};
+      return std::tuple(j["benchmark_name"].get<std::string_view>(),
+                        jbp["num_iters"].get<long long>(),
+                        jbp["marker_after_iter"].get<long long>(),
+                        jbp["cxxet_reserve_buffer"].get<long long>(),
+                        jbp["num_threads"].get<long long>(),
+                        jbp["used_lib"].get<std::string_view>(),
+                        jbp["subtype"].get<std::string_view>(),
+                        jbp["reps_max"].get<long long>(),
+                        jbp["rep_no"].get<long long>());
+    };
+
+    using cmp_tuple_t = decltype(json_elem_cmp_tuple(benchmarks.front()));
+
+    std::vector<std::pair<cmp_tuple_t, nlohmann::json *>> sortable_benchmarks;
+    sortable_benchmarks.reserve(benchmarks.size());
+
+    for (auto &j : benchmarks) {
+      sortable_benchmarks.emplace_back(json_elem_cmp_tuple(j), &j);
+    }
+
+    std::sort(sortable_benchmarks.begin(), sortable_benchmarks.end(),
+              [](auto const &a, auto const &b) { return a.first < b.first; });
+
+    nlohmann::json sorted_benchmarks = nlohmann::json::array();
+
+    for (auto const &[_, j] : sortable_benchmarks) {
+      sorted_benchmarks.emplace_back(std::move(*j));
+    }
 
     auto const t2{cxxet_pp::now()};
     cxxet_pp::log_time_diff("Sorted postprocessed benchmark results", t1, t2,
                             true);
 
     nlohmann::json result = {
-        {"benchmarks", std::move(benchmarks)},
+        {"benchmarks", std::move(sorted_benchmarks)},
     };
 
     if (file_with_hash.has_value()) {

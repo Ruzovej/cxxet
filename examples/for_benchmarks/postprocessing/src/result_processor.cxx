@@ -359,14 +359,13 @@ void process_benchmark(nlohmann::json &target_array,
                        std::filesystem::path const &meta_file_path) {
   auto const meta_json{nlohmann::json::parse(std::ifstream{meta_file_path})};
 
-  // TODO optimize those `get<...>` calls?! E.g. specialize them to directly
-  // return e.g. `std::filesystem::path`, `std::string_view`, ...:
   auto const benchmark_name{
       meta_json["meta_info"]["benchmark_name"].get<std::string_view>()};
   auto const traced{meta_json["meta_info"]["traced"].get<std::string_view>()};
 
-  std::filesystem::path const cxxet_results_filename{
-      meta_json["meta_info"]["cxxet_results_filename"].get<std::string_view>()};
+  auto const cxxet_results_filename{
+      meta_json["meta_info"]["cxxet_results_filename"]
+          .get<std::filesystem::path>()};
 
   if (bool const is_regular_file{
           std::filesystem::is_regular_file(cxxet_results_filename)};
