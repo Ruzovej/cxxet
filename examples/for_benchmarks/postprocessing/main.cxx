@@ -125,7 +125,6 @@ int main(int const argc, char const *const *const argv) {
 
     auto const t0{cxxet_pp::now()};
     auto benchmarks{nlohmann::json::array()};
-    // TODO (https://github.com/Ruzovej/cxxet/issues/181) parallelize
     for (auto const &entry_path : input_files) {
       static constexpr std::string_view meta_file_suffix{"_meta.json"};
       if (cxxet_pp::ends_with(entry_path.string(), meta_file_suffix)) {
