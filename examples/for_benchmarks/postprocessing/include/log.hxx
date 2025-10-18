@@ -23,6 +23,8 @@
 
 namespace cxxet_pp {
 
+// all is thread unsafe
+
 void set_verbose(bool const aVerbose) noexcept;
 
 bool get_verbose() noexcept;

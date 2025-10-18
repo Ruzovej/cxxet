@@ -163,8 +163,8 @@ int main(int const argc, char const *const *const argv) {
 
       std::atomic<unsigned> next_file_index{0};
       std::mutex log_mtx;
-      auto const do_work = [&](std::size_t const th_ind,
-                               std::size_t const th_num) {
+      auto const postprocessing_worker = [&](std::size_t const th_ind,
+                                             std::size_t const th_num) {
         std::string msg{};
 
         do {
@@ -196,16 +196,16 @@ int main(int const argc, char const *const *const argv) {
       };
 
       std::size_t const num_ths{
-          num_jobs == 0 ? std::thread::hardware_concurrency()
+          num_jobs == 0 ? std::max(std::thread::hardware_concurrency(), 1u)
                         : (num_jobs < 0 ? num_input_files
                                         : static_cast<std::size_t>(num_jobs))};
 
       std::vector<std::thread> ths;
       ths.reserve(std::max(num_ths - 1, num_input_files));
       for (std::size_t i{1}; i < num_ths; ++i) {
-        ths.emplace_back(do_work, i, num_ths);
+        ths.emplace_back(postprocessing_worker, i + 1, num_ths);
       }
-      do_work(num_ths, num_ths);
+      postprocessing_worker(1, num_ths);
       for (auto &th : ths) {
         th.join();
       }
