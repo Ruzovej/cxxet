@@ -35,8 +35,9 @@ struct stats {
   double mean;
   double stddev;
 
-  // 7 percentiles; only 5 - excluding the "fragile" ones - should be written
-  // out if `percentiles_near_min_max_meaningful() == false`
+  // 7 "percentiles" (very loose use of the properly defined term); only 5,
+  // excluding the "fragile" ones, should be written out if
+  // `percentiles_near_min_max_meaningful() == false`
   double min;
   double p02; // fragile
   double p25;
