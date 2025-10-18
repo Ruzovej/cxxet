@@ -162,8 +162,8 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
       std::map<long long, value_diffs_collector> thread_timestamps;
 
       for (auto const &j : results_json["traceEvents"]) {
-        require(j["ph"].get<std::string>() == "C", "phase value");
-        require(j["name"].get<std::string>() == "Counter", "marker name");
+        require(j["ph"].get<std::string_view>() == "C", "phase value");
+        require(j["name"].get<std::string_view>() == "Counter", "marker name");
 
         auto const tid{j["tid"].get<long long>()};
         auto const ts{j["ts"].get<double>()};
@@ -199,8 +199,8 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
 
       value_diffs_collector diffs{expected_size};
       for (auto const &j : results_json["traceEvents"]) {
-        require(j["ph"].get<std::string>() == "i", "phase value");
-        require(j["name"].get<std::string>() == "some instant ...",
+        require(j["ph"].get<std::string_view>() == "i", "phase value");
+        require(j["name"].get<std::string_view>() == "some instant ...",
                 "marker name");
 
         auto const ts{double_us_to_ns(j["ts"].get<double>())};
@@ -227,15 +227,15 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
       auto const &js{results_json["traceEvents"]};
       for (auto it{js.cbegin()}, it_end = js.cend(); it != it_end; it += 2) {
         auto const &j_inst{*it};
-        require(j_inst["ph"].get<std::string>() == "i", "phase value");
-        require(j_inst["name"].get<std::string>() == "some instant ...",
+        require(j_inst["ph"].get<std::string_view>() == "i", "phase value");
+        require(j_inst["name"].get<std::string_view>() == "some instant ...",
                 "instant marker name");
 
         auto const mark_inst_ts{double_us_to_ns(j_inst["ts"].get<double>())};
 
         auto const &j_comp{*(it + 1)};
-        require(j_comp["ph"].get<std::string>() == "X", "phase value");
-        require(j_comp["name"].get<std::string>() ==
+        require(j_comp["ph"].get<std::string_view>() == "X", "phase value");
+        require(j_comp["name"].get<std::string_view>() ==
                     "complete over instant event",
                 "complete marker name");
 
@@ -284,8 +284,8 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
       value_diffs_collector marker_complete_gaps{num_gaps};
 
       for (auto const &j_comp : results_json["traceEvents"]) {
-        require(j_comp["ph"].get<std::string>() == "X", "phase value");
-        require((j_comp["name"].get<std::string>() == "complete ..."),
+        require(j_comp["ph"].get<std::string_view>() == "X", "phase value");
+        require((j_comp["name"].get<std::string_view>() == "complete ..."),
                 "complete marker name");
 
         auto const mark_comp_beg{double_us_to_ns(j_comp["ts"].get<double>())};
@@ -319,14 +319,14 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
       auto const &js{results_json["traceEvents"]};
       for (auto it{js.cbegin()}, it_end = js.cend(); it != it_end; it += 2) {
         auto const &j_begin{*it};
-        require(j_begin["ph"].get<std::string>() == "B", "phase value");
-        require(j_begin["name"].get<std::string>() == "begin marker ...",
+        require(j_begin["ph"].get<std::string_view>() == "B", "phase value");
+        require(j_begin["name"].get<std::string_view>() == "begin marker ...",
                 "begin marker name");
 
         auto const mark_begin_ts{double_us_to_ns(j_begin["ts"].get<double>())};
 
         auto const &j_end{*(it + 1)};
-        require(j_end["ph"].get<std::string>() == "E", "phase value");
+        require(j_end["ph"].get<std::string_view>() == "E", "phase value");
 
         auto const mark_end_ts{double_us_to_ns(j_end["ts"].get<double>())};
 
@@ -362,17 +362,17 @@ void process_benchmark(nlohmann::json &target_array,
   // TODO optimize those `get<...>` calls?! E.g. specialize them to directly
   // return e.g. `std::filesystem::path`, `std::string_view`, ...:
   auto const benchmark_name{
-      meta_json["meta_info"]["benchmark_name"].get<std::string>()};
-  auto const traced{meta_json["meta_info"]["traced"].get<std::string>()};
+      meta_json["meta_info"]["benchmark_name"].get<std::string_view>()};
+  auto const traced{meta_json["meta_info"]["traced"].get<std::string_view>()};
 
   std::filesystem::path const cxxet_results_filename{
-      meta_json["meta_info"]["cxxet_results_filename"].get<std::string>()};
+      meta_json["meta_info"]["cxxet_results_filename"].get<std::string_view>()};
 
   if (bool const is_regular_file{
           std::filesystem::is_regular_file(cxxet_results_filename)};
       (traced == "cxxet") != is_regular_file) {
     throw '\'' + meta_file_path.string() +
-        "' contains inconsistency (traced == " + traced +
+        "' contains inconsistency (traced == " + std::string{traced} +
         ", is_regular_file == " + std::to_string(is_regular_file) + ")";
   }
 
