@@ -21,7 +21,6 @@
 
 #include <fstream>
 #include <map>
-#include <numeric>
 #include <string>
 #include <vector>
 
@@ -34,28 +33,45 @@ namespace cxxet_pp {
 
 namespace {
 
+constexpr std::string_view default_time_units{"ns"};
+
+// all `ts` & `dur` fields are in [us]
+constexpr double double_us_to_ns(double const us) noexcept {
+  return us * 1'000.0;
+}
+
 struct val_unit {
   double value{0.0};
-  std::string_view unit{"ns"};
+  std::string_view unit{};
 };
 
 void write_val_unit_stats(std::map<std::string, val_unit> &target,
-                          stats const &s, std::string const &name,
-                          std::string_view const unit) {
-  bool const all_percentiles{s.percentiles_near_min_max_meaningful()};
-  target[name + "_mean"] = {s.mean, unit};
-  target[name + "_stddev"] = {s.stddev, unit};
-  target[name + "_min"] = {s.min, unit};
+                          stats const &computed_stats,
+                          std::string const &name_base,
+                          std::string_view const unit = default_time_units) {
+  bool const all_percentiles{
+      computed_stats.percentiles_near_min_max_meaningful()};
+  target[name_base + "_mean"] = {computed_stats.mean, unit};
+  target[name_base + "_stddev"] = {computed_stats.stddev, unit};
+  target[name_base + "_min"] = {computed_stats.min, unit};
   if (all_percentiles) {
-    target[name + "_p02"] = {s.p02, unit};
+    target[name_base + "_p02"] = {computed_stats.p02, unit};
   }
-  target[name + "_p25"] = {s.p25, unit};
-  target[name + "_p50"] = {s.p50, unit};
-  target[name + "_p75"] = {s.p75, unit};
+  target[name_base + "_p25"] = {computed_stats.p25, unit};
+  target[name_base + "_p50"] = {computed_stats.p50, unit};
+  target[name_base + "_p75"] = {computed_stats.p75, unit};
   if (all_percentiles) {
-    target[name + "_p98"] = {s.p98, unit};
+    target[name_base + "_p98"] = {computed_stats.p98, unit};
   }
-  target[name + "_max"] = {s.max, unit};
+  target[name_base + "_max"] = {computed_stats.max, unit};
+}
+
+void write_val_unit_stats(std::map<std::string, val_unit> &target,
+                          std::vector<double> &&data,
+                          std::string_view const val_name_base,
+                          std::string_view const unit = default_time_units) {
+  write_val_unit_stats(target, cxxet_pp::stats::compute_from(std::move(data)),
+                       std::string{val_name_base}, unit);
 }
 
 std::map<std::string, val_unit>
@@ -81,25 +97,44 @@ process_benchmark_thread_perfs(nlohmann::json const &thread_perfs) {
 
   std::map<std::string, val_unit> results;
 
-  for (auto const &[name, vals] : sub_results) {
+  for (auto &&[name, vals] : sub_results) {
     auto const n{static_cast<long long>(vals.size())};
     if (!cxxet_pp::begins_with(name, "global_flush") && (n > 1)) {
-      auto const computed_stats{cxxet_pp::compute_stats(vals)};
-      write_val_unit_stats(results, computed_stats, name, "ns");
+      write_val_unit_stats(results, std::move(vals), name, default_time_units);
     } else if (n <= 0) {
       throw "missing `thread_perfs` data";
     } else {
-      results[name] = {vals.front(), "ns"};
+      results[name] = {vals.front(), default_time_units};
     }
   }
 
   return results;
 }
 
-// all `ts` & `dur` fields are in [us]
-constexpr double double_us_to_ns(double const us) noexcept {
-  return us * 1'000.0;
-}
+struct value_diffs_collector {
+  explicit value_diffs_collector(std::size_t const num_values = 0) {
+    diffs.reserve(num_values);
+  }
+
+  template <typename ts_monotonicity_check_fn_t>
+  void add_value(
+      double const ts, ts_monotonicity_check_fn_t const &check_fn,
+      std::string_view const check_ctx,
+      std::optional<double> const adjusted_future_prev_ts = std::nullopt) {
+    if (prev_ts.has_value()) {
+      check_fn(prev_ts.value() <= ts, check_ctx);
+      diffs.emplace_back(ts - prev_ts.value());
+    }
+    prev_ts.emplace(adjusted_future_prev_ts.value_or(ts));
+  }
+
+  std::vector<double> const &get_diffs() const & noexcept { return diffs; }
+  std::vector<double> get_diffs() && noexcept { return std::move(diffs); }
+
+private:
+  std::optional<double> prev_ts{};
+  std::vector<double> diffs;
+};
 
 std::map<std::string, val_unit>
 process_benchmark_raw_results(std::string_view const benchmark_name,
@@ -107,11 +142,11 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
                               std::string_view const traced) {
   std::map<std::string, val_unit> result;
 
-  auto const require = [&](bool const cond, std::string const msg = "") {
+  auto const require = [&](bool const cond, std::string_view const msg = "") {
     if (!cond) {
-      throw "mandatory condition (" + msg + ") unsatisfied; benchmark '" +
-          std::string{benchmark_name} + "', results file '" +
-          results_file_path.string() + '\'';
+      throw "mandatory condition (" + std::string{msg} +
+          ") unsatisfied; benchmark '" + std::string{benchmark_name} +
+          "', results file '" + results_file_path.string() + '\'';
     }
   };
 
@@ -122,7 +157,7 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
     // should exhaust all "options"/targets in
     // `examples/for_benchmarks/CMakeLists.txt`:
     if (benchmark_name == "cxxet_bench_mt_counter") {
-      std::map<long long, std::vector<double>> thread_timestamps;
+      std::map<long long, value_diffs_collector> thread_timestamps;
 
       for (auto const &j : results_json["traceEvents"]) {
         require(j["ph"].get<std::string>() == "C", "phase value");
@@ -131,80 +166,64 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
         auto const tid{j["tid"].get<long long>()};
         auto const ts{j["ts"].get<double>()};
 
-        thread_timestamps[tid].emplace_back(double_us_to_ns(ts));
+        thread_timestamps[tid].add_value(double_us_to_ns(ts), require,
+                                         "monotonic timestamps");
       }
 
       std::size_t total_marker_gaps{0};
       for (auto &[tid, tss] : thread_timestamps) {
-        require(tss.size() >= 2, "minimal amount of data");
-        std::sort(tss.begin(), tss.end()); // just to be sure ...
-        total_marker_gaps += tss.size() - 1;
+        require(!tss.get_diffs().empty(), "some data per thread");
+        total_marker_gaps += tss.get_diffs().size();
       }
 
-      std::vector<double> diffs, tmp;
+      std::vector<double> diffs;
       diffs.reserve(total_marker_gaps);
       for (auto const &[tid, tss] : thread_timestamps) {
-        tmp.clear();
-        tmp.reserve(tss.size());
-
-        std::adjacent_difference(tss.cbegin(), tss.cend(),
-                                 std::back_inserter(tmp));
-
-        require(tmp.size() == tss.size(), "tmp diffs size");
-
-        // first element is meaningless
-        diffs.insert(diffs.end(), tmp.cbegin() + 1, tmp.cend());
+        diffs.insert(diffs.end(), tss.get_diffs().cbegin(),
+                     tss.get_diffs().cend());
       }
-      require(diffs.size() == total_marker_gaps, "diffs size");
-      std::sort(diffs.begin(), diffs.end());
+      require(diffs.size() == total_marker_gaps, "all diffs size");
 
-      write_val_unit_stats(result, cxxet_pp::compute_stats(diffs, false),
-                           "TRACE_counter_marker_interval", "ns");
+      thread_timestamps.clear(); // sligthly dangerous (during later
+                                 // development, if overlooked & needed), but
+                                 // speculatively save some memory here
+
+      write_val_unit_stats(result, std::move(diffs),
+                           "TRACE_counter_marker_interval");
     } else if (benchmark_name == "cxxet_bench_st_instant") {
-      std::vector<double> timestamps;
+      require(results_json["traceEvents"].size() >= 2, "some data");
 
-      timestamps.reserve(results_json["traceEvents"].size());
+      auto const expected_size{results_json["traceEvents"].size() - 1};
+
+      value_diffs_collector diffs{expected_size};
       for (auto const &j : results_json["traceEvents"]) {
         require(j["ph"].get<std::string>() == "i", "phase value");
         require(j["name"].get<std::string>() == "some instant ...",
                 "marker name");
 
-        auto const ts{j["ts"].get<double>()};
-        timestamps.emplace_back(double_us_to_ns(ts));
+        auto const ts{double_us_to_ns(j["ts"].get<double>())};
+
+        diffs.add_value(ts, require, "monotonic timestamps");
       }
+      require(diffs.get_diffs().size() == expected_size, "diffs size");
 
-      require(timestamps.size() >= 2, "minimal amount of data");
-      std::sort(timestamps.begin(), timestamps.end());
-
-      std::vector<double> diffs;
-      diffs.reserve(timestamps.size());
-      std::adjacent_difference(timestamps.cbegin(), timestamps.cend(),
-                               std::back_inserter(diffs));
-
-      require(diffs.size() == timestamps.size(), "diffs size");
-
-      // first element is meaningless
-      diffs.erase(diffs.begin());
-      std::sort(diffs.begin(), diffs.end());
-
-      write_val_unit_stats(result, cxxet_pp::compute_stats(diffs, false),
-                           "TRACE_instant_marker_interval", "ns");
+      write_val_unit_stats(result, std::move(diffs).get_diffs(),
+                           "TRACE_instant_marker_interval");
     } else if (benchmark_name == "cxxet_bench_st_guarded_instant") {
       auto const num_events{results_json["traceEvents"].size()};
-      require(num_events % 2 == 0, "even number of events");
       require(num_events > 0, "some data");
+      require(num_events % 2 == 0, "even number of events");
       auto const num_event_pairs{num_events / 2};
+      auto const num_event_gaps{num_event_pairs - 1};
 
       std::vector<double> guarding_marker_complete_lengths;
       guarding_marker_complete_lengths.reserve(num_event_pairs);
-      std::vector<double> guarding_marker_complete_gaps;
-      guarding_marker_complete_gaps.reserve(num_event_pairs - 1);
+      value_diffs_collector guarding_marker_complete_gaps{num_event_gaps};
       std::vector<double> guarded_marker_instant_dist_from_complete_center;
       guarded_marker_instant_dist_from_complete_center.reserve(num_event_pairs);
 
       auto const &js{results_json["traceEvents"]};
-      std::optional<double> prev_complete_end{};
-      for (auto it{js.cbegin()}; it != js.cend(); it += 2) {
+      for (auto it{js.cbegin()}, it_end = js.cend(); it != it_end; it += 2) {
         auto const &j_inst{*it};
         require(j_inst["ph"].get<std::string>() == "i", "phase value");
         require(j_inst["name"].get<std::string>() == "some instant ...",
@@ -216,7 +235,7 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
         require(j_comp["ph"].get<std::string>() == "X", "phase value");
         require(j_comp["name"].get<std::string>() ==
                     "complete over instant event",
-            "complete marker name");
+                "complete marker name");
 
         auto const mark_comp_beg{double_us_to_ns(j_comp["ts"].get<double>())};
         auto const mark_comp_dur{double_us_to_ns(j_comp["dur"].get<double>())};
@@ -225,55 +244,43 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
         require(mark_comp_beg <= mark_inst_ts, "instant after complete begin");
         require(mark_inst_ts <= mark_comp_end, "instant before complete end");
 
-        guarding_marker_complete_lengths.emplace_back(mark_comp_dur);
-        if (prev_complete_end.has_value()) {
-          guarding_marker_complete_gaps.emplace_back(mark_comp_beg -
-                                                     prev_complete_end.value());
-        }
-        prev_complete_end.emplace(mark_comp_end);
-
         auto const mark_comp_center{mark_comp_beg + 0.5 * mark_comp_dur};
+
+        guarding_marker_complete_lengths.emplace_back(mark_comp_dur);
+        guarding_marker_complete_gaps.add_value(
+            mark_comp_beg, require, "monotonic timestamps", mark_comp_end);
         guarded_marker_instant_dist_from_complete_center.emplace_back(
             mark_inst_ts - mark_comp_center);
       }
 
       require(guarding_marker_complete_lengths.size() == num_event_pairs,
               "marker_complete_lengths size");
-      require(guarding_marker_complete_gaps.size() == num_event_pairs - 1,
+      write_val_unit_stats(result, std::move(guarding_marker_complete_lengths),
+                           "TRACE_guarding_complete_marker_duration");
+
+      require(guarding_marker_complete_gaps.get_diffs().size() ==
+                  num_event_gaps,
               "marker_complete_gaps size");
+      write_val_unit_stats(result,
+                           std::move(guarding_marker_complete_gaps).get_diffs(),
+                           "TRACE_guarding_complete_marker_gap");
+
       require(guarded_marker_instant_dist_from_complete_center.size() ==
                   num_event_pairs,
               "marker_instant_dist_from_complete_center size");
+      write_val_unit_stats(
+          result, std::move(guarded_marker_instant_dist_from_complete_center),
+          "TRACE_guarded_instant_dist_from_complete_center");
 
-      std::sort(guarding_marker_complete_lengths.begin(),
-                guarding_marker_complete_lengths.end());
-      std::sort(guarding_marker_complete_gaps.begin(),
-                guarding_marker_complete_gaps.end());
-      std::sort(guarded_marker_instant_dist_from_complete_center.begin(),
-                guarded_marker_instant_dist_from_complete_center.end());
-
-      write_val_unit_stats(
-          result,
-          cxxet_pp::compute_stats(guarding_marker_complete_lengths, false),
-          "TRACE_guarding_complete_marker_duration", "ns");
-      write_val_unit_stats(
-          result, cxxet_pp::compute_stats(guarding_marker_complete_gaps, false),
-          "TRACE_guarding_complete_marker_gap", "ns");
-      write_val_unit_stats(
-          result,
-          cxxet_pp::compute_stats(
-              guarded_marker_instant_dist_from_complete_center, false),
-          "TRACE_guarded_instant_dist_from_complete_center", "ns");
     } else if (benchmark_name == "cxxet_bench_st_complete") {
       auto const num_events{results_json["traceEvents"].size()};
-      require(num_events > 0, "some data");
+      require(num_events > 1, "some data");
+      auto const num_gaps{num_events - 1};
 
       std::vector<double> marker_complete_lengths;
       marker_complete_lengths.reserve(num_events);
-      std::vector<double> marker_complete_gaps;
-      marker_complete_gaps.reserve(num_events - 1);
+      value_diffs_collector marker_complete_gaps{num_gaps};
 
-      std::optional<double> prev_complete_end{};
       for (auto const &j_comp : results_json["traceEvents"]) {
         require(j_comp["ph"].get<std::string>() == "X", "phase value");
         require((j_comp["name"].get<std::string>() == "complete ..."),
@@ -284,41 +291,31 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
         auto const mark_comp_end{mark_comp_beg + mark_comp_dur};
 
         marker_complete_lengths.emplace_back(mark_comp_dur);
-        if (prev_complete_end.has_value()) {
-          marker_complete_gaps.emplace_back(mark_comp_beg -
-                                            prev_complete_end.value());
-        }
-        prev_complete_end.emplace(mark_comp_end);
+        marker_complete_gaps.add_value(mark_comp_beg, require,
+                                       "monotonic timestamps", mark_comp_end);
       }
 
       require(marker_complete_lengths.size() == num_events,
               "marker_complete_lengths size");
-      require(marker_complete_gaps.size() == num_events - 1,
+      write_val_unit_stats(result, std::move(marker_complete_lengths),
+                           "TRACE_complete_marker_duration");
+      require(marker_complete_gaps.get_diffs().size() == num_gaps,
               "marker_complete_gaps size");
-
-      std::sort(marker_complete_lengths.begin(), marker_complete_lengths.end());
-      std::sort(marker_complete_gaps.begin(), marker_complete_gaps.end());
-
-      write_val_unit_stats(
-          result, cxxet_pp::compute_stats(marker_complete_lengths, false),
-          "TRACE_complete_marker_duration", "ns");
-      write_val_unit_stats(result,
-                           cxxet_pp::compute_stats(marker_complete_gaps, false),
-                           "TRACE_complete_marker_gap", "ns");
+      write_val_unit_stats(result, std::move(marker_complete_gaps).get_diffs(),
+                           "TRACE_complete_marker_gap");
     } else if (benchmark_name == "cxxet_bench_st_duration") {
       auto const num_events{results_json["traceEvents"].size()};
-      require(num_events % 2 == 0, "even number of events");
       require(num_events > 0, "some data");
+      require(num_events % 2 == 0, "even number of events");
       auto const num_event_pairs{num_events / 2};
+      auto const num_gaps{num_event_pairs - 1};
 
       std::vector<double> marker_duration_lengths;
       marker_duration_lengths.reserve(num_event_pairs);
-      std::vector<double> marker_duration_gaps;
-      marker_duration_gaps.reserve(num_event_pairs - 1);
+      value_diffs_collector marker_duration_gaps{num_gaps};
 
       auto const &js{results_json["traceEvents"]};
-      std::optional<double> prev_end_ts{};
-      for (auto it{js.cbegin()}; it != js.cend(); it += 2) {
+      for (auto it{js.cbegin()}, it_end = js.cend(); it != it_end; it += 2) {
         auto const &j_begin{*it};
         require(j_begin["ph"].get<std::string>() == "B", "phase value");
         require(j_begin["name"].get<std::string>() == "begin marker ...",
@@ -333,30 +330,19 @@ process_benchmark_raw_results(std::string_view const benchmark_name,
 
         require(mark_begin_ts <= mark_end_ts, "begin before end");
 
-        auto const duration{mark_end_ts - mark_begin_ts};
-        marker_duration_lengths.emplace_back(duration);
-
-        if (prev_end_ts.has_value()) {
-          marker_duration_gaps.emplace_back(mark_begin_ts -
-                                            prev_end_ts.value());
-        }
-        prev_end_ts.emplace(mark_end_ts);
+        marker_duration_lengths.emplace_back(mark_end_ts - mark_begin_ts);
+        marker_duration_gaps.add_value(mark_begin_ts, require,
+                                       "monotonic timestamps", mark_end_ts);
       }
 
       require(marker_duration_lengths.size() == num_event_pairs,
               "marker_duration_lengths size");
-      require(marker_duration_gaps.size() == num_event_pairs - 1,
+      write_val_unit_stats(result, std::move(marker_duration_lengths),
+                           "TRACE_duration_marker_duration");
+      require(marker_duration_gaps.get_diffs().size() == num_event_pairs - 1,
               "marker_duration_gaps size");
-
-      std::sort(marker_duration_lengths.begin(), marker_duration_lengths.end());
-      std::sort(marker_duration_gaps.begin(), marker_duration_gaps.end());
-
-      write_val_unit_stats(
-          result, cxxet_pp::compute_stats(marker_duration_lengths, false),
-          "TRACE_duration_marker_duration", "ns");
-      write_val_unit_stats(result,
-                           cxxet_pp::compute_stats(marker_duration_gaps, false),
-                           "TRACE_duration_marker_gap", "ns");
+      write_val_unit_stats(result, std::move(marker_duration_gaps).get_diffs(),
+                           "TRACE_duration_marker_gap");
     } else {
       throw "unknown benchmark name '" + std::string{benchmark_name} + "'";
     }

@@ -44,10 +44,9 @@ struct stats {
   double p75;
   double p98; // fragile
   double max;
-};
 
-// `std::span` would be nicer ...
-stats compute_stats(std::vector<double> const &values,
-                    bool const sort_values = true);
+  // `std::span` would be nicer ...
+  static stats compute_from(std::vector<double> &&values);
+};
 
 } // namespace cxxet_pp

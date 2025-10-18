@@ -154,10 +154,12 @@ double percentile(std::vector<double> const &sorted_values, double const p) {
 
 } // namespace
 
-stats compute_stats(std::vector<double> const &values, bool const sort_values) {
+stats stats::compute_from(std::vector<double> &&values) {
   if (values.empty()) {
     throw "cannot compute stats over empty vector";
   }
+
+  std::sort(values.begin(), values.end());
 
   auto const n{static_cast<double>(values.size())};
 
@@ -173,28 +175,16 @@ stats compute_stats(std::vector<double> const &values, bool const sort_values) {
   }
   stddev = std::sqrt(stddev / n);
 
-  using vals_t = std::decay_t<decltype(values)>;
-
-  vals_t const *sorted_vals{nullptr};
-  vals_t sorted_values;
-  if (sort_values) {
-    sorted_values = values;
-    std::sort(sorted_values.begin(), sorted_values.end());
-    sorted_vals = &sorted_values;
-  } else {
-    sorted_vals = &values;
-  }
-
   return stats{static_cast<long long>(n),
                mean,
                stddev,
-               percentile(*sorted_vals, 0.0),
-               percentile(*sorted_vals, 2.0),
-               percentile(*sorted_vals, 25.0),
-               percentile(*sorted_vals, 50.0),
-               percentile(*sorted_vals, 75.0),
-               percentile(*sorted_vals, 98.0),
-               percentile(*sorted_vals, 100.0)};
+               percentile(values, 0.0),
+               percentile(values, 2.0),
+               percentile(values, 25.0),
+               percentile(values, 50.0),
+               percentile(values, 75.0),
+               percentile(values, 98.0),
+               percentile(values, 100.0)};
 }
 
 } // namespace cxxet_pp
