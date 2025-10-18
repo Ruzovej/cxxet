@@ -42,7 +42,7 @@ int main(int const argc, char const *const *const argv) {
                         "...|<input_dir>>",
                     true);
     };
-    auto consume_arg = [&usage, argc = argc - 1,
+    auto consume_arg = [&usage, argc{argc - 1},
                         argv{argv + 1}](bool const require =
                                             false) mutable -> std::string_view {
       if (argc <= 0) {
@@ -118,7 +118,7 @@ int main(int const argc, char const *const *const argv) {
       file_with_hash.reset();
     }
 
-    nlohmann::json benchmarks = nlohmann::json::array();
+    auto benchmarks{nlohmann::json::array()};
 
     auto const t0{cxxet_pp::now()};
 
@@ -162,7 +162,7 @@ int main(int const argc, char const *const *const argv) {
     std::sort(sortable_benchmarks.begin(), sortable_benchmarks.end(),
               [](auto const &a, auto const &b) { return a.first < b.first; });
 
-    nlohmann::json sorted_benchmarks = nlohmann::json::array();
+    auto sorted_benchmarks{nlohmann::json::array()};
 
     for (auto const &[_, j] : sortable_benchmarks) {
       sorted_benchmarks.emplace_back(std::move(*j));
