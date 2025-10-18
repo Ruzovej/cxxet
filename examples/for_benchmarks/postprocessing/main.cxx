@@ -34,11 +34,12 @@
 int main(int const argc, char const *const *const argv) {
   try {
     auto const usage = [&]() {
-      cxxet_pp::log("usage: " + std::string{argv[0]} +
-                        " [-v|--verbose] [-h|--help] <-o|--out|--out-json "
-                        "<output_file> <input_file_1> [<input_file_2>] "
-                        "...|<input_dir>>",
-                    true);
+      cxxet_pp::log(
+          "usage: " + std::string{argv[0]} +
+              " [-v|--verbose] [-h|--help] [-c|--compact] <-o|--out|--out-json "
+              "<output_file> <input_file_1> [<input_file_2>] "
+              "...|<input_dir>>",
+          true);
     };
     auto consume_arg = [&usage, argc{argc - 1},
                         argv{argv + 1}](bool const require =
@@ -59,6 +60,7 @@ int main(int const argc, char const *const *const argv) {
     std::string_view output;
     std::vector<std::string_view> rest;
     rest.reserve(static_cast<std::size_t>(std::max(argc - 3, 1)));
+    int json_indent{2};
 
     while (true) { // why are there no init-statements for `while` loops?!
       auto const arg{consume_arg()};
@@ -74,6 +76,8 @@ int main(int const argc, char const *const *const argv) {
         return EXIT_SUCCESS;
       } else if (arg == "-o" || arg == "--out" || arg == "--out-json") {
         output = consume_arg(true); // ignore repetitions - use the latest value
+      } else if (arg == "-c" || arg == "--compact") {
+        json_indent = -1;
       } else {
         rest.emplace_back(arg);
       }
@@ -119,10 +123,8 @@ int main(int const argc, char const *const *const argv) {
       file_with_hash.reset();
     }
 
-    auto benchmarks{nlohmann::json::array()};
-
     auto const t0{cxxet_pp::now()};
-
+    auto benchmarks{nlohmann::json::array()};
     // TODO parallelize?!
     for (auto const &entry_path : input_files) {
       static constexpr std::string_view meta_file_suffix{"_meta.json"};
@@ -134,41 +136,40 @@ int main(int const argc, char const *const *const argv) {
                                 cxxet_pp::now());
       }
     }
-
     auto const t1{cxxet_pp::now()};
     cxxet_pp::log_time_diff("Postprocessed benchmark results", t0, t1, true);
 
-    auto const json_elem_cmp_tuple = [](nlohmann::json const &j) {
-      auto const &jbp{j["benchmark_params"]};
-      return std::tuple(j["benchmark_name"].get<std::string_view>(),
-                        jbp["num_iters"].get<long long>(),
-                        jbp["marker_after_iter"].get<long long>(),
-                        jbp["cxxet_reserve_buffer"].get<long long>(),
-                        jbp["num_threads"].get<long long>(),
-                        jbp["used_lib"].get<std::string_view>(),
-                        jbp["subtype"].get<std::string_view>(),
-                        jbp["reps_max"].get<long long>(),
-                        jbp["rep_no"].get<long long>());
-    };
-
-    using cmp_tuple_t = decltype(json_elem_cmp_tuple(benchmarks.front()));
-
-    std::vector<std::pair<cmp_tuple_t, nlohmann::json *>> sortable_benchmarks;
-    sortable_benchmarks.reserve(benchmarks.size());
-
-    for (auto &j : benchmarks) {
-      sortable_benchmarks.emplace_back(json_elem_cmp_tuple(j), &j);
-    }
-
-    std::sort(sortable_benchmarks.begin(), sortable_benchmarks.end(),
-              [](auto const &a, auto const &b) { return a.first < b.first; });
-
     auto sorted_benchmarks{nlohmann::json::array()};
+    {
+      auto const json_elem_cmp_tuple = [](nlohmann::json const &j) {
+        auto const &jbp{j["benchmark_params"]};
+        return std::tuple(j["benchmark_name"].get<std::string_view>(),
+                          jbp["num_iters"].get<long long>(),
+                          jbp["marker_after_iter"].get<long long>(),
+                          jbp["cxxet_reserve_buffer"].get<long long>(),
+                          jbp["num_threads"].get<long long>(),
+                          jbp["used_lib"].get<std::string_view>(),
+                          jbp["subtype"].get<std::string_view>(),
+                          jbp["reps_max"].get<long long>(),
+                          jbp["rep_no"].get<long long>());
+      };
 
-    for (auto const &[_, j] : sortable_benchmarks) {
-      sorted_benchmarks.emplace_back(std::move(*j));
+      using cmp_tuple_t = decltype(json_elem_cmp_tuple(benchmarks.front()));
+
+      std::vector<std::pair<cmp_tuple_t, nlohmann::json *>> sortable_benchmarks;
+      sortable_benchmarks.reserve(benchmarks.size());
+
+      for (auto &j : benchmarks) {
+        sortable_benchmarks.emplace_back(json_elem_cmp_tuple(j), &j);
+      }
+
+      std::sort(sortable_benchmarks.begin(), sortable_benchmarks.end(),
+                [](auto const &a, auto const &b) { return a.first < b.first; });
+
+      for (auto &[_, jp] : sortable_benchmarks) {
+        sorted_benchmarks.emplace_back(std::move(*jp));
+      }
     }
-
     auto const t2{cxxet_pp::now()};
     cxxet_pp::log_time_diff("Sorted postprocessed benchmark results", t1, t2,
                             true);
@@ -183,8 +184,7 @@ int main(int const argc, char const *const *const argv) {
                                                 .get<std::string>();
     }
 
-    std::ofstream ofs{output_file};
-    ofs << result.dump(2);
+    std::ofstream{output_file} << result.dump(json_indent);
 
     cxxet_pp::log_time_diff("Saved results into file " + output_file.string(),
                             t2, cxxet_pp::now(), true);
