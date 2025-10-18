@@ -23,7 +23,11 @@
 
 namespace cxxet_pp {
 
+// all is thread unsafe
+
 void set_verbose(bool const aVerbose) noexcept;
+
+bool get_verbose() noexcept;
 
 void log(std::string_view const msg, bool const force = false);
 

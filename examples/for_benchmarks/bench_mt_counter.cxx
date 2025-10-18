@@ -73,7 +73,7 @@ int main(int const argc, char const **argv) {
 
 #ifndef NDEBUG
   if (ai.load(std::memory_order::memory_order_acquire) !=
-      (driver.num_iters * driver.num_threads)) {
+      (driver.num_iters * driver.num_threads * driver.marker_after_iter)) {
     return EXIT_FAILURE;
   }
 #endif
