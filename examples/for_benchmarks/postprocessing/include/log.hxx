@@ -25,6 +25,8 @@ namespace cxxet_pp {
 
 void set_verbose(bool const aVerbose) noexcept;
 
+bool get_verbose() noexcept;
+
 void log(std::string_view const msg, bool const force = false);
 
 void log_error(std::string_view const msg);

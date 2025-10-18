@@ -177,12 +177,16 @@ int main(int const argc, char const *const *const argv) {
           if (cxxet_pp::ends_with(entry_path.string(), meta_file_suffix)) {
             auto const t00{cxxet_pp::now()};
             cxxet_pp::process_benchmark(sub_results[my_file_index], entry_path);
-            msg = "\tThread " + std::to_string(th_ind) + "/" +
-                  std::to_string(th_num) + " processed " + entry_path.string();
-            auto const t01{cxxet_pp::now()};
 
-            std::lock_guard lck{log_mtx};
-            cxxet_pp::log_time_diff(msg, t00, t01);
+            if (cxxet_pp::get_verbose()) {
+              msg = "\tThread " + std::to_string(th_ind) + "/" +
+                    std::to_string(th_num) + " processed " +
+                    entry_path.string();
+              auto const t01{cxxet_pp::now()};
+
+              std::lock_guard lck{log_mtx};
+              cxxet_pp::log_time_diff(msg, t00, t01);
+            }
           }
         } while (true);
       };

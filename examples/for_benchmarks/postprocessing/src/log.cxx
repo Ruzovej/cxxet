@@ -27,6 +27,8 @@ static bool verbose{false};
 
 void set_verbose(bool const aVerbose) noexcept { verbose = aVerbose; }
 
+bool get_verbose() noexcept { return verbose; }
+
 void log(std::string_view const msg, bool const force) {
   if (verbose || force) {
     std::cout << msg << '\n';
