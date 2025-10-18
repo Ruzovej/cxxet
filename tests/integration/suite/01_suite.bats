@@ -12,8 +12,6 @@ function setup_file() {
     export CXXET_VERBOSE=1
     export CXXET_DEFAULT_BLOCK_SIZE=2
     export CXXET_TARGET_FILENAME='' # by default disable dumping events into "implicit" file
-    export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
-    mkdir -p "${TMP_RESULT_DIR}"
 
     user_log "# using tmp dir '%s'\n" "${TMP_RESULT_DIR}"
 }
@@ -599,29 +597,60 @@ Deduced CXXET_TARGET_FILENAME: "
         2 # marker_after_iter
         3 # cxxet_reserve_buffer
         "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
+    local meta_file1="${result_base}_bare_meta.json"
+    local output_file1="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    refute [ -f "${result_base}.json" ]
+    assert [ -f "${meta_file1}" ]
+    refute [ -f "${output_file1}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" "${num_threads}"
+    assert_equal "$(jq -e 'length' "${meta_file1}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file1}")" "\"${executable}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file1}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file1}")" '"bare"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file1}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    local output_file="${result_base}_traced.json"
+    local meta_file2="${result_base}_meta.json"
+    local output_file2="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    assert [ -f "${output_file}" ]
+    assert [ -f "${meta_file2}" ]
+    assert [ -f "${output_file2}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" "${num_threads}"
-    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * num_threads ))"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${output_file}")" "$(( num_iters * num_threads ))"
+    assert_equal "$(jq -e 'length' "${meta_file2}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file2}")" "\"${executable}\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file2}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file2}")" '"cxxet"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file2}")" "${num_threads}"
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file2}")" "$(( num_iters * num_threads ))"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${output_file2}")" "$(( num_iters * num_threads ))"
+
+    local pp_file="${result_base}_pp.json"
+    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${pp_file}" ]
+
+    assert_equal "$(jq -e 'length' "${pp_file}")" 2
+
+    local num_extracted_statistic_from_real_file_low=7 # `examples/for_benchmarks/postprocessing/include/statistics.hxx` -> method `percentiles_near_min_max_meaningful`
+    local num_driver_statistics="$(( 2 + 4 * num_extracted_statistic_from_real_file_low ))" # see `examples/for_benchmarks/common/sources/cxxet_bench_driver.cxx` -> `struct meta` + `examples/for_benchmarks/postprocessing/src/result_processor.cxx` -> function `process_benchmark_thread_perfs` ... 6 items, only 4 of them have (7) detailed statistics
+    local num_extracted_statistic_from_real_file_high=9
+    assert_equal "$(jq -e '.benchmarks | length' "${pp_file}")" "$(( num_driver_statistics * 2 + num_extracted_statistic_from_real_file_high ))"
+    # first `*2`: `cxxet` + `bare`
+    # observing one thing - gaps (or intervals ...) - in the results:
+    # there are 4 * 49 gaps -> detailed statistics will consist of 9 entries
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "bare")] | length' "${pp_file}")" "${num_driver_statistics}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "cxxet")] | length' "${pp_file}")" "$(( num_driver_statistics + num_extracted_statistic_from_real_file_high ))"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_counter_marker_interval"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_high}"
+    # IMHO unnecessary to test it in more detail ...
 }
 
 @test "Large benchmark correctness test 2 (cxxet_bench_st_instant)" {
@@ -631,36 +660,67 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_2"
     local num_iters=50
+    local num_threads=1
     local executable="${BIN_DIR}/cxxet_bench_st_instant"
 
     local args=(
         "${num_iters}"
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
-        1 # num_threads
+        "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
+    local meta_file1="${result_base}_bare_meta.json"
+    local output_file1="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    refute [ -f "${result_base}.json" ]
+    assert [ -f "${meta_file1}" ]
+    refute [ -f "${output_file1}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e 'length' "${meta_file1}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file1}")" "\"${executable}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file1}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file1}")" '"bare"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file1}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    local output_file="${result_base}_traced.json"
+    local meta_file2="${result_base}_meta.json"
+    local output_file2="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    assert [ -f "${output_file}" ]
+    assert [ -f "${meta_file2}" ]
+    assert [ -f "${output_file2}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
-    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "${num_iters}"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e 'length' "${meta_file2}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file2}")" "\"${executable}\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file2}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file2}")" '"cxxet"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file2}")" "${num_threads}"
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file2}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file2}")" "${num_iters}"
+
+    local pp_file="${result_base}_pp.json"
+    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${pp_file}" ]
+
+    assert_equal "$(jq -e 'length' "${pp_file}")" 2
+
+    local num_driver_statistics=6 # see `examples/for_benchmarks/common/sources/cxxet_bench_driver.cxx` -> `struct meta`
+    local num_extracted_statistic_from_real_file_low=7 # `examples/for_benchmarks/postprocessing/include/statistics.hxx` -> method `percentiles_near_min_max_meaningful`
+    assert_equal "$(jq -e '.benchmarks | length' "${pp_file}")" "$(( num_driver_statistics * 2 + num_extracted_statistic_from_real_file_low ))"
+    # first `*2`: `cxxet` + `bare`
+    # observing one thing - gaps (or intervals ...) - in the results:
+    # there are 4 * 49 gaps -> detailed statistics will consist of 9 entries
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "bare")] | length' "${pp_file}")" "${num_driver_statistics}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "cxxet")] | length' "${pp_file}")" "$(( num_driver_statistics + num_extracted_statistic_from_real_file_low ))"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_instant_marker_interval"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_low}"
+    # IMHO unnecessary to test it in more detail ...
 }
 
 @test "Large benchmark correctness test 3 (cxxet_bench_st_guarded_instant)" {
@@ -670,37 +730,70 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_3"
     local num_iters=50
+    local num_threads=1
     local executable="${BIN_DIR}/cxxet_bench_st_guarded_instant"
 
     local args=(
         "${num_iters}"
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
-        1 # num_threads
+        "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
+    local meta_file1="${result_base}_bare_meta.json"
+    local output_file1="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    refute [ -f "${result_base}.json" ]
+    assert [ -f "${meta_file1}" ]
+    refute [ -f "${output_file1}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e 'length' "${meta_file1}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file1}")" "\"${executable}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file1}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file1}")" '"bare"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file1}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    local output_file="${result_base}_traced.json"
+    local meta_file2="${result_base}_meta.json"
+    local output_file2="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    assert [ -f "${output_file}" ]
+    assert [ -f "${meta_file2}" ]
+    assert [ -f "${output_file2}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
-    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * 2 ))"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file}")" "${num_iters}"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e 'length' "${meta_file2}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file2}")" "\"${executable}\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file2}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file2}")" '"cxxet"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file2}")" "${num_threads}"
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file2}")" "$(( num_iters * 2 ))"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file2}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file2}")" "${num_iters}"
+
+    local pp_file="${result_base}_pp.json"
+    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${pp_file}" ]
+
+    assert_equal "$(jq -e 'length' "${pp_file}")" 2
+
+    local num_driver_statistics=6 # see `examples/for_benchmarks/common/sources/cxxet_bench_driver.cxx` -> `struct meta`
+    local num_extracted_statistic_from_real_file_low=7 # `examples/for_benchmarks/postprocessing/include/statistics.hxx` -> method `percentiles_near_min_max_meaningful`
+    local num_extracted_statistic_from_real_file_high=9
+    assert_equal "$(jq -e '.benchmarks | length' "${pp_file}")" "$(( num_driver_statistics * 2 + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high * 2 ))"
+    # first `*2`: `cxxet` + `bare`
+    # observing three things ...
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "bare")] | length' "${pp_file}")" "${num_driver_statistics}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "cxxet")] | length' "${pp_file}")" "$(( num_driver_statistics + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high * 2 ))"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_guarding_complete_marker_duration"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_high}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_guarding_complete_marker_gap"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_low}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_guarded_instant_dist_from_complete_center"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_high}"
+    # IMHO unnecessary to test it in more detail ...
 }
 
 @test "Large benchmark correctness test 4 (cxxet_bench_st_complete)" {
@@ -710,36 +803,69 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_4"
     local num_iters=50
+    local num_threads=1
     local executable="${BIN_DIR}/cxxet_bench_st_complete"
 
     local args=(
         "${num_iters}"
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
-        1 # num_threads
+        "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
+    local meta_file1="${result_base}_bare_meta.json"
+    local output_file1="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    refute [ -f "${result_base}.json" ]
+    assert [ -f "${meta_file1}" ]
+    refute [ -f "${output_file1}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e 'length' "${meta_file1}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file1}")" "\"${executable}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file1}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file1}")" '"bare"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file1}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    local output_file="${result_base}_traced.json"
+    local meta_file2="${result_base}_meta.json"
+    local output_file2="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    assert [ -f "${output_file}" ]
+    assert [ -f "${meta_file2}" ]
+    assert [ -f "${output_file2}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
-    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "${num_iters}"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e 'length' "${meta_file2}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file2}")" "\"${executable}\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file2}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file2}")" '"cxxet"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file2}")" "${num_threads}"
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file2}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file2}")" "${num_iters}"
+
+    local pp_file="${result_base}_pp.json"
+    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${pp_file}" ]
+
+    assert_equal "$(jq -e 'length' "${pp_file}")" 2
+
+    local num_driver_statistics=6 # see `examples/for_benchmarks/common/sources/cxxet_bench_driver.cxx` -> `struct meta`
+    local num_extracted_statistic_from_real_file_low=7 # `examples/for_benchmarks/postprocessing/include/statistics.hxx` -> method `percentiles_near_min_max_meaningful`
+    local num_extracted_statistic_from_real_file_high=9
+    assert_equal "$(jq -e '.benchmarks | length' "${pp_file}")" "$(( num_driver_statistics * 2 + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high ))"
+    # first `*2`: `cxxet` + `bare`
+    # observing one thing - durations - in the results:
+    # there are 50 durations -> detailed statistics will consist of 9 entries
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "bare")] | length' "${pp_file}")" "${num_driver_statistics}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "cxxet")] | length' "${pp_file}")" "$(( num_driver_statistics + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high ))"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_complete_marker_duration"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_high}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_complete_marker_gap"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_low}"
+    # IMHO unnecessary to test it in more detail ...
 }
 
 @test "Large benchmark correctness test 5 (cxxet_bench_st_duration)" {
@@ -749,37 +875,71 @@ Deduced CXXET_TARGET_FILENAME: "
 
     local result_base="${TMP_RESULT_DIR}/example_large_benchmark_5"
     local num_iters=50
+    local num_threads=1
     local executable="${BIN_DIR}/cxxet_bench_st_duration"
 
     local args=(
         "${num_iters}"
         1 # marker_after_iter
         3 # cxxet_reserve_buffer
-        1 # num_threads
+        "${num_threads}"
+        1 # repetition
+        1 # num_repetitions
         "${result_base}" # bench_result_filename_base
     )
 
-    local meta_file="${result_base}_meta.json"
+    local meta_file1="${result_base}_bare_meta.json"
+    local output_file1="${result_base}_bare.json"
     run "${executable}_bare" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    refute [ -f "${result_base}.json" ]
+    assert [ -f "${meta_file1}" ]
+    refute [ -f "${output_file1}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
+    assert_equal "$(jq -e 'length' "${meta_file1}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file1}")" "\"${executable}_bare\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file1}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file1}")" '"bare"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file1}")" "${num_threads}"
 
-    meta_file="${result_base}_traced_meta.json"
-    local output_file="${result_base}_traced.json"
+    local meta_file2="${result_base}_meta.json"
+    local output_file2="${result_base}.json"
     run "${executable}" "${args[@]}"
     assert_success
     refute_sanitizer_output
-    assert [ -f "${meta_file}" ]
-    assert [ -f "${output_file}" ]
+    assert [ -f "${meta_file2}" ]
+    assert [ -f "${output_file2}" ]
 
-    assert_equal "$(jq -e 'length' "${meta_file}")" 1
-    assert_equal "$(jq -e '.traceEvents | length' "${output_file}")" "$(( num_iters * 2 ))"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${output_file}")" "${num_iters}"
-    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${output_file}")" "${num_iters}"
+    assert_equal "$(jq -e 'length' "${meta_file2}")" 2
+    assert_equal "$(jq -e '.meta_info.benchmark_executable' "${meta_file2}")" "\"${executable}\""
+    assert_equal "$(jq -e '.meta_info.benchmark_name' "${meta_file2}")" "\"${executable##*/}\""
+    assert_equal "$(jq -e '.meta_info.traced' "${meta_file2}")" '"cxxet"'
+    assert_equal "$(jq -e '.thread_perfs | length' "${meta_file2}")" "${num_threads}"
+    assert_equal "$(jq -e '.traceEvents | length' "${output_file2}")" "$(( num_iters * 2 ))"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "B")] | length' "${output_file2}")" "${num_iters}"
+    assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${output_file2}")" "${num_iters}"
+
+    local pp_file="${result_base}_pp.json"
+    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${pp_file}" ]
+    # TODO for the test cases above too!
+
+    assert_equal "$(jq -e 'length' "${pp_file}")" 2
+
+    local num_driver_statistics=6 # see `examples/for_benchmarks/common/sources/cxxet_bench_driver.cxx` -> `struct meta`
+    local num_extracted_statistic_from_real_file_low=7 # `examples/for_benchmarks/postprocessing/include/statistics.hxx` -> method `percentiles_near_min_max_meaningful`
+    local num_extracted_statistic_from_real_file_high=9
+    assert_equal "$(jq -e '.benchmarks | length' "${pp_file}")" "$(( num_driver_statistics * 2 + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high ))"
+    # first `*2`: `cxxet` + `bare`
+    # observing two things - durations and gaps - in the results:
+    # there are 49 gaps and 50 durations ... -> detailed statistics for one will consist of 7 entries, for the other of 9 entries
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "bare")] | length' "${pp_file}")" "${num_driver_statistics}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.used_lib == "cxxet")] | length' "${pp_file}")" "$(( num_driver_statistics + num_extracted_statistic_from_real_file_low + num_extracted_statistic_from_real_file_high ))"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_duration_marker_gap"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_low}"
+    assert_equal "$(jq -e '[.benchmarks[].benchmark_params | select(.subtype | startswith("TRACE_duration_marker_duration"))] | length' "${pp_file}")" "${num_extracted_statistic_from_real_file_high}"
+    # IMHO unnecessary to test it in more detail ...
 }
 
 # TODO end-user usage:
@@ -1085,7 +1245,11 @@ Deduced CXXET_TARGET_FILENAME: "
         # user_log "# checking file '%s'\n" "${file}"
         run ldd "${file}"
         assert_success
-        if [[ "${file}" =~ _bare$ || "${file}" =~ cxxet_unit_tests$ || "${file}" =~ cxxet_benchmarks$ ]]; then
+        if [[ "${file}" =~ _bare$ \
+            || "${file}" =~ cxxet_unit_tests \
+            || "${file}" =~ cxxet_benchmarks \
+            || "${file}" =~ cxxet_large_bench_postprocess \
+        ]]; then
             refute_output --partial "libcxxet.so"
         else
             assert_output --partial "libcxxet.so"

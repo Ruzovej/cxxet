@@ -70,6 +70,8 @@ struct driver {
   int const marker_after_iter;
   int const cxxet_reserve_buffer;
   int const num_threads;
+  int const repetition;
+  int const num_repetitions;
 
 private:
   driver(driver const &) = delete;

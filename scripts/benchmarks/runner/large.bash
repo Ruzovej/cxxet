@@ -3,6 +3,7 @@
 set -e
 
 cxxet_include scripts/commands/compile
+cxxet_include scripts/common/commit_hash_json_file
 
 function large() {
     cxxet_require_command \
@@ -102,17 +103,19 @@ function large() {
         local num_threads="${5:?}"
         local result_base="${6:?}"
 
-        local args=(
-            "${num_iters}"
-            "${marker_after_iter}"
-            "${cxxet_reserve_buffer}"
-            "${num_threads}"
-        )
-
         [[ "${dry_run}" == 'true' ]] || [[ -x "${executable}" ]] || return 1
 
         local rep
         for rep in $(seq 1 "${reps}"); do
+            local args=(
+                "${num_iters}"
+                "${marker_after_iter}"
+                "${cxxet_reserve_buffer}"
+                "${num_threads}"
+                "${rep}"
+                "${reps}"
+            )
+
             local rep_result_base="${result_base}"
             [[ "${reps}" == 1 ]] || rep_result_base="${rep_result_base}-rep${rep}"
 
@@ -124,7 +127,7 @@ function large() {
                         "${rep_result_base}"
                 ) >&2
             else
-                printf '%s %s %s %s %s %s\n' \
+                printf '%s %s %s %s %s %s %s %s\n' \
                     "${executable##${CXXET_ROOT_DIR}/}" \
                         "${args[@]}" \
                         "${rep_result_base##${CXXET_ROOT_DIR}/}" >&2
@@ -189,14 +192,14 @@ function large() {
         fi
 
         local num_iters
-        for num_iters in 100 10000 100000; do # 3 values
+        for num_iters in 100 1000 10000 100000; do # 4 values
             local mai
             for mai in "${marker_after_iters[@]}"; do # 1 or 2 values
                 local cxxet_reserve_buffer
                 for cxxet_reserve_buffer in "$((num_iters / 8))" "${num_iters}" "$((num_iters * 4))"; do # 3 values
                     local nths
                     for nths in "${num_threads[@]}"; do # 1 or 3 values
-                        # either 9 or 64 combinations ...!!!
+                        # either 12 (`st`) or 72 (`mt`) combinations ...!!!
                         # this below is either `1 (or 2 if not skipping "bare" version) * reps` runs ...
                         run_large_benchmark \
                             "${bin_dir}" \
@@ -218,16 +221,13 @@ function large() {
     printf -- '-=-=-=-=-=-=-=- Executed %s large benchmarks (with out_dir "%s")\n' "${num_executed_benchmarks}" "${out_dir}" >&2
 
     if [[ "${dry_run}" == 'false' ]]; then
-        local out_file="${out_dir}/commit_hash.json"
+        commit_hash_json_file "${out_dir}"
 
-        local git_hash="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD 2>/dev/null || printf "N/A")"
-        local git_dirty="$(git -C "${CXXET_ROOT_DIR}" diff --shortstat)"
-
-        local result="${git_hash}${git_dirty:+ (dirty)}"
-
-        printf '{"context":{"cxxet_git_hash":"%s"}}' "${result}" > "${out_file}"
+        "${CXXET_ROOT_DIR}/bin/${preset}/cxxet_large_bench_postprocess" --verbose "${out_dir}" >&2
 
         if [[ "${compression}" == 'true' ]]; then
+            cp "${out_dir}/large.json" "${out_dir}/../large.json"
+
             (
                 set -x
                 tar \
@@ -236,7 +236,7 @@ function large() {
                     --remove-files \
                     --create \
                     --file "${out_dir}.tar.zst" \
-                    . \
+                    .
                 # (TODO?!) provide command for uncompressing it too (into given directory)? E.g.:
                 # mkdir "${PWD}/tmp/ahoj2"
                 # zstd \

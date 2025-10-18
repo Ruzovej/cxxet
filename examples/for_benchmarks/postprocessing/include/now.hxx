@@ -19,26 +19,12 @@
 
 #pragma once
 
-namespace cxxet::impl::sink {
+#include "../../../../include/public/cxxet/timepoint.hxx"
 
-struct properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+namespace cxxet_pp {
 
-  [[nodiscard]] static properties const &instance() noexcept;
+inline long long now() noexcept {
+  return cxxet::impl::as_int_ns(cxxet::impl::now());
+}
 
-#ifndef CXXET_WITH_UNIT_TESTS
-private:
-#endif
-  properties() noexcept;
-
-private:
-  properties(properties const &) = delete;
-  properties &operator=(properties const &) = delete;
-  properties(properties &&) = delete;
-  properties &operator=(properties &&) = delete;
-};
-
-} // namespace cxxet::impl::sink
+} // namespace cxxet_pp

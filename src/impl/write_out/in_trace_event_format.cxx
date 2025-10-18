@@ -19,6 +19,7 @@
 
 #include "impl/write_out/in_trace_event_format.hxx"
 
+#include <cassert>
 #include <cstring>
 
 #include <iomanip>
@@ -85,9 +86,33 @@ std::string escape_json_string(char const *const str, std::size_t len = 0) {
   return result.str();
 }
 
-constexpr double longlong_ns_to_double_us(long long const ns) noexcept {
-  return static_cast<double>(ns) / 1'000.0;
-}
+class fraction_us {
+  long long us;
+  long long frac; // in [0, 999]
+
+  static constexpr int divisor{1'000};
+
+public:
+  explicit fraction_us(long long const ns) noexcept
+      : us{ns / divisor}, frac{ns % divisor} {
+    assert(ns >= 0);
+  }
+
+  friend output::writer &operator<<(output::writer &ow, fraction_us const &fu) {
+    ow << fu.us << '.';
+
+    // ugh ...
+    if (fu.frac < 100) {
+      ow << '0';
+    }
+    if (fu.frac < 10) {
+      ow << '0';
+    }
+    ow << fu.frac;
+
+    return ow;
+  }
+};
 
 } // namespace
 
@@ -123,7 +148,7 @@ void in_trace_event_format(output::writer &out,
     }
 
     auto const write_out_timestamp = [&out](long long const ns) {
-      out << "\"ts\":" << longlong_ns_to_double_us(ns) << ',';
+      out << "\"ts\":" << fraction_us{ns} << ',';
     };
 
     switch (evt.get_type()) {
@@ -140,7 +165,7 @@ void in_trace_event_format(output::writer &out,
     case event::trace_type::complete: {
       auto const &e{evt.evt.cmpl};
       write_out_timestamp(e.start_ns - time_point_zero_ns);
-      out << "\"dur\":" << longlong_ns_to_double_us(e.duration_ns) << ',';
+      out << "\"dur\":" << fraction_us{e.duration_ns} << ',';
       break;
     }
     case event::trace_type::instant: {

@@ -21,6 +21,7 @@
 
 #include <cassert>
 
+#include <algorithm>
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -71,21 +72,35 @@ private:
   bool flush{true};
 };
 
-meta &get_meta() noexcept {
+[[nodiscard]] meta &get_meta() noexcept {
   thread_local meta m;
   return m;
 }
 
 struct metas {
-  explicit metas(std::string aTarget_filename)
-      : target_filename{std::move(aTarget_filename)} {
-    assert(!target_filename.empty());
-  }
+  metas() = default;
   ~metas();
+
+  void set_traits(std::string aBenchmark_name, int const aNum_iters,
+                  int const aMarker_after_iter, int const aCxxet_reserve_buffer,
+                  int const aNum_threads, int const aRepetition,
+                  int const aNum_repetitions,
+                  std::string aCxxet_results_filename,
+                  std::string aMeta_results_filename) {
+    benchmark_executable = std::move(aBenchmark_name);
+    num_iters = aNum_iters;
+    marker_after_iter = aMarker_after_iter;
+    cxxet_reserve_buffer = aCxxet_reserve_buffer;
+    num_threads = aNum_threads;
+    repetition = aRepetition;
+    num_repetitions = aNum_repetitions;
+    cxxet_results_filename = std::move(aCxxet_results_filename);
+    meta_results_filename = std::move(aMeta_results_filename);
+  }
 
   void submit(meta m) {
     std::lock_guard lck{mtx};
-    ms.push_back(std::move(m));
+    ms.emplace_back(std::move(m));
   }
 
 private:
@@ -94,39 +109,83 @@ private:
 
   std::mutex mtx;
   std::vector<meta> ms;
-  std::string target_filename;
+
+  std::string benchmark_executable;
+  int num_iters;
+  int marker_after_iter;
+  int cxxet_reserve_buffer;
+  int num_threads;
+  int repetition;
+  int num_repetitions;
+  std::string cxxet_results_filename;
+  std::string meta_results_filename;
 };
 
-metas &get_metas(std::string const &target_filename) {
-  static metas m{target_filename};
+[[nodiscard]] metas &get_metas() {
+  static metas m{};
   return m;
 }
 
 meta::~meta() {
   if (flush) {
     flush = false;
-    get_metas("").submit(*this);
+    get_metas().submit(*this);
   }
 }
 
 metas::~metas() {
-  auto const pid{cxxet::impl::get_process_id()};
+  assert(!meta_results_filename.empty());
 
-  nlohmann::json j = nlohmann::json::array();
-
-  for (auto const &m : ms) {
-    j.push_back({{"pid", pid},
-                 {"tid", m.tid},
-                 {"thread_reserve_ns", m.thread_reserve_ns},
-                 {"set_thread_name_ns", m.set_thread_name_ns},
-                 {"markers_submission_ns", m.markers_submission_ns},
-                 {"thread_flush_ns", m.thread_flush_ns},
-                 {"global_flush_target_ns", m.global_flush_target_ns},
-                 {"global_flush_ns", m.global_flush_ns}});
+  std::string benchmark_name{benchmark_executable};
+  {
+    auto const slash_pos{benchmark_name.find_last_of('/')};
+    if (slash_pos != std::string::npos) {
+      benchmark_name = benchmark_name.substr(slash_pos + 1);
+    }
+    auto const sz{static_cast<long long>(benchmark_name.size())};
+    if (sz < 6) {
+      benchmark_name = "!!!unknown!!!";
+    }
+    if (std::equal(benchmark_name.begin() + (sz - 5), benchmark_name.end(),
+                   "_bare")) {
+      benchmark_name =
+          benchmark_name.substr(0, static_cast<std::size_t>(sz - 5));
+    }
   }
 
-  std::ofstream ofs{target_filename};
-  ofs << j.dump(2);
+  nlohmann::json meta_info = {
+      {"pid", cxxet::impl::get_process_id()},
+      {"benchmark_executable", benchmark_executable},
+      {"benchmark_name", std::move(benchmark_name)},
+      {"traced", cxxet_bench::driver::tracing_enabled() ? "cxxet" : "bare"},
+      {"num_iters", num_iters},
+      {"marker_after_iter", marker_after_iter},
+      {"cxxet_reserve_buffer", cxxet_reserve_buffer},
+      {"num_threads", num_threads},
+      {"cxxet_results_filename", std::move(cxxet_results_filename)},
+      {"repetitions", num_repetitions},
+      {"repetition_index", repetition},
+  };
+
+  nlohmann::json thread_perfs = nlohmann::json::array();
+  for (auto const &m : ms) {
+    thread_perfs.push_back(
+        {{"tid", m.tid},
+         {"thread_reserve_ns", m.thread_reserve_ns},
+         {"set_thread_name_ns", m.set_thread_name_ns},
+         {"markers_submission_ns", m.markers_submission_ns},
+         {"thread_flush_ns", m.thread_flush_ns},
+         {"global_flush_target_ns", m.global_flush_target_ns},
+         {"global_flush_ns", m.global_flush_ns}});
+  }
+
+  nlohmann::json result = {
+      {"meta_info", std::move(meta_info)},
+      {"thread_perfs", std::move(thread_perfs)},
+  };
+
+  std::ofstream ofs{meta_results_filename};
+  ofs << result.dump(2);
 }
 
 } // namespace
@@ -138,11 +197,15 @@ driver::driver(int const argc, char const **argv)
       marker_after_iter(argc > 2 ? std::atoi(argv[2]) : 1),
       cxxet_reserve_buffer(argc > 3 ? std::atoi(argv[3]) : 10'000),
       num_threads(argc > 4 ? std::atoi(argv[4]) : 4),
+      repetition{argc > 5 ? std::atoi(argv[5]) : 1},
+      num_repetitions{argc > 6 ? std::atoi(argv[6]) : 1},
       bench_result_filename_base{
-          (argc > 5 ? argv[5] : "/tmp/bench_result") +
-          std::string{tracing_enabled() ? "_traced" : ""}} {
-  [[maybe_unused]] auto const &metas{
-      get_metas(bench_result_filename_base + "_meta.json")};
+          (argc > 7 ? argv[7] : "/tmp/bench_result") +
+          std::string{tracing_enabled() ? "" : "_bare"}} {
+  get_metas().set_traits(argv[0], num_iters, marker_after_iter,
+                         cxxet_reserve_buffer, num_threads, repetition,
+                         num_repetitions, bench_result_filename_base + ".json",
+                         bench_result_filename_base + "_meta.json");
 #ifdef CXXET_ENABLE
   global_file_sink = cxxet::file_sink_handle::make(num_threads > 1);
 #endif
@@ -169,6 +232,8 @@ void driver::thread_reserve(int const capacity) const {
   auto const begin{now()};
 #ifdef CXXET_ENABLE
   global_file_sink->divert_thread_sink_to_this();
+#else
+  (void)capacity;
 #endif
   CXXET_sink_thread_reserve(capacity > 0 ? capacity : cxxet_reserve_buffer);
   get_meta().thread_reserve_ns += now() - begin;
@@ -177,6 +242,9 @@ void driver::thread_reserve(int const capacity) const {
 void driver::set_thread_name(char const *const th_name) const {
   auto const begin{now()};
   CXXET_mark_thread_name(th_name);
+#ifndef CXXET_ENABLE
+  (void)th_name;
+#endif
   get_meta().set_thread_name_ns += now() - begin;
 }
 
@@ -213,15 +281,24 @@ void driver::stop_marker_submission_measurement() const {
 void driver::submit_counter_marker(char const *const name,
                                    double const value) const {
   CXXET_mark_counter(name, value);
+#ifndef CXXET_ENABLE
+  (void)name;
+  (void)value;
+#endif
 }
 
 void driver::submit_instant_marker(char const *const name) const {
   CXXET_mark_instant(name);
+#ifndef CXXET_ENABLE
+  (void)name;
+#endif
 }
 
 driver::complete_marker_alike::~complete_marker_alike() noexcept {
 #ifdef CXXET_ENABLE
   reinterpret_cast<cxxet::mark::complete *>(&buffer)->~complete();
+#else
+  (void)buffer;
 #endif
 }
 
@@ -229,6 +306,8 @@ driver::complete_marker_alike::complete_marker_alike(
     const char *const name) noexcept {
 #ifdef CXXET_ENABLE
   new (&buffer) cxxet::mark::complete{name};
+#else
+  (void)name;
 #endif
 }
 
@@ -239,6 +318,9 @@ driver::submit_complete_marker(char const *const name) const {
 
 void driver::submit_begin_marker(char const *const name) const {
   CXXET_mark_duration_begin(name);
+#ifndef CXXET_ENABLE
+  (void)name;
+#endif
 }
 
 void driver::submit_end_marker() const { CXXET_mark_duration_end(); }

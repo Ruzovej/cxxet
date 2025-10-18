@@ -3,6 +3,7 @@
 set -e
 
 cxxet_include scripts/commands/compile
+cxxet_include scripts/common/commit_hash_json_file
 cxxet_include scripts/tests/initialize_bats
 
 function bats_runner() {
@@ -90,11 +91,17 @@ function bats_runner() {
                 --target infra_sanitizer_check \
                 --target cxxet_examples \
                 --target cxxet_unit_tests \
+                --target cxxet_large_benchmarks \
                 --last-defines \
                 --ignore-compile_commands >&2
 
-            printf -- '-=-=-=-=-=-=-=- Executing %s bats tests:\n' "${preset}" >&2
             export CXXET_PRESET="${preset}"
+            export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
+            mkdir -p "${TMP_RESULT_DIR}"
+
+            commit_hash_json_file "${TMP_RESULT_DIR}"
+
+            printf -- '-=-=-=-=-=-=-=- Executing %s bats tests:\n' "${preset}" >&2
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive "${CXXET_ROOT_DIR}/tests/integration/suite"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/01_suite.bats"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/02_cmake_fetch_cxxet_direct_usage.bats"

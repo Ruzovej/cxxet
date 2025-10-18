@@ -1,0 +1,28 @@
+file(
+    GLOB_RECURSE
+    CXXET_LARGE_BENCH_POSTPROCESS_SOURCES
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_LIST_DIR}/src/*.cxx"
+)
+add_executable(
+    cxxet_large_bench_postprocess
+        "${CMAKE_CURRENT_LIST_DIR}/main.cxx"
+        ${CXXET_LARGE_BENCH_POSTPROCESS_SOURCES}
+)
+target_include_directories(
+    cxxet_large_bench_postprocess
+        PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}/include"
+)
+target_link_libraries(
+    cxxet_large_bench_postprocess
+        PUBLIC
+            nlohmann_json::nlohmann_json
+)
+add_unix_compiler_flags(cxxet_large_bench_postprocess)
+add_sanitizers(cxxet_large_bench_postprocess)
+
+add_dependencies(
+    cxxet_large_benchmarks
+        cxxet_large_bench_postprocess
+)

@@ -19,26 +19,13 @@
 
 #pragma once
 
-namespace cxxet::impl::sink {
+#include <filesystem>
 
-struct properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+#include <nlohmann/json_fwd.hpp>
 
-  [[nodiscard]] static properties const &instance() noexcept;
+namespace cxxet_pp {
 
-#ifndef CXXET_WITH_UNIT_TESTS
-private:
-#endif
-  properties() noexcept;
+void process_benchmark(nlohmann::json &target_array,
+                       std::filesystem::path const &meta_file_path);
 
-private:
-  properties(properties const &) = delete;
-  properties &operator=(properties const &) = delete;
-  properties(properties &&) = delete;
-  properties &operator=(properties &&) = delete;
-};
-
-} // namespace cxxet::impl::sink
+} // namespace cxxet_pp

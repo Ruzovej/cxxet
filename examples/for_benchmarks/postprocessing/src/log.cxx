@@ -17,28 +17,32 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "log.hxx"
 
-namespace cxxet::impl::sink {
+#include <iostream>
 
-struct properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+namespace cxxet_pp {
 
-  [[nodiscard]] static properties const &instance() noexcept;
+static bool verbose{false};
 
-#ifndef CXXET_WITH_UNIT_TESTS
-private:
-#endif
-  properties() noexcept;
+void set_verbose(bool const aVerbose) noexcept { verbose = aVerbose; }
 
-private:
-  properties(properties const &) = delete;
-  properties &operator=(properties const &) = delete;
-  properties(properties &&) = delete;
-  properties &operator=(properties &&) = delete;
-};
+void log(std::string_view const msg, bool const force) {
+  if (verbose || force) {
+    std::cout << msg << '\n';
+  }
+}
+void log_error(std::string_view const msg) {
+  std::cout.flush();
+  std::cerr << msg << '\n';
+}
 
-} // namespace cxxet::impl::sink
+void log_time_diff(std::string_view const msg, long long const begin,
+                   long long const end, bool const force) {
+  if (verbose || force) {
+    std::cout << msg << ": " << static_cast<double>(end - begin) / 1'000'000
+              << " [ms]\n";
+  }
+}
+
+} // namespace cxxet_pp

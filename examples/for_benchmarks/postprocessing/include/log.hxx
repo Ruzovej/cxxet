@@ -19,26 +19,17 @@
 
 #pragma once
 
-namespace cxxet::impl::sink {
+#include <string_view>
 
-struct properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+namespace cxxet_pp {
 
-  [[nodiscard]] static properties const &instance() noexcept;
+void set_verbose(bool const aVerbose) noexcept;
 
-#ifndef CXXET_WITH_UNIT_TESTS
-private:
-#endif
-  properties() noexcept;
+void log(std::string_view const msg, bool const force = false);
 
-private:
-  properties(properties const &) = delete;
-  properties &operator=(properties const &) = delete;
-  properties(properties &&) = delete;
-  properties &operator=(properties &&) = delete;
-};
+void log_error(std::string_view const msg);
 
-} // namespace cxxet::impl::sink
+void log_time_diff(std::string_view const msg, long long const begin,
+                   long long const end, bool const force = false);
+
+} // namespace cxxet_pp

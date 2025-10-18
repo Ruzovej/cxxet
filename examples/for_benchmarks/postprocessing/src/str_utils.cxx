@@ -17,28 +17,18 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "str_utils.hxx"
 
-namespace cxxet::impl::sink {
+namespace cxxet_pp {
 
-struct properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+bool begins_with(std::string_view const str, std::string_view const prefix) {
+  return (str.size() >= prefix.size()) &&
+         (str.compare(0, prefix.size(), prefix) == 0);
+}
 
-  [[nodiscard]] static properties const &instance() noexcept;
+bool ends_with(std::string_view const str, std::string_view const suffix) {
+  return (str.size() >= suffix.size()) &&
+         (str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0);
+}
 
-#ifndef CXXET_WITH_UNIT_TESTS
-private:
-#endif
-  properties() noexcept;
-
-private:
-  properties(properties const &) = delete;
-  properties &operator=(properties const &) = delete;
-  properties(properties &&) = delete;
-  properties &operator=(properties &&) = delete;
-};
-
-} // namespace cxxet::impl::sink
+} // namespace cxxet_pp

@@ -19,26 +19,12 @@
 
 #pragma once
 
-namespace cxxet::impl::sink {
+#include <string_view>
 
-struct properties {
-  long long const time_point_zero_ns;
-  bool verbose;
-  int default_list_node_capacity;
-  char const *default_target_filename;
+namespace cxxet_pp {
 
-  [[nodiscard]] static properties const &instance() noexcept;
+bool begins_with(std::string_view const str, std::string_view const prefix);
 
-#ifndef CXXET_WITH_UNIT_TESTS
-private:
-#endif
-  properties() noexcept;
+bool ends_with(std::string_view const str, std::string_view const suffix);
 
-private:
-  properties(properties const &) = delete;
-  properties &operator=(properties const &) = delete;
-  properties(properties &&) = delete;
-  properties &operator=(properties &&) = delete;
-};
-
-} // namespace cxxet::impl::sink
+} // namespace cxxet_pp
