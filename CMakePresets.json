@@ -18,9 +18,10 @@
             "name": "deploy",
             "inherits": "default",
             "cacheVariables": {
+                "CXXET_BUILD_BENCHMARKS": "OFF",
                 "CXXET_BUILD_EXAMPLES": "OFF",
                 "CXXET_BUILD_TESTS": "OFF",
-                "CXXET_BUILD_BENCHMARKS": "OFF",
+                "CXXET_BUILD_TOOLS": "OFF",
                 "CXXET_OUTPUT_DIRECTORY": "${sourceDir}/bin/deploy",
                 "CMAKE_BUILD_TYPE": "Release"
             }
