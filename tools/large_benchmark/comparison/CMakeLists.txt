@@ -1,29 +1,29 @@
 file(
     GLOB_RECURSE
-    CXXET_LARGE_BENCH_POSTPROCESS_SOURCES
+    CXXET_LARGE_BENCH_COMPARE_SOURCES
         CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_LIST_DIR}/src/*.cxx"
 )
 add_executable(
-    cxxet_large_bench_postprocess
+    cxxet_large_bench_compare
         "${CMAKE_CURRENT_LIST_DIR}/main.cxx"
-        ${CXXET_LARGE_BENCH_POSTPROCESS_SOURCES}
+        ${CXXET_LARGE_BENCH_COMPARE_SOURCES}
 )
 target_include_directories(
-    cxxet_large_bench_postprocess
+    cxxet_large_bench_compare
         PRIVATE
             "${CMAKE_CURRENT_LIST_DIR}/include"
 )
 target_link_libraries(
-    cxxet_large_bench_postprocess
+    cxxet_large_bench_compare
         PRIVATE
             nlohmann_json::nlohmann_json
             cxxet_large_benchmark_common
 )
-add_unix_compiler_flags(cxxet_large_bench_postprocess)
-add_sanitizers(cxxet_large_bench_postprocess)
+add_unix_compiler_flags(cxxet_large_bench_compare)
+add_sanitizers(cxxet_large_bench_compare)
 
 add_dependencies(
     cxxet_large_benchmarks
-        cxxet_large_bench_postprocess
+        cxxet_large_bench_compare
 )

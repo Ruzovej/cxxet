@@ -320,5 +320,5 @@ if (CXXET_BUILD_EXAMPLES AND NOT CXXET_CMAKE_FETCHED)
 endif()
 
 if (CXXET_BUILD_TOOLS AND NOT CXXET_CMAKE_FETCHED)
-    add_subdirectory(tools/large_benchmark/postprocessing)
+    add_subdirectory(tools)
 endif()

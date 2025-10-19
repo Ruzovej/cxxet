@@ -1,0 +1,18 @@
+file(
+    GLOB_RECURSE
+    CXXET_LARGE_BENCHMARK_COMMON_SOURCES
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_LIST_DIR}/src/*.cxx"
+)
+add_library(
+    cxxet_large_benchmark_common
+        SHARED
+            ${CXXET_LARGE_BENCHMARK_COMMON_SOURCES}
+)
+target_include_directories(
+    cxxet_large_benchmark_common
+        PUBLIC
+            "${CMAKE_CURRENT_LIST_DIR}/include"
+)
+add_unix_compiler_flags(cxxet_large_benchmark_common)
+add_sanitizers(cxxet_large_benchmark_common)

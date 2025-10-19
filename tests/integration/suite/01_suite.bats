@@ -1229,6 +1229,7 @@ Deduced CXXET_TARGET_FILENAME: "
             || "${file}" =~ cxxet_unit_tests \
             || "${file}" =~ cxxet_benchmarks \
             || "${file}" =~ cxxet_large_bench_postprocess \
+            || "${file}" =~ cxxet_large_bench_compare \
         ]]; then
             refute_output --partial "libcxxet.so"
         else
