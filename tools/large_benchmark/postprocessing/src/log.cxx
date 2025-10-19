@@ -34,6 +34,7 @@ void log(std::string_view const msg, bool const force) {
     std::cout << msg << '\n';
   }
 }
+
 void log_error(std::string_view const msg) {
   std::cout.flush();
   std::cerr << msg << '\n';
