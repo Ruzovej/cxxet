@@ -21,6 +21,7 @@
 #include <string>
 #include <string_view>
 
+#include "compare.hxx"
 #include "log.hxx"
 
 int main(int const argc, char const *const *const argv) {
@@ -94,6 +95,9 @@ int main(int const argc, char const *const *const argv) {
         !std::filesystem::exists(input_challenger)) {
       throw "input file(s) do not exist";
     }
+
+    cxxet_cmp::compare_files(input_baseline, input_challenger, output,
+                             json_indent);
 
     return EXIT_SUCCESS;
   } catch (std::exception const &e) {

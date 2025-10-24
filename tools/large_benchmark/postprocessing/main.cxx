@@ -223,7 +223,7 @@ int main(int const argc, char const *const *const argv) {
     {
       auto const json_elem_cmp_tuple = [](nlohmann::json const &j) {
         auto const &jbp{j["benchmark_params"]};
-        return std::tuple(j["benchmark_name"].get<std::string_view>(),
+        return std::tuple{j["benchmark_name"].get<std::string_view>(),
                           jbp["num_iters"].get<long long>(),
                           jbp["marker_after_iter"].get<long long>(),
                           jbp["cxxet_reserve_buffer"].get<long long>(),
@@ -231,7 +231,7 @@ int main(int const argc, char const *const *const argv) {
                           jbp["used_lib"].get<std::string_view>(),
                           jbp["subtype"].get<std::string_view>(),
                           jbp["reps_max"].get<long long>(),
-                          jbp["rep_no"].get<long long>());
+                          jbp["rep_no"].get<long long>()};
       };
 
       using cmp_tuple_t = decltype(json_elem_cmp_tuple(benchmarks.front()));

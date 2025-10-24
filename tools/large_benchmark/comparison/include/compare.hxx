@@ -19,6 +19,13 @@
 
 #pragma once
 
+#include <filesystem>
+#include <string_view>
+
 namespace cxxet_cmp {
-// TODO
+
+void compare_files(std::filesystem::path const &baseline,
+                   std::filesystem::path const &challenger,
+                   std::string_view const output, int const json_indent);
+
 } // namespace cxxet_cmp
