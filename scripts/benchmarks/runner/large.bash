@@ -223,7 +223,7 @@ function large() {
     if [[ "${dry_run}" == 'false' ]]; then
         commit_hash_json_file "${out_dir}"
 
-        "${CXXET_ROOT_DIR}/bin/${preset}/cxxet_large_bench_postprocess" --verbose "${out_dir}" >&2
+        "${CXXET_ROOT_DIR}/bin/${preset}/cxxet_large_bench_postprocess" --verbose --jobs 4 "${out_dir}" >&2
 
         if [[ "${compression}" == 'true' ]]; then
             cp "${out_dir}/large.json" "${out_dir}/../large.json"
