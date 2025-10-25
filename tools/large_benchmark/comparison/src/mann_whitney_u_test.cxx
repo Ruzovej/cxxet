@@ -61,7 +61,7 @@ MannWhitneyResult mann_whitney_u_test(std::vector<double> const &sample1,
 
   // Sort by value
   std::sort(combined.begin(), combined.end(),
-            [](const RankedValue &a, const RankedValue &b) {
+            [](RankedValue const &a, RankedValue const &b) {
               return a.value < b.value;
             });
 
