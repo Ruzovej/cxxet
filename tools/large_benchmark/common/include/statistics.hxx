@@ -47,6 +47,10 @@ struct stats {
   double max;
 
   // `std::span` would be nicer ...
+  static stats compute_from(std::vector<double> const &values) {
+    auto copy{values};
+    return compute_from(std::move(copy));
+  }
   static stats compute_from(std::vector<double> &&values);
 };
 

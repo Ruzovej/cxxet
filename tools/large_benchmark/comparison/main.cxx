@@ -23,6 +23,7 @@
 
 #include "compare.hxx"
 #include "log.hxx"
+#include "now.hxx"
 
 int main(int const argc, char const *const *const argv) {
   try {
@@ -96,8 +97,13 @@ int main(int const argc, char const *const *const argv) {
       throw "input file(s) do not exist";
     }
 
+    auto const t0{cxxet_pp::now()};
+
     cxxet_cmp::compare_files(input_baseline, input_challenger, output,
                              json_indent);
+
+    cxxet_pp::log_time_diff("Compared postprocessed benchmark results", t0,
+                            cxxet_pp::now(), true);
 
     return EXIT_SUCCESS;
   } catch (std::exception const &e) {
