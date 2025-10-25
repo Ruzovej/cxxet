@@ -107,18 +107,16 @@ int main(int const argc, char const *const *const argv) {
 
     return EXIT_SUCCESS;
   } catch (std::exception const &e) {
-    cxxet_pp::log_error(
-        "Failed (3) to postprocess \"large\" benchmark results: " +
-        std::string{e.what()});
+    cxxet_pp::log_error("Failed (3) to compare \"large\" benchmark results: " +
+                        std::string{e.what()});
   } catch (std::string const &msg) {
-    cxxet_pp::log_error(
-        "Failed (2) to postprocess \"large\" benchmark results: " + msg);
+    cxxet_pp::log_error("Failed (2) to compare \"large\" benchmark results: " +
+                        msg);
   } catch (char const *const msg) {
-    cxxet_pp::log_error(
-        "Failed (1) to postprocess \"large\" benchmark results: " +
-        std::string{msg});
+    cxxet_pp::log_error("Failed (1) to compare \"large\" benchmark results: " +
+                        std::string{msg});
   } catch (...) {
-    cxxet_pp::log_error("Failed (0) to postprocess \"large\" benchmark "
+    cxxet_pp::log_error("Failed (0) to compare \"large\" benchmark "
                         "results: unknown exception");
   }
   return EXIT_FAILURE;

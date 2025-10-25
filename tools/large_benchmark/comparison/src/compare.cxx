@@ -207,7 +207,7 @@ void compare_files(std::filesystem::path const &baseline,
       "  Challenger better: " + std::to_string(cnt_challenger_better) + " (" +
       std::to_string(pct_challenger_better) + " %)");
   cxxet_pp::log("  Challenger worse: " + std::to_string(cnt_challenger_worse) +
-                " (" + std::to_string(pct_challenger_worse) + "%)");
+                " (" + std::to_string(pct_challenger_worse) + " %)");
 }
 
 } // namespace cxxet_cmp
