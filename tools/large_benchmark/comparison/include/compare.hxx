@@ -23,9 +23,11 @@
 
 namespace cxxet_cmp {
 
-void compare_files(std::filesystem::path const &baseline,
-                   std::filesystem::path const &challenger,
-                   std::filesystem::path const &json_output,
-                   int const json_indent);
+void compare_files(
+    // must be paths to valid postprocessed results:
+    std::filesystem::path const &baseline,
+    std::filesystem::path const &challenger,
+    // may be empty => no JSON output:
+    std::filesystem::path const &json_output, int const json_indent);
 
 } // namespace cxxet_cmp
