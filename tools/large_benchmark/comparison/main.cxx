@@ -28,11 +28,14 @@
 int main(int const argc, char const *const *const argv) {
   try {
     auto const usage = [&]() {
-      cxxet_pp::log("usage: " + std::string{argv[0]} +
-                        " [-v|--verbose] [-h|--help] [-c|--compact] "
-                        "[-o|--out|--out-json <output_file>] "
-                        "<input_file_baseline> <input_file_challenger>",
-                    true);
+      cxxet_pp::log(
+          "usage: " + std::string{argv[0]} +
+              " [-v|--verbose] [-h|--help] [-c|--compact] "
+              "[-o|--out|--out-json <output_file>] "
+              "<input_file_baseline> <input_file_challenger>\n\tproviding the "
+              "same input file twice means comparing the overhead of the "
+              "'cxxet' over 'bare' version",
+          true);
     };
     auto consume_arg = [&usage, argc{argc - 1}, argv{argv + 1}](
                            bool const require = false,

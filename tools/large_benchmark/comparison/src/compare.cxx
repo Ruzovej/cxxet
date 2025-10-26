@@ -301,7 +301,7 @@ void compare_files(std::filesystem::path const &baseline,
     auto &total{results_json["total"]};
     auto const write_total = [&total](std::string_view const key,
                                       long long const val, double const pct) {
-      total[std::string{key}] = {
+      total[key] = {
           {"cnt", val},
           {"pct", pct},
       };
