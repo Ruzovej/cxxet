@@ -106,7 +106,6 @@ void compare_files(std::filesystem::path const &baseline,
                    std::filesystem::path const &challenger,
                    std::filesystem::path const &json_output,
                    int const json_indent) {
-
   static constexpr std::string_view p_eq{"probably_equivalent"};
   static constexpr std::string_view p_chall_better{
       "probably_challenger_better"};
@@ -119,7 +118,7 @@ void compare_files(std::filesystem::path const &baseline,
     results_json = {
         {"comparing",
          {
-             {"mode", "TODO"},
+             {"mode", "TODO"}, // will be filled below ...
              {"inputs", nlohmann::json::array()},
          }},
         {"total", {}},
@@ -214,7 +213,9 @@ void compare_files(std::filesystem::path const &baseline,
       auto const stats_challenger{
           cxxet_pp::stats::compute_from(vals[challenger_ind])};
 
-      bool const challenger_better{stats_challenger.mean < stats_baseline.mean};
+      bool const challenger_better{
+          stats_challenger.mean <
+          stats_baseline.mean}; // isn't this oversimplification?!
 
       if (challenger_better) {
         ++cnt_challenger_better;
@@ -235,9 +236,10 @@ void compare_files(std::filesystem::path const &baseline,
                     ") for measurement " + measurement_key_str);
 
       if (!json_output.empty()) {
-        // even though it's used only one time ... `clangd` got confused by the
-        // nested brackets, etc. and got broken around those strings being
-        // provided directly, at the usage site:
+        // even though they are used only one time, they are inconveniently
+        // defined as `std::string_view`s ... because "current" `clangd` got
+        // confused by the nested brackets, etc. and got broken around those
+        // string literals being provided directly, at the usage site:
         static constexpr std::string_view measurement{"measurement"};
         static constexpr std::string_view challenger_mean{"challenger_mean"};
         static constexpr std::string_view challenger_stddev{
