@@ -118,7 +118,9 @@ void compare_files(std::filesystem::path const &baseline,
     results_json = {
         {"comparing",
          {
-             {"mode", "TODO"}, // will be filled below ...
+             {"mode",
+              "TODO - will be filled below ... if You see this in real "
+              "results, search for this in '" __FILE__ "' and fix it :-)"},
              {"inputs", nlohmann::json::array()},
          }},
         {"total", {}},
@@ -213,9 +215,10 @@ void compare_files(std::filesystem::path const &baseline,
       auto const stats_challenger{
           cxxet_pp::stats::compute_from(vals[challenger_ind])};
 
-      bool const challenger_better{
-          stats_challenger.mean <
-          stats_baseline.mean}; // isn't this oversimplification?!
+      // For performance benchmarks, lower mean (of time, etc.) is considered
+      // better. This silently assumes that compared quantities should be
+      // minimized. This is almost certainly oversimplification.
+      bool const challenger_better{stats_challenger.mean < stats_baseline.mean};
 
       if (challenger_better) {
         ++cnt_challenger_better;
