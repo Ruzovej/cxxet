@@ -1,0 +1,647 @@
+{
+    "benchmarks": [
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 1,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 1.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 2,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 2.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 3,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 3.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 4,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 4.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 5,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 5.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 6,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 6.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 7,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 7.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 8,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 8.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 9,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 9.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 10,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_eq",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 10.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 1,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 1.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 2,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 2.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 3,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 3.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 4,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 4.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 5,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 5.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 6,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 6.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 7,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 7.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 8,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 8.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 9,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 9.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 10,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_baseline_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 10.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 1,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 61.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 2,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 32.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 3,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 34.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 4,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 3.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 5,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 4.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 6,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 17.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 7,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 18.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 8,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 8.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 9,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 10.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_common",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 10,
+                "reps_max": 10,
+                "subtype": "sub_fake_common_challenger_better",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 19.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 1,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 1.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 2,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 2.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 3,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 3.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 4,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 4.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 5,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 5.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 6,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 6.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 7,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 7.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 8,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 8.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 9,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 9.0,
+            "unit": "ns"
+        },
+        {
+            "benchmark_name": "fake_1",
+            "benchmark_params": {
+                "cxxet_reserve_buffer": 3,
+                "marker_after_iter": 2,
+                "num_iters": 50,
+                "num_threads": 4,
+                "rep_no": 10,
+                "reps_max": 10,
+                "subtype": "sub_fake_1",
+                "used_lib": "cxxet"
+            },
+            "file_path_source": "/some/fake/file/1.json",
+            "result": 10.0,
+            "unit": "ns"
+        }
+    ],
+    "context": {
+        "cxxet_git_hash": "abcdef1234567890"
+    }
+}

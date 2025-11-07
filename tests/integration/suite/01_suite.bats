@@ -922,6 +922,35 @@ Deduced CXXET_TARGET_FILENAME: "
     # IMHO unnecessary to test it in more detail ...
 }
 
+@test "Large benchmark result comparison test" {
+    local executable="${BIN_DIR}/cxxet_large_bench_compare"
+    local fake_baseline="${CXXET_ROOT_DIR}/tests/integration/fake_data/large_bench_fake_res_1.json"
+    local fake_challenger="${CXXET_ROOT_DIR}/tests/integration/fake_data/large_bench_fake_res_2.json"
+    local results="${TMP_RESULT_DIR}/large_benchmark_compare_output.json"
+
+    run "${executable}" --verbose --out-json "${results}" "${fake_baseline}" "${fake_challenger}"
+    assert_success
+    refute_sanitizer_output
+    assert [ -f "${results}" ]
+
+    # TODO (https://github.com/Ruzovej/cxxet/issues/188): `sub_fake_common_baseline_better` and `sub_fake_common_challenger_better` shouldn't come out as `EQUIVALENT`!!!
+    assert_output --partial "No challenger data for measurement fake_1 (crb=3, mai=2, nit=50, nths=4, subtype=sub_fake_1, impl=cxxet); skipping comparison"
+    assert_output --partial "No baseline data for measurement fake_2 (crb=3, mai=2, nit=50, nths=4, subtype=sub_fake_2, impl=cxxet); skipping comparison"
+    assert_output --partial "Challenger is most probably EQUIVALENT to baseline for measurement fake_common (crb=3, mai=2, nit=50, nths=4, subtype=sub_fake_common_baseline_better, impl=cxxet)"
+    assert_output --partial "Challenger is most probably EQUIVALENT to baseline for measurement fake_common (crb=3, mai=2, nit=50, nths=4, subtype=sub_fake_common_challenger_better, impl=cxxet)"
+    assert_output --partial "Challenger is most probably EQUIVALENT to baseline for measurement fake_common (crb=3, mai=2, nit=50, nths=4, subtype=sub_fake_common_eq, impl=cxxet)"
+
+    # ditto:
+    assert_output --partial "  Total measurements compared: 5"
+    assert_output --partial "  Missing baseline measurements: 1 (20.000000 %)"
+    assert_output --partial "  Missing challenger measurements: 1 (20.000000 %)"
+    assert_output --partial "  Draws: 3 (60.000000 %)"
+    assert_output --partial "  Challenger better: 0 (0.000000 %)"
+    assert_output --partial "  Challenger worse: 0 (0.000000 %)"
+
+    assert_output --partial "Saved comparison results into ${results}"
+}
+
 # TODO end-user usage:
 # * All event types in one file.
 
@@ -1229,6 +1258,7 @@ Deduced CXXET_TARGET_FILENAME: "
             || "${file}" =~ cxxet_unit_tests \
             || "${file}" =~ cxxet_benchmarks \
             || "${file}" =~ cxxet_large_bench_postprocess \
+            || "${file}" =~ cxxet_large_bench_compare \
         ]]; then
             refute_output --partial "libcxxet.so"
         else

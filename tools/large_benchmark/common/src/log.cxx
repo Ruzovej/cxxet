@@ -17,37 +17,35 @@
   with cxxet. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "log.hxx"
 
-#include <vector>
+#include <iostream>
 
 namespace cxxet_pp {
 
-struct stats {
-  static constexpr int cnt_for_all_percentiles{50};
-  constexpr bool percentiles_near_min_max_meaningful() const noexcept {
-    return cnt_for_all_percentiles <= cnt;
+static bool verbose{false};
+
+void set_verbose(bool const aVerbose) noexcept { verbose = aVerbose; }
+
+bool get_verbose() noexcept { return verbose; }
+
+void log(std::string_view const msg, bool const force) {
+  if (verbose || force) {
+    std::cout << msg << '\n';
   }
+}
 
-  long long cnt;
+void log_error(std::string_view const msg) {
+  std::cout.flush();
+  std::cerr << msg << '\n';
+}
 
-  // 2 values:
-  double mean;
-  double stddev;
-
-  // 7 "percentiles" (very loose use of the properly defined term); only 5,
-  // excluding the "fragile" ones, should be written out if
-  // `percentiles_near_min_max_meaningful() == false`
-  double min;
-  double p02; // fragile
-  double p25;
-  double p50; // median
-  double p75;
-  double p98; // fragile
-  double max;
-
-  // `std::span` would be nicer ...
-  static stats compute_from(std::vector<double> &&values);
-};
+void log_time_diff(std::string_view const msg, long long const begin,
+                   long long const end, bool const force) {
+  if (verbose || force) {
+    std::cout << msg << ": " << static_cast<double>(end - begin) / 1'000'000
+              << " [ms]\n";
+  }
+}
 
 } // namespace cxxet_pp

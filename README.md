@@ -15,6 +15,9 @@ https://docs.github.com/en/get-started/writing-on-github/getting-started-with-wr
     * [Preparing & using `docker` environment](#preparing--using-docker-environment)
       * [Command line](#command-line)
       * [Devcontainer for `VS Code`](#devcontainer-for-vs-code)
+    * [Benchmarking](#benchmarking)
+      * [Micro benchmarks](#micro-benchmarks)
+      * [Large benchmarks](#large-benchmarks)
 * [TODO](#todo)
 
 ## Introduction
@@ -108,6 +111,33 @@ $ ./cxxet_manage.bash docker_devcontainer XYZ
 ```
 
 After this, `VS Code` will offer to reopen the project in the container.
+
+#### Benchmarking
+
+##### Micro benchmarks
+
+TODO ... using `google/benchmark` ...
+
+##### Large benchmarks
+
+First generate some data (or use present one), then adjust the source code and generate "challenger" data, e.g.:
+
+```bash
+$ ./cxxet_manage.bash benchmarks large --out-dir /tmp/baseline -n 10 -c
+...
+# adjust source code, recompile, etc. and measure it again:
+$ ./cxxet_manage.bash benchmarks large --out-dir /tmp/challenger -n 10 -c
+...
+```
+
+Then compare the results, e.g.:
+
+```bash
+$ bin/release/cxxet_large_bench_compare --verbose /tmp/baseline/large.json /tmp/challenger/large.json | less -M
+...
+```
+
+and decide whether the changes were for better or not.
 
 ## TODO
 
