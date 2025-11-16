@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function populate_needed_bash_variables() {
-    local tests_filepath="${1:?No file specified!}"
+    local tests_filepath="${BATS_TEST_FILENAME:?}"
     local tests_filename="$(filename "${tests_filepath}")"
     local tests_name="${tests_filename%.bats}"
 

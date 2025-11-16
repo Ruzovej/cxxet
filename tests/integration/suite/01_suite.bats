@@ -10,7 +10,7 @@ load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 
 function setup_file() {
-    populate_needed_bash_variables "${BATS_TEST_FILENAME:?}"
+    populate_needed_bash_variables
 
     adjust_cxxet_env_variables
 }
