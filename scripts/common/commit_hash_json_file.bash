@@ -13,4 +13,7 @@ function commit_hash_json_file() {
     local result="${git_hash}${git_dirty:+ (dirty)}"
 
     printf '{"context":{"cxxet_git_hash":"%s"}}' "${result}" > "${out_file}"
+
+    export CXXET_CURRENT_COMMIT_HASH="${git_hash}"
+    export CXXET_UNCOMMITED_CHANGES="${git_dirty}"
 }

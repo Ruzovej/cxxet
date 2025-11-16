@@ -68,19 +68,19 @@ function bats_runner() {
         args+=(--jobs "$(nproc)")
     fi
 
+    export TMP_RESULT_DIR_BASE="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_bats"
+    mkdir -p "${TMP_RESULT_DIR_BASE}"
+
+    commit_hash_json_file "${TMP_RESULT_DIR_BASE}"
+
+    local reports_folder="${TMP_RESULT_DIR_BASE}/bats_reports"
+    mkdir -p "${reports_folder}"
+    args+=(
+        --output "${reports_folder}"
+    )
+
     (
         initialize_bats
-
-        export TMP_RESULT_DIR_BASE="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_bats"
-        
-        local reports_folder="${TMP_RESULT_DIR_BASE}/bats_reports"
-        mkdir -p "${reports_folder}"
-        args+=(
-            --output "${reports_folder}"
-        )
-
-        export CXXET_CURRENT_COMMIT_HASH="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD)"
-        export CXXET_UNCOMMITED_CHANGES="$(git -C "${CXXET_ROOT_DIR}" status --porcelain)"
 
         local preset
         for preset in "${test_presets[@]}"; do
