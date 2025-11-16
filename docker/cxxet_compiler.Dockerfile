@@ -12,7 +12,7 @@ RUN apt update \
         abigail-tools \
         ca-certificates \
         clang-${CLANG_VERSION} \
-# TODO (https://github.com/Ruzovej/cxxet/issues/11) maybe fix exact version, so reformats doesn't happen "unexpectedly":
+# TODO (https://github.com/Ruzovej/cxxet/issues/11) maybe fix exact version, so reformats don't happen "unexpectedly":
         clang-format-${CLANG_VERSION} \
         cmake \
         curl \
@@ -42,6 +42,8 @@ RUN apt update \
         ssh-client \
         strace \
         vim \
+# for `filename`:
+        wcstools \
         zstd \
     && rm -rf /var/lib/apt/lists/*
 

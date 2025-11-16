@@ -8,6 +8,7 @@ cxxet_include scripts/tests/initialize_bats
 
 function bats_runner() {
     cxxet_require_command \
+        filename \
         jq \
         nm \
         parallel \
@@ -84,10 +85,12 @@ function bats_runner() {
 
         local preset
         for preset in "${test_presets[@]}"; do
-            printf -- '-=-=-=-=-=-=-=- Building needed targets (preset %s) for bats tests:\n' "${preset}" >&2
+            export CXXET_PRESET="${preset}"
+
+            printf -- '-=-=-=-=-=-=-=- Building needed targets (preset %s) for bats tests:\n' "${CXXET_PRESET}" >&2
             compile \
                 --quiet \
-                --preset "${preset}" \
+                --preset "${CXXET_PRESET}" \
                 --target infra_sanitizer_check \
                 --target cxxet_examples \
                 --target cxxet_unit_tests \
@@ -95,11 +98,13 @@ function bats_runner() {
                 --last-defines \
                 --ignore-compile_commands >&2
 
-            export CXXET_PRESET="${preset}"
-            export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
-            mkdir -p "${TMP_RESULT_DIR}"
+            # TODO remove this later ... `Large benchmark correctness test ...` fail without it
+            (
+                export TMP_RESULT_DIR_TO_REMOVE="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
+                mkdir -p "${TMP_RESULT_DIR_TO_REMOVE}"
 
-            commit_hash_json_file "${TMP_RESULT_DIR}"
+                commit_hash_json_file "${TMP_RESULT_DIR_TO_REMOVE}"
+            )
 
             printf -- '-=-=-=-=-=-=-=- Executing bats tests:\n' >&2
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive "${CXXET_ROOT_DIR}/tests/integration/suite"
