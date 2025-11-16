@@ -1,7 +1,8 @@
 #!/usr/bin/env bats
 
-load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
+load "${BATS_HELPER_DIRECTORY}/bats-support/load"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/adjust_cxxet_env_variables"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 
 function setup_file() {
@@ -9,9 +10,8 @@ function setup_file() {
         skip "this should test only 'release' build(s), current preset is '${CXXET_PRESET}'"
     fi
 
-    export CXXET_VERBOSE=1
-    export CXXET_DEFAULT_BLOCK_SIZE=2 # torture it little bit
-    export CXXET_TARGET_FILENAME='' # by default disable dumping events into "implicit" file
+    adjust_cxxet_env_variables
+
     export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/03_cmake_fetch_cxxet_indirect_usage"
     mkdir -p "${TMP_RESULT_DIR}"
 
