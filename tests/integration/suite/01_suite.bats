@@ -2,16 +2,16 @@
 
 # TODO rename this file
 
-load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
-load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
+load "${BATS_HELPER_DIRECTORY}/bats-support/load"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/adjust_cxxet_env_variables"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 
 function setup_file() {
+    adjust_cxxet_env_variables
+    
     export BIN_DIR="${CXXET_ROOT_DIR}/bin/${CXXET_PRESET}"
-    export CXXET_VERBOSE=1
-    export CXXET_DEFAULT_BLOCK_SIZE=2
-    export CXXET_TARGET_FILENAME='' # by default disable dumping events into "implicit" file
 
     user_log "# using tmp dir '%s'\n" "${TMP_RESULT_DIR}"
 }
