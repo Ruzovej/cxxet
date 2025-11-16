@@ -25,12 +25,12 @@ function teardown() {
 
 function teardown_file() {
     :
-    #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
+    #user_log "# results from this run are in '%s'\n" "${CXXET_RESULTS_DIR}"
 }
 
 # TODO move out this test case to its own `*.bats` file & extract the binary from `CMakeLists.txt` to it's own, standalone one
 @test "Sanitizers work as expected" {
-    local san_check="${BIN_DIR}/infra_sanitizer_check"
+    local san_check="${CXXET_BIN_DIR}/infra_sanitizer_check"
     if [[ "${CXXET_PRESET}" =~ asan* ]]; then
         run "${san_check}" asan
         assert_failure
@@ -77,8 +77,8 @@ function teardown_file() {
 }
 
 @test "Duration markers example" {
-    local executable="${BIN_DIR}/cxxet_example_duration_1"
-    local result="${TMP_RESULT_DIR}/example_duration.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_duration_1"
+    local result="${CXXET_RESULTS_DIR}/example_duration.json"
 
     run "${executable}_bare"
     assert_success
@@ -106,8 +106,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Complete markers example" {
-    local executable="${BIN_DIR}/cxxet_example_complete_1"
-    local result="${TMP_RESULT_DIR}/example_complete.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_complete_1"
+    local result="${CXXET_RESULTS_DIR}/example_complete.json"
 
     run "${executable}_bare"
     assert_success
@@ -135,8 +135,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Instant markers example 1" {
-    local executable="${BIN_DIR}/cxxet_example_instant_1"
-    local result="${TMP_RESULT_DIR}/example_instant_1.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_instant_1"
+    local result="${CXXET_RESULTS_DIR}/example_instant_1.json"
 
     run "${executable}_bare"
     assert_success
@@ -164,8 +164,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Instant markers example 2" {
-    local executable="${BIN_DIR}/cxxet_example_instant_2"
-    local result="${TMP_RESULT_DIR}/example_instant_2.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_instant_2"
+    local result="${CXXET_RESULTS_DIR}/example_instant_2.json"
 
     run "${executable}_bare"
     assert_success
@@ -197,8 +197,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Counter markers example 1" {
-    local executable="${BIN_DIR}/cxxet_example_counter_1"
-    local result="${TMP_RESULT_DIR}/example_counter_1.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_counter_1"
+    local result="${CXXET_RESULTS_DIR}/example_counter_1.json"
 
     run "${executable}_bare"
     assert_success
@@ -232,8 +232,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Counter markers example 2" {
-    local executable="${BIN_DIR}/cxxet_example_counter_2"
-    local result="${TMP_RESULT_DIR}/example_counter_2.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_counter_2"
+    local result="${CXXET_RESULTS_DIR}/example_counter_2.json"
 
     run "${executable}_bare"
     assert_success
@@ -265,8 +265,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Metadata markers example" {
-    local executable="${BIN_DIR}/cxxet_example_metadata_1"
-    local result="${TMP_RESULT_DIR}/example_metadata_1.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_metadata_1"
+    local result="${CXXET_RESULTS_DIR}/example_metadata_1.json"
 
     run "${executable}_bare" "${result}"
     assert_success
@@ -310,8 +310,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Categories example 1 - basic registration and event categorization" {
-    local executable="${BIN_DIR}/cxxet_example_categories_1"
-    local result="${TMP_RESULT_DIR}/example_categories_1.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_categories_1"
+    local result="${CXXET_RESULTS_DIR}/example_categories_1.json"
 
     run "${executable}_bare" "${result}"
     assert_success
@@ -347,8 +347,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Categories example 2 - registration fails with invalid name" {
-    local executable="${BIN_DIR}/cxxet_example_fail_categories_2"
-    local result="${TMP_RESULT_DIR}/example_fail_categories_2.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_fail_categories_2"
+    local result="${CXXET_RESULTS_DIR}/example_fail_categories_2.json"
 
     run "${executable}_bare" "${result}"
     assert_success
@@ -368,8 +368,8 @@ terminate called after throwing an instance of 'std::runtime_error'
 }
 
 @test "Categories example 3 - registration fails with invalid flag" {
-    local executable="${BIN_DIR}/cxxet_example_fail_categories_3"
-    local result="${TMP_RESULT_DIR}/example_fail_categories_3.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_fail_categories_3"
+    local result="${CXXET_RESULTS_DIR}/example_fail_categories_3.json"
 
     run "${executable}_bare" "${result}"
     assert_success
@@ -389,8 +389,8 @@ terminate called after throwing an instance of 'std::runtime_error'
 }
 
 @test "Categories example 4 - registration fails with duplicate flag" {
-    local executable="${BIN_DIR}/cxxet_example_fail_categories_4"
-    local result="${TMP_RESULT_DIR}/example_fail_categories_4.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_fail_categories_4"
+    local result="${CXXET_RESULTS_DIR}/example_fail_categories_4.json"
 
     run "${executable}_bare" "${result}"
     assert_success
@@ -410,9 +410,9 @@ terminate called after throwing an instance of 'std::runtime_error'
 }
 
 @test "Custom file_sink redirection example 1" {
-    local executable="${BIN_DIR}/cxxet_example_local_file_sink_1"
-    local result1="${TMP_RESULT_DIR}/example_local_file_sink_1_A.json"
-    local result2="${TMP_RESULT_DIR}/example_local_file_sink_1_B.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_local_file_sink_1"
+    local result1="${CXXET_RESULTS_DIR}/example_local_file_sink_1_A.json"
+    local result2="${CXXET_RESULTS_DIR}/example_local_file_sink_1_B.json"
 
     run "${executable}_bare"
     assert_success
@@ -447,9 +447,9 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Custom file_sink redirection example 2" {
-    local executable="${BIN_DIR}/cxxet_example_local_file_sink_2"
-    local result1="${TMP_RESULT_DIR}/example_local_file_sink_2_A.json"
-    local result2="${TMP_RESULT_DIR}/example_local_file_sink_2_B.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_local_file_sink_2"
+    local result1="${CXXET_RESULTS_DIR}/example_local_file_sink_2_A.json"
+    local result2="${CXXET_RESULTS_DIR}/example_local_file_sink_2_B.json"
 
     run "${executable}_bare"
     assert_success
@@ -484,9 +484,9 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Custom file_sink redirection example 3" {
-    local executable="${BIN_DIR}/cxxet_example_local_file_sink_3"
-    local result1="${TMP_RESULT_DIR}/example_local_file_sink_3_A.json"
-    local result2="${TMP_RESULT_DIR}/example_local_file_sink_3_B.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_local_file_sink_3"
+    local result1="${CXXET_RESULTS_DIR}/example_local_file_sink_3_A.json"
+    local result2="${CXXET_RESULTS_DIR}/example_local_file_sink_3_B.json"
 
     run "${executable}_bare"
     assert_success
@@ -521,8 +521,8 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Custom file_sink & cascade_sink redirection example 4" {
-    local executable="${BIN_DIR}/cxxet_example_local_file_sink_4"
-    local result="${TMP_RESULT_DIR}/example_local_file_sink_4.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_local_file_sink_4"
+    local result="${CXXET_RESULTS_DIR}/example_local_file_sink_4.json"
 
     run "${executable}_bare"
     assert_success
@@ -550,7 +550,7 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Custom file_sink & custom writer example 5" {
-    local executable="${BIN_DIR}/cxxet_example_local_file_sink_5"
+    local executable="${CXXET_BIN_DIR}/cxxet_example_local_file_sink_5"
 
     run "${executable}_bare"
     assert_success
@@ -582,10 +582,10 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 1 (cxxet_bench_mt_counter)" {
-    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_1"
+    local result_base="${CXXET_RESULTS_DIR}/example_large_benchmark_1"
     local num_iters=50
     local num_threads=4
-    local executable="${BIN_DIR}/cxxet_bench_mt_counter"
+    local executable="${CXXET_BIN_DIR}/cxxet_bench_mt_counter"
 
     local args=(
         "${num_iters}"
@@ -628,7 +628,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${output_file2}")" "$(( num_iters * num_threads ))"
 
     local pp_file="${result_base}_pp.json"
-    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -649,10 +649,10 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 2 (cxxet_bench_st_instant)" {
-    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_2"
+    local result_base="${CXXET_RESULTS_DIR}/example_large_benchmark_2"
     local num_iters=50
     local num_threads=1
-    local executable="${BIN_DIR}/cxxet_bench_st_instant"
+    local executable="${CXXET_BIN_DIR}/cxxet_bench_st_instant"
 
     local args=(
         "${num_iters}"
@@ -695,7 +695,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -715,10 +715,10 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 3 (cxxet_bench_st_guarded_instant)" {
-    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_3"
+    local result_base="${CXXET_RESULTS_DIR}/example_large_benchmark_3"
     local num_iters=50
     local num_threads=1
-    local executable="${BIN_DIR}/cxxet_bench_st_guarded_instant"
+    local executable="${CXXET_BIN_DIR}/cxxet_bench_st_guarded_instant"
 
     local args=(
         "${num_iters}"
@@ -762,7 +762,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -784,10 +784,10 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 4 (cxxet_bench_st_complete)" {
-    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_4"
+    local result_base="${CXXET_RESULTS_DIR}/example_large_benchmark_4"
     local num_iters=50
     local num_threads=1
-    local executable="${BIN_DIR}/cxxet_bench_st_complete"
+    local executable="${CXXET_BIN_DIR}/cxxet_bench_st_complete"
 
     local args=(
         "${num_iters}"
@@ -830,7 +830,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -852,10 +852,10 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark correctness test 5 (cxxet_bench_st_duration)" {
-    local result_base="${TMP_RESULT_DIR}/example_large_benchmark_5"
+    local result_base="${CXXET_RESULTS_DIR}/example_large_benchmark_5"
     local num_iters=50
     local num_threads=1
-    local executable="${BIN_DIR}/cxxet_bench_st_duration"
+    local executable="${CXXET_BIN_DIR}/cxxet_bench_st_duration"
 
     local args=(
         "${num_iters}"
@@ -899,7 +899,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -922,10 +922,10 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Large benchmark result comparison test" {
-    local executable="${BIN_DIR}/cxxet_large_bench_compare"
+    local executable="${CXXET_BIN_DIR}/cxxet_large_bench_compare"
     local fake_baseline="${CXXET_ROOT_DIR}/tests/integration/fake_data/large_bench_fake_res_1.json"
     local fake_challenger="${CXXET_ROOT_DIR}/tests/integration/fake_data/large_bench_fake_res_2.json"
-    local results="${TMP_RESULT_DIR}/large_benchmark_compare_output.json"
+    local results="${CXXET_RESULTS_DIR}/large_benchmark_compare_output.json"
 
     run "${executable}" --verbose --out-json "${results}" "${fake_baseline}" "${fake_challenger}"
     assert_success
@@ -954,8 +954,8 @@ Deduced CXXET_TARGET_FILENAME: "
 # * All event types in one file.
 
 @test "Initialization alone" {
-    local executable="${BIN_DIR}/cxxet_test_init"
-    local result="${TMP_RESULT_DIR}/example_test_init.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_test_init"
+    local result="${CXXET_RESULTS_DIR}/example_test_init.json"
 
     run "${executable}_bare" "${result}"
     assert_success
@@ -987,11 +987,11 @@ Deduced CXXET_TARGET_FILENAME: "
         skip "strace doesn't work with sanitizers"
     fi
 
-    local executable="${BIN_DIR}/cxxet_test_empty_file"
+    local executable="${CXXET_BIN_DIR}/cxxet_test_empty_file"
 
     # bare
 
-    local strace_output_file1="${TMP_RESULT_DIR}/cxxet_test_empty_file.strace.1"
+    local strace_output_file1="${CXXET_RESULTS_DIR}/cxxet_test_empty_file.strace.1"
     run strace -o "${strace_output_file1}" "${executable}_bare"
     assert_success
     refute_sanitizer_output
@@ -1002,7 +1002,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     # discarding all events
 
-    local strace_output_file2="${TMP_RESULT_DIR}/cxxet_test_empty_file.strace.2"
+    local strace_output_file2="${CXXET_RESULTS_DIR}/cxxet_test_empty_file.strace.2"
     run strace -o "${strace_output_file2}" "${executable}"
     assert_success
     refute_sanitizer_output
@@ -1016,8 +1016,8 @@ Deduced CXXET_TARGET_FILENAME: "
 
     # specifying file, but no events recorded -> no file created
 
-    local strace_output_file3="${TMP_RESULT_DIR}/cxxet_test_empty_file.strace.3"
-    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.json"
+    local strace_output_file3="${CXXET_RESULTS_DIR}/cxxet_test_empty_file.strace.3"
+    local output_file="${CXXET_RESULTS_DIR}/cxxet_test_empty_file.json"
     export CXXET_TARGET_FILENAME="${output_file}"
     run strace -o "${strace_output_file3}" "${executable}"
     assert_success
@@ -1033,7 +1033,7 @@ Deduced CXXET_TARGET_FILENAME: ${output_file}"
 }
 
 @test "Implicit file - default and modified behavior" {
-    local executable="${BIN_DIR}/cxxet_test_empty_file"
+    local executable="${CXXET_BIN_DIR}/cxxet_test_empty_file"
 
     unset CXXET_TARGET_FILENAME # reset to default (empty) value
 
@@ -1048,7 +1048,7 @@ Deduced CXXET_TARGET_FILENAME: ${output_file}"
     assert_output --partial "Deduced CXXET_DEFAULT_BLOCK_SIZE: 2
 Deduced CXXET_TARGET_FILENAME: /tmp/cxxet_default.pid{pid}.json.XXXXXX"
 
-    local output_file="${TMP_RESULT_DIR}/cxxet_test_empty_file.pid{pid}.json.XXXXXX"
+    local output_file="${CXXET_RESULTS_DIR}/cxxet_test_empty_file.pid{pid}.json.XXXXXX"
     export CXXET_TARGET_FILENAME="${output_file}"
     run "${executable}"
     assert_success
@@ -1059,10 +1059,10 @@ Deduced CXXET_TARGET_FILENAME: ${output_file}"
 }
 
 @test "Split recorded events into multiple files" {
-    local executable="${BIN_DIR}/cxxet_test_split_files"
-    local result1="${TMP_RESULT_DIR}/example_test_split_1.json"
-    local result2="${TMP_RESULT_DIR}/example_test_split_2.json"
-    local result3="${TMP_RESULT_DIR}/example_test_split_3.json"
+    local executable="${CXXET_BIN_DIR}/cxxet_test_split_files"
+    local result1="${CXXET_RESULTS_DIR}/example_test_split_1.json"
+    local result2="${CXXET_RESULTS_DIR}/example_test_split_2.json"
+    local result3="${CXXET_RESULTS_DIR}/example_test_split_3.json"
 
     run "${executable}_bare" "${result1}" "${result2}" "${result3}"
     assert_success
@@ -1093,7 +1093,7 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Provide custom writer to global/default file_sink" {
-    local executable="${BIN_DIR}/cxxet_custom_writer"
+    local executable="${CXXET_BIN_DIR}/cxxet_custom_writer"
 
     run "${executable}_bare"
     assert_success
@@ -1119,9 +1119,9 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Properly read env. variables" {
-    local executable="${BIN_DIR}/cxxet_test_reading_env"
+    local executable="${CXXET_BIN_DIR}/cxxet_test_reading_env"
 
-    local result1="${TMP_RESULT_DIR}/example_test_reading_env_1.json"
+    local result1="${CXXET_RESULTS_DIR}/example_test_reading_env_1.json"
     export CXXET_TARGET_FILENAME="${result1}"
     run "${executable}_bare"
     assert_success
@@ -1130,7 +1130,7 @@ Deduced CXXET_TARGET_FILENAME: "
 
     refute [ -f "${result1}" ]
 
-    local result2="${TMP_RESULT_DIR}/example_test_reading_env_2.json"
+    local result2="${CXXET_RESULTS_DIR}/example_test_reading_env_2.json"
     export CXXET_TARGET_FILENAME="${result2}"
     export CXXET_DEFAULT_BLOCK_SIZE=1
     run "${executable}"
@@ -1145,7 +1145,7 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result2}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result2}")" 1
 
-    local result3="${TMP_RESULT_DIR}/example_test_reading_env_3.json"
+    local result3="${CXXET_RESULTS_DIR}/example_test_reading_env_3.json"
     export CXXET_VERBOSE=0
     export CXXET_TARGET_FILENAME="${result3}"
     run "${executable}"
@@ -1159,7 +1159,7 @@ Deduced CXXET_TARGET_FILENAME: ${result2}"
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${result3}")" 1
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${result3}")" 1
 
-    local result4="${TMP_RESULT_DIR}/example_test_reading_env_4.pid{pid}.json.XXXXXX"
+    local result4="${CXXET_RESULTS_DIR}/example_test_reading_env_4.pid{pid}.json.XXXXXX"
     export CXXET_VERBOSE=1
     export CXXET_DEFAULT_BLOCK_SIZE=40
     export CXXET_TARGET_FILENAME="${result4}"
@@ -1195,7 +1195,7 @@ Deduced CXXET_TARGET_FILENAME: ${result5}"
 }
 
 @test "Suboptimal initialization 1" {
-    local executable="${BIN_DIR}/cxxet_test_suboptimal_init_1"
+    local executable="${CXXET_BIN_DIR}/cxxet_test_suboptimal_init_1"
 
     run "${executable}" 
     refute_sanitizer_output
@@ -1205,7 +1205,7 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Suboptimal initialization 2" {
-    local executable="${BIN_DIR}/cxxet_test_suboptimal_init_2"
+    local executable="${CXXET_BIN_DIR}/cxxet_test_suboptimal_init_2"
 
     run "${executable}" # no output file -> writes to `stdout`
     refute_sanitizer_output
@@ -1217,7 +1217,7 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Shared library symbol visibility" {
-    local shared_lib="${BIN_DIR}/libcxxet.so"
+    local shared_lib="${CXXET_BIN_DIR}/libcxxet.so"
 
     if ! [[ -f "${shared_lib}" ]]; then
         skip "shared lib. not found - probably built as a static library"
@@ -1233,11 +1233,11 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Unit tests runner contains expected symbols" {
-    if ! [[ -f "${BIN_DIR}/libcxxet.so" ]]; then
+    if ! [[ -f "${CXXET_BIN_DIR}/libcxxet.so" ]]; then
         skip "shared lib. not found - probably built as a static library"
     fi
 
-    run nm -C "${BIN_DIR}/cxxet_unit_tests"
+    run nm -C "${CXXET_BIN_DIR}/cxxet_unit_tests"
     assert_success
     # contains internal implementation symbols & `doctest` stuff:
     assert_output --partial "cxxet::impl::"
@@ -1245,11 +1245,11 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Examples & unit test runner properly depend on shared library if built this way" {
-    if ! [[ -f "${BIN_DIR}/libcxxet.so" ]]; then
+    if ! [[ -f "${CXXET_BIN_DIR}/libcxxet.so" ]]; then
         skip "shared lib. not found - probably built as a static library"
     fi
 
-    for file in "${BIN_DIR}"/cxxet_*; do
+    for file in "${CXXET_BIN_DIR}"/cxxet_*; do
         # user_log "# checking file '%s'\n" "${file}"
         run ldd "${file}"
         assert_success
