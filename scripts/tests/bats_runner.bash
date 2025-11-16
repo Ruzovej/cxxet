@@ -84,7 +84,7 @@ function bats_runner() {
 
         local preset
         for preset in "${test_presets[@]}"; do
-            printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for bats tests:\n' "${preset}" >&2
+            printf -- '-=-=-=-=-=-=-=- Building needed targets (preset %s) for bats tests:\n' "${preset}" >&2
             compile \
                 --quiet \
                 --preset "${preset}" \
@@ -101,7 +101,7 @@ function bats_runner() {
 
             commit_hash_json_file "${TMP_RESULT_DIR}"
 
-            printf -- '-=-=-=-=-=-=-=- Executing %s bats tests:\n' "${preset}" >&2
+            printf -- '-=-=-=-=-=-=-=- Executing bats tests:\n' >&2
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive "${CXXET_ROOT_DIR}/tests/integration/suite"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/01_suite.bats"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/02_cmake_fetch_cxxet_direct_usage.bats"

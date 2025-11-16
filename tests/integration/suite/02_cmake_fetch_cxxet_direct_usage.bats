@@ -6,7 +6,7 @@ load "${CUSTOM_BATS_HELPERS_DIRECTORY}/adjust_cxxet_env_variables"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 
 function setup_file() {
-    if [[ "${CXXET_PRESET:-release}" != 'release' ]]; then
+    if [[ "${CXXET_PRESET}" != 'release' ]]; then
         skip "this should test only 'release' build(s), current preset is '${CXXET_PRESET}'"
     fi
 
@@ -29,7 +29,7 @@ function setup_file() {
         -S "${CXXET_ROOT_DIR}/examples/cmake_fetch_content/direct_usage" \
         -B "${CXXET_BUILD_DIR}" \
         -G "Unix Makefiles" \
-        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_BUILD_TYPE="${CXXET_PRESET}" \
         -DCXXET_ROOT_DIR="${CXXET_ROOT_DIR}" \
         -DCXXET_TAG="${CXXET_CURRENT_COMMIT_HASH}"
     user_log 'done\n'
