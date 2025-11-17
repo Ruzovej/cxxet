@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
 
-function populate_needed_bash_variables() {
+# TODO (https://github.com/Ruzovej/cxxet/issues/202) ...
+function prepare_CXXET_RESULTS_DIR() {
     local tests_filepath="${BATS_TEST_FILENAME:?}"
     local tests_filename="$(filename "${tests_filepath}")"
     local tests_name="${tests_filename%.bats}"
-
-    export CXXET_BIN_DIR="${CXXET_ROOT_DIR}/bin/${CXXET_PRESET}"
-    # must have been already created, and should contain (not checked here ...) compiled binaries, etc.:
-    assert [ -d "${CXXET_BIN_DIR}" ]
 
     export CXXET_RESULTS_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/${tests_name:?No test name derived!}"
     mkdir -p "${CXXET_RESULTS_DIR}"

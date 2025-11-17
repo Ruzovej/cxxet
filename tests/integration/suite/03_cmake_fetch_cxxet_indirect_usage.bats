@@ -3,16 +3,16 @@
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
 load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/adjust_cxxet_env_variables"
-load "${CUSTOM_BATS_HELPERS_DIRECTORY}/populate_needed_bash_variables"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/prepare_CXXET_RESULTS_DIR"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/skip_for_preset_other_than"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 
 function setup_file() {
     skip_for_preset_other_than release
 
-    populate_needed_bash_variables
-
     adjust_cxxet_env_variables
+
+    prepare_CXXET_RESULTS_DIR
 
     export CXXET_TMP_BUILD_DIR="${CXXET_RESULTS_DIR}/build"
 
