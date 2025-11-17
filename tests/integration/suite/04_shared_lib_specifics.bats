@@ -7,6 +7,11 @@ load "${CUSTOM_BATS_HELPERS_DIRECTORY}/populate_CXXET_BIN_DIR"
 
 function setup_file() {
     populate_CXXET_BIN_DIR
+
+    if [[ ! -f "${CXXET_BIN_DIR}/libcxxet.so" ]]; then
+        assert [ -f "${CXXET_BIN_DIR}/libcxxet.a" ]
+        skip "shared lib. not found - built as a static library"
+    fi
 }
 
 function setup() {
@@ -24,10 +29,6 @@ function teardown_file() {
 @test "Shared library symbol visibility" {
     local shared_lib="${CXXET_BIN_DIR}/libcxxet.so"
 
-    if ! [[ -f "${shared_lib}" ]]; then
-        skip "shared lib. not found - probably built as a static library"
-    fi
-
     run nm -D -C "${shared_lib}"
     assert_success
     # only those symbols should be exported - more detailed checks are done via `abidiff` (see `scripts/commands/abi_check.bash`):
@@ -35,13 +36,10 @@ function teardown_file() {
     # those definitely not:
     refute_output --partial "doctest::"
     refute_output --partial "cxxet::impl::"
+    refute_output --partial "benchmark::"
 }
 
 @test "Unit tests runner contains expected symbols" {
-    if ! [[ -f "${CXXET_BIN_DIR}/libcxxet.so" ]]; then
-        skip "shared lib. not found - probably built as a static library"
-    fi
-
     run nm -C "${CXXET_BIN_DIR}/cxxet_unit_tests"
     assert_success
     # contains internal implementation symbols & `doctest` stuff:
@@ -49,11 +47,15 @@ function teardown_file() {
     assert_output --partial "doctest::"
 }
 
-@test "Examples & unit test runner properly depend on shared library if built this way" {
-    if ! [[ -f "${CXXET_BIN_DIR}/libcxxet.so" ]]; then
-        skip "shared lib. not found - probably built as a static library"
-    fi
+@test "Micro benchmarks runner contains expected symbols" {
+    run nm -C "${CXXET_BIN_DIR}/cxxet_benchmarks"
+    assert_success
+    # contains internal implementation symbols & `google benchmark` stuff:
+    assert_output --partial "cxxet::impl::"
+    assert_output --partial "benchmark::"
+}
 
+@test "Examples & unit test runner properly depend on shared library if built this way" {
     for file in "${CXXET_BIN_DIR}"/cxxet_*; do
         # user_log "# checking file '%s'\n" "${file}"
         run ldd "${file}"
