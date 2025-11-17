@@ -27,9 +27,7 @@ function teardown_file() {
 }
 
 @test "Shared library symbol visibility" {
-    local shared_lib="${CXXET_BIN_DIR}/libcxxet.so"
-
-    run nm -D -C "${shared_lib}"
+    run nm -D -C "${CXXET_BIN_DIR}/libcxxet.so"
     assert_success
     # only those symbols should be exported - more detailed checks are done via `abidiff` (see `scripts/commands/abi_check.bash`):
     assert_output --partial "cxxet::"
