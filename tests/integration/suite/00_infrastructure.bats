@@ -49,21 +49,6 @@ function teardown_file() {
         #assert_output --partial 'ThreadSanitizer: reported 2 warnings'
         assert_output --partial 'ThreadSanitizer: reported'
     else
-        # well, to be precise, each consists of "undefined behavior" so it's just a lucky coincidence that it succeeds:
-        run "${san_check}" tsan
-        assert_success
-        assert_output ''
-
-        run "${san_check}" ubsan
-        assert_success
-        assert_output ''
-
-        run "${san_check}" asan
-        assert_success
-        assert_output ''
-
-        run "${san_check}" lsan
-        assert_success
-        assert_output ''
+        skip "sanitizers not enabled in this preset (${CXXET_PRESET})"
     fi
 }
