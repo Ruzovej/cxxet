@@ -5,14 +5,17 @@
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
 load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/adjust_cxxet_env_variables"
-load "${CUSTOM_BATS_HELPERS_DIRECTORY}/populate_needed_bash_variables"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/populate_CXXET_BIN_DIR"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/prepare_CXXET_RESULTS_DIR"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/refute_sanitizer_output"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 
 function setup_file() {
-    populate_needed_bash_variables
-
     adjust_cxxet_env_variables
+
+    populate_CXXET_BIN_DIR
+
+    prepare_CXXET_RESULTS_DIR
 }
 
 function setup() {
