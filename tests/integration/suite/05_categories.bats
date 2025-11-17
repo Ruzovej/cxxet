@@ -31,7 +31,7 @@ function teardown_file() {
     #user_log "# results from this run are in '%s'\n" "${CXXET_RESULTS_DIR}"
 }
 
-@test "Categories example 1 - basic registration and event categorization" {
+@test "Example 1 - basic registration and event categorization" {
     local executable="${CXXET_BIN_DIR}/cxxet_example_categories_1"
     local result="${CXXET_RESULTS_DIR}/example_categories_1.json"
 
@@ -68,7 +68,7 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.name == "6 Uncategorized operation (ignoring unknown categories)")] | .[0] | has("cat")' "${result}")" 'false'
 }
 
-@test "Categories example 2 - registration fails with invalid name" {
+@test "Example 2 - registration fails with invalid name" {
     local executable="${CXXET_BIN_DIR}/cxxet_example_fail_categories_2"
     local result="${CXXET_RESULTS_DIR}/example_fail_categories_2.json"
 
@@ -89,7 +89,7 @@ terminate called after throwing an instance of 'std::runtime_error'
     refute [ -f "${result}" ]
 }
 
-@test "Categories example 3 - registration fails with invalid flag" {
+@test "Example 3 - registration fails with invalid flag" {
     local executable="${CXXET_BIN_DIR}/cxxet_example_fail_categories_3"
     local result="${CXXET_RESULTS_DIR}/example_fail_categories_3.json"
 
@@ -110,7 +110,7 @@ terminate called after throwing an instance of 'std::runtime_error'
     refute [ -f "${result}" ]
 }
 
-@test "Categories example 4 - registration fails with duplicate flag" {
+@test "Example 4 - registration fails with duplicate flag" {
     local executable="${CXXET_BIN_DIR}/cxxet_example_fail_categories_4"
     local result="${CXXET_RESULTS_DIR}/example_fail_categories_4.json"
 
