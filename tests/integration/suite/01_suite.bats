@@ -28,7 +28,6 @@ function teardown() {
 
 function teardown_file() {
     :
-    #user_log "# results from this run are in '%s'\n" "${CXXET_RESULTS_DIR}"
 }
 
 @test "Duration markers example" {
