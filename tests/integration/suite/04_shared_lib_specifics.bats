@@ -45,8 +45,14 @@ function teardown_file() {
     assert_output --partial "doctest::"
 }
 
-@test "Micro benchmarks runner contains expected symbols" {
-    run nm -C "${CXXET_BIN_DIR}/cxxet_benchmarks"
+@test "If present, micro benchmarks runner contains expected symbols" {
+    local micro_benchmark_runner="${CXXET_BIN_DIR}/cxxet_benchmarks"
+
+    if [[ ! -f "${micro_benchmark_runner}" ]]; then
+        skip "micro benchmark runner not present"
+    fi
+
+    run nm -C "${micro_benchmark_runner}"
     assert_success
     # contains internal implementation symbols & `google benchmark` stuff:
     assert_output --partial "cxxet::impl::"

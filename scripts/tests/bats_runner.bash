@@ -91,10 +91,10 @@ function bats_runner() {
             compile \
                 --quiet \
                 --preset "${CXXET_PRESET}" \
-                --target infra_sanitizer_check \
                 --target cxxet_examples \
-                --target cxxet_unit_tests \
                 --target cxxet_large_benchmarks \
+                --target cxxet_unit_tests \
+                --target infra_sanitizer_check \
                 --last-defines \
                 --ignore-compile_commands >&2
 
