@@ -1,7 +1,5 @@
 #!/usr/bin/env bats
 
-# TODO rename this file
-
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
 load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/adjust_cxxet_env_variables"
