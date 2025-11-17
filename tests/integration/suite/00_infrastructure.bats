@@ -20,7 +20,7 @@ function teardown_file() {
     :
 }
 
-# TODO (https://github.com/Ruzovej/cxxet/issues/203) extract the binary from `CMakeLists.txt` to it's own, standalone one
+# TODO (https://github.com/Ruzovej/cxxet/issues/203) extract the binary from `CMakeLists.txt` to its own, standalone one
 @test "Sanitizers work as expected" {
     local san_check="${CXXET_BIN_DIR}/infra_sanitizer_check"
     if [[ "${CXXET_PRESET}" =~ asan* ]]; then
