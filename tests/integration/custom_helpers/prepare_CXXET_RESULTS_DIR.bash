@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# TODO (https://github.com/Ruzovej/cxxet/issues/202) ...
 function prepare_CXXET_RESULTS_DIR() {
     local tests_filepath="${BATS_TEST_FILENAME:?}"
     local tests_filename="$(filename "${tests_filepath}")"
