@@ -628,7 +628,10 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "C")] | length' "${output_file2}")" "$(( num_iters * num_threads ))"
 
     local pp_file="${result_base}_pp.json"
-    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" \
+        --git-commit-hash-file "${CXXET_RESULTS_DIR}/../../commit_hash.json" \
+        --out-json "${pp_file}" \
+        "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -695,7 +698,10 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "i")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" \
+        --git-commit-hash-file "${CXXET_RESULTS_DIR}/../../commit_hash.json" \
+        --out-json "${pp_file}" \
+        "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -762,7 +768,10 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" \
+        --git-commit-hash-file "${CXXET_RESULTS_DIR}/../../commit_hash.json" \
+        --out-json "${pp_file}" \
+        "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -830,7 +839,10 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "X")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" \
+        --git-commit-hash-file "${CXXET_RESULTS_DIR}/../../commit_hash.json" \
+        --out-json "${pp_file}" \
+        "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]
@@ -899,7 +911,10 @@ Deduced CXXET_TARGET_FILENAME: "
     assert_equal "$(jq -e '[.traceEvents[] | select(.ph == "E")] | length' "${output_file2}")" "${num_iters}"
 
     local pp_file="${result_base}_pp.json"
-    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" --out-json "${pp_file}" "${meta_file1}" "${meta_file2}"
+    run "${CXXET_BIN_DIR}/cxxet_large_bench_postprocess" \
+        --git-commit-hash-file "${CXXET_RESULTS_DIR}/../../commit_hash.json" \
+        --out-json "${pp_file}" \
+        "${meta_file1}" "${meta_file2}"
     assert_success
     refute_sanitizer_output
     assert [ -f "${pp_file}" ]

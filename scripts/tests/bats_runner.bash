@@ -98,14 +98,6 @@ function bats_runner() {
                 --last-defines \
                 --ignore-compile_commands >&2
 
-            # TODO remove this later ... `Large benchmark correctness test ...` fail without it
-            (
-                export TMP_RESULT_DIR_TO_REMOVE="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
-                mkdir -p "${TMP_RESULT_DIR_TO_REMOVE}"
-
-                commit_hash_json_file "${TMP_RESULT_DIR_TO_REMOVE}"
-            )
-
             printf -- '-=-=-=-=-=-=-=- Executing bats tests:\n' >&2
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive "${CXXET_ROOT_DIR}/tests/integration/suite"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/01_suite.bats"
