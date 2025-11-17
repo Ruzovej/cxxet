@@ -8,6 +8,7 @@ cxxet_include scripts/tests/initialize_bats
 
 function bats_runner() {
     cxxet_require_command \
+        filename \
         jq \
         nm \
         parallel \
@@ -68,26 +69,28 @@ function bats_runner() {
         args+=(--jobs "$(nproc)")
     fi
 
+    export TMP_RESULT_DIR_BASE="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_bats"
+    mkdir -p "${TMP_RESULT_DIR_BASE}"
+
+    commit_hash_json_file "${TMP_RESULT_DIR_BASE}"
+
+    local reports_folder="${TMP_RESULT_DIR_BASE}/bats_reports"
+    mkdir -p "${reports_folder}"
+    args+=(
+        --output "${reports_folder}"
+    )
+
     (
         initialize_bats
 
-        export TMP_RESULT_DIR_BASE="${CXXET_ROOT_DIR}/tmp/$(date +%Y-%m-%dT%H-%M-%S)_bats"
-        
-        local reports_folder="${TMP_RESULT_DIR_BASE}/bats_reports"
-        mkdir -p "${reports_folder}"
-        args+=(
-            --output "${reports_folder}"
-        )
-
-        export CXXET_CURRENT_COMMIT_HASH="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD)"
-        export CXXET_UNCOMMITED_CHANGES="$(git -C "${CXXET_ROOT_DIR}" status --porcelain)"
-
         local preset
         for preset in "${test_presets[@]}"; do
-            printf -- '-=-=-=-=-=-=-=- Building needed targets (with preset %s) for bats tests:\n' "${preset}" >&2
+            export CXXET_PRESET="${preset}"
+
+            printf -- '-=-=-=-=-=-=-=- Building needed targets (preset %s) for bats tests:\n' "${CXXET_PRESET}" >&2
             compile \
                 --quiet \
-                --preset "${preset}" \
+                --preset "${CXXET_PRESET}" \
                 --target infra_sanitizer_check \
                 --target cxxet_examples \
                 --target cxxet_unit_tests \
@@ -95,13 +98,7 @@ function bats_runner() {
                 --last-defines \
                 --ignore-compile_commands >&2
 
-            export CXXET_PRESET="${preset}"
-            export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/01_suite"
-            mkdir -p "${TMP_RESULT_DIR}"
-
-            commit_hash_json_file "${TMP_RESULT_DIR}"
-
-            printf -- '-=-=-=-=-=-=-=- Executing %s bats tests:\n' "${preset}" >&2
+            printf -- '-=-=-=-=-=-=-=- Executing bats tests:\n' >&2
             "${BATS_EXECUTABLE}" "${args[@]}" --recursive "${CXXET_ROOT_DIR}/tests/integration/suite"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/01_suite.bats"
             #"${BATS_EXECUTABLE}" "${args[@]}" "${CXXET_ROOT_DIR}/tests/integration/suite/02_cmake_fetch_cxxet_direct_usage.bats"

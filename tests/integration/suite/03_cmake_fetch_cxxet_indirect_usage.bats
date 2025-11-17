@@ -1,35 +1,34 @@
 #!/usr/bin/env bats
 
-load "${BATS_HELPER_DIRECTORY}/bats-support/load"
 load "${BATS_HELPER_DIRECTORY}/bats-assert/load"
+load "${BATS_HELPER_DIRECTORY}/bats-support/load"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/adjust_cxxet_env_variables"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/populate_needed_bash_variables"
+load "${CUSTOM_BATS_HELPERS_DIRECTORY}/skip_for_preset_other_than"
 load "${CUSTOM_BATS_HELPERS_DIRECTORY}/user_log"
 
 function setup_file() {
-    if [[ "${CXXET_PRESET:-release}" != 'release' ]]; then
-        skip "this should test only 'release' build(s), current preset is '${CXXET_PRESET}'"
-    fi
+    skip_for_preset_other_than release
 
-    export CXXET_VERBOSE=1
-    export CXXET_DEFAULT_BLOCK_SIZE=2 # torture it little bit
-    export CXXET_TARGET_FILENAME='' # by default disable dumping events into "implicit" file
-    export TMP_RESULT_DIR="${TMP_RESULT_DIR_BASE}/${CXXET_PRESET}/03_cmake_fetch_cxxet_indirect_usage"
-    mkdir -p "${TMP_RESULT_DIR}"
+    populate_needed_bash_variables
 
-    user_log "# using tmp dir '%s', repository in '%s' and testing its commit '%s'%s\n" \
-        "${TMP_RESULT_DIR}" \
+    adjust_cxxet_env_variables
+
+    export CXXET_TMP_BUILD_DIR="${CXXET_RESULTS_DIR}/build"
+
+    user_log "# repository is in '%s', testing commit '%s'%s, build will be in '%s'\n" \
         "${CXXET_ROOT_DIR}" \
         "${CXXET_CURRENT_COMMIT_HASH:?}" \
-        "${CXXET_UNCOMMITED_CHANGES:+", !!! BUT BEWARE, THERE ARE UNCOMMITTED CHANGES THAT WON'T BE 'FETCH_CONTENT-ED' !!!"}"
-
-    export CXXET_BUILD_DIR="${TMP_RESULT_DIR}/build"
+        "${CXXET_UNCOMMITED_CHANGES:+" !!! BUT BEWARE, THERE ARE UNCOMMITTED CHANGES THAT WON'T BE 'FETCH_CONTENT-ED' !!!"}" \
+        "${CXXET_TMP_BUILD_DIR}"
 
     # When using `Ninja`, `compile_commands.json` contains a bit different paths -> default generator is fixed
     user_log "# configuring and building cxxet cmake fetch_content examples ... "
     run cmake \
         -S "${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage" \
-        -B "${CXXET_BUILD_DIR}" \
+        -B "${CXXET_TMP_BUILD_DIR}" \
         -G "Unix Makefiles" \
-        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_BUILD_TYPE="${CXXET_PRESET}" \
         -DCXXET_ROOT_DIR="${CXXET_ROOT_DIR}" \
         -DCXXET_TAG="${CXXET_CURRENT_COMMIT_HASH}"
     user_log 'done\n'
@@ -37,14 +36,14 @@ function setup_file() {
     #user_log '%s\n' "${output}"
 
     run cmake \
-        --build "${CXXET_BUILD_DIR}" \
+        --build "${CXXET_TMP_BUILD_DIR}" \
         -j "$(nproc)"
     assert_success
     #user_log '%s\n' "${output}"
 
-    export CXXET_EXAMPLE_SO="${CXXET_BUILD_DIR}/libcxxet_fetch_content_shared_lib_example_foo.so"
-    export CXXET_EXAMPLE_SO_BARE="${CXXET_BUILD_DIR}/libcxxet_fetch_content_shared_lib_example_foo_bare.so"
-    export CXXET_EXAMPLE_EXECUTABLE="${CXXET_BUILD_DIR}/cxxet_fetch_content_indirect_usage_example"
+    export CXXET_EXAMPLE_SO="${CXXET_TMP_BUILD_DIR}/libcxxet_fetch_content_shared_lib_example_foo.so"
+    export CXXET_EXAMPLE_SO_BARE="${CXXET_TMP_BUILD_DIR}/libcxxet_fetch_content_shared_lib_example_foo_bare.so"
+    export CXXET_EXAMPLE_EXECUTABLE="${CXXET_TMP_BUILD_DIR}/cxxet_fetch_content_indirect_usage_example"
     export CXXET_EXAMPLE_EXECUTABLE_BARE="${CXXET_EXAMPLE_EXECUTABLE}_bare"
 }
 
@@ -58,14 +57,14 @@ function teardown() {
 
 function teardown_file() {
     :
-    #user_log "# results from this run are in '%s'\n" "${TMP_RESULT_DIR}"
+    #user_log "# results from this run are in '%s'\n" "${CXXET_RESULTS_DIR}"
 }
 
 @test "Check build properties described in generated 'compile_commands.json'" {
-    local compile_commands="${CXXET_BUILD_DIR}/compile_commands.json"
+    local compile_commands="${CXXET_TMP_BUILD_DIR}/compile_commands.json"
     assert [ -f "${compile_commands}" ]
 
-    local cxxet_lib_source_files=("$(find "${CXXET_BUILD_DIR}/_deps/cxxet-src/src/" -type f -name '*.cxx')")
+    local cxxet_lib_source_files=("$(find "${CXXET_TMP_BUILD_DIR}/_deps/cxxet-src/src/" -type f -name '*.cxx')")
     local num_cxxet_lib_source_files="$(printf '%s\n' "${cxxet_lib_source_files[@]}" | wc -l)"
     local num_examples_built=4 # `num. examples` * 2 (for regular & bare version)
     local expected_num_source_files="$((num_cxxet_lib_source_files + num_examples_built))"
@@ -74,14 +73,14 @@ function teardown_file() {
     assert_equal "$(jq -e 'length' "${compile_commands}")" "${expected_num_source_files}"
 
     # "custom" executables source files:
-    assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | length" "${compile_commands}")" "${num_examples_built}"
+    assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_TMP_BUILD_DIR}\") ] | length" "${compile_commands}")" "${num_examples_built}"
 
-    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage/indirect_usage.cxx\",\"${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage/shared_lib_foo.cxx\"]"
+    assert_equal "$(jq -e -c "[ .[] | select(.directory == \"${CXXET_TMP_BUILD_DIR}\") ] | map(.file) | unique | sort" "${compile_commands}")" "[\"${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage/indirect_usage.cxx\",\"${CXXET_ROOT_DIR}/examples/cmake_fetch_content/indirect_usage/shared_lib_foo.cxx\"]"
 
     # fetched `cxxet` source files:
-    assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}/_deps/cxxet-build\") ] | length" "${num_cxxet_lib_source_files}")"
+    assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_TMP_BUILD_DIR}/_deps/cxxet-build\") ] | length" "${num_cxxet_lib_source_files}")"
 
-    assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_BUILD_DIR}/_deps/cxxet-build\") ] | map(.file) | unique | sort" "${compile_commands}" | grep -c "${CXXET_BUILD_DIR}/_deps/cxxet-src/src")" "${num_cxxet_lib_source_files}"
+    assert_equal "$(jq -e "[ .[] | select(.directory == \"${CXXET_TMP_BUILD_DIR}/_deps/cxxet-build\") ] | map(.file) | unique | sort" "${compile_commands}" | grep -c "${CXXET_TMP_BUILD_DIR}/_deps/cxxet-src/src")" "${num_cxxet_lib_source_files}"
 }
 
 @test "Shared lib. with tracing contains expected cxxet symbols" {
@@ -110,7 +109,7 @@ function teardown_file() {
     run ldd "${CXXET_EXAMPLE_EXECUTABLE}"
     assert_success
     assert_output --partial "libcxxet.so"
-    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO}")" # NOTE on ubuntu: `$ sudo apt install wcstools`
+    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO}")"
 }
 
 @test "Shared lib. with disabled tracing doesn't contain any cxxet symbols" {
@@ -139,11 +138,11 @@ function teardown_file() {
     run ldd "${CXXET_EXAMPLE_EXECUTABLE_BARE}"
     assert_success
     refute_output --partial "libcxxet.so"
-    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO_BARE}")" # NOTE on ubuntu: `$ sudo apt install wcstools`
+    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO_BARE}")"
 }
 
 @test "Using 'fetch_content-ed' cxxet to trace executable" {
-    local result="${TMP_RESULT_DIR}/traced.json"
+    local result="${CXXET_RESULTS_DIR}/traced.json"
     refute [ -f "${result}" ]
 
     run "${CXXET_EXAMPLE_EXECUTABLE}" "${result}"
@@ -164,7 +163,7 @@ Deduced CXXET_TARGET_FILENAME: "
 }
 
 @test "Using 'fetch_content-ed' cxxet_bare to not trace executable" {
-    local target_file="${TMP_RESULT_DIR}/bare.json"
+    local target_file="${CXXET_RESULTS_DIR}/bare.json"
 
     run "${CXXET_EXAMPLE_EXECUTABLE_BARE}" "${target_file}"
     assert_success

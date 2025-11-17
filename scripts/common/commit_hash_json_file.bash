@@ -8,9 +8,12 @@ function commit_hash_json_file() {
     local out_file="${1:?}/commit_hash.json"
 
     local git_hash="$(git -C "${CXXET_ROOT_DIR}" rev-parse HEAD 2>/dev/null || printf "N/A")"
-    local git_dirty="$(git -C "${CXXET_ROOT_DIR}" diff --shortstat)"
+    local git_dirty="$(git -C "${CXXET_ROOT_DIR}" status --porcelain 2>/dev/null)"
 
     local result="${git_hash}${git_dirty:+ (dirty)}"
 
     printf '{"context":{"cxxet_git_hash":"%s"}}' "${result}" > "${out_file}"
+
+    export CXXET_CURRENT_COMMIT_HASH="${git_hash}"
+    export CXXET_UNCOMMITED_CHANGES="${git_dirty}"
 }

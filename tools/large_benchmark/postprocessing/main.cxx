@@ -23,6 +23,7 @@
 #include <filesystem>
 #include <fstream>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -38,11 +39,13 @@
 int main(int const argc, char const *const *const argv) {
   try {
     auto const usage = [&]() {
-      cxxet_pp::log("usage: " + std::string{argv[0]} +
-                        " [-v|--verbose] [-h|--help] [-c|--compact] [-j|--jobs "
-                        "<N>] <-o|--out|--out-json <output_file> "
-                        "<input_file_1> [<input_file_2>] ...|<input_dir>>",
-                    true);
+      cxxet_pp::log(
+          "usage: " + std::string{argv[0]} +
+              " [-v|--verbose] [-h|--help] [-g|--git-commit-hash-file <file>]"
+              " [-c|--compact] [-j|--jobs <N>]"
+              " <<-o|--out|--out-json <output_file>"
+              " <input_file_1> [<input_file_2> ...]>|<input_dir>>",
+          true);
     };
     auto consume_arg = [&usage, argc{argc - 1}, argv{argv + 1}](
                            bool const require = false,
@@ -64,6 +67,7 @@ int main(int const argc, char const *const *const argv) {
 
     std::string_view output;
     std::vector<std::string_view> rest;
+    std::optional<std::filesystem::path> file_with_hash;
     rest.reserve(static_cast<std::size_t>(std::max(argc - 3, 1)));
     int json_indent{2};
     // anything negative means unbounded
@@ -88,6 +92,12 @@ int main(int const argc, char const *const *const argv) {
             consume_arg(true, arg); // ignore repetitions - use the latest value
       } else if (arg == "-c" || arg == "--compact") {
         json_indent = -1;
+      } else if (arg == "-g" || arg == "--git-commit-hash-file") {
+        file_with_hash.emplace(consume_arg(true, arg));
+        if (!std::filesystem::exists(*file_with_hash)) {
+          throw "git commit hash file '" + file_with_hash->string() +
+              "' does not exist";
+        }
       } else if (arg == "-j" || arg == "--jobs") {
         auto const num_jobs_str{consume_arg(true, arg)};
         auto const [_, ec] = std::from_chars(num_jobs_str.cbegin(),
@@ -107,8 +117,18 @@ int main(int const argc, char const *const *const argv) {
     }
 
     std::filesystem::path output_file;
-    std::optional<std::filesystem::path> file_with_hash;
     std::vector<std::filesystem::path> input_files;
+
+    const auto adjust_commit_hash_file_path_if_empty =
+        [&file_with_hash](std::filesystem::path &&path) {
+          if (file_with_hash == std::nullopt) {
+            file_with_hash.emplace(std::move(path));
+
+            if (!std::filesystem::exists(*file_with_hash)) {
+              file_with_hash.reset();
+            }
+          }
+        };
 
     if (output.empty()) {
       output_file = rest.front();
@@ -119,8 +139,8 @@ int main(int const argc, char const *const *const argv) {
 
       output_file /= "large.json";
 
-      file_with_hash.emplace(std::filesystem::path{rest.front()} /
-                             "commit_hash.json");
+      adjust_commit_hash_file_path_if_empty(
+          std::filesystem::path{rest.front()} / "commit_hash.json");
 
       for (auto const &entry :
            std::filesystem::directory_iterator{rest.front()}) {
@@ -129,15 +149,12 @@ int main(int const argc, char const *const *const argv) {
     } else {
       output_file = output;
 
-      file_with_hash.emplace(output_file.parent_path() / "commit_hash.json");
+      adjust_commit_hash_file_path_if_empty(output_file.parent_path() /
+                                            "commit_hash.json");
 
       for (auto const &strv : rest) {
         input_files.emplace_back(strv);
       }
-    }
-
-    if (!std::filesystem::exists(*file_with_hash)) {
-      file_with_hash.reset();
     }
 
     auto const t0{cxxet_pp::now()};
