@@ -109,7 +109,7 @@ function teardown_file() {
     run ldd "${CXXET_EXAMPLE_EXECUTABLE}"
     assert_success
     assert_output --partial "libcxxet.so"
-    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO}")" # NOTE on ubuntu: `$ sudo apt install wcstools`
+    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO}")"
 }
 
 @test "Shared lib. with disabled tracing doesn't contain any cxxet symbols" {
@@ -138,7 +138,7 @@ function teardown_file() {
     run ldd "${CXXET_EXAMPLE_EXECUTABLE_BARE}"
     assert_success
     refute_output --partial "libcxxet.so"
-    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO_BARE}")" # NOTE on ubuntu: `$ sudo apt install wcstools`
+    assert_output --partial "$(filename "${CXXET_EXAMPLE_SO_BARE}")"
 }
 
 @test "Using 'fetch_content-ed' cxxet to trace executable" {
